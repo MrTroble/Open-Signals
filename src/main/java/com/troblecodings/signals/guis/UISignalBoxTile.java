@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -12,6 +14,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
@@ -19,6 +22,7 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
@@ -45,7 +49,6 @@ public class UISignalBoxTile extends UIComponentEntity {
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
     private final Map<ModeSet, SignalState> greenSignals = new HashMap<>();
-    private final UITrainNumber uiTrainNumber = new UITrainNumber();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
@@ -88,7 +91,7 @@ public class UISignalBoxTile extends UIComponentEntity {
             rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) Math.PI / 2.0f));
             entity.add(rotation);
         }
-        entity.add(new UIIndependentTranslate(0, 0, 1));
+        entity.add(new UIIndependentTranslate(0, 0, modeSet.mode.translation + 1));
 
         SignalState state = greenSignals.getOrDefault(modeSet, SignalState.RED);
         if (modeSet.mode.equals(EnumGuiMode.RS)) {
@@ -97,11 +100,11 @@ public class UISignalBoxTile extends UIComponentEntity {
             if (setToEntity.containsKey(hpMode)) {
                 if (hpState.equals(SignalState.RED)) {
                     switch (state) {
-                        case SUBSIDIARY_RED:
-                        case GREEN: {
+                        case SUBSIDIARY_RED: {
                             hpState = SignalState.SUBSIDIARY_RED;
                             break;
                         }
+                        case GREEN:
                         case SUBSIDIARY_OFF: {
                             hpState = SignalState.SUBSIDIARY_OFF;
                             break;
@@ -116,6 +119,18 @@ public class UISignalBoxTile extends UIComponentEntity {
                 localRemove(modeSet);
                 updateModeSet(hpMode);
                 return;
+            }
+        }
+
+        if (modeSet.mode.equals(EnumGuiMode.TRAIN_NUMBER)) {
+            final TrainNumber number = node.getOption(modeSet).get()
+                    .getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+            if (!number.equals(TrainNumber.DEFAULT)) {
+                final UIEntity label = GuiElements.createLabel(number.trainNumber,
+                        ConfigHandler.CLIENT.signalboxTrainnumberColor.get(), 0.5f);
+                label.setX(6);
+                label.setY(3);
+                entity.add(label);
             }
         }
 
@@ -145,6 +160,13 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void updateEvent(final UpdateEvent event) {
         super.updateEvent(event);
         this.update();
+    }
+
+    @Override
+    public void draw(final DrawInfo info) {
+        info.alphaOn();
+        super.draw(info);
+        info.alphaOff();
     }
 
     private void localRemove(final ModeSet modeSet) {
@@ -187,15 +209,6 @@ public class UISignalBoxTile extends UIComponentEntity {
         final UIEntity entity = setToEntity.get(mode);
         if (entity != null) {
             entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
-        }
-    }
-
-    public void updateTrainNumber() {
-        this.getParent().remove(uiTrainNumber);
-        final TrainNumber number = this.node.getTrainNumber();
-        uiTrainNumber.setTrainNumber(number);
-        if (!number.trainNumber.isEmpty()) {
-            this.getParent().add(uiTrainNumber);
         }
     }
 }

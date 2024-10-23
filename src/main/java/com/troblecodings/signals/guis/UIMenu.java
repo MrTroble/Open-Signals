@@ -4,13 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.KeyEvent;
+import com.troblecodings.guilib.ecs.entitys.UIScrollBox;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
+import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
+import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -29,11 +33,17 @@ public class UIMenu extends UIComponentEntity {
 
     public UIMenu() {
         super(new UIEntity());
-        entity.setHeight(20);
-        entity.setWidth(22 * EnumGuiMode.values().length);
-        entity.setX(2);
-        entity.setY(2);
-        entity.add(new UIBox(UIBox.HBOX, 2));
+        entity.setInheritWidth(true);
+        entity.setHeight(32);
+        entity.add(new UIBox(UIBox.VBOX, 0));
+        entity.add(new UIScissor());
+
+        final UIEntity list = new UIEntity();
+        entity.add(list);
+        list.setInherits(true);
+
+        final UIScrollBox scrollbox = new UIScrollBox(UIBox.HBOX, 2);
+        list.add(scrollbox);
         for (final EnumGuiMode mode : EnumGuiMode.values()) {
             final UIEntity preview = new UIEntity();
             preview.add(new UIColor(0xFFAFAFAF));
@@ -46,9 +56,15 @@ public class UIMenu extends UIComponentEntity {
             if (mode.ordinal() == this.selection)
                 preview.add(new UIBorder(0xFF00FF00, 1));
             preview.add(new UIClickable(e -> updateSelection(mode)));
-            entity.add(preview);
+            list.add(preview);
             modeForEntity.put(mode, preview);
         }
+        final UIScroll scroll = new UIScroll();
+        final UIEntity scrollBar = GuiElements.createScrollBar(scrollbox, 10, scroll);
+        scrollbox.setConsumer(i -> {
+        });
+        entity.add(scroll);
+        entity.add(scrollBar);
     }
 
     private void updateSelection(final EnumGuiMode newMode) {
@@ -65,7 +81,11 @@ public class UIMenu extends UIComponentEntity {
     @Override
     public void update() {
         this.entity.onAdd(this.getParent());
-        super.update();
+        entity.setHeight(32);
+        entity.setWidth(parent.getWidth() - 4);
+        entity.setX(entity.getX() + 1);
+        entity.setY(entity.getY() + 1);
+        entity.update();
     }
 
     public int getSelection() {

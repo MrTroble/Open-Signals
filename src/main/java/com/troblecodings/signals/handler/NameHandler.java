@@ -23,9 +23,11 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.NameStateListener;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
+import com.troblecodings.signals.enums.ChangedState;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
@@ -52,8 +54,10 @@ public final class NameHandler implements INetworkSync {
 
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static final Map<StateInfo, List<LoadHolder<?>>> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
+    private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -89,7 +93,7 @@ public final class NameHandler implements INetworkSync {
             final PlayerEntity creator) {
         if (info.world.isClientSide || name == null)
             return;
-        new Thread(() -> {
+        THREAD_SERVICE.execute(() -> {
             setNameForNonSignal(info, name);
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -97,7 +101,7 @@ public final class NameHandler implements INetworkSync {
                 LOAD_COUNTER.put(info, list);
             }
             createToFile(info, name);
-        }, "OSNameHandler:createName").start();
+        });
     }
 
     public static void setNameForSignal(final StateInfo info, final String name) {
@@ -114,12 +118,12 @@ public final class NameHandler implements INetworkSync {
     public static void setNameForNonSignal(final StateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
-        new Thread(() -> {
+        THREAD_SERVICE.execute(() -> {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
             sendToAll(info, name);
-        }, "OSNameHandler:setName").start();
+        });
     }
 
     public static String getName(final StateInfo info) {
@@ -144,6 +148,31 @@ public final class NameHandler implements INetworkSync {
         buffer.putBoolean(false);
         buffer.putString(name);
         return buffer.build();
+    }
+
+    public static boolean isNameLoaded(final StateInfo info) {
+        synchronized (ALL_NAMES) {
+            return ALL_NAMES.containsKey(info);
+        }
+    }
+
+    public static void runTaskWhenNameLoaded(final StateInfo info,
+            final NameStateListener listener) {
+        if (!info.isValid() || info.isWorldNullOrClientSide())
+            return;
+        if (isNameLoaded(info)) {
+            synchronized (ALL_NAMES) {
+                listener.update(info, ALL_NAMES.get(info), ChangedState.UPDATED);
+            }
+        } else {
+            synchronized (TASKS_WHEN_LOAD) {
+                final List<NameStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
+                        _u -> new ArrayList<>());
+                if (!list.contains(listener)) {
+                    list.add(listener);
+                }
+            }
+        }
     }
 
     public static void setRemoved(final StateInfo info) {
@@ -308,7 +337,7 @@ public final class NameHandler implements INetworkSync {
             final @Nullable PlayerEntity player) {
         if (infos == null || infos.isEmpty())
             return;
-        new Thread(() -> {
+        THREAD_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
@@ -344,8 +373,15 @@ public final class NameHandler implements INetworkSync {
                     ALL_NAMES.put(info.info, name);
                 }
                 sendToAll(info.info, name);
+                synchronized (TASKS_WHEN_LOAD) {
+                    final List<NameStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
+                    if (tasks != null) {
+                        tasks.forEach(listener -> listener.update(info.info, name,
+                                ChangedState.ADDED_TO_CACHE));
+                    }
+                }
             });
-        }, "NameHandler:loadNames").start();
+        });
     }
 
     public static void unloadName(final StateLoadHolder holder) {

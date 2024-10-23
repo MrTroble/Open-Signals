@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -151,6 +152,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void setSignals(final SignalStateInfo lastSignal) {
+        if (tile == null || isExecutingSignalSet)
+            return;
         final StateInfo identifier = new StateInfo(tile.getLevel(), tile.getBlockPos());
         if (lastSignal != null && pathwayToReset != null) {
             final Signal signal = SignalBoxHandler.getSignal(identifier, lastSignal.pos);
@@ -197,8 +200,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (!lastSignal.state.equals(previous))
                 greenSignals.add(lastSignal);
         }
-        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
-        distantSignalPositions.values().forEach(position -> {
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
+                .getOtherSignals();
+        distantSignalPositions.forEach((holder, position) -> {
+            if (holder.shouldTurnSignalOff()) {
+                position.state = SignalState.OFF;
+                greenSignals.add(position);
+                return;
+            }
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
             if (lastSignal != null && next != null && !next.isEmptyOrBroken()) {

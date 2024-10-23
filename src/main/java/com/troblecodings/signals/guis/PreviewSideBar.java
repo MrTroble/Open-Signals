@@ -32,7 +32,7 @@ public class PreviewSideBar {
                 .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * MODIFIER, 0))));
 
         blockRenderEntity.add(new UIScissor());
-        blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        blockRenderEntity.add(new UIColor(0xFF8B8B8B));
         blockRenderEntity.add(blockRender);
     }
 

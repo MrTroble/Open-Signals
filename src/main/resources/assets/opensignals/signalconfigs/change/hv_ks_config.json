@@ -7,6 +7,8 @@
     },
     "values": {
 
+        "map(drive)": ["distantsignal.VR1"],
+
         "(config(zs3.Z1) || config(zs3plate.Z1))": ["zs3v.Z1", "distantsignal.VR2"],
         "(config(zs3.Z2) || config(zs3plate.Z2))": ["zs3v.Z2", "distantsignal.VR2"],
         "(config(zs3.Z3) || config(zs3plate.Z3))": ["zs3v.Z3", "distantsignal.VR2"],
@@ -24,7 +26,6 @@
         "(config(zs3.Z15) || config(zs3plate.Z15))": ["zs3v.Z15", "distantsignal.VR1"],
 
         "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
-        "map(drive)": ["distantsignal.VR1"],
         "signalRepeater(true)": ["vrlight.true"],
 
         "speed(<.1) || speed(>.15)": ["stopsignal.HP1", "hphome.HP1", "hpblock.HP1"],
