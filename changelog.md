@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.12.2 - 3.6.2]
+* feat: added train length signs
+* feat: added trainnumber element
+* feat: added configurable shunting pw color
+* feat: added system to select pathway type when several are possible
+* fix: problems with 'dead signal'
+* fix: end is not a valid end point
+* fix: disappearing signals in signalbox
+* fix: issue in signal configs
+* fix: skipping same signals
+* fix: issue with names not shown every time
+* fix: issue with trainnumbers
+* fix: problem with shunting and normal pathway
+* fix: UI line and background coloring
+* fix: issue with delay intersignalbox pathway
+* fix: issue with wrong feedback signal
+* fix: intersignalbox can be added to saver
+* fix: delay with shunting pathway
+* fix: wn signals
+* fix: item dropping
+* fix: sh statuslight wrong lamp
+* fix: issues with intersignalbox pathway
+* fix: not updating signals in signalbox
+* ref: remove CUSTOMNAME from saving into files
+* ref: better signalbox UI
+* ref: better error handling
+* ref: better code performance
+* ref: added arrow to possible shunting pathway end
+* ref: better signalbox NBT saving
+* ref: better signalbox loading system for names and signals
+
 ## [1.12.2 - 3.6.1]
 * fix: issues with InterSignalBoxPathways
 * fix: issue with Zs3V in HV

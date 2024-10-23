@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -85,7 +84,7 @@ public class SidePanel {
         helpPage.add(new UIBox(UIBox.VBOX, 2));
 
         final UIRotate rotate = new UIRotate();
-        rotate.setRotateZ((float) 90);
+        rotate.setRotateZ(90);
         label.add(rotate);
         final UILabel labelComponent = new UILabel(I18Wrapper.format("info.infolabel"));
         labelComponent.setTextColor(new UIEntity().getBasicTextColor());
@@ -112,7 +111,7 @@ public class SidePanel {
         spacerEntity.add(new UIBox(UIBox.VBOX, 0));
         spacerEntity.add(button);
         spacerEntity.add(entity);
-        spacerEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        spacerEntity.add(new UIColor(0xFF8B8B8B));
         lowerEntity.add(spacerEntity);
 
         helpPageSpacer.setHeight(5);
@@ -143,9 +142,8 @@ public class SidePanel {
 
     private UIEntity getIcons() {
         final SignalBoxPage page = gui.getPage();
-        if (page.equals(SignalBoxPage.EDITOR)) {
+        if (page.equals(SignalBoxPage.EDITOR))
             return GuiElements.createSpacerV(25);
-        }
         final UIEntity list = new UIEntity();
         list.setInheritWidth(true);
         list.setHeight(100);
@@ -196,8 +194,9 @@ public class SidePanel {
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
-        preview.setWidth(70);
-        preview.setHeight(70);
+        preview.setWidth(60);
+        preview.setHeight(60);
+        preview.setX(7);
         preview.add(new UIColor(0xFFAFAFAF));
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
@@ -213,6 +212,7 @@ public class SidePanel {
 
         preview.add(sbtEntity);
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
+        preview.add(new UIScale(0.9f, 0.9f, 0));
 
         infoEntity.add(preview);
         infoEntity.add(getSpacerLine());
@@ -397,8 +397,9 @@ public class SidePanel {
                             (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
                                     : signalName) + " - " + mode.mode.toString(),
                             new UIEntity().getBasicTextColor(), 0.8f));
-                    if (!(mode.mode == EnumGuiMode.HP || mode.mode == EnumGuiMode.RS))
+                    if (!(mode.mode == EnumGuiMode.HP || mode.mode == EnumGuiMode.RS)) {
                         continue;
+                    }
                     final UIEntity entity = GuiElements
                             .createButton(I18Wrapper.format("btn.subsidiary"), e -> {
                                 final UIBox hbox = new UIBox(UIBox.VBOX, 1);
@@ -444,8 +445,9 @@ public class SidePanel {
                                                                 identifier.getPoint(),
                                                                 _u -> new ArrayList<>());
                                                 if (entry.state) {
-                                                    if (greenSignals.contains(identifier))
+                                                    if (greenSignals.contains(identifier)) {
                                                         greenSignals.remove(identifier);
+                                                    }
                                                     greenSignals.add(identifier);
                                                 } else {
                                                     greenSignals.remove(identifier);
@@ -485,8 +487,9 @@ public class SidePanel {
                     final UIEntity manuelButtonEntity = GuiElements
                             .createButton(I18Wrapper.format("info.usage.manuel") + " : " + modeName
                                     + " - " + rotationName, e1 -> {
-                                        final Optional<EnumPathUsage> usage = option
-                                                .getEntry(PathEntryType.PATHUSAGE);
+                                        final EnumPathUsage usage = option
+                                                .getEntry(PathEntryType.PATHUSAGE)
+                                                .orElse(EnumPathUsage.FREE);
                                         final UIEntity info = new UIEntity();
                                         info.setInherits(true);
                                         info.add(new UIBox(UIBox.VBOX, 5));
@@ -508,8 +511,7 @@ public class SidePanel {
                                                         new UITexture(GuiSignalBox.REDSTONE_OFF));
                                             }
                                         } else {
-                                            if (usage.isPresent()
-                                                    && !usage.get().equals(EnumPathUsage.FREE)) {
+                                            if (!usage.equals(EnumPathUsage.FREE)) {
                                                 textureEntity.add(new UITexture(
                                                         GuiSignalBox.REDSTONE_ON_BLOCKED));
                                             } else {
@@ -518,11 +520,13 @@ public class SidePanel {
                                             }
                                         }
                                         info.add(textureEntity);
-                                        final UILabel outputStatus = new UILabel(((usage.isPresent()
-                                                && !usage.get().equals(EnumPathUsage.FREE))
-                                                || node.containsManuellOutput(mode))
-                                                        ? I18Wrapper.format("info.usage.rs.true")
-                                                        : I18Wrapper.format("info.usage.rs.false"));
+                                        final UILabel outputStatus = new UILabel(
+                                                ((!usage.equals(EnumPathUsage.FREE))
+                                                        || node.containsManuellOutput(mode))
+                                                                ? I18Wrapper.format(
+                                                                        "info.usage.rs.true")
+                                                                : I18Wrapper.format(
+                                                                        "info.usage.rs.false"));
                                         outputStatus.setCenterY(false);
                                         outputStatus
                                                 .setTextColor(new UIEntity().getBasicTextColor());
@@ -567,7 +571,7 @@ public class SidePanel {
                 }
                 final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
                         .orElse(EnumPathUsage.FREE);
-                if (path.equals(EnumPathUsage.BLOCKED)) {
+                if (!(path.equals(EnumPathUsage.FREE) || path.equals(EnumPathUsage.PROTECTED))) {
                     isPathBlocked = true;
                 }
             }
@@ -738,9 +742,9 @@ public class SidePanel {
                 statusEntity.add(currentStatus);
                 final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
                 currentNode.getModes().forEach((mode, entry) -> {
-                    final Optional<EnumPathUsage> pathUsage = entry
-                            .getEntry(PathEntryType.PATHUSAGE);
-                    if (pathUsage.isPresent() && !pathUsage.get().equals(EnumPathUsage.FREE)) {
+                    final EnumPathUsage pathUsage = entry.getEntry(PathEntryType.PATHUSAGE)
+                            .orElse(EnumPathUsage.FREE);
+                    if (!pathUsage.equals(EnumPathUsage.FREE)) {
                         currentStatus.setText(I18Wrapper.format("info.usage.status") + " : "
                                 + I18Wrapper.format("info.usage.status.blocked"));
                         canBeManuelChanged.set(false);
@@ -770,19 +774,18 @@ public class SidePanel {
                                 textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
                             }
                         } else {
-                            if (pathUsage.isPresent()
-                                    && !pathUsage.get().equals(EnumPathUsage.FREE)) {
+                            if (!pathUsage.equals(EnumPathUsage.FREE)) {
                                 textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON_BLOCKED));
                             } else {
                                 textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF_BLOCKED));
                             }
                         }
                         info.add(textureEntity);
-                        final UILabel outputStatus = new UILabel(((pathUsage.isPresent()
-                                && !pathUsage.get().equals(EnumPathUsage.FREE))
-                                || currentNode.containsManuellOutput(mode))
-                                        ? I18Wrapper.format("info.usage.rs.true")
-                                        : I18Wrapper.format("info.usage.rs.false"));
+                        final UILabel outputStatus = new UILabel(
+                                ((!pathUsage.equals(EnumPathUsage.FREE))
+                                        || currentNode.containsManuellOutput(mode))
+                                                ? I18Wrapper.format("info.usage.rs.true")
+                                                : I18Wrapper.format("info.usage.rs.false"));
                         outputStatus.setCenterY(false);
                         outputStatus.setTextColor(new UIEntity().getBasicTextColor());
                         final UIEntity outputEntity = new UIEntity();
@@ -862,14 +865,13 @@ public class SidePanel {
             final UIScrollBox scrollbox = new UIScrollBox(UIBox.VBOX, 2);
             list.add(scrollbox);
 
-            gui.container.nextPathways.forEach(entry -> {
+            gui.container.nextPathways.forEach((entry, pathType) -> {
                 final UIEntity layout = new UIEntity();
                 layout.setHeight(20);
                 layout.setInheritWidth(true);
                 layout.add(new UIBox(UIBox.HBOX, 2));
-                final UIEntity button = GuiElements
-                        .createButton("Start: " + entry.getKey().toShortString() + ", End: "
-                                + entry.getValue().toShortString());
+                final UIEntity button = GuiElements.createButton(entry.getKey().toShortString()
+                        + " to " + entry.getValue().toShortString() + " as " + pathType.name());
                 layout.add(button);
                 layout.add(
                         GuiElements.createButton(I18Wrapper.format("info.usage.show"), 40, _u -> {

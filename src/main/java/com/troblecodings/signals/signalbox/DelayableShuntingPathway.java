@@ -7,11 +7,11 @@ import java.util.concurrent.Executors;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.enums.EnumPathUsage;
 
-public class DelayableSignalBoxPathway extends SignalBoxPathway {
+public class DelayableShuntingPathway extends ShuntingPathway {
 
     private final ExecutorService service = Executors.newFixedThreadPool(1);
 
-    public DelayableSignalBoxPathway(final PathwayData data) {
+    public DelayableShuntingPathway(final PathwayData data) {
         super(data);
     }
 
@@ -43,7 +43,7 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
                 loadTileAndExecute(thisTile -> {
                     final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                             .getPathwayByLastPoint(getLastPoint());
-                    pw.setPathStatus(EnumPathUsage.SELECTED);
+                    pw.setPathStatus(EnumPathUsage.SHUNTING);
                     pw.updatePathwayOnGrid();
                 });
             });
@@ -52,7 +52,8 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     public String toString() {
-        return "DelayableSignalBoxPathway [start=" + getFirstPoint() + ", end=" + getLastPoint()
+        return "DelayableShuntingPathway [start=" + getFirstPoint() + ", end=" + getLastPoint()
                 + ", delay=" + data.getDelay() + "]";
     }
+
 }
