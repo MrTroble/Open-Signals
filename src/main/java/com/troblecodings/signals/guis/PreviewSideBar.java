@@ -105,9 +105,9 @@ public class PreviewSideBar {
                         signal.getDefaultState(), wrapper, new VectorWrapper(0.5f, 0.5f, 0.5f));
                 info.predicate = p -> predicate.test(wrapper);
                 info.consumer = d -> {
+                    GlStateManager.translate(0.5f, 0.5f, 0.5f);
                     modelTranslation.translate();
-                    GlStateManager.translate(modelTrans.getX(), modelTrans.getY(),
-                            modelTrans.getZ());
+                    GlStateManager.translate(-0.5f, -0.5f, -0.5f);
                 };
                 animationInfos.add(info);
             }
