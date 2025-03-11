@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
-import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
@@ -536,6 +535,6 @@ public class Signal extends BasicBlock {
     }
 
     public boolean hasAnimation() {
-        return SignalAnimationConfigParser.ALL_ANIMATIONS.containsKey(this);
+        return prop.hasAnimation;s
     }
 }

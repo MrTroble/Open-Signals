@@ -116,7 +116,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             markDirty();
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
         } else {
-            if (getSignal().hasAnimation())
+            if (hasAnimation())
                 handler.updateAnimationListFromBlock();
         }
     }

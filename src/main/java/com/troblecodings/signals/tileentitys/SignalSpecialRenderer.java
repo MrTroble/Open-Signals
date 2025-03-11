@@ -13,7 +13,7 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
         if (tile.hasCustomName()) {
             tile.renderOverlay(new RenderOverlayInfo(x, y, z, getFontRenderer()));
         }
-        if (tile.getSignal().hasAnimation()) {
+        if (tile.hasAnimation()) {
             tile.getAnimationHandler().render(new RenderAnimationInfo(x, y, z).with(tile));
         }
     }
