@@ -12,7 +12,8 @@
         },
         "signalHeights": {
             "config(SH_HIGH.TRUE)": 2
-        }
+        },
+        "hasAnimation": true
     },
     "seProperties": [
         {
