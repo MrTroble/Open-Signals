@@ -42,8 +42,6 @@ public class CommonProxy {
         OpenSignalsMain.handler = init.getKey();
         OpenSignalsMain.network = init.getValue();
 
-        SignalAnimationConfigParser.loadAllAnimations();
-
         SignalStateHandler.init();
         NameHandler.init();
         OSSounds.init();
@@ -64,5 +62,6 @@ public class CommonProxy {
         ChangeConfigParser.loadChangeConfigs();
         OneSignalPredicateConfigParser.loadAllOneSignalPredicateConfigs();
         SubsidiarySignalParser.loadAllSubsidiarySignals();
+        SignalAnimationConfigParser.loadAllAnimations();
     }
 }

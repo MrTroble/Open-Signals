@@ -137,12 +137,13 @@ public class SignalAnimationHandler {
     public void updateAnimationListFromBlock() {
         animationPerModel.clear();
         final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = //
-                SignalAnimationConfigParser.ALL_ANIMATIONS.get(tile.getSignal());
+                SignalAnimationConfigParser.ALL_ANIMATIONS.getOrDefault(tile.getSignal(),
+                        new HashMap<>());
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
+                    new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),
