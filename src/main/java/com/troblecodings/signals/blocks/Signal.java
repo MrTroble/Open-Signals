@@ -535,6 +535,6 @@ public class Signal extends BasicBlock {
     }
 
     public boolean hasAnimation() {
-        return prop.hasAnimation;s
+        return prop.hasAnimation;
     }
 }
