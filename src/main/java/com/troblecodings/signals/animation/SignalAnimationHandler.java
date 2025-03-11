@@ -1,6 +1,5 @@
 package com.troblecodings.signals.animation;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,14 +24,13 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -42,6 +40,7 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 public class SignalAnimationHandler {
 
     private final SignalTileEntity tile;
+    private BlockRendererDispatcher blockRenderer;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;
@@ -55,6 +54,9 @@ public class SignalAnimationHandler {
         final BlockPos pos = tile.getPos();
         final IBlockState state = world.getBlockState(pos);
         final SignalAngel angle = state.getValue(Signal.ANGEL);
+        if (blockRenderer == null) {
+            blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+        }
 
         animationPerModel.forEach((first, entry) -> {
             final ModelTranslation translation = entry.getKey();
@@ -62,40 +64,22 @@ public class SignalAnimationHandler {
                 return;
 
             GlStateManager.pushMatrix();
-            GlStateManager.translate(info.x, info.y, info.z);
-            GlStateManager.translate(0.5f, 0.5f, 0.5f);
+            GlStateManager.translate(info.x + 0.5f, info.y + 0.5f, info.z + 0.5f);
             GlStateManager.rotate(angle.getQuaternion());
             translation.translate();
-            drawBuffer(first.getValue());
+            GlStateManager.rotate(-90, 0, 1, 0);
+            GlStateManager.bindTexture(8);
+            GlStateManager.disableLighting();
+            blockRenderer.getBlockModelRenderer().renderModel(world, first.getKey(), state, pos,
+                    first.getValue(), false);
+            blockRenderer.getBlockModelRenderer().renderModelBrightness(first.getKey(), state,
+                    0.65f, false);
             GlStateManager.popMatrix();
 
             if (translation.isAnimationAssigned()) {
                 updateAnimation(translation);
             }
         });
-    }
-
-    public void drawBuffer(final BufferBuilder buffer) {
-        if (buffer.getVertexCount() > 0) {
-            final VertexFormat vertexformat = buffer.getVertexFormat();
-            final int i = vertexformat.getNextOffset();
-            final ByteBuffer bytebuffer = buffer.getByteBuffer();
-            final List<VertexFormatElement> list = vertexformat.getElements();
-
-            for (int j = 0; j < list.size(); ++j) {
-                final VertexFormatElement vertexformatelement = list.get(j);
-                bytebuffer.position(vertexformat.getOffset(j));
-                vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
-            }
-
-            GlStateManager.glDrawArrays(buffer.getDrawMode(), 0, buffer.getVertexCount());
-            int i1 = 0;
-
-            for (final int j1 = list.size(); i1 < j1; ++i1) {
-                final VertexFormatElement vertexformatelement1 = list.get(i1);
-                vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
-            }
-        }
     }
 
     private void updateAnimation(final ModelTranslation translation) {
