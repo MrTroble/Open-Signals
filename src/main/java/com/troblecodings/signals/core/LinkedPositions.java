@@ -179,7 +179,7 @@ public class LinkedPositions {
             final Map<SEProperty, String> properties) {
         final Map<SubsidiaryState, ConfigProperty> subsidiaries = SubsidiarySignalParser.SUBSIDIARY_SIGNALS
                 .get(info.signal);
-        if (subsidiaries == null)
+        if (subsidiaries == null || properties == null)
             return;
         final List<SubsidiaryState> validStates = new ArrayList<>();
         subsidiaries.forEach((state, config) -> {
