@@ -17,7 +17,6 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.AxisAlignedBB;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
@@ -85,17 +84,6 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return block instanceof Signal ? (Signal) block : null;
     }
 
-    @Override
-    public AxisAlignedBB getRenderBoundingBox() {
-        // I don't know why I need to do this shit for rendering the Entity if I have an
-        // animation and I dont want it to stop when I am not watching...
-        if (hasAnimation()) {
-            return new AxisAlignedBB(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE,
-                    Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-        }
-        return super.getRenderBoundingBox();
-    }
-
     public boolean hasAnimation() {
         final Signal signal = getSignal();
         if (signal == null)
@@ -116,8 +104,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             markDirty();
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
         } else {
-            if (hasAnimation())
+            if (hasAnimation()) {
                 handler.updateAnimationListFromBlock();
+            }
         }
     }
 
