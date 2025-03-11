@@ -593,6 +593,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     protected void updateTrainNumber(final TrainNumber number) {
         resetAllTrainNumbers();
         final List<ModeIdentifier> trainNumberDisplays = data.getTrainNumberDisplays();
+        if (trainNumberDisplays == null)
+            return;
         trainNumberDisplays.forEach(ident -> grid.getNode(ident.point).getOption(ident.mode)
                 .orElse(new PathOptionEntry()).setEntry(PathEntryType.TRAINNUMBER, number));
         this.trainNumber = number;
