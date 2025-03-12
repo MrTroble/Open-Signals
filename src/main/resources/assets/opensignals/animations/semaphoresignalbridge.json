@@ -1,0 +1,96 @@
+{
+    "animations": {
+        "semaphore_signals/sema_main_wing1_small": {
+            "translationX": 0.6875,
+            "translationY": 3.5625,
+            "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "!hasandis(WING1)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0
+                },
+                {
+                    "predicate": "hasandis(WING1)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -45
+                }
+            ]
+        },
+        "semaphore_signals/sema_main_wing1_small_lamp": {
+            "translationX": 0.6875,
+            "translationY": 3.5625,
+            "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "!hasandis(WING1)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
+                    "rotation": 0
+                },
+                {
+                    "predicate": "hasandis(WING1)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
+                    "rotation": -25
+                }
+            ]
+        },
+        "semaphore_signals/sema_main_wing2_small": {
+            "translationX": 0.6875,
+            "translationY": 1.5625,
+            "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "!hasandis(WING2) && hasandis(HP2)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0
+                },
+                {
+                    "predicate": "hasandis(WING2) && hasandis(HP2)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 45
+                }
+            ]
+        },
+        "semaphore_signals/sema_main_wing2_small_lamp": {
+            "translationX": 0.6875,
+            "translationY": 1.5625,
+            "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "!hasandis(WING2) && hasandis(HP2)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
+                    "rotation": 0
+                },
+                {
+                    "predicate": "hasandis(WING2) && hasandis(HP2)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
+                    "rotation": -25
+                }
+            ]
+        }
+    }
+}
