@@ -49,8 +49,6 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                     player.getPosition(), "signalbridge");
             return EnumActionResult.SUCCESS;
         }
-        if (worldIn.isRemote)
-            return EnumActionResult.PASS;
         final NBTWrapper tag = NBTWrapper.getOrCreateWrapper(player.getHeldItemMainhand())
                 .getWrapper(ContainerSignalBridge.SIGNALBRIDGE_TAG);
         if (tag.isTagNull())
