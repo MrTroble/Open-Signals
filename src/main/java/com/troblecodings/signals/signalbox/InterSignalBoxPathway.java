@@ -113,6 +113,9 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (otherGrid.get() != null) {
                 final SignalBoxPathway otherPathway = otherGrid.get()
                         .getPathwayByLastPoint(blockPW.getValue());
+                if (!(otherPathway instanceof InterSignalBoxPathway)) {
+                    return;
+                }
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
                 blockPW = null;
             }
@@ -127,6 +130,9 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (otherGrid.get() != null) {
                 final SignalBoxPathway otherPathway = otherGrid.get()
                         .getPathwayByLastPoint(resetPW.getValue());
+                if (!(otherPathway instanceof InterSignalBoxPathway)) {
+                    return;
+                }
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
                 resetPW = null;
             }
@@ -273,10 +279,16 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     }
 
     public void setOtherPathwayToBlock(final InterSignalBoxPathway pathway) {
+        if (!(pathway instanceof InterSignalBoxPathway)) {
+            return;
+        }
         this.pathwayToBlock = pathway;
     }
 
     public void setOtherPathwayToReset(final InterSignalBoxPathway pathway) {
+        if (!(pathway instanceof InterSignalBoxPathway)) {
+            return;
+        }
         this.pathwayToReset = pathway;
     }
 
