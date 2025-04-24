@@ -54,38 +54,22 @@ public class ClientSignalStateHandler implements INetworkSync {
         final List<SEProperty> signalProperties = Signal.SIGNAL_IDS.get(signalID).getProperties();
         final StateInfo stateInfo = new StateInfo(level, signalPos);
         final boolean contains;
-        final Map<SEProperty, String> newProperties = new HashMap<>();
-
-        for (int i = 0; i < propertiesSize; i++) {
-            final SEProperty property = signalProperties.get(propertyIDs[i]);
-            final String value = property.getObjFromID(valueIDs[i]);
-            newProperties.put(property, value);
-        }
-
-        boolean propertiesChanged = false;
-        final Map<SEProperty, String> oldProperties;
+        final Map<SEProperty, String> properties;
         synchronized (CURRENTLY_LOADED_STATES) {
             contains = CURRENTLY_LOADED_STATES.containsKey(stateInfo);
-            oldProperties = CURRENTLY_LOADED_STATES.getOrDefault(stateInfo, new HashMap<>());
+            properties = CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
 
-            for (Map.Entry<SEProperty, String> map : newProperties.entrySet()) {
-                final String oldState = oldProperties.get(map.getKey());
-                propertiesChanged = !map.getValue().equals(oldState);
-                if (propertiesChanged) {
-                    break;
-                }
+            for (int i = 0; i < propertiesSize; i++) {
+                final SEProperty property = signalProperties.get(propertyIDs[i]);
+                final String value = property.getObjFromID(valueIDs[i]);
+                properties.put(property, value);
             }
-            oldProperties.putAll(newProperties);
-
-            CURRENTLY_LOADED_STATES.put(stateInfo, oldProperties);
-        }
-        if (!propertiesChanged) {
-            return;
+            CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
         mc.addScheduledTask(() -> {
             final TileEntity tile = level.getTileEntity(signalPos);
             if (tile != null && tile instanceof SignalTileEntity) {
-                ((SignalTileEntity) tile).updateAnimationStates(oldProperties, !contains);
+                ((SignalTileEntity) tile).updateAnimationStates(properties, !contains);
             }
             final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
             if (chunk == null)

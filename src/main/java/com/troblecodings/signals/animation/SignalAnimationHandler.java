@@ -78,8 +78,6 @@ public class SignalAnimationHandler {
 
             if (translation.isAnimationAssigned()) {
                 updateAnimation(translation);
-            } else {
-                first.getValue().reset();
             }
         });
     }
