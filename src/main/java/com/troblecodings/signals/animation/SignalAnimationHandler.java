@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -64,16 +65,19 @@ public class SignalAnimationHandler {
                 return;
 
             GlStateManager.pushMatrix();
+
             GlStateManager.translate(info.x + 0.5f, info.y + 0.5f, info.z + 0.5f);
             GlStateManager.rotate(angle.getQuaternion());
             translation.translate();
             GlStateManager.rotate(-90, 0, 1, 0);
-            GlStateManager.bindTexture(8);
+            Minecraft.getMinecraft().getTextureManager()
+                    .bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             GlStateManager.disableLighting();
             blockRenderer.getBlockModelRenderer().renderModel(world, first.getKey(), state, pos,
                     first.getValue(), false);
             blockRenderer.getBlockModelRenderer().renderModelBrightness(first.getKey(), state,
                     0.65f, false);
+
             GlStateManager.popMatrix();
 
             if (translation.isAnimationAssigned()) {
@@ -144,8 +148,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                    new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),
