@@ -22,7 +22,7 @@
         "signWidth": 50,
         "renderHeights": {
             "!config(NETYPE.NE1)": -1,
-            "config(NETYPE.TRAIN_LENGTH)": 0.9
+            "config(NETYPE.TRAIN_LENGTH) || config(NETYPE.NE5) && config(NE5_ADDITION.FREE)": 0.9
         }
     },
     "seProperties": [
