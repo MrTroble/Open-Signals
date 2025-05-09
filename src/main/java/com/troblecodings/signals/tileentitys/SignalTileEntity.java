@@ -9,6 +9,7 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.animation.SignalAnimationHandler;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
@@ -20,15 +21,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
     protected final SignalAnimationHandler handler;
+    private final int renderDistance;
 
     private final Map<SEProperty, String> properties = new HashMap<>();
 
     public SignalTileEntity() {
         this.handler = new SignalAnimationHandler(this);
+        renderDistance = ConfigHandler.renderDistance * ConfigHandler.renderDistance;
     }
 
     private final SignalStateListener listener = (info, states, changed) -> {
@@ -75,11 +80,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        if (handler.areAnimationsRunning()) {
+        if (handler.areAnimationsRunning())
             return new AxisAlignedBB(getPos().add(-50, -50, -50), getPos().add(50, 50, 50));
-        } else {
+        else
             return super.getRenderBoundingBox();
-        }
     }
 
     @Override
@@ -131,4 +135,13 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
                     listener);
         }
     }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public double getMaxRenderDistanceSquared() {
+        if (hasAnimation())
+            return renderDistance;
+        return super.getMaxRenderDistanceSquared();
+    }
+
 }
