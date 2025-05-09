@@ -11,12 +11,15 @@ import com.troblecodings.signals.animation.SignalAnimationHandler;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.AxisAlignedBB;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
@@ -71,6 +74,15 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (handler.areAnimationsRunning()) {
+            return new AxisAlignedBB(getPos().add(-50, -50, -50), getPos().add(50, 50, 50));
+        } else {
+            return super.getRenderBoundingBox();
+        }
+    }
+
+    @Override
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
         final Signal signal = getSignal();
@@ -106,6 +118,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         } else {
             if (hasAnimation()) {
                 handler.updateAnimationListFromBlock();
+                handler.updateStates(
+                        ClientSignalStateHandler.getClientStates(new StateInfo(world, pos)), true);
             }
         }
     }

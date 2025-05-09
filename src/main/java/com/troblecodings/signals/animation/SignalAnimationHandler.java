@@ -42,6 +42,7 @@ public class SignalAnimationHandler {
 
     private final SignalTileEntity tile;
     private BlockRendererDispatcher blockRenderer;
+    private int animationsRunning = 0;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;
@@ -88,12 +89,17 @@ public class SignalAnimationHandler {
         });
     }
 
+    public boolean areAnimationsRunning() {
+        return animationsRunning > 0;
+    }
+
     private void updateAnimation(final ModelTranslation translation) {
         final SignalAnimation animation = translation.getAssigendAnimation();
         if (animation.isFinished()) {
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
             translation.removeAnimation();
             animation.reset();
+            animationsRunning--;
             return;
         }
         animation.updateAnimation();
@@ -119,10 +125,12 @@ public class SignalAnimationHandler {
                     if (translation.isAnimationAssigned()) {
                         final SignalAnimation other = translation.getAssigendAnimation();
                         other.reset();
+                        animationsRunning--;
                     }
                     animation.setUpAnimationValues(translation);
                     translation.setUpNewTranslation(animation.getModelTranslation());
                     translation.assignAnimation(animation);
+                    animationsRunning++;
                 }
             }
         });
@@ -148,8 +156,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
+                    new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),
