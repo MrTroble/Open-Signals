@@ -11,6 +11,7 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.animation.SignalAnimationHandler;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
@@ -22,6 +23,9 @@ import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
@@ -93,8 +97,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public void requestModelDataUpdate() {
-        final Map<SEProperty, String> newProperties = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> newProperties =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
         handler.updateStates(newProperties, properties);
         this.properties.clear();
         this.properties.putAll(newProperties);
@@ -112,8 +116,12 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
                     listener);
         } else {
-            if (getSignal().hasAnimation())
+            if (getSignal().hasAnimation()) {
                 handler.updateAnimationListFromBlock();
+                final Map<SEProperty, String> newProperties = ClientSignalStateHandler
+                        .getClientStates(new StateInfo(level, worldPosition));
+                handler.updateStates(newProperties, properties);
+            }
         }
     }
 
@@ -123,5 +131,22 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             SignalStateHandler.removeListener(
                     new SignalStateInfo(level, worldPosition, getSignal()), listener);
         }
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (handler.areAnimationsRunning())
+            return new AxisAlignedBB(getBlockPos().offset(-50, -50, -50),
+                    getBlockPos().offset(50, 50, 50));
+        else
+            return super.getRenderBoundingBox();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public double getViewDistance() {
+        if (getSignal().hasAnimation())
+            return ConfigHandler.CLIENT.renderDistance.get();
+        return super.getViewDistance();
     }
 }
