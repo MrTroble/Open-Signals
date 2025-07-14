@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.troblecodings.core.TCBoolean;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.parser.interm.EvaluationLevel;
@@ -48,6 +49,9 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.put("zs2value", new MethodInfo(String.class, "zs2value",
                 obj -> PredicateHolder.zs2Value((String) obj[0]), String.class));
+
+        TRANSLATION_TABLE.put("zs6state", new MethodInfo(TCBoolean.class, "zs6state",
+                obj -> PredicateHolder.zs6State((boolean) obj[0]), TCBoolean.class));
 
         TRANSLATION_TABLE.put("signalrepeater", new MethodInfo(Boolean.class, "signalrepeater",
                 obj -> PredicateHolder.signalRepeater((boolean) obj[0]), Boolean.class));
