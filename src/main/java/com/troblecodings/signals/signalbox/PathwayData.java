@@ -290,6 +290,7 @@ public class PathwayData {
                     EnumGuiMode.HP, EnumGuiMode.ZS3)) {
                 final ModeSet modeSet = new ModeSet(mode, rotation);
                 node.getOption(modeSet).ifPresent(option -> {
+                    // TODO Why is this not present?
                     option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
                         final Optional<Boolean> repeaterOption =
                                 option.getEntry(PathEntryType.SIGNAL_REPEATER);
