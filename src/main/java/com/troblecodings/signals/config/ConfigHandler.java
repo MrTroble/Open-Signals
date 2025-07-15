@@ -77,4 +77,8 @@ public final class ConfigHandler {
     @Name("Render distance")
     @Comment("Change the render distance for animated signals. Default: 128")
     public static int renderDistance = 128;
+
+    @Name("Debug Mode")
+    @Comment("Toggle debug mode.")
+    public static boolean debugMode = false;
 }

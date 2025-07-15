@@ -60,6 +60,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private Consumer<List<Point>> signalUpdates;
     private Runnable counterUpdater;
     private Consumer<List<Point>> trainNumberUpdater;
+    private Consumer<List<Point>> debugPoints;
     private EntityPlayer player;
 
     public ContainerSignalBox(final GuiInfo info) {
@@ -286,6 +287,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     updates.add(point);
                 }
                 trainNumberUpdater.accept(updates);
+                break;
+            }
+            case SEND_DEBUG_POINTS: {
+                List<Point> points = new ArrayList<>();
+                final int size = buffer.getInt();
+                for (int i = 0; i < size; i++) {
+                    final Point point = Point.of(buffer);
+                    points.add(point);
+                }
+                debugPoints.accept(points);
                 break;
             }
             default:
@@ -540,5 +551,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     protected void setTrainNumberUpdater(final Consumer<List<Point>> updater) {
         this.trainNumberUpdater = updater;
+    }
+
+    protected void setDebugPointUpdater(final Consumer<List<Point>> points) {
+        this.debugPoints = points;
     }
 }

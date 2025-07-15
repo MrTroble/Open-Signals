@@ -128,6 +128,9 @@ public class GuiSignalBox extends GuiBase {
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     private final Map<Point, UIColor> colors = new HashMap<>();
 
+    private int index = 0;
+    private List<Point> pointList = new ArrayList<>();
+
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
@@ -136,6 +139,7 @@ public class GuiSignalBox extends GuiBase {
         container.setSignalUpdater(this::updateSignals);
         container.setConuterUpdater(this::updateCounter);
         container.setTrainNumberUpdater(this::updateTrainNumber);
+        container.setDebugPointUpdater(this::setDebugPoint);
         this.info = info;
     }
 
@@ -304,7 +308,10 @@ public class GuiSignalBox extends GuiBase {
                 }
             }
         }));
-        tile.add(new UIClickable(e -> openNodeShortcuts(currentTile.getNode(), e), 1));
+        tile.add(new UIClickable(e -> {
+            openNodeShortcuts(currentTile.getNode(), e);
+            getDebugPoint();
+        }, 1));
     }
 
     private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
@@ -1069,5 +1076,31 @@ public class GuiSignalBox extends GuiBase {
                     .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)
                             .orElseGet(() -> EnumPathUsage.FREE).getColor()));
         }
+    }
+
+    private void setDebugPoint(final List<Point> points) {
+        pointList = points;
+    }
+
+    private void getDebugPoint() {
+        if (index >= pointList.size()) {
+            pointList.clear();
+            index = 0;
+            return;
+        }
+        Point point = pointList.get(index);
+        System.out.println(point.getX() + ", " + point.getY());
+        SignalBoxNode node = container.grid.getNode(point);
+        if (node == null)
+            return;
+        node.forEach(mode -> {
+            if (!(mode.mode == EnumGuiMode.STRAIGHT || mode.mode == EnumGuiMode.CORNER
+                    || mode.mode == EnumGuiMode.CROSSING))
+                return;
+            final UISignalBoxTile tile = allTiles.get(node.getPoint());
+            UIColor color = new UIColor(0x4016fffe);
+            tile.getParent().add(color);
+        });
+        index++;
     }
 }

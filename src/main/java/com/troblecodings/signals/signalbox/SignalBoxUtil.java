@@ -25,6 +25,8 @@ public final class SignalBoxUtil {
     public static final int PREPARED_COLOR = ConfigHandler.signalboxPreparedColor;
     public static final int SHUNTING_COLOR = ConfigHandler.signalboxShuntingColor;
 
+    private static List<Point> debugPointList = new ArrayList<>();
+
     private SignalBoxUtil() {
     }
 
@@ -94,12 +96,17 @@ public final class SignalBoxUtil {
             scores.remove(currentPath);
 
             final Point previousPoint = currentPath.getPoint();
+            debugPointList.add(previousPoint);
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
+                }
+                if (ConfigHandler.debugMode) {
+                    grid.sendDebugPointUpdates(debugPointList);
+                    debugPointList.clear();
                 }
                 result = PathwayRequestResult.PASS;
                 return result.setPathwayData(PathwayData.of(grid, nodes, pathType));
@@ -122,6 +129,10 @@ public final class SignalBoxUtil {
                     visited.add(pathIdent.path.getInverse());
                 }
             }
+        }
+        if (ConfigHandler.debugMode) {
+            grid.sendDebugPointUpdates(debugPointList);
+            debugPointList.clear();
         }
         return result;
     }
