@@ -35,15 +35,14 @@ public final class SignalBoxUtil {
     }
 
     public static Rotation getRotationFromDelta(final Point delta) {
-        if (delta.getX() > 0) {
+        if (delta.getX() > 0)
             return Rotation.CLOCKWISE_180;
-        } else if (delta.getX() < 0) {
+        else if (delta.getX() < 0)
             return Rotation.NONE;
-        } else if (delta.getY() > 0) {
+        else if (delta.getY() > 0)
             return Rotation.COUNTERCLOCKWISE_90;
-        } else {
+        else
             return Rotation.CLOCKWISE_90;
-        }
     }
 
     public static class PathIdentifier {
@@ -195,7 +194,8 @@ public final class SignalBoxUtil {
             case END:
             case IN_CONNECTION:
             case ARROW:
-            case OUT_CONNECTION: {
+            case OUT_CONNECTION:
+            case CROSSING: {
                 return 0;
             }
             case CORNER: {
@@ -209,11 +209,10 @@ public final class SignalBoxUtil {
 
     public static PathType getPathTypeFrom(final SignalBoxNode start, final SignalBoxNode end) {
         final List<PathType> possilbeTypes = start.getPossibleTypes(end);
-        if (!possilbeTypes.isEmpty()) {
+        if (!possilbeTypes.isEmpty())
             return possilbeTypes.get(0);
-        } else {
+        else
             return PathType.NONE;
-        }
     }
 
 }

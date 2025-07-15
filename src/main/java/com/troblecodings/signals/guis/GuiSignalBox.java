@@ -1015,7 +1015,8 @@ public class GuiSignalBox extends GuiBase {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
-                if (!(mode.mode == EnumGuiMode.STRAIGHT || mode.mode == EnumGuiMode.CORNER))
+                if (!(mode.mode == EnumGuiMode.STRAIGHT || mode.mode == EnumGuiMode.CORNER
+                        || mode.mode == EnumGuiMode.CROSSING))
                     return;
                 if (node.containsManuellOutput(mode)) {
                     tile.setColor(mode, OUTPUT_COLOR);
@@ -1037,6 +1038,7 @@ public class GuiSignalBox extends GuiBase {
                 switch (guiMode) {
                     case STRAIGHT:
                     case CORNER:
+                    case CROSSING:
                         tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
                         entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
                                 _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));

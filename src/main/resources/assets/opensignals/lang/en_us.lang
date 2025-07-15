@@ -676,3 +676,4 @@ gui.tile.notvalid=Not valid
 property.SHUNTING=Shunting
 gui.signalbox.choosetypes=Choose pathway type
 property.mode_select.name=Select track element
+info.crossing=Crossing element

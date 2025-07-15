@@ -96,7 +96,8 @@ public class ModeDropDownBoxUI {
         final Rotation rotation = modeSet.rotation;
         switch (mode) {
             case CORNER:
-            case STRAIGHT: {
+            case STRAIGHT:
+            case CROSSING: {
                 final EnumPathUsage path =
                         option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
                 final UIEntity stateEntity = new UIEntity();

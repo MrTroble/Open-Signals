@@ -677,3 +677,4 @@ gui.tile.notvalid=Nicht erlaubt
 property.SHUNTING=Rangieren
 gui.signalbox.choosetypes=Wähle Fahrstraßentyp
 property.mode_select.name=Wähle Streckenelement
+info.crossing=Kreuzungselement
