@@ -24,6 +24,7 @@
         "speed(==.14)": ["zs3.Z14", "wing1.TRUE", "wing2.FALSE"],
         "speed(==.15)": ["zs3.Z15", "wing1.TRUE", "wing2.FALSE"],
 
+        "zs6state(true)": ["zs3.ZS6"],
         "zs2value(A)": ["zs3.A"],
         "zs2value(B)": ["zs3.B"],
         "zs2value(C)": ["zs3.C"],

@@ -45,6 +45,7 @@
         "speed(==.14)": ["zs3.Z14"],
         "speed(==.15)": ["zs3.Z15"],
 
+        "zs6state(true)": ["zs2.ZS6"],
         "zs2value(A)": ["zs2.A"],
         "zs2value(B)": ["zs2.B"],
         "zs2value(C)": ["zs2.C"],
@@ -73,7 +74,6 @@
         "zs2value(Z)": ["zs2.Z"],
         "zs2value(ZS6)" : ["zs2.ZS6"],
         "zs2value(ZS13)": ["zs2.ZS13"],
-        "zs6state(true)": ["zs2.ZS6"],
 
         "config(zs2.A)": ["zs2v.A"],
         "config(zs2.B)": ["zs2v.B"],
