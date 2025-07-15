@@ -92,8 +92,8 @@ public final class PredicateHolder {
         return s -> s.equalsIgnoreCase(value);
     }
 
-    public static Predicate<TCBoolean> zs6State(final boolean state) {
-        return s -> s.booleanValue() == state;
+    public static Predicate<TCBoolean> zs6State(final TCBoolean obj) {
+        return s -> s == obj;
     }
 
     public static Predicate<Boolean> signalRepeater(final boolean state) {
