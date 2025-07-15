@@ -51,7 +51,7 @@ public final class LogicParser {
                 obj -> PredicateHolder.zs2Value((String) obj[0]), String.class));
 
         TRANSLATION_TABLE.put("zs6state", new MethodInfo(TCBoolean.class, "zs6state",
-                obj -> PredicateHolder.zs6State((boolean) obj[0]), TCBoolean.class));
+                obj -> PredicateHolder.zs6State((TCBoolean) obj[0]), TCBoolean.class));
 
         TRANSLATION_TABLE.put("signalrepeater", new MethodInfo(Boolean.class, "signalrepeater",
                 obj -> PredicateHolder.signalRepeater((boolean) obj[0]), Boolean.class));
@@ -61,11 +61,14 @@ public final class LogicParser {
                     final Predicate original = info.blockState.apply(objects);
                     return (Predicate<Map>) inMap -> {
                         final Map<Class, Object> map = inMap;
-                        final Object obj = map.get(info.getSubtype());
+                        Object obj = map.get(info.getSubtype());
                         if (obj == null)
                             throw new IllegalArgumentException(
                                     String.format("No data for type=%s was passed to function=%s!",
                                             info.getSubtype().toString(), name));
+                        if (info.getSubtype().equals(TCBoolean.class)) {
+                            obj = TCBoolean.valueOf((boolean) obj);
+                        }
                         return original.test(obj);
                     };
                 }, info.parameter)));
