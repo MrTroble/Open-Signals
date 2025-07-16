@@ -32,7 +32,7 @@
         "speed(==.14)": ["zs3.Z14", "stopsignal.HP1", "hphome.HP1", "hpblock.HP1"],
         "speed(==.15)": ["zs3.Z15", "stopsignal.HP1", "hphome.HP1", "hpblock.HP1"],
 
-        "zs6state(true)": ["zs2.ZS6"],
+        "zs6state(true)": ["zs3.ZS6"],
         "zs2value(A)": ["zs3.A"],
         "zs2value(B)": ["zs3.B"],
         "zs2value(C)": ["zs3.C"],
