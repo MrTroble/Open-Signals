@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Quaternion;
 
 import com.google.common.collect.Maps;
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -68,7 +69,7 @@ public class SignalAnimationHandler {
             GlStateManager.pushMatrix();
 
             GlStateManager.translate(info.x + 0.5f, info.y + 0.5f, info.z + 0.5f);
-            GlStateManager.rotate(angle.getQuaternion());
+            GlStateManager.rotate(QuaternionWrapper.fromXYZ(0, (float) angle.getRadians(), 0));
             translation.translate();
             GlStateManager.rotate(-90, 0, 1, 0);
             Minecraft.getMinecraft().getTextureManager()
@@ -156,8 +157,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                    new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),
