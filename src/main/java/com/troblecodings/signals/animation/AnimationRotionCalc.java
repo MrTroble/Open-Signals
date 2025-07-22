@@ -6,6 +6,8 @@ import javax.vecmath.Vector3f;
 
 import org.lwjgl.util.vector.Quaternion;
 
+import net.minecraft.client.Minecraft;
+
 public class AnimationRotionCalc {
 
     private float step;
@@ -15,7 +17,7 @@ public class AnimationRotionCalc {
 
     public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
             final float animationSpeed, final RotationAxis axis) {
-        this.step = 0.005f * animationSpeed;
+        this.step = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
         this.axis = axis;
         calculateWayAndValues(startPosition, finalPosition);
     }

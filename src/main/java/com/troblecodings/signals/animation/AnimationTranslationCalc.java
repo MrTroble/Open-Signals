@@ -4,6 +4,8 @@ import java.util.Objects;
 
 import com.troblecodings.core.VectorWrapper;
 
+import net.minecraft.client.Minecraft;
+
 public class AnimationTranslationCalc {
 
     private float stepX;
@@ -22,9 +24,9 @@ public class AnimationTranslationCalc {
 
     public AnimationTranslationCalc(final VectorWrapper startPosition,
             final VectorWrapper finalPosition, final float animationSpeed) {
-        this.stepX = 0.005f * animationSpeed;
-        this.stepY = 0.005f * animationSpeed;
-        this.stepZ = 0.005f * animationSpeed;
+        this.stepX = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
+        this.stepY = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
+        this.stepZ = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
         calculateWayAndValues(startPosition, finalPosition);
     }
 
@@ -70,13 +72,11 @@ public class AnimationTranslationCalc {
     private static boolean isAnimationOnAxisIsFinished(final float step, final float progress,
             final float max) {
         if (step > 0) {
-            if (progress < max) {
+            if (progress < max)
                 return false;
-            }
         } else {
-            if (max < progress) {
+            if (max < progress)
                 return false;
-            }
         }
         return true;
     }
