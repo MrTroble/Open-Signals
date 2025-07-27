@@ -674,5 +674,8 @@
 	"gui.tile.notvalid": "Nicht erlaubt",
 	"property.SHUNTING": "Rangieren",
 	"gui.signalbox.choosetypes": "Wähle Fahrstraßentyp",
-	"property.mode_select.name": "Wähle Streckenelement"
+	"property.mode_select.name": "Wähle Streckenelement",
+    "info.crossing": "Kreuzungselement",
+    "property.zs6_state.name": "Zs6",
+    "property.zs6_state.desc": "Hier kann ausgewählt werden, ob die Fahrstraße ins Gegengleis führt."
 }

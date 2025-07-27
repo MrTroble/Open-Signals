@@ -674,5 +674,8 @@
 	"gui.tile.notvalid": "Not valid",
 	"property.SHUNTING": "Shunting",
 	"gui.signalbox.choosetypes": "Choose pathway type",
-	"property.mode_select.name": "Select track element"
+	"property.mode_select.name": "Select track element",
+    "info.crossing": "Crossing element",
+    "property.zs6_state.name": "Wrong side of tracks (Zs6)",
+    "property.zs6_state.desc": "Here you can select whether the path leads to the wrong side of tracks."
 }

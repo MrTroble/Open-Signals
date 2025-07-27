@@ -539,7 +539,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     private boolean tryReversReset(final BlockPos pos, final SignalBoxNode node,
             final Rotation rot) {
         final AtomicBoolean canReset = new AtomicBoolean(false);
-        for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.CORNER, EnumGuiMode.STRAIGHT)) {
+        for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.CORNER, EnumGuiMode.STRAIGHT,
+                EnumGuiMode.CROSSING)) {
             node.getOption(new ModeSet(mode, rot)).ifPresent(
                     entry -> entry.getEntry(PathEntryType.RESETING).ifPresent(blockPos -> {
                         if (!blockPos.equals(pos))

@@ -23,6 +23,7 @@ public final class ConfigHandler {
     public static class General {
 
         public final ConfigValue<Integer> lightEmission;
+        public final ConfigValue<Boolean> debugMode;
 
         public General(final ForgeConfigSpec.Builder builder) {
             String desc;
@@ -32,6 +33,9 @@ public final class ConfigHandler {
                     + " When you change the value, the signal block lights "
                     + "up and illuminates the environment. Default: 1";
             lightEmission = builder.comment(desc).defineInRange("Signal light emission", 1, 0, 15);
+
+            desc = "Toggle debug mode.";
+            debugMode = builder.comment(desc).define("Debug Mode", false);
 
             builder.pop();
         }
