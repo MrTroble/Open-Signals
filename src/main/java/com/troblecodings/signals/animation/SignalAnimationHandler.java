@@ -41,6 +41,8 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 
 public class SignalAnimationHandler {
 
+    public static final int NORM_FPS = 75;
+
     private final SignalTileEntity tile;
     private BlockRendererDispatcher blockRenderer;
     private int animationsRunning = 0;
@@ -83,7 +85,7 @@ public class SignalAnimationHandler {
             GlStateManager.popMatrix();
 
             if (translation.isAnimationAssigned()) {
-                updateAnimation(translation);
+                updateAnimation(translation, info.partialTicks);
             } else {
                 first.getValue().reset();
             }
@@ -94,7 +96,7 @@ public class SignalAnimationHandler {
         return animationsRunning > 0;
     }
 
-    private void updateAnimation(final ModelTranslation translation) {
+    private void updateAnimation(final ModelTranslation translation, final float partialTicks) {
         final SignalAnimation animation = translation.getAssigendAnimation();
         if (animation.isFinished()) {
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
@@ -103,7 +105,7 @@ public class SignalAnimationHandler {
             animationsRunning--;
             return;
         }
-        animation.updateAnimation();
+        animation.updateAnimation(partialTicks);
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 
@@ -157,8 +159,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
+                    new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),

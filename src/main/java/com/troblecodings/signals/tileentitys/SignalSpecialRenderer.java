@@ -14,7 +14,9 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
             tile.renderOverlay(new RenderOverlayInfo(x, y, z, getFontRenderer()));
         }
         if (tile.hasAnimation()) {
-            tile.getAnimationHandler().render(new RenderAnimationInfo(x, y, z).with(tile));
+            System.out.println(partialTicks);
+            tile.getAnimationHandler()
+                    .render(new RenderAnimationInfo(x, y, z, partialTicks).with(tile));
         }
     }
 

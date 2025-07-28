@@ -24,9 +24,16 @@ public class AnimationTranslationCalc {
 
     public AnimationTranslationCalc(final VectorWrapper startPosition,
             final VectorWrapper finalPosition, final float animationSpeed) {
-        this.stepX = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
-        this.stepY = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
-        this.stepZ = 0.005f * 60 / Minecraft.getDebugFPS() * animationSpeed;
+        this.stepX = 0.005f /**
+                             * SignalAnimationHandler.NORM_FPS / Minecraft.getDebugFPS()
+                             */
+                * animationSpeed;
+        this.stepY = 0.005f * /*
+                               * SignalAnimationHandler.NORM_FPS / Minecraft.getDebugFPS()
+                               **/ animationSpeed;
+        this.stepZ = 0.005f * /*
+                               * SignalAnimationHandler.NORM_FPS / Minecraft.getDebugFPS()
+                               */animationSpeed;
         calculateWayAndValues(startPosition, finalPosition);
     }
 
@@ -50,17 +57,17 @@ public class AnimationTranslationCalc {
         }
     }
 
-    public void updateAnimation() {
+    public void updateAnimation(final float partialTicks) {
         if (!finishedX) {
-            progressX += stepX;
+            progressX = progressX + (stepX * partialTicks);
             this.finishedX = isAnimationOnAxisIsFinished(stepX, progressX, maxX);
         }
         if (!finishedY) {
-            progressY += stepY;
+            progressY = progressY + (stepY * partialTicks);
             this.finishedY = isAnimationOnAxisIsFinished(stepY, progressY, maxY);
         }
         if (!finishedZ) {
-            progressZ += stepZ;
+            progressZ = progressZ + (stepZ * partialTicks);
             this.finishedZ = isAnimationOnAxisIsFinished(stepZ, progressZ, maxZ);
         }
     }
