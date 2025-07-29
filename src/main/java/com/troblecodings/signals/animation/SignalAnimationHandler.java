@@ -85,7 +85,7 @@ public class SignalAnimationHandler {
             GlStateManager.popMatrix();
 
             if (translation.isAnimationAssigned()) {
-                updateAnimation(translation, info.partialTicks);
+                updateAnimation(translation);
             } else {
                 first.getValue().reset();
             }
@@ -96,7 +96,7 @@ public class SignalAnimationHandler {
         return animationsRunning > 0;
     }
 
-    private void updateAnimation(final ModelTranslation translation, final float partialTicks) {
+    private void updateAnimation(final ModelTranslation translation) {
         final SignalAnimation animation = translation.getAssigendAnimation();
         if (animation.isFinished()) {
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
@@ -105,7 +105,7 @@ public class SignalAnimationHandler {
             animationsRunning--;
             return;
         }
-        animation.updateAnimation(partialTicks);
+        animation.updateAnimation();
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 

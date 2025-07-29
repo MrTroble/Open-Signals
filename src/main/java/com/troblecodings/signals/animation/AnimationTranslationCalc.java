@@ -24,16 +24,13 @@ public class AnimationTranslationCalc {
 
     public AnimationTranslationCalc(final VectorWrapper startPosition,
             final VectorWrapper finalPosition, final float animationSpeed) {
-        this.stepX = 0.005f /**
-                             * SignalAnimationHandler.NORM_FPS / Minecraft.getDebugFPS()
-                             */
-                * animationSpeed;
-        this.stepY = 0.005f * /*
-                               * SignalAnimationHandler.NORM_FPS / Minecraft.getDebugFPS()
-                               **/ animationSpeed;
-        this.stepZ = 0.005f * /*
-                               * SignalAnimationHandler.NORM_FPS / Minecraft.getDebugFPS()
-                               */animationSpeed;
+        final int currentFPS = Minecraft.getDebugFPS();
+        this.stepX = 0.005f * SignalAnimationHandler.NORM_FPS
+                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
+        this.stepY = 0.005f * SignalAnimationHandler.NORM_FPS
+                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
+        this.stepZ = 0.005f * SignalAnimationHandler.NORM_FPS
+                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
         calculateWayAndValues(startPosition, finalPosition);
     }
 
@@ -57,17 +54,17 @@ public class AnimationTranslationCalc {
         }
     }
 
-    public void updateAnimation(final float partialTicks) {
+    public void updateAnimation() {
         if (!finishedX) {
-            progressX = progressX + (stepX * partialTicks);
+            progressX = progressX + stepX;
             this.finishedX = isAnimationOnAxisIsFinished(stepX, progressX, maxX);
         }
         if (!finishedY) {
-            progressY = progressY + (stepY * partialTicks);
+            progressY = progressY + stepY;
             this.finishedY = isAnimationOnAxisIsFinished(stepY, progressY, maxY);
         }
         if (!finishedZ) {
-            progressZ = progressZ + (stepZ * partialTicks);
+            progressZ = progressZ + stepZ;
             this.finishedZ = isAnimationOnAxisIsFinished(stepZ, progressZ, maxZ);
         }
     }

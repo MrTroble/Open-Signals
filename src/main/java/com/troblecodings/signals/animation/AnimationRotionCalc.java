@@ -18,10 +18,8 @@ public class AnimationRotionCalc {
     public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
             final float animationSpeed, final RotationAxis axis) {
         final int currentFPS = Minecraft.getDebugFPS();
-        this.step = 0.005f * /*
-                              * SignalAnimationHandler.NORM_FPS / (currentFPS == 0 ?
-                              * SignalAnimationHandler.NORM_FPS : currentFPS)
-                              **/ animationSpeed;
+        this.step = 0.005f * SignalAnimationHandler.NORM_FPS
+                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
         this.axis = axis;
         calculateWayAndValues(startPosition, finalPosition);
     }
@@ -49,8 +47,8 @@ public class AnimationRotionCalc {
         }
     }
 
-    public void updateAnimation(final float partialTicks) {
-        progress = progress + (step * partialTicks);
+    public void updateAnimation() {
+        progress = progress + step;
     }
 
     public boolean isAnimationFinished() {
