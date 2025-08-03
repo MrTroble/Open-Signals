@@ -41,11 +41,15 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 
 public class SignalAnimationHandler {
 
-    public static final int NORM_FPS = 75;
-
     private final SignalTileEntity tile;
     private BlockRendererDispatcher blockRenderer;
     private int animationsRunning = 0;
+    private long lastWorldTick = -1;
+
+    private int calls = 0;
+
+    public static final float BASIC_ANIMATION_SPEED = 0.01f;
+    public static final int MAX_CALLS_PER_TICK = 3;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;
@@ -62,6 +66,7 @@ public class SignalAnimationHandler {
         if (blockRenderer == null) {
             blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
         }
+        final boolean shouldUpdateAnimation = shouldUpdateAnimation();
 
         animationPerModel.forEach((first, entry) -> {
             final ModelTranslation translation = entry.getKey();
@@ -69,7 +74,6 @@ public class SignalAnimationHandler {
                 return;
 
             GlStateManager.pushMatrix();
-
             GlStateManager.translate(info.x + 0.5f, info.y + 0.5f, info.z + 0.5f);
             GlStateManager.rotate(QuaternionWrapper.fromXYZ(0, (float) angle.getRadians(), 0));
             translation.translate();
@@ -84,12 +88,25 @@ public class SignalAnimationHandler {
 
             GlStateManager.popMatrix();
 
-            if (translation.isAnimationAssigned()) {
+            if (translation.isAnimationAssigned() && shouldUpdateAnimation) {
                 updateAnimation(translation);
             } else {
                 first.getValue().reset();
             }
         });
+    }
+
+    private boolean shouldUpdateAnimation() {
+        long currentTick = tile.getWorld().getTotalWorldTime();
+        if (currentTick != lastWorldTick) {
+            calls = 0;
+            lastWorldTick = currentTick;
+        }
+        calls++;
+        if (calls <= MAX_CALLS_PER_TICK) {
+            return true;
+        }
+        return false;
     }
 
     public boolean areAnimationsRunning() {

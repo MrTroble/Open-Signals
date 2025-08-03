@@ -6,8 +6,6 @@ import javax.vecmath.Vector3f;
 
 import org.lwjgl.util.vector.Quaternion;
 
-import net.minecraft.client.Minecraft;
-
 public class AnimationRotionCalc {
 
     private float step;
@@ -17,9 +15,7 @@ public class AnimationRotionCalc {
 
     public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
             final float animationSpeed, final RotationAxis axis) {
-        final int currentFPS = Minecraft.getDebugFPS();
-        this.step = 0.005f * SignalAnimationHandler.NORM_FPS
-                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
+        this.step = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
         this.axis = axis;
         calculateWayAndValues(startPosition, finalPosition);
     }

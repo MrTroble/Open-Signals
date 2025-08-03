@@ -4,8 +4,6 @@ import java.util.Objects;
 
 import com.troblecodings.core.VectorWrapper;
 
-import net.minecraft.client.Minecraft;
-
 public class AnimationTranslationCalc {
 
     private float stepX;
@@ -24,13 +22,9 @@ public class AnimationTranslationCalc {
 
     public AnimationTranslationCalc(final VectorWrapper startPosition,
             final VectorWrapper finalPosition, final float animationSpeed) {
-        final int currentFPS = Minecraft.getDebugFPS();
-        this.stepX = 0.005f * SignalAnimationHandler.NORM_FPS
-                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
-        this.stepY = 0.005f * SignalAnimationHandler.NORM_FPS
-                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
-        this.stepZ = 0.005f * SignalAnimationHandler.NORM_FPS
-                / (currentFPS == 0 ? SignalAnimationHandler.NORM_FPS : currentFPS) * animationSpeed;
+        this.stepX = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        this.stepY = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        this.stepZ = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
         calculateWayAndValues(startPosition, finalPosition);
     }
 
