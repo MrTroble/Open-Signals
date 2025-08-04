@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.troblecodings.core.TCBoolean;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -13,7 +14,8 @@ import com.troblecodings.signals.blocks.Signal;
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
 
-    private static final HashMap<Class, Function<FunctionParsingInfo, Object>> PARAMETER_PARSER = new HashMap<>();
+    private static final HashMap<Class, Function<FunctionParsingInfo, Object>> PARAMETER_PARSER =
+            new HashMap<>();
 
     private final HashMap<String, SEProperty> propertyCache = new HashMap<>();
     private final HashMap<String, ValuePack> predicateCache = new HashMap<>();
@@ -25,6 +27,7 @@ public class FunctionParsingInfo {
         PARAMETER_PARSER.put(StringInteger.class, FunctionParsingInfo::getStringInt);
         PARAMETER_PARSER.put(String.class, FunctionParsingInfo::getString);
         PARAMETER_PARSER.put(Boolean.class, FunctionParsingInfo::getBoolean);
+        PARAMETER_PARSER.put(TCBoolean.class, FunctionParsingInfo::getTCBoolean);
     }
 
     public String argument;
@@ -70,11 +73,10 @@ public class FunctionParsingInfo {
                     .filter(noneCache -> noneCache.getName().equalsIgnoreCase(name)).findAny()
                     .orElse(null);
         });
-        if (property == null) {
+        if (property == null)
             throw new LogicalParserException(
                     String.format("Could not make predicate=%s with system=%S!", name, signalName)
                             + " Valid Properties: " + properties);
-        }
         return property;
     }
 
@@ -88,9 +90,10 @@ public class FunctionParsingInfo {
             argument = parts[0];
             final SEProperty property = (SEProperty) getProperty();
             final String value = parts[1].toUpperCase();
-            if (!property.getParent().isValid(new String(value)))
+            if (!property.getParent().isValid(new String(value))) {
                 OpenSignalsMain.exitMinecraftWithMessage("[" + value + "] is not a valid state of "
                         + property + "! Valid States: " + property.getParent().getAllowedValues());
+            }
             return new ValuePack(property, ext -> ext.equals(value));
         });
         if (predicate == null)
@@ -117,6 +120,10 @@ public class FunctionParsingInfo {
 
     public Object getBoolean() {
         return Boolean.valueOf(argument);
+    }
+
+    public Object getTCBoolean() {
+        return TCBoolean.valueOf(argument);
     }
 
     public Map<String, MethodInfo> getTable() {

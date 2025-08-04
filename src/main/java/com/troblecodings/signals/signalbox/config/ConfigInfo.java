@@ -10,6 +10,7 @@ public class ConfigInfo {
     public final SignalStateInfo nextinfo;
     public final int speed;
     public final String zs2Value;
+    public final boolean zs6State;
     public final PathType type;
     public final boolean isSignalRepeater;
 
@@ -24,6 +25,7 @@ public class ConfigInfo {
         this.nextinfo = nextinfo;
         this.speed = data.getSpeed();
         this.zs2Value = data.getZS2Value();
+        this.zs6State = data.getZS6State();
         this.type = data.getPathType();
         this.isSignalRepeater = isSignalRepeater;
     }

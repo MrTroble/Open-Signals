@@ -51,8 +51,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
-        final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
-                _u -> SignalBoxFactory.getFactory().getEntry());
+        final PathOptionEntry optionEntry =
+                possibleModes.computeIfAbsent(mode, _u -> SignalBoxFactory.getFactory().getEntry());
         optionEntry.setEntry(entry, type);
     }
 
@@ -61,8 +61,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public void addManuellOutput(final ModeSet mode) {
-        if (!manuellEnabledOutputs.contains(mode))
+        if (!manuellEnabledOutputs.contains(mode)) {
             manuellEnabledOutputs.add(mode);
+        }
     }
 
     public void removeManuellOutput(final ModeSet mode) {
@@ -103,6 +104,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             }
             final Point p1 = new Point(this.point);
             final Point p2 = new Point(this.point);
+            final Point p3 = new Point(this.point);
+            final Point p4 = new Point(this.point);
             switch (mode.mode) {
                 case CORNER:
                     switch (mode.rotation) {
@@ -146,12 +149,37 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             break;
                     }
                     break;
+                case CROSSING:
+                    switch (mode.rotation) {
+                        case NONE:
+                        case CLOCKWISE_180:
+                            p1.translate(1, 0);
+                            p2.translate(-1, 0);
+                            p3.translate(0, 1);
+                            p4.translate(0, -1);
+                            break;
+                        case CLOCKWISE_90:
+                        case COUNTERCLOCKWISE_90:
+                            p1.translate(0, 1);
+                            p2.translate(0, -1);
+                            p3.translate(1, 0);
+                            p4.translate(-1, 0);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 default:
                     continue;
             }
             final Path path = new Path(p1, p2);
             possibleConnections.put(path, mode);
             possibleConnections.put(path.getInverse(), mode);
+            if (mode.mode.equals(EnumGuiMode.CROSSING)) {
+                final Path secondPath = new Path(p3, p4);
+                possibleConnections.put(secondPath, mode);
+                possibleConnections.put(secondPath.getInverse(), mode);
+            }
         }
     }
 
@@ -178,10 +206,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             return wrapper;
         })::iterator);
         this.point.write(compound);
-        if (isAutoPoint)
+        if (isAutoPoint) {
             compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
-        if (!customText.isEmpty())
+        }
+        if (!customText.isEmpty()) {
             compound.putString(CUSTOM_NAME, customText);
+        }
     }
 
     @Override
@@ -195,21 +225,26 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             possibleModes.put(mode, entry);
             if (!oldOutputSystem)
                 if (tag.getBoolean(ENABLED_OUTPUTS)) {
-                    if (!manuellEnabledOutputs.contains(mode))
+                    if (!manuellEnabledOutputs.contains(mode)) {
                         manuellEnabledOutputs.add(mode);
+                    }
                 }
         });
-        if (oldOutputSystem)
+        if (oldOutputSystem) {
             compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
                 final ModeSet modeSet = new ModeSet(tag);
-                if (!manuellEnabledOutputs.contains(modeSet))
+                if (!manuellEnabledOutputs.contains(modeSet)) {
                     manuellEnabledOutputs.add(modeSet);
+                }
             });
+        }
         this.point.read(compound);
-        if (compound.contains(IS_AUTO_POINT))
+        if (compound.contains(IS_AUTO_POINT)) {
             this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
-        if (compound.contains(CUSTOM_NAME))
+        }
+        if (compound.contains(CUSTOM_NAME)) {
             this.customText = compound.getString(CUSTOM_NAME);
+        }
         post();
     }
 
@@ -239,12 +274,13 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final Set<EnumGuiMode> otherMode = other.possibleModes.keySet().stream()
                 .map(mode -> mode.mode).collect(Collectors.toSet());
         for (final PathType type : PathType.values()) {
-            final boolean thisContains = Arrays.stream(type.getModes())
-                    .anyMatch(thisMode::contains);
-            final boolean otherContains = Arrays.stream(type.getModes())
-                    .anyMatch(otherMode::contains);
-            if (thisContains && otherContains)
+            final boolean thisContains =
+                    Arrays.stream(type.getModes()).anyMatch(thisMode::contains);
+            final boolean otherContains =
+                    Arrays.stream(type.getModes()).anyMatch(otherMode::contains);
+            if (thisContains && otherContains) {
                 possibleTypes.add(type);
+            }
         }
         return possibleTypes;
     }
@@ -272,9 +308,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         for (final Point point : Arrays.asList(this.point.delta(new Point(1, 0)),
                 this.point.delta(new Point(-1, 0)), this.point.delta(new Point(0, 1)),
                 this.point.delta(new Point(0, -1)))) {
-            if (isUsedInDirection(point)) {
+            if (isUsedInDirection(point))
                 return true;
-            }
         }
         return false;
     }
@@ -289,9 +324,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 continue;
             }
             if (!getOption(mode).orElse(new PathOptionEntry()).getEntry(PathEntryType.PATHUSAGE)
-                    .orElse(EnumPathUsage.FREE).equals(EnumPathUsage.FREE)) {
+                    .orElse(EnumPathUsage.FREE).equals(EnumPathUsage.FREE))
                 return true;
-            }
         }
         return false;
     }
@@ -372,8 +406,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final int outputsSize = buffer.getByteToUnsignedInt();
         for (int i = 0; i < outputsSize; i++) {
             final ModeSet modeSet = ModeSet.of(buffer);
-            if (!manuellEnabledOutputs.contains(modeSet))
+            if (!manuellEnabledOutputs.contains(modeSet)) {
                 manuellEnabledOutputs.add(modeSet);
+            }
         }
         this.isAutoPoint = buffer.getBoolean();
         this.customText = buffer.getString();
@@ -390,12 +425,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             possibleModes.put(mode, entry);
         }
         final int outputsSize = buffer.getByteToUnsignedInt();
-        if (outputsSize == 0)
+        if (outputsSize == 0) {
             manuellEnabledOutputs.clear();
+        }
         for (int i = 0; i < outputsSize; i++) {
             final ModeSet modeSet = ModeSet.of(buffer);
-            if (!manuellEnabledOutputs.contains(modeSet))
+            if (!manuellEnabledOutputs.contains(modeSet)) {
                 manuellEnabledOutputs.add(modeSet);
+            }
         }
         this.isAutoPoint = buffer.getBoolean();
         this.customText = buffer.getString();
@@ -419,8 +456,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         int size = 0;
         for (final PathOptionEntry entry : possibleModes.values()) {
             if (entry.containsEntry(PathEntryType.PATHUSAGE)
-                    || entry.containsEntry(PathEntryType.TRAINNUMBER))
+                    || entry.containsEntry(PathEntryType.TRAINNUMBER)) {
                 size++;
+            }
         }
         buffer.putByte((byte) size);
         possibleModes.forEach((mode, entry) -> {

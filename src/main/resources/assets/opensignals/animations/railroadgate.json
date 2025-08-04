@@ -12,12 +12,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -34,12 +36,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -56,12 +60,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L1) || with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L1) || with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -78,12 +84,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -100,12 +108,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -122,12 +132,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -144,12 +156,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]
@@ -166,12 +180,14 @@
                     "predicate": "with(BARRIER_OPEN.FALSE) && with(BARRIER_LENGTH.L6)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(BARRIER_OPEN.TRUE) && with(BARRIER_LENGTH.L6)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 0.5,
                     "rotation": 90
                 }
             ]

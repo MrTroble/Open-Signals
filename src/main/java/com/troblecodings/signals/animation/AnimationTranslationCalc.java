@@ -22,9 +22,9 @@ public class AnimationTranslationCalc {
 
     public AnimationTranslationCalc(final VectorWrapper startPosition,
             final VectorWrapper finalPosition, final float animationSpeed) {
-        this.stepX = 0.005f * animationSpeed;
-        this.stepY = 0.005f * animationSpeed;
-        this.stepZ = 0.005f * animationSpeed;
+        this.stepX = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        this.stepY = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        this.stepZ = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
         calculateWayAndValues(startPosition, finalPosition);
     }
 
@@ -50,15 +50,15 @@ public class AnimationTranslationCalc {
 
     public void updateAnimation() {
         if (!finishedX) {
-            progressX += stepX;
+            progressX = progressX + stepX;
             this.finishedX = isAnimationOnAxisIsFinished(stepX, progressX, maxX);
         }
         if (!finishedY) {
-            progressY += stepY;
+            progressY = progressY + stepY;
             this.finishedY = isAnimationOnAxisIsFinished(stepY, progressY, maxY);
         }
         if (!finishedZ) {
-            progressZ += stepZ;
+            progressZ = progressZ + stepZ;
             this.finishedZ = isAnimationOnAxisIsFinished(stepZ, progressZ, maxZ);
         }
     }
@@ -70,13 +70,11 @@ public class AnimationTranslationCalc {
     private static boolean isAnimationOnAxisIsFinished(final float step, final float progress,
             final float max) {
         if (step > 0) {
-            if (progress < max) {
+            if (progress < max)
                 return false;
-            }
         } else {
-            if (max < progress) {
+            if (max < progress)
                 return false;
-            }
         }
         return true;
     }
