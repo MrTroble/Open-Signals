@@ -72,7 +72,7 @@ public class SignalAnimationTranslation implements SignalAnimation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, dest, model);
+        return Objects.hash(animationSpeed, calc, dest, model, predicate);
     }
 
     @Override
@@ -85,7 +85,8 @@ public class SignalAnimationTranslation implements SignalAnimation {
             return false;
         final SignalAnimationTranslation other = (SignalAnimationTranslation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && Objects.equals(dest, other.dest) && Objects.equals(model, other.model);
+                && Objects.equals(calc, other.calc) && Objects.equals(dest, other.dest)
+                && Objects.equals(model, other.model) && Objects.equals(predicate, other.predicate);
     }
 
 }
