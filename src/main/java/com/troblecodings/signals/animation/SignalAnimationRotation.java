@@ -98,7 +98,8 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, axis, pivot, calc, rotation);
+        return Objects.hash(animationSpeed, axis, calc, finalRotationValue, pivot, predicate,
+                rotation);
     }
 
     @Override
@@ -111,8 +112,11 @@ public class SignalAnimationRotation implements SignalAnimation {
             return false;
         final SignalAnimationRotation other = (SignalAnimationRotation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && axis == other.axis && Objects.equals(pivot, other.pivot)
-                && Objects.equals(calc, other.calc) && Objects.equals(rotation, other.rotation);
+                && axis == other.axis && Objects.equals(calc, other.calc)
+                && Float.floatToIntBits(finalRotationValue) == Float
+                        .floatToIntBits(other.finalRotationValue)
+                && Objects.equals(pivot, other.pivot) && Objects.equals(predicate, other.predicate)
+                && Float.floatToIntBits(rotation) == Float.floatToIntBits(other.rotation);
     }
 
 }

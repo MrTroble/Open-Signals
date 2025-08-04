@@ -9,26 +9,26 @@
             "pivotZ": -0.34375,
             "animationConfigs": [
                 {
-                    "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH)  && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN1) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": 0
                 },
                 {
-                    "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH)  && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN2) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": -90
                 },
                 {
-                    "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH)  && hasandis(MANUAL)",
+                    "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "animationSpeed": 2,
                     "rotation": 0
                 },
                 {
-                    "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH)  && hasandis(MANUAL)",
+                    "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "animationSpeed": 2,
@@ -45,13 +45,13 @@
             "pivotZ": -0.34375,
             "animationConfigs": [
                 {
-                    "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN1) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": 0
                 },
                 {
-                    "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN2) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": -90
@@ -81,13 +81,13 @@
             "pivotZ": -0.34375,
             "animationConfigs": [
                 {
-                    "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN1) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": 0
                 },
                 {
-                    "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN2) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": -90
@@ -117,13 +117,13 @@
             "pivotZ": -0.34375,
             "animationConfigs": [
                 {
-                    "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN1) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": 0
                 },
                 {
-                    "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
+                    "predicate": "with(WN_MECH.WN2) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
                     "rotation": -90
