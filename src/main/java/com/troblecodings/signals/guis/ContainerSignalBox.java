@@ -48,7 +48,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     protected final Map<Point, List<MainSignalIdentifier>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
-    protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes =
+            new HashMap<>();
     protected final Map<Map.Entry<Point, Point>, PathType> nextPathways = new HashMap<>();
     protected final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
     protected SignalBoxGrid grid;
@@ -59,6 +60,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private Consumer<List<Point>> signalUpdates;
     private Runnable counterUpdater;
     private Consumer<List<Point>> trainNumberUpdater;
+    private Consumer<List<Point>> debugPoints;
     private EntityPlayer player;
 
     public ContainerSignalBox(final GuiInfo info) {
@@ -74,8 +76,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
         final StateInfo identifier = new StateInfo(info.world, tile.getPos());
-        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
-                .getPossibleSubsidiaries(identifier);
+        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries =
+                SignalBoxHandler.getPossibleSubsidiaries(identifier);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
         buffer.putInt(possibleSubsidiaries.size());
         possibleSubsidiaries.forEach((pos, list) -> {
@@ -100,11 +102,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 .forEach(entry -> {
                     final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
                     grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, entry.getKey())));
-                    if (grid.get() == null)
+                    if (grid.get() == null) {
                         loadChunkAndGetTile(SignalBoxTileEntity.class, info.world, entry.getKey(),
                                 (otherTile, _u) -> grid.set(otherTile.getSignalBoxGrid()));
-                    if (grid.get() != null)
+                    }
+                    if (grid.get() != null) {
                         validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
+                    }
                 });
         buffer.putByte((byte) validInConnections.size());
         validInConnections.forEach((pos, list) -> {
@@ -178,8 +182,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                             .getOrDefault(identifier.getPoint(), new HashMap<>());
                     final SubsidiaryEntry entry = subsidiary.get(identifier.getModeSet());
                     if (entry != null) {
-                        identifier.state = SignalState
-                                .combine(entry.enumValue.getSubsidiaryShowType());
+                        identifier.state =
+                                SignalState.combine(entry.enumValue.getSubsidiaryShowType());
                     }
 
                     final List<MainSignalIdentifier> greenSignals = this.greenSignals
@@ -257,11 +261,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                             .getOrDefault(modeIdentifier.getPoint(), new HashMap<>());
                     final SubsidiaryEntry entry = subsidiary.get(modeIdentifier.getModeSet());
                     if (entry != null) {
-                        modeIdentifier.state = SignalState
-                                .combine(entry.enumValue.getSubsidiaryShowType());
+                        modeIdentifier.state =
+                                SignalState.combine(entry.enumValue.getSubsidiaryShowType());
                     }
-                    if (!greenSignals.contains(modeIdentifier))
+                    if (!greenSignals.contains(modeIdentifier)) {
                         greenSignals.add(modeIdentifier);
+                    }
 
                     pointUpdates.add(modeIdentifier.getPoint());
                 }
@@ -284,6 +289,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 trainNumberUpdater.accept(updates);
                 break;
             }
+            case SEND_DEBUG_POINTS: {
+                List<Point> points = new ArrayList<>();
+                final int size = buffer.getInt();
+                for (int i = 0; i < size; i++) {
+                    final Point point = Point.of(buffer);
+                    points.add(point);
+                }
+                debugPoints.accept(points);
+                break;
+            }
             default:
                 break;
         }
@@ -291,8 +306,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        if (grid == null)
+        if (grid == null) {
             grid = tile.getSignalBoxGrid();
+        }
         final SignalBoxNetwork mode = buffer.getEnumValue(SignalBoxNetwork.class);
         switch (mode) {
             case SEND_INT_ENTRY: {
@@ -303,8 +319,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final Point point = Point.of(buffer);
                 final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
                 final Rotation rotation = deserializeRotation(buffer);
-                final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES
-                        .get(buffer.getByteToUnsignedInt());
+                final PathEntryType<?> entryType =
+                        PathEntryType.ALL_ENTRIES.get(buffer.getByteToUnsignedInt());
                 final ModeSet modeSet = new ModeSet(guiMode, rotation);
                 grid.getNode(point).getOption(modeSet)
                         .ifPresent(entry -> entry.removeEntry(entryType));
@@ -316,6 +332,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             }
             case SEND_ZS2_ENTRY: {
                 deserializeEntry(buffer, buffer.getByte());
+                break;
+            }
+            case SEND_ZS6_ENTRY: {
+                deserializeEntry(buffer, buffer.getTcBoolean());
                 break;
             }
             case REMOVE_POS: {
@@ -344,7 +364,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final PathwayRequestResult request = grid.requestWay(start, end, type);
                 if (!request.isPass()) {
                     final SignalBoxNode endNode = grid.getNode(end);
-                    if (request.canBeAddedToSaver() && !endNode.containsOutConnection()
+                    if (request.canBeAddedToSaver() && type.equals(PathType.NORMAL)
+                            && !endNode.containsOutConnection()
                             && grid.addNextPathway(start, end, type)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
@@ -458,8 +479,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         final Point point = Point.of(buffer);
         final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
         final Rotation rotation = deserializeRotation(buffer);
-        final PathEntryType<T> entryType = (PathEntryType<T>) PathEntryType.ALL_ENTRIES
-                .get(buffer.getByteToUnsignedInt());
+        final PathEntryType<T> entryType =
+                (PathEntryType<T>) PathEntryType.ALL_ENTRIES.get(buffer.getByteToUnsignedInt());
         final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
         final ModeSet modeSet = new ModeSet(guiMode, rotation);
         final Optional<PathOptionEntry> option = node.getOption(modeSet);
@@ -479,15 +500,17 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         if (map == null)
             return;
         map.remove(identifier.getModeSet());
-        if (map.isEmpty())
+        if (map.isEmpty()) {
             enabledSubsidiaryTypes.remove(identifier.getPoint());
+        }
     }
 
     @Override
     public void onContainerClosed(final EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        if (this.tile != null)
+        if (this.tile != null) {
             this.tile.remove(this);
+        }
     }
 
     @Override
@@ -528,5 +551,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     protected void setTrainNumberUpdater(final Consumer<List<Point>> updater) {
         this.trainNumberUpdater = updater;
+    }
+
+    protected void setDebugPointUpdater(final Consumer<List<Point>> points) {
+        this.debugPoints = points;
     }
 }

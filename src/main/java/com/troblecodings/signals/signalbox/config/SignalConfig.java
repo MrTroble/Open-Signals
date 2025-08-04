@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
+import com.troblecodings.core.TCBoolean;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
@@ -21,8 +22,8 @@ import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigPropert
 
 public final class SignalConfig {
 
-    private static final LoadHolder<Class<SignalConfig>> LOAD_HOLDER = new LoadHolder<>(
-            SignalConfig.class);
+    private static final LoadHolder<Class<SignalConfig>> LOAD_HOLDER =
+            new LoadHolder<>(SignalConfig.class);
 
     private SignalConfig() {
     }
@@ -43,8 +44,8 @@ public final class SignalConfig {
                 loadDefault(info);
             }
         } else if (info.type.equals(PathType.SHUNTING)) {
-            final List<ConfigProperty> shuntingValues = OneSignalNonPredicateConfigParser.SHUNTINGCONFIGS
-                    .get(currentSignal);
+            final List<ConfigProperty> shuntingValues =
+                    OneSignalNonPredicateConfigParser.SHUNTINGCONFIGS.get(currentSignal);
             if (shuntingValues != null && info.currentinfo.isValid()) {
                 loadWithoutPredicate(shuntingValues, info.currentinfo);
             }
@@ -54,16 +55,16 @@ public final class SignalConfig {
     private static void loadDefault(final ConfigInfo info) {
         if (!info.currentinfo.isValid())
             return;
-        final List<ConfigProperty> defaultValues = OneSignalPredicateConfigParser.DEFAULTCONFIGS
-                .get(info.currentinfo.signal);
+        final List<ConfigProperty> defaultValues =
+                OneSignalPredicateConfigParser.DEFAULTCONFIGS.get(info.currentinfo.signal);
         if (defaultValues != null) {
             changeIfPresent(defaultValues, info);
         }
     }
 
     public static void reset(final ResetInfo info) {
-        final List<ConfigProperty> resetValues = OneSignalNonPredicateConfigParser.RESETCONFIGS
-                .get(info.current.signal);
+        final List<ConfigProperty> resetValues =
+                OneSignalNonPredicateConfigParser.RESETCONFIGS.get(info.current.signal);
         if (resetValues == null)
             return;
         loadSignalAndRunTask(info.current, (stateInfo, oldProperties, _u) -> {
@@ -79,14 +80,15 @@ public final class SignalConfig {
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                 }
             });
-            if (!propertiesToSet.isEmpty())
+            if (!propertiesToSet.isEmpty()) {
                 SignalStateHandler.setStates(info.current, propertiesToSet);
+            }
         });
     }
 
     public static void loadDisable(final ConfigInfo info) {
-        final List<ConfigProperty> disableValues = OneSignalPredicateConfigParser.DISABLECONFIGS
-                .get(info.currentinfo.signal);
+        final List<ConfigProperty> disableValues =
+                OneSignalPredicateConfigParser.DISABLECONFIGS.get(info.currentinfo.signal);
         if (disableValues != null) {
             changeIfPresent(disableValues, info);
         }
@@ -112,6 +114,7 @@ public final class SignalConfig {
         object.put(Integer.class, info.speed);
         object.put(String.class, info.zs2Value);
         object.put(Boolean.class, info.isSignalRepeater);
+        object.put(TCBoolean.class, info.zs6State);
         final Map<SEProperty, String> propertiesToSet = new HashMap<>();
         values.forEach(property -> {
             if (property.test(object)) {

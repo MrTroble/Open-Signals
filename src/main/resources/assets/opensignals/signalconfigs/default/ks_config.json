@@ -19,6 +19,7 @@
         "true": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF"],
         "signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
 
+        "zs6state(true)": ["zs2.ZS6"],
         "zs2value(A)": ["zs2.A"],
         "zs2value(B)": ["zs2.B"],
         "zs2value(C)": ["zs2.C"],

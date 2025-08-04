@@ -72,4 +72,13 @@ public final class ConfigHandler {
     @Name("Signalbox trainnumber background color")
     @Comment("Change the background color of trainnumber in the signalbox. Default: -11534336")
     public static int signalboxTrainnumberBackgroundColor = 0xFF500000;
+
+    @RequiresMcRestart
+    @Name("Render distance")
+    @Comment("Change the render distance for animated signals. Default: 128")
+    public static int renderDistance = 128;
+
+    @Name("Debug Mode")
+    @Comment("Toggle debug mode.")
+    public static boolean debugMode = false;
 }

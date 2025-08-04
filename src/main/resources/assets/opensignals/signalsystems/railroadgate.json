@@ -2,7 +2,8 @@
     "systemProperties": {
         "placementToolName": "signplacementtool",
         "canLink": true,
-        "defaultHeight": 1
+        "defaultHeight": 1,
+        "hasAnimation": true
     },
     "seProperties": [
         {

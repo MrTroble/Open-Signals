@@ -6,6 +6,7 @@
         "speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"],
         "speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"],
 
+        "zs6state(true)": ["zs2.ZS6"],
         "zs2value(A)": ["zs2.A"],
         "zs2value(B)": ["zs2.B"],
         "zs2value(C)": ["zs2.C"],

@@ -17,7 +17,8 @@
         "renderHeights": {
             "config(SEMATYPE.MAIN_SMALL)": 1.04,
             "config(SEMATYPE.DIST)": -1
-        }
+        },
+        "hasAnimation": true
     },
     "seProperties": [
         {

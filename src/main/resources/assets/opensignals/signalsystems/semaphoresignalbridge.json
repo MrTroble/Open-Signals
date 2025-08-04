@@ -10,7 +10,8 @@
             16777215,
             16761344
         ],
-        "isBridgeSignal": true
+        "isBridgeSignal": true,
+        "hasAnimation": true
     },
     "seProperties": [
         {

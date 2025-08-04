@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.12.2 - 3.7.0]
+* feat: new animation system for moving parts
+* feat: added render distance config option
+* feat: shunting path can be added to pathway saver
+* feat: added zs6 state for signalbox pathway
+* feat: added same-level crossing element for signalbox
+* feat: added debug view for path algorithm
+* fix: possible NPE in LinkedPositions
+* fix: NPE in signalboxpathway with train numbers
+* fix: ne5 addition freetext don't shown
+
 ## [1.12.2 - 3.6.3]
 * fix: threads blocking each other
 * ref: better system for pathway updateing and signal setting

@@ -1,9 +1,10 @@
 {
 	"textures": {
-		"lamp_green": "opensignals:blocks/lamps/lamp_green",
 		"lamp_white": "opensignals:blocks/lamps/lamp_white",
-		"lamp_red": "opensignals:blocks/lamps/lamp_red",
-		"lamp_yellow": "opensignals:blocks/lamps/lamp_yellow"
+		"lamp_yellow": "opensignals:blocks/lamps/lamp_yellow",
+		"lamp_red_shield": "opensignals:blocks/semaphore/lamp_red",
+		"lamp_green_shield": "opensignals:blocks/semaphore/lamp_green",
+		"lamp_yellow_shield": "opensignals:blocks/semaphore/lamp_yellow"
 	},
 	"models": {
 		"semaphore_signals/sema_main_base": {
@@ -42,7 +43,15 @@
 		},
 		"semaphore_signals/sema_mainsmall_mast2_hp2": {
 			"textures": [
-				{}
+				{
+					"blockstate": "hasandis(HP2) && with(WING2.FALSE)"
+				},
+				{
+					"blockstate": "hasandis(HP2) && with(WING2.TRUE)",
+					"retexture": {
+						"lamp": "lamp_yellow_shield"
+					}
+				}
 			],
 			"y": 1
 		},
@@ -54,7 +63,15 @@
 		},
 		"semaphore_signals/sema_mainsmall_mast4": {
 			"textures": [
-				{}
+				{
+					"blockstate": "with(WING1.FALSE)"
+				},
+				{
+					"blockstate": "with(WING1.TRUE)",
+					"retexture": {
+						"lamp": "lamp_green_shield"
+					}
+				}
 			],
 			"y": 3
 		},
@@ -147,38 +164,6 @@
 			"x": 0.1875,
 			"z": -0.4375
         },
-		"semaphore_signals/sema_main_wing1": {
-			"textures": [
-				{
-					"blockstate": "hasandisnot(WING1)"
-				}
-			],
-			"y": 3
-		},
-		"semaphore_signals/sema_main_wing1_on": {
-			"textures": [
-				{
-					"blockstate": "hasandis(WING1)"
-				}
-			],
-			"y": 3
-		},
-		"semaphore_signals/sema_main_wing2": {
-			"textures": [
-				{
-					"blockstate": "hasandis(HP2) && hasandisnot(WING2)"
-				}
-			],
-			"y": 1
-		},
-		"semaphore_signals/sema_main_wing2_on": {
-			"textures": [
-				{
-					"blockstate": "hasandis(HP2) && hasandis(WING2)"
-				}
-			],
-			"y": 1
-		},
         "zs/zs12": {
             "textures": [
                 {

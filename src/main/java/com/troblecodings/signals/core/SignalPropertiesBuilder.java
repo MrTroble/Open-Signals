@@ -44,6 +44,7 @@ public class SignalPropertiesBuilder {
     private Map<String, String> remoteRedstoneOutputs;
     private int defaultItemDamage = 1;
     private boolean isBridgeSignal = false;
+    private boolean hasAnimation = false;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -151,6 +152,6 @@ public class SignalPropertiesBuilder {
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
                 ImmutableList.copyOf(redstoneValuePacks), defaultItemDamage,
-                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal);
+                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal, hasAnimation);
     }
 }

@@ -68,6 +68,7 @@
         "zs2value(Z)": ["zs2.Z"],
         "zs2value(ZS6)" : ["zs2.ZS6"],
         "zs2value(ZS13)": ["zs2.ZS13"],
+        "zs6state(true)": ["zs2.ZS6"],
 
         "config(zs3.A)": ["zs2v.A"],
         "config(zs3.B)": ["zs2v.B"],
