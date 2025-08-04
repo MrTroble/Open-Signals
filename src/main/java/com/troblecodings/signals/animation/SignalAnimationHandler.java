@@ -42,8 +42,8 @@ public class SignalAnimationHandler {
         this.tile = tile;
     }
 
-    private final Map<IBakedModel, Entry<ModelTranslation, List<SignalAnimation>>>//
-    animationPerModel = new HashMap<>();
+    private final Map<IBakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel = //
+            new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
         final BlockState state = tile.getBlockState();

@@ -15,7 +15,7 @@ public class SignalAnimationTranslation implements SignalAnimation {
     private final float animationSpeed;
     private final VectorWrapper dest;
 
-    public SignalAnimationTranslation(Predicate<ModelInfoWrapper> predicate,
+    public SignalAnimationTranslation(final Predicate<ModelInfoWrapper> predicate,
             final float animationSpeed, final VectorWrapper dest) {
         this.predicate = predicate;
         this.animationSpeed = animationSpeed;
