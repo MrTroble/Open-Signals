@@ -29,6 +29,7 @@
         "map(drive) && map(100) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL2_3", "blocksignal.HL4", "blockexitsignal.HL1"],
         "map(drive) && map(100) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL2_3", "blocksignal.HL4", "blockexitsignal.HL1"],
 
+        "zs6state(true)": ["zs2.ZS6"],
         "zs2value(A)": ["zs2.A"],
         "zs2value(B)": ["zs2.B"],
         "zs2value(C)": ["zs2.C"],

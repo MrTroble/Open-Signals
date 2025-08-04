@@ -9,7 +9,9 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.animation.SignalAnimationHandler;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
@@ -21,12 +23,18 @@ import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
+    protected final SignalAnimationHandler handler;
+
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
+        this.handler = new SignalAnimationHandler(this);
     }
 
     private final Map<SEProperty, String> properties = new HashMap<>();
@@ -83,11 +91,23 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return ImmutableMap.copyOf(properties);
     }
 
+    public SignalAnimationHandler getAnimationHandler() {
+        return handler;
+    }
+
+    @Override
+    public void requestModelDataUpdate() {
+        final Map<SEProperty, String> newProperties =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
+        handler.updateStates(newProperties, properties);
+        this.properties.clear();
+        this.properties.putAll(newProperties);
+        super.requestModelDataUpdate();
+    }
+
     @Override
     public @Nonnull IModelData getModelData() {
-        final Map<SEProperty, String> states =
-                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
-        return new ModelInfoWrapper(states);
+        return new ModelInfoWrapper(properties);
     }
 
     @Override
@@ -95,6 +115,13 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         if (!level.isClientSide) {
             SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
                     listener);
+        } else {
+            if (getSignal().hasAnimation()) {
+                handler.updateAnimationListFromBlock();
+                final Map<SEProperty, String> newProperties = ClientSignalStateHandler
+                        .getClientStates(new StateInfo(level, worldPosition));
+                handler.updateStates(newProperties, properties);
+            }
         }
     }
 
@@ -104,5 +131,22 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             SignalStateHandler.removeListener(
                     new SignalStateInfo(level, worldPosition, getSignal()), listener);
         }
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (handler.areAnimationsRunning())
+            return new AxisAlignedBB(getBlockPos().offset(-50, -50, -50),
+                    getBlockPos().offset(50, 50, 50));
+        else
+            return super.getRenderBoundingBox();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public double getViewDistance() {
+        if (getSignal().hasAnimation())
+            return ConfigHandler.CLIENT.renderDistance.get();
+        return super.getViewDistance();
     }
 }

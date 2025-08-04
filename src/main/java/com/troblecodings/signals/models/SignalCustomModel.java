@@ -19,6 +19,7 @@ import com.mojang.datafixers.util.Pair;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -44,6 +45,8 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements IUnbakedModel {
+
+    private static final Map<ResourceLocation, IBakedModel> LOCATION_TO_MODEL = new HashMap<>();
 
     @Nonnull
     public static final Random RANDOM = new Random();
@@ -81,8 +84,8 @@ public class SignalCustomModel implements IUnbakedModel {
         }
     }
 
-    private static BakedModelPair transform(final SignalModelLoaderInfo info,
-            final ModelBakery bakery, final ResourceLocation location,
+    private BakedModelPair transform(final SignalModelLoaderInfo info, final ModelBakery bakery,
+            final ResourceLocation location,
             final Function<RenderMaterial, TextureAtlasSprite> function,
             final Map<String, Either<RenderMaterial, String>> material, final Quaternion rotation) {
         final TransformationMatrix transformation = new TransformationMatrix(
@@ -110,6 +113,9 @@ public class SignalCustomModel implements IUnbakedModel {
             model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
                     .forEach(quad -> transform(quad, matrix));
         }
+        if (angel.equals(SignalAngel.ANGEL0) && info.isAnimation) {
+            LOCATION_TO_MODEL.put(new ResourceLocation(OpenSignalsMain.MODID, info.name), model);
+        }
         return new BakedModelPair(info.state, model);
     }
 
@@ -132,8 +138,8 @@ public class SignalCustomModel implements IUnbakedModel {
 
     @Override
     public IBakedModel bake(final ModelBakery bakery,
-            final Function<RenderMaterial, TextureAtlasSprite> function, final IModelTransform modelTransform,
-            final ResourceLocation resource) {
+            final Function<RenderMaterial, TextureAtlasSprite> function,
+            final IModelTransform modelTransform, final ResourceLocation resource) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
@@ -149,5 +155,10 @@ public class SignalCustomModel implements IUnbakedModel {
         final Quaternion quaternion = angel.getQuaternion();
         return new SignalBakedModel(list.stream().map(info -> transform(info, bakery, resource,
                 function, materialsFromString, quaternion)).collect(Collectors.toList()));
+    }
+
+    public static IBakedModel getModelFromLocation(final ResourceLocation location) {
+        return LOCATION_TO_MODEL.getOrDefault(location,
+                Minecraft.getInstance().getModelManager().getMissingModel());
     }
 }

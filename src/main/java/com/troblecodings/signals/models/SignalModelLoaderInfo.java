@@ -17,6 +17,7 @@ public class SignalModelLoaderInfo {
     public final float z;
     public final Map<String, String> retexture;
     public IUnbakedModel model;
+    public boolean isAnimation = false;
 
     public SignalModelLoaderInfo(final String name, final Predicate<ModelInfoWrapper> state,
             final float x, final float y, final float z, final Map<String, String> retexture) {
@@ -28,8 +29,8 @@ public class SignalModelLoaderInfo {
         this.retexture = retexture;
     }
 
-    public SignalModelLoaderInfo with(final IUnbakedModel model) {
-        this.model = model;
+    public SignalModelLoaderInfo setOnAnimation() {
+        this.isAnimation = true;
         return this;
     }
 }

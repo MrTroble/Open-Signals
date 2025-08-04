@@ -11,8 +11,8 @@ jobs:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
     - name: Get Changed Files
-      id: changed
-      uses: foodee/pr-includes-file-change@master
+      id: changed-files
+      uses: tj-actions/changed-files@v46.0.5
       with:
         paths: github/workflows/gradle.yml
 

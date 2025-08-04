@@ -3,6 +3,7 @@ package com.troblecodings.signals.parser;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.troblecodings.core.TCBoolean;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.enums.CompareValues;
 import com.troblecodings.signals.models.ModelInfoWrapper;
@@ -23,8 +24,8 @@ public final class PredicateHolder {
     @SuppressWarnings("unchecked")
     public static Predicate<ModelInfoWrapper> with(final ValuePack pack) {
         return ebs -> {
-            final Object test = ebs.get(pack.property);
-            return test != null && pack.predicate.test(test);
+            final String test = ebs.get(pack.property);
+            return test != null && pack.predicate.test(test.toUpperCase());
         };
     }
 
@@ -88,6 +89,10 @@ public final class PredicateHolder {
 
     public static Predicate<String> zs2Value(final String value) {
         return s -> s.equalsIgnoreCase(value);
+    }
+
+    public static Predicate<TCBoolean> zs6State(final TCBoolean obj) {
+        return s -> s == obj;
     }
 
     public static Predicate<Boolean> signalRepeater(final boolean state) {

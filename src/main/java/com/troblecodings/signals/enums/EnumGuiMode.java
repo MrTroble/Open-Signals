@@ -30,7 +30,10 @@ public enum EnumGuiMode {
     ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE, 1),
     TRAIN_NUMBER((_u) -> new UILines(new float[] {
             0, 0.5f, 2, 0.5f
-    }, 6).setColor(GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR), PathwayModeType.NONE, 2);
+    }, 6).setColor(GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR), PathwayModeType.NONE, 2),
+    CROSSING(new float[] {
+            0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
+    });
 
     /**
      * Naming
