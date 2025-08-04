@@ -37,7 +37,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SignalCustomModel implements IModel {
 
-    private static final Map<ResourceLocation, IBakedModel> locationToModel = new HashMap<>();
+    private static final Map<ResourceLocation, IBakedModel> LOCATION_TO_MODEL = new HashMap<>();
 
     private final HashMap<SignalModelLoaderInfo, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
     private List<ResourceLocation> textures = new ArrayList<>();
@@ -118,7 +118,7 @@ public class SignalCustomModel implements IModel {
                                 .test(new ModelInfoWrapper((IExtendedBlockState) blockstate)),
                         bakedModel);
                 if (angel.equals(SignalAngel.ANGEL0) && info.isAnimation) {
-                    locationToModel.put(new ResourceLocation(OpenSignalsMain.MODID, info.name),
+                    LOCATION_TO_MODEL.put(new ResourceLocation(OpenSignalsMain.MODID, info.name),
                             bakedModel);
                 }
             });
@@ -156,6 +156,6 @@ public class SignalCustomModel implements IModel {
     }
 
     public static IBakedModel getModelFromLocation(final ResourceLocation location) {
-        return locationToModel.get(location);
+        return LOCATION_TO_MODEL.get(location);
     }
 }

@@ -89,8 +89,8 @@ public class PreviewSideBar {
 
     private void buildRenderListForAnimations(final Signal signal, final ModelInfoWrapper wrapper) {
         animationInfos.clear();
-        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> //
-        map = SignalAnimationConfigParser.ALL_ANIMATIONS.getOrDefault(signal, new HashMap<>());
+        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = SignalAnimationConfigParser.ALL_ANIMATIONS
+                .getOrDefault(signal, new HashMap<>());
         map.forEach((entry, list) -> {
             for (final SignalAnimation animation : list) {
                 final Predicate<ModelInfoWrapper> predicate = animation.getPredicate();

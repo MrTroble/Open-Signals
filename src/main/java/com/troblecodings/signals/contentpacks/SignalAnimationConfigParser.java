@@ -20,8 +20,8 @@ public class SignalAnimationConfigParser {
 
     private static final Gson GSON = new Gson();
 
-    public static final Map<Signal, Map<Entry<String, VectorWrapper>, List<SignalAnimation>>>//
-    ALL_ANIMATIONS = new HashMap<>();
+    public static final Map<Signal, Map<Entry<String, VectorWrapper>, List<SignalAnimation>>> ALL_ANIMATIONS = //
+            new HashMap<>();
 
     public static void loadAllAnimations() {
         if (!ALL_ANIMATIONS.isEmpty())
