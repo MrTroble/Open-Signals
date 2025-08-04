@@ -31,6 +31,12 @@ public class SignalAnimationHandler {
 
     private final SignalTileEntity tile;
     private int animationsRunning = 0;
+    private long lastWorldTick = -1;
+
+    private int calls = 0;
+
+    public static final float BASIC_ANIMATION_SPEED = 0.01f;
+    public static final int MAX_CALLS_PER_TICK = 3;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;
@@ -43,9 +49,10 @@ public class SignalAnimationHandler {
         final BlockState state = tile.getBlockState();
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final BlockModelRenderer renderer = info.dispatcher.getModelRenderer();
-        final IVertexBuilder vertex =
-                info.source.getBuffer(RenderTypeLookup.getRenderType(state, false));
+        final IVertexBuilder vertex = info.source
+                .getBuffer(RenderTypeLookup.getRenderType(state, false));
         final IModelData data = tile.getModelData();
+        final boolean shouldUpdateAnimation = shouldUpdateAnimation();
 
         animationPerModel.forEach((model, entry) -> {
             final ModelTranslation translation = entry.getKey();
@@ -60,10 +67,23 @@ public class SignalAnimationHandler {
                     info.overlayTexture, data);
             info.stack.popPose();
 
-            if (translation.isAnimationAssigned()) {
+            if (translation.isAnimationAssigned() && shouldUpdateAnimation) {
                 updateAnimation(translation);
             }
         });
+    }
+
+    private boolean shouldUpdateAnimation() {
+        long currentTick = tile.getLevel().getGameTime();
+        if (currentTick != lastWorldTick) {
+            calls = 0;
+            lastWorldTick = currentTick;
+        }
+        calls++;
+        if (calls <= MAX_CALLS_PER_TICK) {
+            return true;
+        }
+        return false;
     }
 
     private void updateAnimation(final ModelTranslation translation) {
@@ -132,8 +152,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
+                    new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
                     .map(animation -> animation.copy()).collect(Collectors.toList())));

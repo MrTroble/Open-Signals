@@ -11,7 +11,7 @@ import net.minecraft.util.math.vector.Vector3f;
 
 public class SignalAnimationRotation implements SignalAnimation {
 
-    private AnimationRotionCalc calc;
+    private AnimationRotationCalc calc;
 
     private final Predicate<ModelInfoWrapper> predicate;
     private final float animationSpeed;
@@ -56,7 +56,7 @@ public class SignalAnimationRotation implements SignalAnimation {
             default:
                 break;
         }
-        this.calc = new AnimationRotionCalc(vec, maxPos, animationSpeed, axis);
+        this.calc = new AnimationRotationCalc(vec, maxPos, animationSpeed, axis);
     }
 
     @Override

@@ -2,21 +2,19 @@ package com.troblecodings.signals.animation;
 
 import java.util.Objects;
 
-import com.troblecodings.signals.core.FPSHelper;
-
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class AnimationRotionCalc {
+public class AnimationRotationCalc {
 
     private float step;
     private final RotationAxis axis;
     private float progress;
     private float max;
 
-    public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
+    public AnimationRotationCalc(final Vector3f startPosition, final Vector3f finalPosition,
             final float animationSpeed, final RotationAxis axis) {
-        this.step = 0.005f * 60 / FPSHelper.getFPS() * animationSpeed;
+        this.step = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
         this.axis = axis;
         calculateWayAndValues(startPosition, finalPosition);
     }
@@ -76,7 +74,7 @@ public class AnimationRotionCalc {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final AnimationRotionCalc other = (AnimationRotionCalc) obj;
+        final AnimationRotationCalc other = (AnimationRotationCalc) obj;
         return axis == other.axis && Float.floatToIntBits(max) == Float.floatToIntBits(other.max)
                 && Float.floatToIntBits(progress) == Float.floatToIntBits(other.progress)
                 && Float.floatToIntBits(step) == Float.floatToIntBits(other.step);
