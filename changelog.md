@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.12.2 - 3.7.1]
+* fix: render bounding box
+
 ## [1.12.2 - 3.7.0]
 * feat: new animation system for moving parts
 * feat: added render distance config option
