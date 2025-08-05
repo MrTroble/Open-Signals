@@ -28,7 +28,8 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
-            return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+            return ImmutableMap
+                    .copyOf(CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>()));
         }
     }
 
@@ -61,7 +62,7 @@ public class ClientSignalStateHandler implements INetworkSync {
                 final String value = property.getObjFromID(valueIDs[i]);
                 properties.put(property, value);
             }
-            CURRENTLY_LOADED_STATES.put(stateInfo, ImmutableMap.copyOf(properties));
+            CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
         final long startTime = Calendar.getInstance().getTimeInMillis();
         SERVICE.execute(() -> {
