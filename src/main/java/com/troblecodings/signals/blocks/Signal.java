@@ -68,8 +68,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
-            SignalAngel.class);
+    public static final EnumProperty<SignalAngel> ANGEL =
+            EnumProperty.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -151,6 +151,11 @@ public class Signal extends BasicBlock {
     public VoxelShape getCollisionShape(final BlockState blockState, final IBlockReader worldIn,
             final BlockPos pos, final ISelectionContext context) {
         return getShape(blockState, worldIn, pos, context);
+    }
+
+    @Override
+    public boolean hasDynamicShape() {
+        return true;
     }
 
     @Override
