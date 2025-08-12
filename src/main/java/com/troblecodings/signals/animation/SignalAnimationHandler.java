@@ -56,7 +56,7 @@ public class SignalAnimationHandler {
     }
 
     private final Map<Entry<IBakedModel, BufferBuilder>, Entry<ModelTranslation, List<SignalAnimation>>> //
-    animationPerModel = new HashMap<>();
+        animationPerModel = new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
         final World world = tile.getWorld();
