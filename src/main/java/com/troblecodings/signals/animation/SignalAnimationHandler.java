@@ -47,10 +47,12 @@ public class SignalAnimationHandler {
 
     public void render(final RenderAnimationInfo info) {
         final BlockState state = tile.getBlockState();
+        if (!(state.getBlock() instanceof Signal))
+            return;
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final BlockModelRenderer renderer = info.dispatcher.getModelRenderer();
-        final IVertexBuilder vertex = info.source
-                .getBuffer(RenderTypeLookup.getRenderType(state, false));
+        final IVertexBuilder vertex =
+                info.source.getBuffer(RenderTypeLookup.getRenderType(state, false));
         final IModelData data = tile.getModelData();
         final boolean shouldUpdateAnimation = shouldUpdateAnimation();
 
@@ -82,9 +84,8 @@ public class SignalAnimationHandler {
             lastWorldTick = currentTick;
         }
         calls++;
-        if (calls <= MAX_CALLS_PER_TICK) {
+        if (calls <= MAX_CALLS_PER_TICK)
             return true;
-        }
         return false;
     }
 
@@ -159,8 +160,8 @@ public class SignalAnimationHandler {
             map.forEach((entry, animations) -> {
                 final IBakedModel model = SignalCustomModel.getModelFromLocation(
                         new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-                final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                        new Quaternion(0, 0, 0, 0));
+                final ModelTranslation translation =
+                        new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
                 translation.setModelTranslation(entry.getValue().copy());
                 animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
                         .map(animation -> animation.copy()).collect(Collectors.toList())));

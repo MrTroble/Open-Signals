@@ -81,6 +81,13 @@ public class SignalCustomModel implements IUnbakedModel {
             oldVertex[i + 0] = Float.floatToIntBits(vector.x());
             oldVertex[i + 1] = Float.floatToIntBits(vector.y());
             oldVertex[i + 2] = Float.floatToIntBits(vector.z());
+
+            String texName = quad.getSprite().getName().toString();
+            if (texName.contains("lamp_")) {
+                oldVertex[i + 6] = 15728880;
+            } else if (texName.contains("reflection_")) {
+                oldVertex[i + 6] = (int) (15728880 * 0.5f);
+            }
         }
     }
 
@@ -88,11 +95,11 @@ public class SignalCustomModel implements IUnbakedModel {
             final ResourceLocation location,
             final Function<RenderMaterial, TextureAtlasSprite> function,
             final Map<String, Either<RenderMaterial, String>> material, final Quaternion rotation) {
-        final TransformationMatrix transformation = new TransformationMatrix(
-                new Vector3f(info.x, info.y, info.z), null, null, null);
+        final TransformationMatrix transformation =
+                new TransformationMatrix(new Vector3f(info.x, info.y, info.z), null, null, null);
         final BlockModel blockModel = (BlockModel) info.model;
-        final ImmutableMap<String, Either<RenderMaterial, String>> defaultMap = ImmutableMap
-                .copyOf(blockModel.textureMap);
+        final ImmutableMap<String, Either<RenderMaterial, String>> defaultMap =
+                ImmutableMap.copyOf(blockModel.textureMap);
         info.retexture.forEach((id, texture) -> blockModel.textureMap.computeIfPresent(id,
                 (_u, old) -> material.get(texture)));
         final IBakedModel model = info.model.bake(bakery, function,
@@ -142,8 +149,8 @@ public class SignalCustomModel implements IUnbakedModel {
             final IModelTransform modelTransform, final ResourceLocation resource) {
         list.forEach(info -> {
             if (info.model == null) {
-                final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
-                        "block/" + info.name);
+                final ResourceLocation location =
+                        new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name);
                 if (bakery instanceof ModelLoader) {
                     info.model = ((ModelLoader) bakery).getModelOrLogError(location,
                             String.format("Could not find %s!", location));
