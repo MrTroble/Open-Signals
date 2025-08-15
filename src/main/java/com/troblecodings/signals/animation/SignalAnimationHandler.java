@@ -62,6 +62,8 @@ public class SignalAnimationHandler {
         final World world = tile.getWorld();
         final BlockPos pos = tile.getPos();
         final IBlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof Signal))
+            return;
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         if (blockRenderer == null) {
             blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
@@ -103,9 +105,8 @@ public class SignalAnimationHandler {
             lastWorldTick = currentTick;
         }
         calls++;
-        if (calls <= MAX_CALLS_PER_TICK) {
+        if (calls <= MAX_CALLS_PER_TICK)
             return true;
-        }
         return false;
     }
 
@@ -176,8 +177,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                    new Quaternion(0, 0, 0, 0));
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),
