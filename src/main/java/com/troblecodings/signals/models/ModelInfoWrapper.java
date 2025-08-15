@@ -2,6 +2,7 @@ package com.troblecodings.signals.models;
 
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.BlockModelDataWrapper;
 import com.troblecodings.signals.SEProperty;
 
@@ -20,7 +21,8 @@ public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     public ModelInfoWrapper(final Map<SEProperty, String> states) {
         final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> builder.withInitial(property, value));
+        final Map<SEProperty, String> mapCopy = ImmutableMap.copyOf(states);
+        mapCopy.forEach((property, value) -> builder.withInitial(property, value));
         this.data = builder.build();
     }
 

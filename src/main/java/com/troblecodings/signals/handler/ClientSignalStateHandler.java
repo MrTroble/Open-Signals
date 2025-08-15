@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
@@ -27,10 +28,11 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
-            return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+            return ImmutableMap
+                    .copyOf(CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>()));
         }
     }
-    
+
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
     @Override

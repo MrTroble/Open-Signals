@@ -35,28 +35,31 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
         this.handler = new SignalAnimationHandler(this);
+
     }
 
     private final Map<SEProperty, String> properties = new HashMap<>();
 
     private final SignalStateListener listener = (info, states, changed) -> {
-        switch (changed) {
-            case ADDED_TO_CACHE: {
-                properties.clear();
-                properties.putAll(SignalStateHandler.getStates(info));
-                break;
+        synchronized (properties) {
+            switch (changed) {
+                case ADDED_TO_CACHE: {
+                    properties.clear();
+                    properties.putAll(SignalStateHandler.getStates(info));
+                    break;
+                }
+                case REMOVED_FROM_FILE:
+                case REMOVED_FROM_CACHE: {
+                    properties.clear();
+                    break;
+                }
+                case UPDATED: {
+                    properties.putAll(states);
+                    break;
+                }
+                default:
+                    break;
             }
-            case REMOVED_FROM_FILE:
-            case REMOVED_FROM_CACHE: {
-                properties.clear();
-                break;
-            }
-            case UPDATED: {
-                properties.putAll(states);
-                break;
-            }
-            default:
-                break;
         }
     };
 
@@ -97,11 +100,13 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public void requestModelDataUpdate() {
-        final Map<SEProperty, String> newProperties =
-                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> newProperties = ClientSignalStateHandler
+                .getClientStates(new StateInfo(level, worldPosition));
+        synchronized (properties) {
+            this.properties.clear();
+            this.properties.putAll(newProperties);
+        }
         handler.updateStates(newProperties, properties);
-        this.properties.clear();
-        this.properties.putAll(newProperties);
         super.requestModelDataUpdate();
     }
 
