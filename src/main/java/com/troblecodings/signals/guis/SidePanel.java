@@ -198,6 +198,7 @@ public class SidePanel {
         preview.setHeight(60);
         preview.setX(7);
         preview.add(new UIColor(0xFFAFAFAF));
+        preview.add(new UIScissor());
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         node.add(new ModeSet(modes, Rotation.values()[rotation]));
@@ -220,9 +221,6 @@ public class SidePanel {
                 new UIEntity().getInfoTextColor(), 0.5f));
         infoEntity
                 .add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.editor.key.lmb"),
-                        new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity
-                .add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.editor.key.rmb"),
                         new UIEntity().getInfoTextColor(), 0.5f));
         infoEntity.add(getSpacerLine());
         infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.description"),
@@ -708,143 +706,101 @@ public class SidePanel {
     private void addManuellRStoUI() {
         final List<SignalBoxNode> allNodes = gui.container.grid.getNodes();
         final Minecraft mc = Minecraft.getInstance();
-        final UIEntity screen = GuiElements.createScreen(searchPanel -> {
-            final UIEntity searchBar = new UIEntity();
-            searchBar.setInheritWidth(true);
-            searchBar.setHeight(20);
-            final UITextInput input = new UITextInput("");
-            searchBar.add(input);
-            searchPanel.add(searchBar);
-
-            final UIEntity listWithScroll = new UIEntity();
-            listWithScroll.setInherits(true);
-            listWithScroll.add(new UIBox(UIBox.HBOX, 2));
-            listWithScroll.add(new UIScissor());
-            listWithScroll.add(new UIBorder(0xFF00FFFF));
-            searchPanel.add(listWithScroll);
-
-            final UIEntity list = new UIEntity();
-            listWithScroll.add(list);
-            list.setInherits(true);
-
-            final UIScrollBox scrollbox = new UIScrollBox(UIBox.VBOX, 2);
-            list.add(scrollbox);
-            final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
-
-            allNodes.forEach(currentNode -> {
-                final UILabel currentStatus = new UILabel(I18Wrapper.format("info.usage.status")
-                        + " : " + I18Wrapper.format("info.usage.status.free"));
-                currentStatus.setTextColor(new UIEntity().getBasicTextColor());
-                final UIEntity statusEntity = new UIEntity();
-                statusEntity.setInheritWidth(true);
-                statusEntity.setHeight(20);
-                statusEntity.add(new UIScale(1.1f, 1.1f, 1));
-                statusEntity.add(currentStatus);
-                final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
-                currentNode.getModes().forEach((mode, entry) -> {
-                    final EnumPathUsage pathUsage = entry.getEntry(PathEntryType.PATHUSAGE)
-                            .orElse(EnumPathUsage.FREE);
-                    if (!pathUsage.equals(EnumPathUsage.FREE)) {
-                        currentStatus.setText(I18Wrapper.format("info.usage.status") + " : "
-                                + I18Wrapper.format("info.usage.status.blocked"));
-                        canBeManuelChanged.set(false);
-                    }
-                    if (!entry.containsEntry(PathEntryType.OUTPUT))
-                        return;
-                    final String name = currentNode.getPoint().toString() + " - "
-                            + ClientNameHandler.getClientName(new StateInfo(mc.level,
-                                    entry.getEntry(PathEntryType.OUTPUT).get()));
-                    final UIEntity button = GuiElements.createButton(name, e1 -> {
-                        gui.pop();
-                        final UIEntity info = new UIEntity();
-                        info.setInherits(true);
-                        info.add(new UIBox(UIBox.VBOX, 5));
-                        info.add(new UIClickable(_u -> gui.pop(), 1));
-                        info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
-                        info.add(statusEntity);
-                        final UIEntity textureEntity = new UIEntity();
-                        textureEntity.setHeight(40);
-                        textureEntity.setWidth(40);
-                        textureEntity.setX(120);
-                        textureEntity.add(new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
-                        if (canBeManuelChanged.get()) {
-                            if (currentNode.containsManuellOutput(mode)) {
-                                textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
-                            } else {
-                                textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
-                            }
-                        } else {
-                            if (!pathUsage.equals(EnumPathUsage.FREE)) {
-                                textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON_BLOCKED));
-                            } else {
-                                textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF_BLOCKED));
-                            }
-                        }
-                        info.add(textureEntity);
-                        final UILabel outputStatus = new UILabel(
-                                ((!pathUsage.equals(EnumPathUsage.FREE))
-                                        || currentNode.containsManuellOutput(mode))
-                                                ? I18Wrapper.format("info.usage.rs.true")
-                                                : I18Wrapper.format("info.usage.rs.false"));
-                        outputStatus.setCenterY(false);
-                        outputStatus.setTextColor(new UIEntity().getBasicTextColor());
-                        final UIEntity outputEntity = new UIEntity();
-                        outputEntity.setInheritWidth(true);
-                        outputEntity.setHeight(20);
-                        outputEntity.add(outputStatus);
-                        info.add(outputEntity);
-                        if (!canBeManuelChanged.get()) {
-                            gui.push(GuiElements.createScreen(entity -> entity.add(info)));
-                            return;
-                        }
-                        info.add(GuiElements.createButton(I18Wrapper.format("info.usage.change"),
-                                i -> {
-                                    final boolean turnOff = currentNode.containsManuellOutput(mode);
-                                    textureEntity.clear();
-                                    textureEntity.add(
-                                            new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
-                                    if (turnOff) {
-                                        gui.changeRedstoneOutput(currentNode.getPoint(), mode,
-                                                false);
-                                        outputStatus
-                                                .setText(I18Wrapper.format("info.usage.rs.false"));
-                                        textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
-                                    } else {
-                                        gui.changeRedstoneOutput(currentNode.getPoint(), mode,
-                                                true);
-                                        outputStatus
-                                                .setText(I18Wrapper.format("info.usage.rs.true"));
-                                        textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
-                                    }
-                                }));
-                        gui.push(GuiElements.createScreen(entity -> entity.add(info)));
-                    });
-                    list.add(button);
-                    nameToUIEntity.put(name.toLowerCase(), button);
-
-                });
-            });
-            final UIScroll scroll = new UIScroll();
-            final UIEntity scrollBar = GuiElements.createScrollBar(scrollbox, 10, scroll);
-            scrollbox.setConsumer(size -> {
-                if (size > list.getHeight()) {
-                    listWithScroll.add(scroll);
-                    listWithScroll.add(scrollBar);
-                } else {
-                    listWithScroll.remove(scrollBar);
-                    listWithScroll.remove(scroll);
+        
+        final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
+        allNodes.forEach(currentNode -> {
+            final UILabel currentStatus = new UILabel(I18Wrapper.format("info.usage.status")
+                    + " : " + I18Wrapper.format("info.usage.status.free"));
+            currentStatus.setTextColor(new UIEntity().getBasicTextColor());
+            final UIEntity statusEntity = new UIEntity();
+            statusEntity.setInheritWidth(true);
+            statusEntity.setHeight(20);
+            statusEntity.add(new UIScale(1.1f, 1.1f, 1));
+            statusEntity.add(currentStatus);
+            final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
+            currentNode.getModes().forEach((mode, entry) -> {
+                final EnumPathUsage pathUsage = entry.getEntry(PathEntryType.PATHUSAGE)
+                        .orElse(EnumPathUsage.FREE);
+                if (!pathUsage.equals(EnumPathUsage.FREE)) {
+                    currentStatus.setText(I18Wrapper.format("info.usage.status") + " : "
+                            + I18Wrapper.format("info.usage.status.blocked"));
+                    canBeManuelChanged.set(false);
                 }
-            });
-            input.setOnTextUpdate(string -> {
-                nameToUIEntity.forEach((name, entity) -> {
-                    if (!name.contains(string.toLowerCase())) {
-                        list.remove(entity);
+                if (!entry.containsEntry(PathEntryType.OUTPUT))
+                    return;
+                final String name = currentNode.getPoint().toString() + " - "
+                        + ClientNameHandler.getClientName(new StateInfo(mc.level,
+                                entry.getEntry(PathEntryType.OUTPUT).get()));
+                final UIEntity button = GuiElements.createButton(name, e1 -> {
+                    gui.pop();
+                    final UIEntity info = new UIEntity();
+                    info.setInherits(true);
+                    info.add(new UIBox(UIBox.VBOX, 5));
+                    info.add(new UIClickable(_u -> gui.pop(), 1));
+                    info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    info.add(statusEntity);
+                    final UIEntity textureEntity = new UIEntity();
+                    textureEntity.setHeight(40);
+                    textureEntity.setWidth(40);
+                    textureEntity.setX(120);
+                    textureEntity.add(new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
+                    if (canBeManuelChanged.get()) {
+                        if (currentNode.containsManuellOutput(mode)) {
+                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
+                        } else {
+                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
+                        }
                     } else {
-                        list.add(entity);
+                        if (!pathUsage.equals(EnumPathUsage.FREE)) {
+                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON_BLOCKED));
+                        } else {
+                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF_BLOCKED));
+                        }
                     }
+                    info.add(textureEntity);
+                    final UILabel outputStatus = new UILabel(
+                            ((!pathUsage.equals(EnumPathUsage.FREE))
+                                    || currentNode.containsManuellOutput(mode))
+                                            ? I18Wrapper.format("info.usage.rs.true")
+                                            : I18Wrapper.format("info.usage.rs.false"));
+                    outputStatus.setCenterY(false);
+                    outputStatus.setTextColor(new UIEntity().getBasicTextColor());
+                    final UIEntity outputEntity = new UIEntity();
+                    outputEntity.setInheritWidth(true);
+                    outputEntity.setHeight(20);
+                    outputEntity.add(outputStatus);
+                    info.add(outputEntity);
+                    if (!canBeManuelChanged.get()) {
+                        gui.push(GuiElements.createScreen(entity -> entity.add(info)));
+                        return;
+                    }
+                    info.add(GuiElements.createButton(I18Wrapper.format("info.usage.change"),
+                            i -> {
+                                final boolean turnOff = currentNode.containsManuellOutput(mode);
+                                textureEntity.clear();
+                                textureEntity.add(
+                                        new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
+                                if (turnOff) {
+                                    gui.changeRedstoneOutput(currentNode.getPoint(), mode,
+                                            false);
+                                    outputStatus
+                                            .setText(I18Wrapper.format("info.usage.rs.false"));
+                                    textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
+                                } else {
+                                    gui.changeRedstoneOutput(currentNode.getPoint(), mode,
+                                            true);
+                                    outputStatus
+                                            .setText(I18Wrapper.format("info.usage.rs.true"));
+                                    textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
+                                }
+                            }));
+                    gui.push(GuiElements.createScreen(entity -> entity.add(info)));
                 });
+                nameToUIEntity.put(name.toLowerCase(), button);
             });
         });
+
+        final UIEntity screen = GuiElements.createSelectionScreen(nameToUIEntity);
         screen.add(new UIClickable(e1 -> gui.pop(), 1));
         gui.push(screen);
     }

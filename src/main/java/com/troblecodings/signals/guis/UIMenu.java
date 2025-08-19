@@ -34,20 +34,23 @@ public class UIMenu extends UIComponentEntity {
     public UIMenu() {
         super(new UIEntity());
         entity.setInheritWidth(true);
-        entity.setHeight(32);
+        entity.setX(2);
+        entity.setY(2);
         entity.add(new UIBox(UIBox.VBOX, 0));
         entity.add(new UIScissor());
 
         final UIEntity list = new UIEntity();
         entity.add(list);
-        list.setInherits(true);
-
+        list.setInheritWidth(true);
+        list.setHeight(21);
+        
         final UIScrollBox scrollbox = new UIScrollBox(UIBox.HBOX, 2);
         list.add(scrollbox);
         for (final EnumGuiMode mode : EnumGuiMode.values()) {
             final UIEntity preview = new UIEntity();
             preview.add(new UIColor(0xFFAFAFAF));
             final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
+            preview.add(new UIScissor());
             node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
             final UISignalBoxTile sbt = new UISignalBoxTile(node);
             preview.add(sbt);
@@ -78,16 +81,6 @@ public class UIMenu extends UIComponentEntity {
         consumer.accept(selection, rotation);
     }
 
-    @Override
-    public void update() {
-        this.entity.onAdd(this.getParent());
-        entity.setHeight(32);
-        entity.setWidth(parent.getWidth() - 4);
-        entity.setX(entity.getX() + 1);
-        entity.setY(entity.getY() + 1);
-        entity.update();
-    }
-
     public int getSelection() {
         return selection;
     }
@@ -96,6 +89,20 @@ public class UIMenu extends UIComponentEntity {
         this.consumer = consumer;
     }
 
+    @Override
+    public void update() {
+    	this.entity.setHeight(this.parent.getHeight());
+    	this.entity.setWidth(this.parent.getWidth() - 4);
+    	this.entity.update();
+    }
+    
+    @Override
+    public void onAdd(UIEntity entity) {
+    	super.onAdd(entity);
+    	this.entity.onAdd(entity);
+    	this.entity.updateEvent(entity.getLastUpdateEvent());
+    }
+    
     @Override
     public void keyEvent(final KeyEvent event) {
         super.keyEvent(event);

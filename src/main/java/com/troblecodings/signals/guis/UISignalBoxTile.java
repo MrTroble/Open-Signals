@@ -173,7 +173,7 @@ public class UISignalBoxTile extends UIComponentEntity {
         this.entity.remove(setToEntity.remove(modeSet));
         this.entity.setVisible(!setToEntity.isEmpty());
     }
-
+    
     public void add(final ModeSet modeSet) {
         this.node.add(modeSet);
         localAdd(modeSet);
