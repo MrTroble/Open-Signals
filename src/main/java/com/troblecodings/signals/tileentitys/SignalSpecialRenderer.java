@@ -25,10 +25,8 @@ public class SignalSpecialRenderer extends TileEntityRenderer<SignalTileEntity> 
             tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));
         }
         if (tile.getSignal().hasAnimation()) {
-            tile.getAnimationHandler()
-                    .render(new RenderAnimationInfo(stack,
-                            Minecraft.getInstance().getBlockRenderer(), source, rand1, rand2)
-                                    .with(tile));
+            tile.getAnimationHandler().render(new RenderAnimationInfo(stack,
+                    context.getBlockRenderDispatcher(), source, rand1, rand2, tick).with(tile));
         }
     }
 }

@@ -33,10 +33,7 @@ public class SignalAnimationHandler {
     private int animationsRunning = 0;
     private long lastWorldTick = -1;
 
-    private int calls = 0;
-
-    public static final float BASIC_ANIMATION_SPEED = 0.01f;
-    public static final int MAX_CALLS_PER_TICK = 3;
+    public static final float BASIC_ANIMATION_SPEED = 0.001f;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;
@@ -49,12 +46,17 @@ public class SignalAnimationHandler {
         final BlockState state = tile.getBlockState();
         if (!(state.getBlock() instanceof Signal))
             return;
+        final long currentTick = Util.getMillis();
+        if(lastWorldTick < 0) this.lastWorldTick = currentTick;
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final BlockModelRenderer renderer = info.dispatcher.getModelRenderer();
         final IVertexBuilder vertex =
                 info.source.getBuffer(RenderTypeLookup.getRenderType(state, false));
         final IModelData data = tile.getModelData();
-        final boolean shouldUpdateAnimation = shouldUpdateAnimation();
+        
+        final float tick = (float)(currentTick - this.lastWorldTick);
+        this.lastWorldTick = currentTick;
+        System.out.println(tick);
 
         synchronized (animationPerModel) {
             animationPerModel.forEach((model, entry) -> {
@@ -70,35 +72,23 @@ public class SignalAnimationHandler {
                         info.lightColor, info.overlayTexture, data);
                 info.stack.popPose();
 
-                if (translation.isAnimationAssigned() && shouldUpdateAnimation) {
-                    updateAnimation(translation);
-                }
-            });
-        }
+            if (translation.isAnimationAssigned()) {
+                updateAnimation(translation, tick);
+            }
+        });
     }
 
-    private boolean shouldUpdateAnimation() {
-        long currentTick = tile.getLevel().getGameTime();
-        if (currentTick != lastWorldTick) {
-            calls = 0;
-            lastWorldTick = currentTick;
-        }
-        calls++;
-        if (calls <= MAX_CALLS_PER_TICK)
-            return true;
-        return false;
-    }
-
-    private void updateAnimation(final ModelTranslation translation) {
+    private void updateAnimation(final ModelTranslation translation, float tick) {
         final SignalAnimation animation = translation.getAssigendAnimation();
+        animation.updateAnimation(tick);
         if (animation.isFinished()) {
+        	System.out.println("Finished animation!");
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
             translation.removeAnimation();
             animation.reset();
             animationsRunning--;
             return;
         }
-        animation.updateAnimation();
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 

@@ -48,17 +48,17 @@ public class AnimationTranslationCalc {
         }
     }
 
-    public void updateAnimation() {
+    public void updateAnimation(float tick) {
         if (!finishedX) {
-            progressX += stepX;
+            progressX += stepX * tick;
             this.finishedX = isAnimationOnAxisIsFinished(stepX, progressX, maxX);
         }
         if (!finishedY) {
-            progressY += stepY;
+            progressY += stepY * tick;
             this.finishedY = isAnimationOnAxisIsFinished(stepY, progressY, maxY);
         }
         if (!finishedZ) {
-            progressZ += stepZ;
+            progressZ += stepZ * tick;
             this.finishedZ = isAnimationOnAxisIsFinished(stepZ, progressZ, maxZ);
         }
     }

@@ -23,8 +23,8 @@ public class SignalAnimationTranslation implements SignalAnimation {
     }
 
     @Override
-    public void updateAnimation() {
-        calc.updateAnimation();
+    public void updateAnimation(float ticks) {
+        calc.updateAnimation(ticks);
     }
 
     @Override
