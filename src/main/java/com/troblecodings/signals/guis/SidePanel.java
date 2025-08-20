@@ -806,12 +806,11 @@ public class SidePanel {
     }
 
     private void addSavedPathsToUI() {
-        final UIEntity screen = GuiElements.createScreen(entity -> {
+        final UIEntity screen = GuiElements.createScreenBack(entity -> {
             final UIEntity listWithScroll = new UIEntity();
             listWithScroll.setInherits(true);
             listWithScroll.add(new UIBox(UIBox.HBOX, 2));
             listWithScroll.add(new UIScissor());
-            listWithScroll.add(new UIBorder(0xFF00FFFF));
             entity.add(listWithScroll);
 
             final UIEntity list = new UIEntity();
@@ -861,7 +860,6 @@ public class SidePanel {
         });
         screen.add(new UIClickable(_u -> gui.pop(), 1));
         gui.push(screen);
-
     }
 
     private void addColorToTile(final Point start, final Point end, final int color) {
