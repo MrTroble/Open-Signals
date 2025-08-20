@@ -139,12 +139,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
-    public AxisAlignedBB getRenderBoundingBox() {
-        if (handler.areAnimationsRunning())
-            return new AxisAlignedBB(getBlockPos().offset(-50, -50, -50),
-                    getBlockPos().offset(50, 50, 50));
-        else
-            return super.getRenderBoundingBox();
+    public AABB getRenderBoundingBox() {
+        return getSignal().getRenderBox().map(box -> box.move(worldPosition))
+                .orElse(super.getRenderBoundingBox());
     }
 
     @OnlyIn(Dist.CLIENT)

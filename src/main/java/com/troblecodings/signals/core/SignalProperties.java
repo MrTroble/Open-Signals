@@ -1,11 +1,14 @@
 package com.troblecodings.signals.core;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProperty;
 import com.troblecodings.signals.properties.SoundProperty;
+
+import net.minecraft.world.phys.AABB;
 
 public class SignalProperties {
 
@@ -28,6 +31,7 @@ public class SignalProperties {
     public final List<ValuePack> redstoneOutputPacks;
     public final int defaultItemDamage;
     public final boolean isBridgeSignal;
+    public final Optional<AABB> shape;
 
     public SignalProperties(final Placementtool placementtool, final float customNameRenderHeight,
             final int height, final List<PredicateProperty<Integer>> signalHeights,
@@ -36,7 +40,8 @@ public class SignalProperties {
             final int textColor, final boolean canLink, final List<Integer> colors,
             final List<PredicateProperty<Float>> renderheights, final List<SoundProperty> sounds,
             final List<ValuePack> redstoneOutputs, final int defaultItemDamage,
-            final List<ValuePack> redstoneOutputPacks, final boolean isBridgeSignal) {
+            final List<ValuePack> redstoneOutputPacks, final boolean isBridgeSignal,
+            final Optional<AABB> shape) {
         this.placementtool = placementtool;
         this.customNameRenderHeight = customNameRenderHeight;
         this.defaultHeight = height;
@@ -56,5 +61,6 @@ public class SignalProperties {
         this.defaultItemDamage = defaultItemDamage;
         this.redstoneOutputPacks = redstoneOutputPacks;
         this.isBridgeSignal = isBridgeSignal;
+        this.shape = shape;
     }
 }
