@@ -12,8 +12,8 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity.KeyEvent;
 import com.troblecodings.guilib.ecs.entitys.UIScrollBox;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
-import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
+import com.troblecodings.guilib.ecs.entitys.render.UIReentrantScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -23,6 +23,9 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import net.minecraft.util.Rotation;
 
 public class UIMenu extends UIComponentEntity {
+
+	public static final int BACKGROUND_COLOR = 0xFFAFAFAF;
+	public static final int HIGHLIGHT_COLOR = 0x45339933;
 
     private final Map<EnumGuiMode, UIEntity> modeForEntity = new HashMap<>();
 
@@ -48,17 +51,17 @@ public class UIMenu extends UIComponentEntity {
         list.add(scrollbox);
         for (final EnumGuiMode mode : EnumGuiMode.values()) {
             final UIEntity preview = new UIEntity();
-            preview.add(new UIColor(0xFFAFAFAF));
+            preview.add(new UIColor(BACKGROUND_COLOR));
+            preview.add(new UIReentrantScissor());
             final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
-            preview.add(new UIScissor());
             node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
             final UISignalBoxTile sbt = new UISignalBoxTile(node);
             preview.add(sbt);
             preview.setHeight(20);
             preview.setWidth(20);
-            if (mode.ordinal() == this.selection)
-                preview.add(new UIBorder(0xFF00FF00, 1));
             preview.add(new UIClickable(e -> updateSelection(mode)));
+            if (mode.ordinal() == this.selection)
+                preview.add(new UIColor(HIGHLIGHT_COLOR));
             list.add(preview);
             modeForEntity.put(mode, preview);
         }
@@ -73,10 +76,10 @@ public class UIMenu extends UIComponentEntity {
     private void updateSelection(final EnumGuiMode newMode) {
         final UIEntity previousEntity = modeForEntity.get(EnumGuiMode.values()[selection]);
         if (previousEntity != null) {
-            previousEntity.findRecursive(UIBorder.class).forEach(previousEntity::remove);
+            previousEntity.findRecursive(UIColor.class).forEach(c -> { if(c.getColor() == HIGHLIGHT_COLOR) previousEntity.remove(c);});
         }
         final UIEntity newEntity = modeForEntity.get(newMode);
-        newEntity.add(new UIBorder(0xFF00FF00, 1));
+        newEntity.add(new UIColor(HIGHLIGHT_COLOR));
         this.selection = newMode.ordinal();
         consumer.accept(selection, rotation);
     }

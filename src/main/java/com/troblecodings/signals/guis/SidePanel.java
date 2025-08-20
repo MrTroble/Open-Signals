@@ -198,6 +198,7 @@ public class SidePanel {
         preview.setHeight(60);
         preview.setX(7);
         preview.add(new UIColor(0xFFAFAFAF));
+        preview.add(new UIBorder(preview.getBasicTextColor()));
         preview.add(new UIScissor());
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
@@ -212,7 +213,6 @@ public class SidePanel {
         sbtEntity.add(sbt);
 
         preview.add(sbtEntity);
-        preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
         preview.add(new UIScale(0.9f, 0.9f, 0));
 
         infoEntity.add(preview);
