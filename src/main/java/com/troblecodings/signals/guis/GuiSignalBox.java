@@ -25,14 +25,10 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
-import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
-import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.render.UILines;
-import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
@@ -73,7 +69,6 @@ public class GuiSignalBox extends GuiBase {
 
     public static final int SELECTION_COLOR = 0x2900FF00;
     public static final int BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
-    public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
     public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
@@ -88,30 +83,6 @@ public class GuiSignalBox extends GuiBase {
     public static final ResourceLocation REDSTONE_ON_BLOCKED =
             new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
-    private static final float[] ALL_LINES = getLines();
-    protected static final int TILE_WIDTH = 10;
-    protected static final int TILE_COUNT = 100;
-
-    private static float[] getLines() {
-        final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
-        final float step = 1.0f / TILE_COUNT;
-        for (int i = 0; i <= TILE_COUNT; i++) {
-            final int offset = i * 4;
-            final float pos = i * step;
-            lines[offset] = pos;
-            lines[offset + 1] = 0;
-            lines[offset + 2] = pos;
-            lines[offset + 3] = 1;
-
-            final int offset2 = (i + TILE_COUNT + 1) * 4;
-            lines[offset2] = 0;
-            lines[offset2 + 1] = pos;
-            lines[offset2 + 2] = 1;
-            lines[offset2 + 3] = pos;
-        }
-        return lines;
-    }
-
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
@@ -120,7 +91,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
-    private final UIEntity splitter = new UIEntity();
+    private UIEntity splitter = new UIEntity();
     private boolean allPacketsRecived = false;
     protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
@@ -579,74 +550,13 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer,
             final boolean showLines) {
-        splitter.clear();
-        final UIEntity plane = new UIEntity();
-        plane.setWidth(TILE_COUNT * TILE_WIDTH);
-        plane.setHeight(TILE_COUNT * TILE_WIDTH);
-        splitter.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
-            if (newScale <= 0)
-                return;
-            plane.setScaleX(newScale);
-            plane.setScaleY(newScale);
-            plane.update();
-        }));
-        splitter.add(new UIDrag((x, y) -> {
-            plane.setX(plane.getX() + x);
-            plane.setY(plane.getY() + y);
-            plane.update();
-        }, 2));
-        if (showLines) {
-            final UILines allLines = new UILines(ALL_LINES, 0.5F);
-            allLines.setColor(GRID_COLOR);
-            plane.add(allLines);
-        }
-        plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
-        allTiles.clear();
-        for (int x = 0; x < TILE_COUNT; x++) {
-            final UIEntity row = new UIEntity();
-            row.add(new UIBox(UIBox.HBOX, 0).setPageable(false));
-            row.setHeight(TILE_WIDTH);
-            row.setWidth(TILE_WIDTH);
-            for (int y = 0; y < TILE_COUNT; y++) {
-                final UIEntity tile = new UIEntity();
-                tile.setHeight(TILE_WIDTH);
-                tile.setWidth(TILE_WIDTH);
-                final Point name = new Point(y, x);
-                SignalBoxNode node = container.grid.getNode(name);
-                if (node == null) {
-                    node = new SignalBoxNode(name);
-                }
-                final UISignalBoxTile sbt = new UISignalBoxTile(node);
-                if (!node.isEmpty()) {
-                    allTiles.put(name, sbt);
-                }
-                tile.add(sbt);
-                sbt.setGreenSignals(container.greenSignals.getOrDefault(name, new ArrayList<>()));
-                if (!node.getCustomText().isEmpty()) {
-                    final UIEntity inputEntity = new UIEntity();
-                    inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));
-                    final UILabel label = new UILabel(node.getCustomText());
-                    label.setTextColor(0xFFFFFFFF);
-                    inputEntity.add(label);
-                    inputEntity.setX(5);
-                    tile.add(inputEntity);
-                }
-                consumer.accept(tile, sbt);
-                row.add(tile);
-            }
-            plane.add(row);
-        }
-        splitter.add(new UIColor(BACKGROUND_COLOR));
-        splitter.add(new UIScissor());
-        splitter.add(new UIBorder(0xFF000000, 4));
-        splitter.add(plane);
-        splitter.setInherits(true);
+        splitter = UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines);
+
         lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
         helpPage = new SidePanel(lowerEntity, this);
 
-        buildColors(container.grid.getNodes());
+        //buildColors(container.grid.getNodes());
     }
 
     public void updateCounter() {

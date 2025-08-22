@@ -180,7 +180,7 @@ public class ModeDropDownBoxUI {
                             screen.add(new UIBox(UIBox.VBOX, 5));
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
-                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
+                          /*  SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
                                     (tile, sbt) -> {
                                         final AtomicReference<PosIdentifier> vp =
                                                 new AtomicReference<>();
@@ -223,6 +223,7 @@ public class ModeDropDownBoxUI {
                                             tile.add(color);
                                         }
                                     });
+                            */
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 preSignalEntity.add(new UIToolTip(I18Wrapper.format("property.presignals.desc")));
@@ -238,7 +239,7 @@ public class ModeDropDownBoxUI {
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
                             final AtomicReference<UIEntity> previous = new AtomicReference<>();
-                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
+                            /*SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
                                     (tile, sbt) -> {
                                         if (sbt.getNode().isEmpty())
                                             return;
@@ -270,6 +271,7 @@ public class ModeDropDownBoxUI {
                                             }
                                         }));
                                     });
+                                    */
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 protectionWay.add(new UIToolTip(I18Wrapper.format("property.protectionway.desc")));
@@ -376,7 +378,7 @@ public class ModeDropDownBoxUI {
                             screen.add(new UIBox(UIBox.VBOX, 5));
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
-                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
+                            /* SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
                                     (nodeEntity, tile) -> {
                                         if (tile.getPoint().equals(identifier.point)) {
                                             nodeEntity
@@ -433,7 +435,7 @@ public class ModeDropDownBoxUI {
                                                 consumer.accept(node, pathModes.get(0));
                                             }
                                         }));
-                                    });
+                                    }); */
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 parent.add(button);

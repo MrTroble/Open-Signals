@@ -69,7 +69,7 @@ public class GuiPathwayRequester extends GuiBase {
         middleEntity.setInherits(true);
         middleEntity.add(new UIBox(UIBox.HBOX, 5));
         middleEntity.add(GuiElements.createSpacerH(20));
-        SignalBoxUIHelper.initializeGrid(middleEntity, container.grid, (tile, sbt) -> {
+     /*   SignalBoxUIHelper.initializeGrid(middleEntity, container.grid, (tile, sbt) -> {
             final Point name = sbt.getPoint();
             tile.add(new UIClickable(e -> {
                 if (container.start == null && sbt.isValidStart()) {
@@ -85,7 +85,7 @@ public class GuiPathwayRequester extends GuiBase {
             if (name.equals(container.start) || name.equals(container.end)) {
                 tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
             }
-        });
+        }); */
         middleEntity.add(GuiElements.createSpacerH(20));
 
         final UIEntity lowerEntity = new UIEntity();

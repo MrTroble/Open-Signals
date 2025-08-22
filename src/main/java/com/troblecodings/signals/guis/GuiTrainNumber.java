@@ -8,13 +8,10 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
-import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
-import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.ContainerTrainNumber.TrainNumberNetwork;
-import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -72,23 +69,8 @@ public class GuiTrainNumber extends GuiBase {
 
         final UIEntity changeButton = GuiElements
                 .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
-                    final UIEntity grid = new UIEntity();
-                    grid.setInherits(true);
-                    grid.add(new UIBox(UIBox.VBOX, 0));
-                    SignalBoxUIHelper.initializeGrid(grid, container.grid, (tile, sbt) -> {
-                        final Point name = sbt.getPoint();
-                        tile.add(new UIClickable(e1 -> {
-                            if (sbt.getNode().isEmpty())
-                                return;
-                            container.setPoint = name;
-                            sendNewPoint();
-                            pop();
-                        }));
-                        if (name.equals(container.setPoint)) {
-                            tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                        }
-                    });
-                    push(GuiElements.createScreen(screen -> screen.add(grid)));
+                    push(GuiElements.createScreen(screen -> 
+                    	screen.add(UISignalBoxRendering.createSignalBoxEntity(container.grid, false))));
                 });
         changeButton.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.setpoint.desc")));
         inner.add(changeButton);
