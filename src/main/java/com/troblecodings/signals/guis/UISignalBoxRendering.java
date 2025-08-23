@@ -72,7 +72,9 @@ public class UISignalBoxRendering extends UIComponent {
 	private void drawModeSets(DrawInfo info, Map<ModeSet, ModeRenderInfo> render) {
 		render.forEach((set, rInfo) -> {
 			info.push();
+			info.translate(TILE_WIDTH/2, TILE_WIDTH/2, 0);
 			info.rotate(Quaternion.fromXYZ(0, 0, set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
+			info.translate(-TILE_WIDTH/2, -TILE_WIDTH/2, 0);
 			info.translate(0, 0, set.mode.translation);
 			rInfo.component.accept(info);
 			info.pop();

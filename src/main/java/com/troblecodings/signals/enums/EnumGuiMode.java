@@ -1,5 +1,6 @@
 package com.troblecodings.signals.enums;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -60,7 +61,13 @@ public enum EnumGuiMode {
 
 	private EnumGuiMode(final float[] array, final PathwayModeType type, final int translation, final int color,
 			final int width) {
-		this((_u) -> ((info) -> info.lines(color, width, array)), type, translation);
+		this((_u) -> {
+			float[] currentArray = Arrays.copyOf(array, array.length);
+			for (int i = 0; i < array.length; i++) {
+				currentArray[i] *= UISignalBoxRendering.TILE_WIDTH;
+			}
+			return (info) -> info.lines(color, width, currentArray);
+		}, type, translation);
 	}
 
 	private EnumGuiMode(final ResourceLocation location, final PathwayModeType type, final int translation) {
