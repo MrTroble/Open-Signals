@@ -70,7 +70,7 @@ public class GuiTrainNumber extends GuiBase {
         final UIEntity changeButton = GuiElements
                 .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
                     push(GuiElements.createScreen(screen -> 
-                    	screen.add(UISignalBoxRendering.createSignalBoxEntity(container.grid, false))));
+                    	screen.add(UISignalBoxRendering.createSignalBoxEntity(container.grid, false, (a, b) -> {}))));
                 });
         changeButton.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.setpoint.desc")));
         inner.add(changeButton);

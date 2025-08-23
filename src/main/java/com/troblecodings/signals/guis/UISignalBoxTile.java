@@ -134,7 +134,16 @@ public class UISignalBoxTile extends UIComponentEntity {
             }
         }
 
-        entity.add((UIComponent) modeSet.mode.consumer.apply(state));
+        entity.add(new UIComponent() {
+			
+			@Override
+			public void update() {}
+			
+			@Override
+			public void draw(DrawInfo info) {
+				modeSet.mode.consumer.apply(state).accept(info);
+			}
+		});
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
         this.entity.setVisible(!setToEntity.isEmpty());
