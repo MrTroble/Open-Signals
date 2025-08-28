@@ -57,11 +57,13 @@ public class UISignalBoxRendering extends UIComponent {
 	private boolean showLines = false;
 	private Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
 	private final BiConsumer<UISignalBoxRendering, Point> consumer;
+	private final UIEntity gridParent;
 
-	public UISignalBoxRendering(final SignalBoxGrid grid, boolean showLines, BiConsumer<UISignalBoxRendering, Point> consumer) {
+	public UISignalBoxRendering(final SignalBoxGrid grid, boolean showLines, BiConsumer<UISignalBoxRendering, Point> consumer, UIEntity gridParent) {
 		super();
 		this.showLines = showLines;
 		this.consumer = consumer;
+		this.gridParent = gridParent;
 		gridRender = Maps.newHashMap();
 		List<SignalBoxNode> nodes = grid.getNodes();
 		nodes.forEach(node -> addNode(node, SignalState.RED));
@@ -100,8 +102,10 @@ public class UISignalBoxRendering extends UIComponent {
 	@Override
 	public void mouseEvent(MouseEvent event) {
 		if(!this.visible) return;
+		double x = event.x - parent.getX();
+		double y = event.y - parent.getLevelY();
+		final Point point = new Point((int)(x) / TILE_WIDTH, (int)(y)/ TILE_WIDTH);
 		if(event.state == EnumMouseState.RELEASE && event.key == MouseEvent.LEFT_MOUSE) {
-			final Point point = new Point((int)(event.x - parent.getX()) / TILE_WIDTH, (int)(event.y - parent.getY())/ TILE_WIDTH);
 			this.consumer.accept(this, point);
 		}
 	}
@@ -132,10 +136,10 @@ public class UISignalBoxRendering extends UIComponent {
 		final UIEntity entity = new UIEntity();
 		entity.setWidth(TILE_WIDTH * TILE_COUNT);
 		entity.setHeight(entity.getHeight());
-		entity.add(new UISignalBoxRendering(sigGrid, showLines, consumer));
+		entity.add(new UISignalBoxRendering(sigGrid, showLines, consumer, grid));
 
 		grid.add(new UIScroll(s -> {
-			final float newScale = (float) (entity.getScaleX() + s * 0.001f);
+			final float newScale = (float) (entity.getScaleX() + s * 0.01f);
 			if (newScale <= 0)
 				return;
 			entity.setScaleX(newScale);
