@@ -77,7 +77,10 @@ public class UISignalBoxRendering extends UIComponent {
 	}
 	
 	public void removeMode(Point point, ModeSet modeSet) {
-		gridRender.computeIfPresent(point, (p, f) -> null);
+		gridRender.computeIfPresent(point, (p, f) -> {
+			f.computeIfPresent(modeSet, (a, b) -> null);
+			return f.isEmpty() ? null:f;
+		});
 	}
 	
 	public void addMode(Point point, ModeSet modeSet) {
@@ -102,7 +105,8 @@ public class UISignalBoxRendering extends UIComponent {
 	@Override
 	public void mouseEvent(MouseEvent event) {
 		if(!this.visible) return;
-		double x = event.x - parent.getX();
+		if(!this.gridParent.isHovered()) return;
+		double x = event.x - parent.getLevelX();
 		double y = event.y - parent.getLevelY();
 		final Point point = new Point((int)(x) / TILE_WIDTH, (int)(y)/ TILE_WIDTH);
 		if(event.state == EnumMouseState.RELEASE && event.key == MouseEvent.LEFT_MOUSE) {
