@@ -830,7 +830,6 @@ public class SidePanel {
                 layout.add(button);
                 layout.add(
                         GuiElements.createButton(I18Wrapper.format("info.usage.show"), 40, _u -> {
-                            gui.resetTileSelection();
                             gui.pop();
                             setShowHelpPage(false);
                             addColorToTile(entry.getKey(), entry.getValue(),
@@ -863,8 +862,8 @@ public class SidePanel {
     }
 
     private void addColorToTile(final Point start, final Point end, final int color) {
-        final UISignalBoxTile startTile = gui.allTiles.get(start);
-        final UISignalBoxTile endTile = gui.allTiles.get(end);
+    	// WTF ???
+    	/*
         if (startTile == null || endTile == null)
             return;
         final UIColor uiColor = new UIColor(color);
@@ -878,7 +877,7 @@ public class SidePanel {
             }
             startTile.getParent().remove(uiColor);
             endTile.getParent().remove(uiColor);
-        }, "GuiSignalBox:showNextPathway").start();
+        }, "GuiSignalBox:showNextPathway").start(); */
     }
 
     private static UIEntity getSpacerLine() {

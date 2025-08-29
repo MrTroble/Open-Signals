@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -49,6 +48,8 @@ import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
+import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
+import com.troblecodings.signals.guis.UISignalBoxRendering.SignalBoxConsumer;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
@@ -87,20 +88,16 @@ public class GuiSignalBox extends GuiBase {
     private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
     private SignalBoxPage page = SignalBoxPage.OPERATION;
-    private UISignalBoxTile lastTile = null;
+    private SignalBoxNode lastTile = null;
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
     private UIEntity splitter = new UIEntity();
+    private UISignalBoxRendering rendering;
     private boolean allPacketsRecived = false;
-    protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
-    private final Map<Point, UIColor> colors = new HashMap<>();
-
-    private int index = 0;
-    private List<Point> pointList = new ArrayList<>();
-
+    
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
@@ -109,7 +106,6 @@ public class GuiSignalBox extends GuiBase {
         container.setSignalUpdater(this::updateSignals);
         container.setConuterUpdater(this::updateCounter);
         container.setTrainNumberUpdater(this::updateTrainNumber);
-        container.setDebugPointUpdater(this::setDebugPoint);
         this.info = info;
     }
 
@@ -118,7 +114,6 @@ public class GuiSignalBox extends GuiBase {
     }
 
     public void infoUpdate(final String errorString) {
-        this.resetTileSelection();
         final UIToolTip tooltip = new UIToolTip(errorString, true);
         lowerEntity.add(tooltip);
         new Thread(() -> {
@@ -147,19 +142,8 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void updateTrainNumber(final List<Point> points) {
-        points.forEach(point -> {
-            final UISignalBoxTile tile = allTiles.get(point);
-            if (tile == null)
-                return;
-            tile.setNode(tile.getNode());
-        });
+    	// TODO WTF IS THIS SHIT????
         lowerEntity.update();
-    }
-
-    protected void resetTileSelection() {
-        colors.values().forEach(color -> color.getParent().remove(color));
-        colors.clear();
-        this.lastTile = null;
     }
 
     protected void selectLink(final UIEntity parent, final SignalBoxNode node,
@@ -218,7 +202,6 @@ public class GuiSignalBox extends GuiBase {
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
-        this.resetTileSelection();
 
         final MainSignalIdentifier identifier =
                 new MainSignalIdentifier(new ModeIdentifier(holder.point, holder.modeSet), pos,
@@ -229,7 +212,7 @@ public class GuiSignalBox extends GuiBase {
         updateSignals(ImmutableList.of(holder.point));
     }
 
-    private void updateTileWithMode(final UIMenu menu, final UISignalBoxRendering rendering, final Point point) {
+    private void updateTileWithMode(final UIMenu menu, final UISignalBoxRendering rendering, final Point point, final int mouse) {
         if (!splitter.isHovered())
             return;
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
@@ -244,32 +227,21 @@ public class GuiSignalBox extends GuiBase {
         changedModes.put(point, node);
     }
 
-    private void tileNormal(final UISignalBoxRendering rendering, final Point tile) {
-    	/*
-            if (lastTile == null) {
-                if (currentTile.isValidStart()) {
-                    this.lastTile = currentTile;
-                    final UIColor previous = colors.get(currentTile.getPoint());
-                    if (previous != null) {
-                        previous.getParent().remove(previous);
-                    }
-
-                    final UIColor newColor = new UIColor(SELECTION_COLOR);
-                    c.add(newColor);
-                    colors.put(currentTile.getPoint(), newColor);
+    private void tileNormal(final UISignalBoxRendering rendering, final Point tile, final int mouse) {
+    	final SignalBoxNode node = this.container.grid.getNode(tile);
+           if (lastTile == null) {
+                if (node.isValidStart()) {
+                    this.lastTile = node;
                 }
             } else {
-                if (lastTile == currentTile) {
-                    this.resetTileSelection();
+                this.lastTile = null;
+                if (lastTile == node) {
                     return;
                 }
-                if (currentTile.isValidEnd()) {
-                    checkForMultiplePathTypes(lastTile.getNode(), currentTile.getNode());
-                    this.resetTileSelection();
-                    return;
+                if (node.isValidEnd()) {
+                    checkForMultiplePathTypes(lastTile, node);
                 }
             }
-            */
     }
 
     private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
@@ -306,17 +278,9 @@ public class GuiSignalBox extends GuiBase {
     private void openNodeShortcuts(final SignalBoxNode node, final UIEntity entity) {
         if (node.isEmpty())
             return;
-        final UIColor previous = colors.get(node.getPoint());
-        if (previous != null && previous.getColor() == EDIT_COLOR) {
-            helpPage.helpUsageMode(null);
-            this.resetTileSelection();
-            return;
-        }
-        this.resetTileSelection();
-
+        
         final UIColor newColor = new UIColor(EDIT_COLOR);
         entity.add(newColor);
-        colors.put(node.getPoint(), newColor);
         helpPage.helpUsageMode(node);
         helpPage.setShowHelpPage(true);
     }
@@ -515,7 +479,7 @@ public class GuiSignalBox extends GuiBase {
                 page = SignalBoxPage.EDITOR;
                 final UIMenu menu = new UIMenu();
                 initializeFieldTemplate(
-                        (rendering, point) -> this.updateTileWithMode(menu, rendering, point), true);
+                        (rendering, point, mouse) -> this.updateTileWithMode(menu, rendering, point, mouse), true);
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
@@ -541,9 +505,11 @@ public class GuiSignalBox extends GuiBase {
         push(screen);
     }
 
-    private void initializeFieldTemplate(final BiConsumer<UISignalBoxRendering, Point> consumer,
+    private void initializeFieldTemplate(final SignalBoxConsumer consumer,
             final boolean showLines) {
-        splitter = UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines, consumer);
+    	BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines, consumer);
+        splitter = entitys.entity;
+        rendering = entitys.rendering;
 
         lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
@@ -770,8 +736,7 @@ public class GuiSignalBox extends GuiBase {
         mode.writeNetwork(buffer);
         buffer.putBoolean(state);
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        final UISignalBoxTile tile = allTiles.get(point);
-        //tile.setColor(mode, state ? OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR);
+        rendering.setColor(point, mode, state ? OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR);
     }
 
     protected void setAutoPoint(final Point point, final byte state) {
@@ -917,19 +882,12 @@ public class GuiSignalBox extends GuiBase {
 
     private void buildColors(final List<SignalBoxNode> nodes) {
         nodes.forEach(node -> {
-            final UISignalBoxTile tile = allTiles.get(node.getPoint());
-            node.forEach(mode -> {
-                if (!(mode.mode == EnumGuiMode.STRAIGHT || mode.mode == EnumGuiMode.CORNER
-                        || mode.mode == EnumGuiMode.CROSSING))
-                    return;
-                if (node.containsManuellOutput(mode)) {
-                    tile.setColor(mode, OUTPUT_COLOR);
-                    return;
-                }
-                final int color = node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
+        	this.rendering.setColor(node.getPoint(), mode -> {
+                if (node.containsManuellOutput(mode))
+                    return OUTPUT_COLOR;
+                return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
                         .orElseGet(() -> EnumPathUsage.FREE).getColor();
-                tile.setColor(mode, color);
-            });
+        	});
         });
     }
 
@@ -978,7 +936,4 @@ public class GuiSignalBox extends GuiBase {
         }
     }
 
-    private void setDebugPoint(final List<Point> points) {
-        pointList = points;
-    }
 }

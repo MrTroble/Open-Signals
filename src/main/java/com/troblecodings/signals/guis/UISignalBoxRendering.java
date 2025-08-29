@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.apache.logging.log4j.util.TriConsumer;
 
 import com.google.common.collect.Maps;
 import com.mojang.math.Quaternion;
@@ -25,6 +28,8 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+
+import net.minecraft.util.Tuple;
 
 public class UISignalBoxRendering extends UIComponent {
 
@@ -56,10 +61,10 @@ public class UISignalBoxRendering extends UIComponent {
 
 	private boolean showLines = false;
 	private Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
-	private final BiConsumer<UISignalBoxRendering, Point> consumer;
+	private final SignalBoxConsumer consumer;
 	private final UIEntity gridParent;
 
-	public UISignalBoxRendering(final SignalBoxGrid grid, boolean showLines, BiConsumer<UISignalBoxRendering, Point> consumer, UIEntity gridParent) {
+	public UISignalBoxRendering(final SignalBoxGrid grid, boolean showLines, SignalBoxConsumer consumer, UIEntity gridParent) {
 		super();
 		this.showLines = showLines;
 		this.consumer = consumer;
@@ -110,8 +115,8 @@ public class UISignalBoxRendering extends UIComponent {
 		double y = event.y - parent.getLevelY();
 		final double actualWidth = TILE_WIDTH * parent.getScaleX();
 		final Point point = new Point((int)(x / actualWidth), (int)(y / actualWidth));
-		if(event.state == EnumMouseState.RELEASE && event.key == MouseEvent.LEFT_MOUSE) {
-			this.consumer.accept(this, point);
+		if(event.state == EnumMouseState.RELEASE) {
+			this.consumer.accept(this, point, event.key);
 		}
 	}
 
@@ -131,7 +136,17 @@ public class UISignalBoxRendering extends UIComponent {
 	public void update() {
 	}
 
-	public static UIEntity createSignalBoxEntity(final SignalBoxGrid sigGrid, boolean showLines, BiConsumer<UISignalBoxRendering, Point> consumer) {
+	public static class BoxEntity {
+		UIEntity entity;
+		UISignalBoxRendering rendering;
+		public BoxEntity(UIEntity entity, UISignalBoxRendering rendering) {
+			super();
+			this.entity = entity;
+			this.rendering = rendering;
+		}
+	}
+	
+	public static BoxEntity createSignalBoxEntity(final SignalBoxGrid sigGrid, boolean showLines, SignalBoxConsumer consumer) {
 		final UIEntity grid = new UIEntity();
 		grid.setInherits(true);
 		grid.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
@@ -141,7 +156,8 @@ public class UISignalBoxRendering extends UIComponent {
 		final UIEntity entity = new UIEntity();
 		entity.setWidth(TILE_WIDTH * TILE_COUNT);
 		entity.setHeight(entity.getHeight());
-		entity.add(new UISignalBoxRendering(sigGrid, showLines, consumer, grid));
+		final UISignalBoxRendering rendering = new UISignalBoxRendering(sigGrid, showLines, consumer, grid);
+		entity.add(rendering);
 
 		grid.add(new UIScroll(s -> {
 			final float newScale = (float) (entity.getScaleX() + s * 0.01f);
@@ -158,22 +174,36 @@ public class UISignalBoxRendering extends UIComponent {
 		}, 2));
 
 		grid.add(entity);
-		return grid;
+		return new BoxEntity(grid, rendering);
 	}
 
-	public void setColor(final Point point, final ModeSet mode, final int color) {
-		final ModeRenderInfo entity = gridRender.get(point).get(mode);
-		// TODO value
+	public void setColor(final Point point, final Function<ModeSet, Integer> color) {
+		gridRender.computeIfPresent(point, (p, map) -> {
+			map.forEach((set, info) -> info.color = color.apply(set));
+			return map;
+		});
 	}
+	
+	public void setColor(final Point point, final ModeSet set, final int color) {
+		gridRender.computeIfPresent(point, (p, map) -> {
+			map.computeIfPresent(set, (u, m) -> { m.color = color; return m;});
+			return map;
+		});
+	}
+
 
 	private class ModeRenderInfo {
+		public int color;
 		public final Consumer<DrawInfo> component;
 
 		public ModeRenderInfo(EnumGuiMode mode, SignalState state) {
-			final Consumer<DrawInfo> component = mode.consumer.apply(state);
-			this.component = component;
+			this.color = mode.getDefaultColor();
+			final BiConsumer<DrawInfo, Integer> component = mode.consumer.apply(state);
+			this.component = (info) -> component.accept(info, color);
 		}
 
 	}
+	
+	public static interface SignalBoxConsumer extends TriConsumer<UISignalBoxRendering, Point, Integer> {}
 
 }

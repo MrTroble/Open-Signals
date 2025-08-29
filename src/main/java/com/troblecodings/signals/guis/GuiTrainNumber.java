@@ -12,6 +12,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.ContainerTrainNumber.TrainNumberNetwork;
+import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -68,10 +69,12 @@ public class GuiTrainNumber extends GuiBase {
         inner.add(inputEntity);
 
         final UIEntity changeButton = GuiElements
-                .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
-                    push(GuiElements.createScreen(screen -> 
-                    	screen.add(UISignalBoxRendering.createSignalBoxEntity(container.grid, false, (a, b) -> {}))));
-                });
+                .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e ->
+                    push(GuiElements.createScreen(screen -> {
+                    	BoxEntity entitys = 
+                    	 UISignalBoxRendering.createSignalBoxEntity(container.grid, false, (a, b, c) -> {});
+                    	screen.add(entitys.entity);
+                    })));
         changeButton.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.setpoint.desc")));
         inner.add(changeButton);
 

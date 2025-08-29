@@ -22,10 +22,14 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraftforge.client.gui.GuiUtils;
 
 public class UISignalBoxTile extends UIComponentEntity {
 
@@ -141,7 +145,7 @@ public class UISignalBoxTile extends UIComponentEntity {
 			
 			@Override
 			public void draw(DrawInfo info) {
-				modeSet.mode.consumer.apply(state).accept(info);
+				modeSet.mode.consumer.apply(state).accept(info, SignalBoxUtil.FREE_COLOR);
 			}
 		});
         this.entity.add(entity);
