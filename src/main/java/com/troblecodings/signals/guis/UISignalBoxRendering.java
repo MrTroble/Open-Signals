@@ -63,7 +63,7 @@ public class UISignalBoxRendering extends UIComponent {
 	private Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
 	private final SignalBoxConsumer consumer;
 	private final UIEntity gridParent;
-	private final ColorPoint[] color = new ColorPoint[2];
+	private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
 
 	public UISignalBoxRendering(final SignalBoxGrid grid, boolean showLines, SignalBoxConsumer consumer, UIEntity gridParent) {
 		super();
@@ -106,32 +106,15 @@ public class UISignalBoxRendering extends UIComponent {
 			rInfo.component.accept(info);
 			info.pop();
 		});
-		info.push();
-		for(ColorPoint c : color) {
-			if(c != null) {
-				final double actualWidth = TILE_WIDTH * parent.getScaleX();
-				info.translate(c.point.getX(), c.point.getY(), 0);
-	            info.applyColor();
-	            info.depthOff();
-	            info.blendOn();
-	            final BufferWrapper wrapper = info.builder(Mode.QUADS,
-	                    DefaultVertexFormat.POSITION_COLOR);
-	            wrapper.quad(0, (int) TILE_WIDTH, 0,
-	                    (int) TILE_WIDTH, c.color);
-	            info.end();
-	            info.blendOff();
-			}
-		}
-		info.pop();
 	}
 	
 	public void addSelection(int c, Point point, SelectionType type){
-		color[type.ordinal()] = new ColorPoint(point, c);
+		colorSelections[type.ordinal()] = new ColorPoint(point, c);
 	}
 	
 	public void clearSelection() {
-		for (int i = 0; i < color.length; i++) {
-			color[i] = null;
+		for (int i = 0; i < colorSelections.length; i++) {
+			colorSelections[i] = null;
 		}
 	}
 	
@@ -158,6 +141,21 @@ public class UISignalBoxRendering extends UIComponent {
 			drawModeSets(info, modelist);
 			info.pop();
 		});
+		for(ColorPoint c : colorSelections) {
+			if(c != null) {
+				info.push();
+				info.translate(c.point.getX() * TILE_WIDTH, c.point.getY() * TILE_WIDTH, 0);
+				info.alphaOn();
+				info.blendOn();
+	            info.applyColor();
+	            final BufferWrapper wrapper = info.builder(Mode.QUADS,
+	                    DefaultVertexFormat.POSITION_COLOR);
+	            wrapper.quad(0, (int) TILE_WIDTH, 0,
+	                    (int) TILE_WIDTH, c.color);
+	            info.end();
+	    		info.pop();
+			}
+		}
 	}
 
 	@Override

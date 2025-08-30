@@ -7,10 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -238,11 +236,11 @@ public class GuiSignalBox extends GuiBase {
                     this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.FIRST);
                 }
             } else {
-                this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.SECOND);
-                this.executor.schedule(rendering::clearSelection, 500, TimeUnit.MILLISECONDS);
                 if (lastTile == node) {
                 	rendering.clearSelection();
                 } else if (node.isValidEnd()) {
+                    this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.SECOND);
+                    this.executor.schedule(rendering::clearSelection, 500, TimeUnit.MICROSECONDS);
                     checkForMultiplePathTypes(lastTile, node);
                 }
                 this.lastTile = null;
