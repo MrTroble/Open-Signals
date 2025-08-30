@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -10,7 +9,10 @@ import java.util.function.Function;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Quaternion;
+import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -28,8 +30,6 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-
-import net.minecraft.util.Tuple;
 
 public class UISignalBoxRendering extends UIComponent {
 
@@ -63,6 +63,7 @@ public class UISignalBoxRendering extends UIComponent {
 	private Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
 	private final SignalBoxConsumer consumer;
 	private final UIEntity gridParent;
+	private final ColorPoint[] color = new ColorPoint[2];
 
 	public UISignalBoxRendering(final SignalBoxGrid grid, boolean showLines, SignalBoxConsumer consumer, UIEntity gridParent) {
 		super();
@@ -105,6 +106,33 @@ public class UISignalBoxRendering extends UIComponent {
 			rInfo.component.accept(info);
 			info.pop();
 		});
+		info.push();
+		for(ColorPoint c : color) {
+			if(c != null) {
+				final double actualWidth = TILE_WIDTH * parent.getScaleX();
+				info.translate(c.point.getX(), c.point.getY(), 0);
+	            info.applyColor();
+	            info.depthOff();
+	            info.blendOn();
+	            final BufferWrapper wrapper = info.builder(Mode.QUADS,
+	                    DefaultVertexFormat.POSITION_COLOR);
+	            wrapper.quad(0, (int) TILE_WIDTH, 0,
+	                    (int) TILE_WIDTH, c.color);
+	            info.end();
+	            info.blendOff();
+			}
+		}
+		info.pop();
+	}
+	
+	public void addSelection(int c, Point point, SelectionType type){
+		color[type.ordinal()] = new ColorPoint(point, c);
+	}
+	
+	public void clearSelection() {
+		for (int i = 0; i < color.length; i++) {
+			color[i] = null;
+		}
 	}
 	
 	@Override
@@ -202,6 +230,21 @@ public class UISignalBoxRendering extends UIComponent {
 			this.component = (info) -> component.accept(info, color);
 		}
 
+	}
+	
+	public static enum SelectionType {
+		FIRST, SECOND;
+	}
+	
+	private static class ColorPoint {
+		public Point point;
+		public int color;
+		
+		public ColorPoint(Point point, int color) {
+			super();
+			this.point = point;
+			this.color = color;
+		}
 	}
 	
 	public static interface SignalBoxConsumer extends TriConsumer<UISignalBoxRendering, Point, Integer> {}

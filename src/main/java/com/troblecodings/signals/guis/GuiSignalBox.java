@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -22,6 +27,7 @@ import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
@@ -49,6 +55,7 @@ import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
+import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SignalBoxConsumer;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
@@ -97,6 +104,7 @@ public class GuiSignalBox extends GuiBase {
     private boolean allPacketsRecived = false;
     private SidePanel helpPage;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     
     public GuiSignalBox(final GuiInfo info) {
         super(info);
@@ -116,14 +124,7 @@ public class GuiSignalBox extends GuiBase {
     public void infoUpdate(final String errorString) {
         final UIToolTip tooltip = new UIToolTip(errorString, true);
         lowerEntity.add(tooltip);
-        new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-            lowerEntity.remove(tooltip);
-        }).start();
+        executor.schedule(() -> lowerEntity.remove(tooltip), 3, TimeUnit.SECONDS);
         return;
     }
 
@@ -213,7 +214,8 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void updateTileWithMode(final UIMenu menu, final UISignalBoxRendering rendering, final Point point, final int mouse) {
-        if (!splitter.isHovered())
+    	if(mouse != MouseEvent.LEFT_MOUSE) return;
+    	if (!splitter.isHovered())
             return;
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
@@ -228,20 +230,24 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void tileNormal(final UISignalBoxRendering rendering, final Point tile, final int mouse) {
-    	final SignalBoxNode node = this.container.grid.getNode(tile);
-           if (lastTile == null) {
+    	if(mouse != MouseEvent.LEFT_MOUSE) return;
+    	this.container.grid.getNodeChecked(tile).ifPresent(node -> {
+            if (lastTile == null) {
                 if (node.isValidStart()) {
                     this.lastTile = node;
+                    this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.FIRST);
                 }
             } else {
-                this.lastTile = null;
+                this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.SECOND);
+                this.executor.schedule(rendering::clearSelection, 500, TimeUnit.MILLISECONDS);
                 if (lastTile == node) {
-                    return;
-                }
-                if (node.isValidEnd()) {
+                	rendering.clearSelection();
+                } else if (node.isValidEnd()) {
                     checkForMultiplePathTypes(lastTile, node);
                 }
+                this.lastTile = null;
             }
+    	});
     }
 
     private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
@@ -515,7 +521,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(splitter);
         helpPage = new SidePanel(lowerEntity, this);
 
-        //buildColors(container.grid.getNodes());
+        buildColors(container.grid.getNodes());
     }
 
     public void updateCounter() {
@@ -892,9 +898,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void resetColors(final List<SignalBoxNode> nodes) {
-    	
         nodes.forEach(node -> {
-            //final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
                 final EnumGuiMode guiMode = mode.mode;
                 final PathOptionEntry entry = node.getOption(mode).get();
@@ -902,7 +906,7 @@ public class GuiSignalBox extends GuiBase {
                     case STRAIGHT:
                     case CORNER:
                     case CROSSING:
-                        //tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
+                        rendering.setColor(node.getPoint(), mode, SignalBoxUtil.FREE_COLOR);
                         entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
                                 _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
                         break;
@@ -923,16 +927,10 @@ public class GuiSignalBox extends GuiBase {
             final Point newPos = listOfNodes.get(i + 1).getPoint();
             final Path path = new Path(oldPos, newPos);
             final SignalBoxNode current = listOfNodes.get(i);
-            /*
-            final UISignalBoxTile uiTile = allTiles.get(current.getPoint());
-            if (uiTile == null) {
-                continue;
-            }
             final ModeSet modeSet = current.getMode(path);
             current.getOption(modeSet)
-                    .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)
+                    .ifPresent(poe -> rendering.setColor(current.getPoint(), modeSet, poe.getEntry(PathEntryType.PATHUSAGE)
                             .orElseGet(() -> EnumPathUsage.FREE).getColor()));
-                            */
         }
     }
 

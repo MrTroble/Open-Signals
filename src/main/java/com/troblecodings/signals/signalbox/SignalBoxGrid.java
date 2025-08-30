@@ -482,6 +482,11 @@ public class SignalBoxGrid implements INetworkSavable {
     public SignalBoxNode getNode(final Point point) {
         return modeGrid.get(point);
     }
+    
+    public Optional<SignalBoxNode> getNodeChecked(final Point point) {
+        return Optional.ofNullable(getNode(point));
+    }
+
 
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
