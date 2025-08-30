@@ -230,6 +230,10 @@ public class SidePanel {
                         new UIEntity().getInfoTextColor(), 0.5f));
         addHelpPageToPlane();
     }
+    
+    public void resetHelpUsageMode() {
+    	helpUsageMode(null);
+    }
 
     public void helpUsageMode(final SignalBoxNode node) {
         infoEntity.clearChildren();

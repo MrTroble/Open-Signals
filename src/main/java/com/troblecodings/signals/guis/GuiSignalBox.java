@@ -228,6 +228,11 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void tileNormal(final UISignalBoxRendering rendering, final Point tile, final int mouse) {
+    	if(mouse == MouseEvent.RIGHT_MOUSE) {
+        	this.container.grid.getNodeChecked(tile)
+        		.ifPresentOrElse(this::openNodeShortcuts, () -> this.helpPage.setShowHelpPage(false));
+        	return;
+    	}
     	if(mouse != MouseEvent.LEFT_MOUSE) return;
     	this.container.grid.getNodeChecked(tile).ifPresent(node -> {
             if (lastTile == null) {
@@ -279,12 +284,10 @@ public class GuiSignalBox extends GuiBase {
         entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(false));
     }
 
-    private void openNodeShortcuts(final SignalBoxNode node, final UIEntity entity) {
+    private void openNodeShortcuts(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
         
-        final UIColor newColor = new UIColor(EDIT_COLOR);
-        entity.add(newColor);
         helpPage.helpUsageMode(node);
         helpPage.setShowHelpPage(true);
     }
