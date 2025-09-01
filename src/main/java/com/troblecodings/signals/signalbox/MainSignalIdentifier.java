@@ -61,7 +61,7 @@ public class MainSignalIdentifier extends PosIdentifier {
 
     public static enum SignalState {
 
-        RED, GREEN, OFF, SUBSIDIARY_GREEN, SUBSIDIARY_RED, SUBSIDIARY_OFF;
+        GREEN, RED, OFF, SUBSIDIARY_GREEN, SUBSIDIARY_RED, SUBSIDIARY_OFF;
 
         public static SignalState combine(final ShowSubsidiary show) {
             if (show == null)
