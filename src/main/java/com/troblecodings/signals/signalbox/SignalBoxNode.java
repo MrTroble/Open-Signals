@@ -20,6 +20,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -33,6 +34,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
+    private final HashMap<ModeSet, SignalState> signalStates = new HashMap<>();
     private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
     private boolean isAutoPoint = false;
@@ -54,6 +56,15 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final PathOptionEntry optionEntry =
                 possibleModes.computeIfAbsent(mode, _u -> SignalBoxFactory.getFactory().getEntry());
         optionEntry.setEntry(entry, type);
+    }
+    
+    public void updateState(final ModeSet modeSet, final SignalState state) {
+    	if(state == SignalState.RED) this.signalStates.remove(modeSet);
+    	this.signalStates.put(modeSet, state);
+    }
+    
+    public SignalState getState(final ModeSet modeSet) {
+    	return this.signalStates.getOrDefault(modeSet, SignalState.RED);
     }
 
     public boolean has(final ModeSet modeSet) {
@@ -484,5 +495,5 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public Map<ModeSet, PathOptionEntry> getModes() {
         return ImmutableMap.copyOf(possibleModes);
     }
-
+    
 }

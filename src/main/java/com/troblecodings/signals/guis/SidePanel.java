@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -37,7 +37,6 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.handler.ClientNameHandler;
-import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -436,26 +435,9 @@ public class SidePanel {
                                                 }
                                                 gui.pop();
                                                 helpUsageMode(node);
-                                                final MainSignalIdentifier identifier = //
-                                                        new MainSignalIdentifier(
-                                                                new ModeIdentifier(node.getPoint(),
-                                                                        mode),
-                                                                signalPos, SignalState.combine(state
-                                                                        .getSubsidiaryShowType()));
-                                                final List<MainSignalIdentifier> greenSignals = //
-                                                        gui.container.greenSignals.computeIfAbsent(
-                                                                identifier.getPoint(),
-                                                                _u -> new ArrayList<>());
-                                                if (entry.state) {
-                                                    if (greenSignals.contains(identifier)) {
-                                                        greenSignals.remove(identifier);
-                                                    }
-                                                    greenSignals.add(identifier);
-                                                } else {
-                                                    greenSignals.remove(identifier);
-                                                }
-                                                gui.updateSignals(
-                                                        ImmutableList.of(node.getPoint()));
+                                                node.updateState(mode, SignalState.combine(state
+                                                        .getSubsidiaryShowType()));
+                                                gui.container.updatePoint.accept(node.getPoint(), mode);
                                                 if (state.isCountable() && entry.state) {
                                                     gui.container.grid.countOne();
                                                     gui.updateCounter();

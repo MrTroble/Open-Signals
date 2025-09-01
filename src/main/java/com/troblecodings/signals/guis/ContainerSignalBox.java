@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Maps;
@@ -47,9 +48,9 @@ import net.minecraft.world.server.ServerWorld;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync, IChunkLoadable {
 
-    protected final Map<Point, List<MainSignalIdentifier>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
-    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes =
+            new HashMap<>();
     protected final Map<Map.Entry<Point, Point>, PathType> nextPathways = new HashMap<>();
     protected final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
     protected SignalBoxGrid grid;
@@ -57,10 +58,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private SignalBoxTileEntity tile;
     private Consumer<String> infoUpdates;
     private Consumer<List<SignalBoxNode>> colorUpdates;
-    private Consumer<List<Point>> signalUpdates;
     private Runnable counterUpdater;
     private Consumer<List<Point>> trainNumberUpdater;
     private Consumer<List<Point>> debugPoints;
+
+    public BiConsumer<Point, ModeSet> updatePoint = (p, m) -> {
+    };
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -68,7 +71,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             this.tile = info.getTile();
             tile.add(this);
         }
-        info.player.containerMenu = this;
     }
 
     @Override
@@ -120,9 +122,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             buffer.putByte((byte) list.size());
             list.forEach(point -> point.writeNetwork(buffer));
         });
-        final List<MainSignalIdentifier> greenSignals = grid.getGreenSignals();
-        buffer.putInt(greenSignals.size());
-        greenSignals.forEach(signal -> signal.writeNetwork(buffer));
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -142,7 +141,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 possibleSubsidiaries.clear();
                 nextPathways.clear();
                 validInConnections.clear();
-                greenSignals.clear();
                 final int signalSize = buffer.getInt();
                 for (int i = 0; i < signalSize; i++) {
                     final BlockPos signalPos = buffer.getBlockPos();
@@ -178,34 +176,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     }
                     validInConnections.put(boxPos, points);
                 }
-                final int greenSignalsSize = buffer.getInt();
-                for (int i = 0; i < greenSignalsSize; i++) {
-                    final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
-
-                    final Map<ModeSet, SubsidiaryEntry> subsidiary = enabledSubsidiaryTypes
-                            .getOrDefault(identifier.getPoint(), new HashMap<>());
-                    final SubsidiaryEntry entry = subsidiary.get(identifier.getModeSet());
-                    if (entry != null) {
-                        identifier.state =
-                                SignalState.combine(entry.enumValue.getSubsidiaryShowType());
-                    }
-
-                    final List<MainSignalIdentifier> greenSignals = this.greenSignals
-                            .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
-                    greenSignals.add(identifier);
-                }
-                enabledSubsidiaryTypes.forEach((point, map) -> {
-                    map.forEach((modeSet, subsidiary) -> {
-                        final MainSignalIdentifier identifier = new MainSignalIdentifier(
-                                new ModeIdentifier(point, modeSet),
-                                grid.getNode(point).getOption(modeSet).get()
-                                        .getEntry(PathEntryType.SIGNAL).get(),
-                                SignalState.combine(subsidiary.enumValue.getSubsidiaryShowType()));
-                        final List<MainSignalIdentifier> greenSignals = this.greenSignals
-                                .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
-                        greenSignals.add(identifier);
-                    });
-                });
                 update();
                 break;
             }
@@ -246,21 +216,19 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 nextPathways.remove(Maps.immutableEntry(start, end));
                 break;
             }
-            case SET_SIGNALS: {
-                final List<Point> pointUpdates = new ArrayList<>();
+            case SET_SIGNAL_STATE: {
                 final int redSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < redSignalSize; i++) {
                     final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
-                    greenSignals.remove(identifier.getPoint());
-                    pointUpdates.add(identifier.getPoint());
-                    removeFromEnabledSubsidiaries(identifier);
+                    grid.getNodeChecked(identifier.getPoint()).ifPresent(node -> {
+                        node.updateState(identifier.getModeSet(), identifier.state);
+                        this.updatePoint.accept(identifier.getPoint(), identifier.getModeSet());
+                        removeFromEnabledSubsidiaries(identifier);
+                    });
                 }
                 final int greenSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < greenSignalSize; i++) {
                     final MainSignalIdentifier modeIdentifier = MainSignalIdentifier.of(buffer);
-                    final List<MainSignalIdentifier> greenSignals = this.greenSignals
-                            .computeIfAbsent(modeIdentifier.getPoint(), _u -> new ArrayList<>());
-
                     final Map<ModeSet, SubsidiaryEntry> subsidiary = enabledSubsidiaryTypes
                             .getOrDefault(modeIdentifier.getPoint(), new HashMap<>());
                     final SubsidiaryEntry entry = subsidiary.get(modeIdentifier.getModeSet());
@@ -268,13 +236,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                         modeIdentifier.state =
                                 SignalState.combine(entry.enumValue.getSubsidiaryShowType());
                     }
-                    if (!greenSignals.contains(modeIdentifier)) {
-                        greenSignals.add(modeIdentifier);
-                    }
-
-                    pointUpdates.add(modeIdentifier.getPoint());
+                    grid.getNodeChecked(modeIdentifier.getPoint()).ifPresent(node -> {
+                        node.updateState(modeIdentifier.getModeSet(), modeIdentifier.state);
+                        this.updatePoint.accept(modeIdentifier.getPoint(),
+                                modeIdentifier.getModeSet());
+                    });
                 }
-                signalUpdates.accept(pointUpdates);
                 break;
             }
             case SEND_COUNTER: {
@@ -476,6 +443,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             default:
                 break;
         }
+        tile.setChanged();
     }
 
     @SuppressWarnings("unchecked")
@@ -543,10 +511,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     protected void setColorUpdater(final Consumer<List<SignalBoxNode>> updater) {
         this.colorUpdates = updater;
-    }
-
-    protected void setSignalUpdater(final Consumer<List<Point>> updater) {
-        this.signalUpdates = updater;
     }
 
     protected void setConuterUpdater(final Runnable run) {

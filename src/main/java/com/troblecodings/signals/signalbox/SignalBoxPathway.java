@@ -355,7 +355,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             return;
         tile.getLevel().getServer().execute(() -> {
             final WriteBuffer buffer = new WriteBuffer();
-            buffer.putEnumValue(SignalBoxNetwork.SET_SIGNALS);
+            buffer.putEnumValue(SignalBoxNetwork.SET_SIGNAL_STATE);
             buffer.putByte((byte) redSignals.size());
             redSignals.forEach(signal -> {
                 signal.writeNetwork(buffer);

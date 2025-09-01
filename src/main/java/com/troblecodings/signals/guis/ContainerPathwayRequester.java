@@ -1,6 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.ReadBuffer;
