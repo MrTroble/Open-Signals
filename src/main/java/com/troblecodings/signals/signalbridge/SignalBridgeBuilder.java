@@ -19,6 +19,7 @@ import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -218,34 +219,24 @@ public class SignalBridgeBuilder {
     }
 
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putByte((byte) pointForBlocks.size());
-        pointForBlocks.forEach((point, block) -> {
-            point.writeNetwork(buffer);
-            buffer.putInt(block.getID());
-        });
-        buffer.putByte((byte) vecForSignal.size());
-        vecForSignal.forEach((entry, vec) -> {
-            buffer.putString(entry.getKey());
-            buffer.putInt(entry.getValue().getID());
-            vec.writeNetwork(buffer);
-        });
+        // TODO needs to be cheked
+        buffer.putMap(pointForBlocks, NetworkBufferWrappers.POINT_CONSUMER,
+                (buf, block) -> buf.putInt(block.getID()));
+        buffer.putMap(vecForSignal, (buf, entry) -> {
+            buf.putString(entry.getKey());
+            buf.putInt(entry.getValue().getID());
+        }, WriteBuffer.VEC_CONSUMER);
         startPoint.writeNetwork(buffer);
     }
 
     public void readNetwork(final ReadBuffer buffer) {
         pointForBlocks.clear();
         vecForSignal.clear();
-        final int blockSize = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < blockSize; i++) {
-            pointForBlocks.put(Point.of(buffer),
-                    SignalBridgeBasicBlock.ALL_SIGNALBRIDGE_BLOCKS.get(buffer.getInt()));
-        }
-        final int signalsSize = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < signalsSize; i++) {
-            vecForSignal.put(
-                    Maps.immutableEntry(buffer.getString(), Signal.SIGNAL_IDS.get(buffer.getInt())),
-                    VectorWrapper.of(buffer));
-        }
+        pointForBlocks.putAll(buffer.getMap(NetworkBufferWrappers.POINT_FUNCTION,
+                (buf) -> SignalBridgeBasicBlock.ALL_SIGNALBRIDGE_BLOCKS.get(buf.getInt())));
+        vecForSignal.putAll(buffer.getMap(
+                buf -> Maps.immutableEntry(buf.getString(), Signal.SIGNAL_IDS.get(buf.getInt())),
+                ReadBuffer.VEC_FUNCTION));
         this.startPoint = Point.of(buffer);
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }

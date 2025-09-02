@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 
 public class PathOptionEntry implements INetworkSavable {
 
@@ -89,37 +90,29 @@ public class PathOptionEntry implements INetworkSavable {
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        final int size = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < size; i++) {
-            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES
-                    .get(buffer.getByteToUnsignedInt());
-            final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type, _u -> type.newValue());
-            entry.readNetwork(buffer);
-            pathEntrys.put(type, entry);
-        }
+        pathEntrys.putAll(buffer.getMapWithCombinedValueFunc(
+                NetworkBufferWrappers.PATHENTRYTYPE_FUNCTION, (buf, type) -> {
+                    final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type,
+                            _u -> type.newValue());
+                    entry.readNetwork(buffer);
+                    return entry;
+                }));
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putByte((byte) pathEntrys.size());
-        pathEntrys.forEach((type, entry) -> {
-            buffer.putByte((byte) type.getID());
-            entry.writeNetwork(buffer);
-        });
+        buffer.putMap(pathEntrys, NetworkBufferWrappers.PATHENTRYTYPE_CONSUMER,
+                NetworkBufferWrappers.PATHENTRY_CONSUMER);
     }
 
     public void writeUpdateNetwork(final WriteBuffer builder) {
-        int size = 0;
-        for (final PathEntryType<?> entry : pathEntrys.keySet()) {
-            if (entry.equals(PathEntryType.PATHUSAGE) || entry.equals(PathEntryType.TRAINNUMBER))
-                size++;
-        }
-        builder.putByte((byte) size);
-        pathEntrys.forEach((mode, entry) -> {
-            if (mode.equals(PathEntryType.PATHUSAGE) || mode.equals(PathEntryType.TRAINNUMBER)) {
-                builder.putByte((byte) mode.getID());
-                entry.writeNetwork(builder);
-            }
-        });
+        // TODO rework this updateNetwork
+        final Map<PathEntryType<?>, IPathEntry<?>> entriesToSend = new HashMap<>();
+        pathEntrys.entrySet().stream()
+                .filter(entry -> entry.getKey().equals(PathEntryType.PATHUSAGE)
+                        || entry.getKey().equals(PathEntryType.TRAINNUMBER))
+                .forEach(entry -> entriesToSend.put(entry.getKey(), entry.getValue()));
+        builder.putMap(entriesToSend, NetworkBufferWrappers.PATHENTRYTYPE_CONSUMER,
+                NetworkBufferWrappers.PATHENTRY_CONSUMER);
     }
 }

@@ -69,8 +69,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final EnumProperty<SignalAngel> ANGEL =
-            EnumProperty.create("angel", SignalAngel.class);
+    public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
+            SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -93,6 +93,10 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+
+    public static Signal getSignalByID(final int id) {
+        return SIGNAL_IDS.get(id);
     }
 
     public int getID() {
@@ -183,6 +187,10 @@ public class Signal extends BasicBlock {
 
     public List<SEProperty> getProperties() {
         return this.signalProperties;
+    }
+
+    public SEProperty getPropertyByIndex(final int index) {
+        return this.signalProperties.get(index);
     }
 
     public String getSignalTypeName() {

@@ -37,6 +37,7 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
@@ -74,17 +75,17 @@ public class GuiSignalBox extends GuiBase {
     public static final int BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
-    public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
-            ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
+    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor
+            .get();
 
-    public static final ResourceLocation REDSTONE_OFF =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
+    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
@@ -99,7 +100,7 @@ public class GuiSignalBox extends GuiBase {
     private boolean allPacketsRecived = false;
     private SidePanel helpPage;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
@@ -108,8 +109,8 @@ public class GuiSignalBox extends GuiBase {
         container.setColorUpdater(this::applyColorChanges);
         container.setConuterUpdater(this::updateCounter);
         container.setTrainNumberUpdater(this::updateTrainNumber);
-        container.updatePoint =
-                (p, m) -> rendering.updateSignalState(p, m, container.grid.getNode(p).getState(m));
+        container.updatePoint = (p, m) -> rendering.updateSignalState(p, m,
+                container.grid.getNode(p).getState(m));
         this.info = info;
     }
 
@@ -172,8 +173,8 @@ public class GuiSignalBox extends GuiBase {
 
     public static String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final Minecraft mc = Minecraft.getInstance();
-        final String customName =
-                ClientNameHandler.getClientName(new StateInfo(mc.level, signalPos));
+        final String customName = ClientNameHandler
+                .getClientName(new StateInfo(mc.level, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)", customName == null
                 ? (type.equals(LinkType.SIGNAL) ? "" : I18Wrapper.format("type." + type.name()))
                 : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
@@ -201,6 +202,7 @@ public class GuiSignalBox extends GuiBase {
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
         final ModeSet modeSet = new ModeSet(mode, rotation);
+        // TODO Node must be add to grid or you get null
         final SignalBoxNode node = container.grid.getNode(point);
         if (rendering.has(point, modeSet)) {
             rendering.removeMode(point, modeSet);
@@ -302,8 +304,8 @@ public class GuiSignalBox extends GuiBase {
         nameEntity.setHeight(20);
         nameEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity labelEntity =
-                GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
+        final UIEntity labelEntity = GuiElements.createLabel(I18Wrapper.format("info.node.text"),
+                1.25f);
         labelEntity.setInheritWidth(false);
         labelEntity.setWidth(100);
         nameEntity.add(labelEntity);
@@ -485,8 +487,8 @@ public class GuiSignalBox extends GuiBase {
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo =
-                    GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
+            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"),
+                    e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -499,8 +501,8 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final SignalBoxConsumer consumer,
             final boolean showLines) {
-        BoxEntity entitys =
-                UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines, consumer);
+        BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines,
+                consumer);
         splitter = entitys.entity;
         rendering = entitys.rendering;
 
@@ -537,8 +539,8 @@ public class GuiSignalBox extends GuiBase {
                 this::initializePageSettings));
         header.add(
                 GuiElements.createButton(I18Wrapper.format("btn.edit"), this::initializeFieldEdit));
-        mainButton =
-                GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
+        mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"),
+                this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 
@@ -688,11 +690,8 @@ public class GuiSignalBox extends GuiBase {
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_CHANGED_MODES);
-        buffer.putInt(changedModes.size());
-        changedModes.forEach((point, node) -> {
-            point.writeNetwork(buffer);
-            node.writeNetwork(buffer);
-        });
+        buffer.putMap(changedModes, NetworkBufferWrappers.POINT_CONSUMER,
+                NetworkBufferWrappers.SIGNALBOXNODE_CONSUMER);
         container.grid.putAllNodes(changedModes);
         changedModes.clear();
         OpenSignalsMain.network.sendTo(info.player, buffer);
@@ -820,10 +819,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_POSIDENT_LIST);
-        buffer.putInt(list.size());
-        for (final PosIdentifier posIdent : list) {
-            posIdent.writeNetwork(buffer);
-        }
+        buffer.putList(list, NetworkBufferWrappers.POS_IDENTIFIER_CONSUMER);
         node.getPoint().writeNetwork(buffer);
         buffer.putByte((byte) mode.ordinal());
         buffer.putByte((byte) rotation.ordinal());

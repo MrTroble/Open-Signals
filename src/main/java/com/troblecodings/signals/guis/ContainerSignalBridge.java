@@ -16,6 +16,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.enums.SignalBridgeNetwork;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
@@ -53,16 +54,11 @@ public class ContainerSignalBridge extends ContainerBase {
                 });
         final WriteBuffer buffer = new WriteBuffer();
         builder.writeNetwork(buffer);
-        buffer.putByte((byte) allSignals.size());
-        allSignals.forEach((name, entry) -> {
-            buffer.putString(name);
-            buffer.putInt(entry.getKey().getID());
-            final Map<SEProperty, Integer> properties = entry.getValue();
-            buffer.putByte((byte) properties.size());
-            properties.forEach((property, value) -> {
-                buffer.putByte((byte) entry.getKey().getIDFromProperty(property));
-                buffer.putByte(value.byteValue());
-            });
+        buffer.putMap(allSignals, WriteBuffer.STRING_CONSUMER, (buf, entry) -> {
+            final Signal signal = entry.getKey();
+            buffer.putInt(signal.getID());
+            buffer.putMap(entry.getValue(), NetworkBufferWrappers.getSEPropertyConsumer(signal),
+                    WriteBuffer.INT_TO_BYTE_CONSUMER);
         });
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
@@ -71,20 +67,12 @@ public class ContainerSignalBridge extends ContainerBase {
     public void deserializeClient(final ReadBuffer buf) {
         allSignals.clear();
         builder.readNetwork(buf);
-        final int signalSize = buf.getByteToUnsignedInt();
-        for (int i = 0; i < signalSize; i++) {
-            final String name = buf.getString();
+        allSignals.putAll(buf.getMap(ReadBuffer.STRING_FUNCTION, (buffer) -> {
             final Signal signal = Signal.SIGNAL_IDS.get(buf.getInt());
-            final int propertiesSize = buf.getByteToUnsignedInt();
-            final Map<SEProperty, Integer> properties = new HashMap<>();
-            final List<SEProperty> signalProperties = signal.getProperties();
-            for (int j = 0; j < propertiesSize; j++) {
-                final SEProperty property = signalProperties.get(buf.getByteToUnsignedInt());
-                final int value = buf.getByteToUnsignedInt();
-                properties.put(property, value);
-            }
-            allSignals.put(name, Maps.immutableEntry(signal, properties));
-        }
+            return Maps.immutableEntry(signal,
+                    buffer.getMap(NetworkBufferWrappers.getSEPropertyFunc(signal),
+                            ReadBuffer.BYTE_TO_INT_FUNCTION));
+        }));
         update();
     }
 

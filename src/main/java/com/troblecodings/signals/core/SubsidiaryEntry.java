@@ -18,12 +18,11 @@ public class SubsidiaryEntry {
 
     public void writeNetwork(final WriteBuffer buffer) {
         enumValue.writeNetwork(buffer);
-        buffer.putByte((byte) (state ? 1 : 0));
+        buffer.putBoolean(state);
     }
 
     public static SubsidiaryEntry of(final ReadBuffer buffer) {
-        return new SubsidiaryEntry(SubsidiaryState.of(buffer),
-                buffer.getByte() == 1 ? true : false);
+        return new SubsidiaryEntry(SubsidiaryState.of(buffer), buffer.getBoolean());
     }
     
     private static final String SUBSIDIARY_VALUE = "subsidiaryValue";

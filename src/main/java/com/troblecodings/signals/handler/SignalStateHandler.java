@@ -25,6 +25,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.SignalStateLoadHoler;
@@ -445,7 +446,7 @@ public final class SignalStateHandler implements INetworkSync {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putInt(info.signal.getID());
-        buffer.putByte((byte) 255);
+        buffer.putBoolean(true);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
@@ -456,11 +457,10 @@ public final class SignalStateHandler implements INetworkSync {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
         buffer.putInt(stateInfo.signal.getID());
-        buffer.putByte((byte) properties.size());
-        properties.forEach((property, value) -> {
-            buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
-            buffer.putByte((byte) property.getParent().getIDFromValue(value));
-        });
+        buffer.putBoolean(false);
+        buffer.putMapWithCombinedValueConsumer(properties,
+                NetworkBufferWrappers.getSEPropertyConsumer(stateInfo.signal),
+                (buf, prop, value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
         return buffer.build();
     }
 

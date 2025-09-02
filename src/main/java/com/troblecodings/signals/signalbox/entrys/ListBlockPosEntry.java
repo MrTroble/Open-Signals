@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.PosIdentifier;
 
 public class ListBlockPosEntry extends IPathEntry<List<PosIdentifier>> {
@@ -16,16 +17,12 @@ public class ListBlockPosEntry extends IPathEntry<List<PosIdentifier>> {
     @Override
     public void readNetwork(final ReadBuffer buffer) {
         list.clear();
-        final int size = buffer.getInt();
-        for (int i = 0; i < size; i++) {
-            list.add(PosIdentifier.of(buffer));
-        }
+        list.addAll(buffer.getList(NetworkBufferWrappers.POS_IDENTIFIER_FUNCTION));
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putInt(list.size());
-        list.forEach(pos -> pos.writeNetwork(buffer));
+        buffer.putList(list, NetworkBufferWrappers.POS_IDENTIFIER_CONSUMER);
     }
 
     @Override

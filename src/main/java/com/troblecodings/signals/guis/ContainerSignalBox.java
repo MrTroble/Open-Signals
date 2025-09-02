@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -83,25 +82,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         final StateInfo identifier = new StateInfo(info.world, tile.getBlockPos());
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries =
                 SignalBoxHandler.getPossibleSubsidiaries(identifier);
+        // TODO Currently positions hold only other linked blocks (no signals) because
+        // they are send via possibleSubsidiaries, maby change?
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
-        buffer.putInt(possibleSubsidiaries.size());
-        possibleSubsidiaries.forEach((pos, list) -> {
-            buffer.putBlockPos(pos);
-            buffer.putByte((byte) list.size());
-            list.forEach(state -> buffer.putByte((byte) state.getID()));
-        });
-        buffer.putInt(positions.size());
-        positions.forEach((pos, type) -> {
-            buffer.putBlockPos(pos);
-            buffer.putByte((byte) type.ordinal());
-        });
         final Map<Map.Entry<Point, Point>, PathType> nextPathways = grid.getNextPathways();
-        buffer.putByte((byte) nextPathways.size());
-        nextPathways.forEach((entry, pathType) -> {
-            entry.getKey().writeNetwork(buffer);
-            entry.getValue().writeNetwork(buffer);
-            buffer.putEnumValue(pathType);
-        });
+        buffer.putMap(possibleSubsidiaries, WriteBuffer.BLOCKPOS_CONSUMER,
+                (bufferList, list) -> bufferList.putList(list,
+                        (bufferEntry, state) -> bufferEntry.putByte((byte) state.getID())));
+        buffer.putMap(positions, WriteBuffer.BLOCKPOS_CONSUMER, WriteBuffer.getEnumConsumer());
+        buffer.putMap(nextPathways, (b, entry) -> {
+            entry.getKey().writeNetwork(b);
+            entry.getValue().writeNetwork(b);
+        }, WriteBuffer.getEnumConsumer());
         final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
         positions.entrySet().stream().filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
                 .forEach(entry -> {
@@ -116,12 +108,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                         validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
                     }
                 });
-        buffer.putByte((byte) validInConnections.size());
-        validInConnections.forEach((pos, list) -> {
-            buffer.putBlockPos(pos);
-            buffer.putByte((byte) list.size());
-            list.forEach(point -> point.writeNetwork(buffer));
-        });
+        buffer.putMap(validInConnections, WriteBuffer.BLOCKPOS_CONSUMER,
+                (b, list) -> b.putList(list, NetworkBufferWrappers.POINT_CONSUMER));
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -141,41 +129,20 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 possibleSubsidiaries.clear();
                 nextPathways.clear();
                 validInConnections.clear();
-                final int signalSize = buffer.getInt();
-                for (int i = 0; i < signalSize; i++) {
-                    final BlockPos signalPos = buffer.getBlockPos();
+                possibleSubsidiaries.putAll(buffer.getMap((b) -> {
+                    final BlockPos signalPos = b.getBlockPos();
+                    // TODO Based on old system (read comment further up)
                     propertiesForType.put(signalPos, LinkType.SIGNAL);
-                    final List<SubsidiaryState> validSubsidiaries = new ArrayList<>();
-                    final int listSize = buffer.getByteToUnsignedInt();
-                    for (int j = 0; j < listSize; j++) {
-                        validSubsidiaries
-                                .add(SubsidiaryState.ALL_STATES.get(buffer.getByteToUnsignedInt()));
-                    }
-                    possibleSubsidiaries.put(signalPos, validSubsidiaries);
-                }
-                final int size = buffer.getInt();
-                for (int i = 0; i < size; i++) {
-                    final BlockPos blockPos = buffer.getBlockPos();
-                    final LinkType type = LinkType.of(buffer);
-                    propertiesForType.put(blockPos, type);
-                }
-                final int nextPathwaySize = buffer.getByteToUnsignedInt();
-                for (int i = 0; i < nextPathwaySize; i++) {
-                    final Point start = Point.of(buffer);
-                    final Point end = Point.of(buffer);
-                    final PathType type = buffer.getEnumValue(PathType.class);
-                    nextPathways.put(Maps.immutableEntry(start, end), type);
-                }
-                final int validInConnectionsSize = buffer.getByteToUnsignedInt();
-                for (int i = 0; i < validInConnectionsSize; i++) {
-                    final BlockPos boxPos = buffer.getBlockPos();
-                    final List<Point> points = new ArrayList<>();
-                    final int listSize = buffer.getByteToUnsignedInt();
-                    for (int j = 0; j < listSize; j++) {
-                        points.add(Point.of(buffer));
-                    }
-                    validInConnections.put(boxPos, points);
-                }
+                    return signalPos;
+                }, (b) -> b.getList(bufferEntry -> SubsidiaryState.ALL_STATES
+                        .get(bufferEntry.getByteToUnsignedInt()))));
+                propertiesForType.putAll(buffer.getMap(ReadBuffer.BLOCKPOS_FUNCTION,
+                        ReadBuffer.getEnumFunction(LinkType.class)));
+                nextPathways
+                        .putAll(buffer.getMap((b -> Maps.immutableEntry(Point.of(b), Point.of(b))),
+                                b -> b.getEnumValue(PathType.class)));
+                validInConnections.putAll(buffer.getMap(ReadBuffer.BLOCKPOS_FUNCTION,
+                        b -> b.getList(NetworkBufferWrappers.POINT_FUNCTION)));
                 update();
                 break;
             }
@@ -250,24 +217,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 break;
             }
             case SEND_TRAIN_NUMBER: {
-                final List<Point> updates = new ArrayList<>();
-                final int size = buffer.getInt();
-                for (int i = 0; i < size; i++) {
+                trainNumberUpdater.accept(buffer.getList(buf -> {
                     final Point point = Point.of(buffer);
                     grid.getNode(point).readNetwork(buffer);
-                    updates.add(point);
-                }
-                trainNumberUpdater.accept(updates);
+                    return point;
+                }));
                 break;
             }
             case SEND_DEBUG_POINTS: {
-                List<Point> points = new ArrayList<>();
-                final int size = buffer.getInt();
-                for (int i = 0; i < size; i++) {
-                    final Point point = Point.of(buffer);
-                    points.add(point);
-                }
-                debugPoints.accept(points);
+                debugPoints.accept(buffer.getList(NetworkBufferWrappers.POINT_FUNCTION));
                 break;
             }
             default:
@@ -428,12 +386,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 break;
             }
             case SEND_POSIDENT_LIST: {
-                final List<PosIdentifier> list = new ArrayList<>();
-                final int size = buffer.getInt();
-                for (int i = 0; i < size; i++) {
-                    list.add(PosIdentifier.of(buffer));
-                }
-                deserializeEntry(buffer, list);
+                deserializeEntry(buffer,
+                        buffer.getList(NetworkBufferWrappers.POS_IDENTIFIER_FUNCTION));
                 break;
             }
             case SEND_CONNECTED_TRAINNUMBERS: {
