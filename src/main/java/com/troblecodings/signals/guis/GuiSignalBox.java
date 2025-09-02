@@ -202,14 +202,14 @@ public class GuiSignalBox extends GuiBase {
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
         final ModeSet modeSet = new ModeSet(mode, rotation);
-        // TODO Node must be add to grid or you get null
-        final SignalBoxNode node = container.grid.getNode(point);
+        
+        container.grid.updateMode(point, modeSet);
         if (rendering.has(point, modeSet)) {
             rendering.removeMode(point, modeSet);
         } else {
             rendering.addMode(point, modeSet);
         }
-        changedModes.put(point, node);
+        this.changedModes.put(point, container.grid.getNode(point));
     }
 
     private void tileNormal(final UISignalBoxRendering rendering, final Point tile,

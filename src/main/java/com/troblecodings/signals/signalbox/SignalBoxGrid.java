@@ -137,6 +137,15 @@ public class SignalBoxGrid implements INetworkSavable {
         pathway.postReset();
     }
 
+    public void updateMode(final Point point, final ModeSet mode) {
+    	final SignalBoxNode node = this.modeGrid.computeIfAbsent(point, SignalBoxNode::new);
+    	if(!node.has(mode)) {
+    		node.add(mode);
+    	} else {
+    		node.remove(mode);
+    	}
+    }
+    
     protected void updateToNet(final SignalBoxPathway pathway) {
         if (tile == null || !tile.isBlocked())
             return;
