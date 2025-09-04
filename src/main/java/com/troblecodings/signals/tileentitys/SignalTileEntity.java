@@ -98,6 +98,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return handler;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void requestModelDataUpdate() {
         final Map<SEProperty, String> newProperties =
