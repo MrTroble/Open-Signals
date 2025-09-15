@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
-import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.guis.UISignalBoxTile;
@@ -50,21 +49,19 @@ public enum EnumGuiMode {
     private int defaultColor;
     private final PathwayModeType type;
 
-    private EnumGuiMode(final int id, final PathwayModeType type, final int translation) {
-        this((_u) -> ((info, c) -> UITexture.drawTexture(info, UISignalBoxTile.ICON,
-                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0,
-                id * 0.2 + 0.2, 0.5)), type, translation);
-    }
+	private EnumGuiMode(final int id, final PathwayModeType type, final int translation) {
+		this((_u) -> ((info, c) -> info.drawTexture(UISignalBoxTile.ICON, UISignalBoxRendering.TILE_WIDTH,
+				UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0, id * 0.2 + 0.2, 0.5)), type, translation);
+	}
 
-    private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type,
-            final int translation) {
-        this((state) -> {
-            final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> UITexture.drawTexture(info, UISignalBoxTile.SIGNALS,
-                    UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
-                    (id + factor) * 0.0666667f, 0.0f, (id + factor) * 0.066667f + 0.06f, 1.0f);
-        }, type, translation);
-    }
+	private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type, final int translation) {
+		this((state) -> {
+			final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
+			return (info, c) -> info.drawTexture(UISignalBoxTile.SIGNALS, UISignalBoxRendering.TILE_WIDTH,
+					UISignalBoxRendering.TILE_WIDTH, (id + factor) * 0.0666667f, 0.0f,
+					(id + factor) * 0.066667f + 0.06f, 1.0f);
+		}, type, translation);
+	}
 
     private EnumGuiMode(final float[] array) {
         this(array, PathwayModeType.NONE, 0);
@@ -86,13 +83,12 @@ public enum EnumGuiMode {
         this.defaultColor = color;
     }
 
-    private EnumGuiMode(final ResourceLocation location, final PathwayModeType type,
-            final int translation) {
-        this.consumer = (state) -> ((info, color) -> UITexture.drawTexture(info, location,
-                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, 0, 0, 1, 1));
-        this.type = type;
-        this.translation = translation;
-    }
+	private EnumGuiMode(final ResourceLocation location, final PathwayModeType type, final int translation) {
+		this.consumer = (state) -> ((info, color) -> info.drawTexture(location, UISignalBoxRendering.TILE_WIDTH,
+				UISignalBoxRendering.TILE_WIDTH, 0, 0, 1, 1));
+		this.type = type;
+		this.translation = translation;
+	}
 
     private EnumGuiMode(final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer,
             final PathwayModeType type, final int translation) {

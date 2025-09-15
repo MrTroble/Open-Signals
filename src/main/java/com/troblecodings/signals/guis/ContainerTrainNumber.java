@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.ReadBuffer;
@@ -63,7 +62,6 @@ public class ContainerTrainNumber extends ContainerBase implements IChunkLoadabl
         }
         this.setPoint = Point.of(buf);
         this.number = TrainNumber.of(buf);
-        // TODO RECHECK
         this.grid = SignalBoxFactory.getFactory().getGrid();
         grid.readNetwork(buf);
         update();
