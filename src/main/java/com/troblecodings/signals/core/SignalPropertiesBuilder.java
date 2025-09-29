@@ -3,6 +3,7 @@ package com.troblecodings.signals.core;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
@@ -21,6 +22,7 @@ import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProp
 import com.troblecodings.signals.properties.SoundProperty;
 
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
 
 public class SignalPropertiesBuilder {
 
@@ -45,6 +47,7 @@ public class SignalPropertiesBuilder {
     private int defaultItemDamage = 1;
     private boolean isBridgeSignal = false;
     private boolean hasAnimation = false;
+    private List<Integer> customRenderBoundingBox;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -146,12 +149,20 @@ public class SignalPropertiesBuilder {
         }
 
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
+        
+        Optional<AxisAlignedBB> shape = Optional.empty();
+        if (customRenderBoundingBox != null && customRenderBoundingBox.size() == 6) {
+            shape = Optional
+                    .of(new AxisAlignedBB(customRenderBoundingBox.get(0), customRenderBoundingBox.get(1),
+                            customRenderBoundingBox.get(2), customRenderBoundingBox.get(3),
+                            customRenderBoundingBox.get(4), customRenderBoundingBox.get(5)));
+        }
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
                 ImmutableList.copyOf(redstoneValuePacks), defaultItemDamage,
-                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal, hasAnimation);
+                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal, hasAnimation, shape);
     }
 }

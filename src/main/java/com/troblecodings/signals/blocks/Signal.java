@@ -122,7 +122,11 @@ public class Signal extends BasicBlock {
     @Override
     public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
             final IBlockAccess worldIn, final BlockPos pos) {
-        return FULL_BLOCK_AABB.expand(20, 10, 20).expand(-20, -10, -20);
+        return getBoundingBox(blockState, worldIn, pos);
+    }
+
+    public Optional<AxisAlignedBB> getRenderBox() {
+        return prop.shape;
     }
 
     public static ItemStack pickBlock(final EntityPlayer player, final Item item) {
