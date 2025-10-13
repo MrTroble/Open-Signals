@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
+import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.KeyEvent;
@@ -16,9 +17,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIReentrantScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.signals.enums.EnumGuiMode;
-import com.troblecodings.signals.signalbox.ModeSet;
-import com.troblecodings.signals.signalbox.Point;
-import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.util.Rotation;
 
@@ -53,9 +51,8 @@ public class UIMenu extends UIComponentEntity {
             final UIEntity preview = new UIEntity();
             preview.add(new UIColor(BACKGROUND_COLOR));
             preview.add(new UIReentrantScissor());
-            final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
-            node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
-            final UISignalBoxTile sbt = new UISignalBoxTile(node);
+            
+            final UIComponent sbt = SidePanel.fromEnum(mode.ordinal(), rotation, 1.95f);
             preview.add(sbt);
             preview.setHeight(20);
             preview.setWidth(20);

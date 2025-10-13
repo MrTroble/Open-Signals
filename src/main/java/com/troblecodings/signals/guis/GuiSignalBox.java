@@ -409,7 +409,7 @@ public class GuiSignalBox extends GuiBase {
             final UITexture texture = t.equals(LinkType.SIGNALBOX)
                     ? new UITexture(new ResourceLocation(OpenSignalsMain.MODID,
                             "textures/blocks/signalbox.png"))
-                    : new UITexture(UISignalBoxTile.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
+                    : new UITexture(UISignalBoxRendering.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
             icon.add(texture);
             icon.setHeight(20);
             icon.setWidth(20);
@@ -870,6 +870,8 @@ public class GuiSignalBox extends GuiBase {
     private void buildColors(final List<SignalBoxNode> nodes) {
         nodes.forEach(node -> {
             this.rendering.setColor(node.getPoint(), mode -> {
+            	if(mode.mode == EnumGuiMode.TRAIN_NUMBER)
+            		return mode.mode.getDefaultColor();
                 if (node.containsManuellOutput(mode))
                     return OUTPUT_COLOR;
                 return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
