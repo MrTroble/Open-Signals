@@ -108,7 +108,7 @@ public class GuiSignalBox extends GuiBase {
         container.setInfoConsumer(this::infoUpdate);
         container.setColorUpdater(this::applyColorChanges);
         container.setConuterUpdater(this::updateCounter);
-        container.setTrainNumberUpdater(this::updateTrainNumber);
+        container.setTrainNumberUpdater(this::updateTrainNumbers);
         container.updatePoint = (p, m) -> rendering.updateSignalState(p, m,
                 container.grid.getNode(p).getState(m));
         this.info = info;
@@ -125,9 +125,17 @@ public class GuiSignalBox extends GuiBase {
         return;
     }
 
-    private void updateTrainNumber(final List<Point> points) {
-        // TODO WTF IS THIS SHIT????
-        lowerEntity.update();
+    private void updateTrainNumbers(final List<SignalBoxNode> nodes) {
+        nodes.forEach(node -> {
+            node.iterator().forEachRemaining(modeSet -> {
+                if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
+                    return;
+                node.getOption(modeSet)
+                        .ifPresent(option -> option.getEntry(PathEntryType.TRAINNUMBER)
+                                .ifPresent(trainNumber -> rendering.putTrainNumber(node.getPoint(),
+                                        trainNumber.trainNumber)));
+            });
+        });
     }
 
     protected void selectLink(final UIEntity parent, final SignalBoxNode node,
@@ -202,7 +210,7 @@ public class GuiSignalBox extends GuiBase {
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
         final ModeSet modeSet = new ModeSet(mode, rotation);
-        
+
         container.grid.updateMode(point, modeSet);
         if (rendering.has(point, modeSet)) {
             rendering.removeMode(point, modeSet);
@@ -510,7 +518,9 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(splitter);
         helpPage = new SidePanel(lowerEntity, this);
 
-        buildColors(container.grid.getNodes());
+        final List<SignalBoxNode> nodes = container.grid.getNodes();
+        buildColors(nodes);
+        updateTrainNumbers(nodes);
     }
 
     public void updateCounter() {

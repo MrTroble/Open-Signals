@@ -23,7 +23,7 @@ import net.minecraft.world.server.ServerWorld;
 public class ContainerTrainNumber extends ContainerBase implements IChunkLoadable {
 
     private TrainNumberTileEntity tile;
-    protected Point setPoint;
+    protected Point selectedPoint;
     protected TrainNumber number = TrainNumber.DEFAULT;
     protected BlockPos linkedPos;
     protected SignalBoxGrid grid;
@@ -60,7 +60,7 @@ public class ContainerTrainNumber extends ContainerBase implements IChunkLoadabl
         if (this.linkedPos.equals(BlockPos.ZERO)) {
             this.linkedPos = null;
         }
-        this.setPoint = Point.of(buf);
+        this.selectedPoint = Point.of(buf);
         this.number = TrainNumber.of(buf);
         this.grid = SignalBoxFactory.getFactory().getGrid();
         grid.readNetwork(buf);
@@ -77,6 +77,31 @@ public class ContainerTrainNumber extends ContainerBase implements IChunkLoadabl
         } else if (mode.equals(TrainNumberNetwork.SEND_NEW_TRAINNUMBER)) {
             tile.setNewTrainNumber(TrainNumber.of(buf));
         }
+    }
+
+    protected void sendNewPoint() {
+        final WriteBuffer buffer = getBufferByEnum(TrainNumberNetwork.SEND_NEW_POINT);
+        selectedPoint.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendNewTrainNumber(final String number) {
+        final WriteBuffer buffer = getBufferByEnum(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
+        buffer.putEnumValue(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
+        buffer.putString(number);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void setTrainNumber() {
+        final WriteBuffer buffer = getBufferByEnum(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
+        buffer.putEnumValue(TrainNumberNetwork.SET_TRAINNUMBER);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private WriteBuffer getBufferByEnum(final TrainNumberNetwork networkEnum) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(networkEnum);
+        return buffer;
     }
 
     public static enum TrainNumberNetwork {

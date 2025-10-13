@@ -365,6 +365,7 @@ public class ModeDropDownBoxUI {
                 break;
             }
             case TRAIN_NUMBER: {
+                // TODO Add set of connected Train Number Element
                 final UIEntity button = GuiElements
                         .createButton(I18Wrapper.format("btn.connect.trainnumber"), e -> {
                             final ModeIdentifier identifier =

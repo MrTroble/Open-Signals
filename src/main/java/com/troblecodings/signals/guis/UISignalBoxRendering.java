@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.util.TriConsumer;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
@@ -24,36 +27,36 @@ import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
-
-import net.minecraft.resources.ResourceLocation;
-
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 
 public class UISignalBoxRendering extends UIComponent {
-    public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/symbols.png");
-    public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/arrow.png");
-    public static final ResourceLocation INCOMING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/connection_in.png");
-    public static final ResourceLocation OUTGOING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/connection_out.png");
-    public static final ResourceLocation SIGNALS = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/signals.png");
-    public static final ResourceLocation NE1_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/ne1.png");
-    public static final ResourceLocation NE5_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/ne5.png");
-    public static final ResourceLocation ZS3_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/zs3.png");
-
+    public static final ResourceLocation ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/symbols.png");
+    public static final ResourceLocation ARROW_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/arrow.png");
+    public static final ResourceLocation INCOMING_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_in.png");
+    public static final ResourceLocation OUTGOING_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_out.png");
+    public static final ResourceLocation SIGNALS =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/signals.png");
+    public static final ResourceLocation NE1_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne1.png");
+    public static final ResourceLocation NE5_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne5.png");
+    public static final ResourceLocation ZS3_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/zs3.png");
 
     public static final int TILE_WIDTH = 10;
     public static final int TILE_COUNT = 100;
@@ -83,18 +86,19 @@ public class UISignalBoxRendering extends UIComponent {
 
     private boolean showLines = false;
     private final Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
+    private final FontRenderer font = Minecraft.getInstance().font;
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
+    private final Map<Point, String> trainNumbers = new HashMap<>();
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final boolean showLines,
             final SignalBoxConsumer consumer, final UIEntity gridParent) {
-        super();
         this.showLines = showLines;
         this.consumer = consumer;
         this.gridParent = gridParent;
         gridRender = Maps.newHashMap();
-        List<SignalBoxNode> nodes = grid.getNodes();
+        final List<SignalBoxNode> nodes = grid.getNodes();
         nodes.forEach(this::addNode);
     }
 
@@ -128,10 +132,14 @@ public class UISignalBoxRendering extends UIComponent {
             info.translate(TILE_WIDTH / 2, TILE_WIDTH / 2, 0);
             info.rotate(QuaternionWrapper.fromXYZ(0, 0,
                     set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
-            info.translate(-TILE_WIDTH / 2, -TILE_WIDTH / 2, set.mode.translation);
+            info.translate(-TILE_WIDTH / 2, -TILE_WIDTH / 2, set.mode.depth);
             rInfo.component.accept(info);
             info.pop();
         });
+    }
+
+    public void putTrainNumber(final Point point, final String text) {
+        trainNumbers.put(point, text);
     }
 
     public void addSelection(final int c, final Point point, final SelectionType type) {
@@ -170,7 +178,7 @@ public class UISignalBoxRendering extends UIComponent {
             drawModeSets(info, modelist);
             info.pop();
         });
-        for (ColorPoint c : colorSelections) {
+        for (final ColorPoint c : colorSelections) {
             if (c != null) {
                 info.push();
                 info.translate(c.point.getX() * TILE_WIDTH, c.point.getY() * TILE_WIDTH, 0);
@@ -184,6 +192,20 @@ public class UISignalBoxRendering extends UIComponent {
                 info.pop();
             }
         }
+        final int signalBoxTrainNumberColor = ConfigHandler.CLIENT.signalboxTrainNumberColor.get();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO);
+        trainNumbers.forEach((point, number) -> {
+            final float translateWidth = (4 * TILE_WIDTH - font.width(number)) / 2;
+            info.push();
+            info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
+            info.scale(0.5f, 0.5f, 0.5f);
+            font.draw(info.stack, number, translateWidth, 6.5f, signalBoxTrainNumberColor);
+            info.pop();
+        });
+        RenderSystem.blendColor(1, 1, 1, 1);
     }
 
     @Override

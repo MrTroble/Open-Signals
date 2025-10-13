@@ -1,8 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
@@ -11,11 +8,12 @@ import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.render.UIColor;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
+import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -23,7 +21,6 @@ public class GuiPathwayRequester extends GuiBase {
 
     private final ContainerPathwayRequester container;
     private final PlayerEntity player;
-    private final Map<Point, UIEntity> allTiles = new HashMap<>();
 
     public GuiPathwayRequester(final GuiInfo info) {
         super(info);
@@ -42,16 +39,41 @@ public class GuiPathwayRequester extends GuiBase {
         higherEntity.setHeight(20);
         higherEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity label = GuiElements.createLabel(I18Wrapper.format("tile.pathwayrequester"),
-                0x7678a0);
+        final UIEntity label =
+                GuiElements.createLabel(I18Wrapper.format("tile.pathwayrequester"), 0x7678a0, 1f);
         higherEntity.add(label);
 
-        final UIEntity newPathButton = GuiElements
-                .createButton(I18Wrapper.format("gui.pwr.newpath"), e -> {
-                    final UIEntity start = allTiles.getOrDefault(container.start, new UIEntity());
-                    start.findRecursive(UIColor.class).forEach(start::remove);
-                    final UIEntity end = allTiles.getOrDefault(container.end, new UIEntity());
-                    start.findRecursive(UIColor.class).forEach(end::remove);
+        final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(container.grid,
+                false, (rendering, point, mouseKey) -> {
+                    if (mouseKey != MouseEvent.LEFT_MOUSE)
+                        return;
+                    container.grid.getNodeChecked(point).ifPresent(node -> {
+                        if (container.start == null && node.isValidStart()) {
+                            container.start = point;
+                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
+                                    SelectionType.FIRST);
+                        } else if (container.start != null && container.end == null
+                                && node.isValidEnd()) {
+                            container.end = point;
+                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
+                                    SelectionType.SECOND);
+                            sendPWToServer();
+                            infoUpdate(I18Wrapper.format("gui.saved"));
+                        }
+                    });
+                });
+        if (container.start != null) {
+            boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR, container.start,
+                    SelectionType.FIRST);
+        }
+        if (container.end != null) {
+            boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR, container.end,
+                    SelectionType.SECOND);
+        }
+
+        final UIEntity newPathButton =
+                GuiElements.createButton(I18Wrapper.format("gui.pwr.newpath"), e -> {
+                    boxEntity.rendering.clearSelection();
                     container.start = null;
                     container.end = null;
                     infoUpdate(I18Wrapper.format("gui.pwr.newpath.set"));
@@ -68,23 +90,7 @@ public class GuiPathwayRequester extends GuiBase {
         middleEntity.setInherits(true);
         middleEntity.add(new UIBox(UIBox.HBOX, 5));
         middleEntity.add(GuiElements.createSpacerH(20));
-     /*   SignalBoxUIHelper.initializeGrid(middleEntity, container.grid, (tile, sbt) -> {
-            final Point name = sbt.getPoint();
-            tile.add(new UIClickable(e -> {
-                if (container.start == null && sbt.isValidStart()) {
-                    container.start = name;
-                    e.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                } else if (container.start != null && container.end == null && sbt.isValidEnd()) {
-                    container.end = name;
-                    e.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                    sendPWToServer();
-                    infoUpdate(I18Wrapper.format("gui.saved"));
-                }
-            }));
-            if (name.equals(container.start) || name.equals(container.end)) {
-                tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-            }
-        }); */
+        middleEntity.add(boxEntity.entity);
         middleEntity.add(GuiElements.createSpacerH(20));
 
         final UIEntity lowerEntity = new UIEntity();

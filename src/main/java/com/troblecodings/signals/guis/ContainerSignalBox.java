@@ -58,7 +58,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private Consumer<String> infoUpdates;
     private Consumer<List<SignalBoxNode>> colorUpdates;
     private Runnable counterUpdater;
-    private Consumer<List<Point>> trainNumberUpdater;
+    private Consumer<List<SignalBoxNode>> trainNumberUpdater;
     private Consumer<List<Point>> debugPoints;
 
     public BiConsumer<Point, ModeSet> updatePoint = (p, m) -> {
@@ -219,8 +219,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             case SEND_TRAIN_NUMBER: {
                 trainNumberUpdater.accept(buffer.getList(buf -> {
                     final Point point = Point.of(buffer);
-                    grid.getNode(point).readNetwork(buffer);
-                    return point;
+                    final SignalBoxNode node = grid.getNode(point);
+                    node.readNetwork(buffer);
+                    return node;
                 }));
                 break;
             }
@@ -471,7 +472,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         this.counterUpdater = run;
     }
 
-    protected void setTrainNumberUpdater(final Consumer<List<Point>> updater) {
+    protected void setTrainNumberUpdater(final Consumer<List<SignalBoxNode>> updater) {
         this.trainNumberUpdater = updater;
     }
 
