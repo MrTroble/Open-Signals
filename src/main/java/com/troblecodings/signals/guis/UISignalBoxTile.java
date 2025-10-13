@@ -92,7 +92,7 @@ public class UISignalBoxTile extends UIComponentEntity {
             rotation.setRotateZ(modeSet.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE);
             entity.add(rotation);
         }
-        entity.add(new UIIndependentTranslate(0, 0, modeSet.mode.translation + 1));
+        entity.add(new UIIndependentTranslate(0, 0, modeSet.mode.depth + 1));
 
         SignalState state = greenSignals.getOrDefault(modeSet, SignalState.RED);
         if (modeSet.mode.equals(EnumGuiMode.RS)) {
