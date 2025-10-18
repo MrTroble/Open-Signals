@@ -224,11 +224,17 @@ public class GuiSignalBox extends GuiBase {
             final int mouse) {
         if (mouse == MouseEvent.RIGHT_MOUSE) {
             this.container.grid.getNodeChecked(tile).ifPresentOrElse(this::openNodeShortcuts,
-                    () -> this.helpPage.setShowHelpPage(false));
+                    () -> { 
+                    	this.helpPage.setShowHelpPage(false); 
+                        rendering.clearSelection();
+                        this.lastTile = null;
+                    });
             return;
         }
+    	this.helpPage.setShowHelpPage(false); 
+        rendering.clearSelection();
         if (mouse != MouseEvent.LEFT_MOUSE)
-            return;
+        	return;
         this.container.grid.getNodeChecked(tile).ifPresent(node -> {
             if (lastTile == null) {
                 if (node.isValidStart()) {
@@ -282,7 +288,9 @@ public class GuiSignalBox extends GuiBase {
     private void openNodeShortcuts(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
-
+        rendering.addSelection(EDIT_COLOR, node.getPoint(), SelectionType.FIRST);
+        lastTile = null;
+        
         helpPage.helpUsageMode(node);
         helpPage.setShowHelpPage(true);
     }
@@ -450,7 +458,6 @@ public class GuiSignalBox extends GuiBase {
         reset();
         sendModeChanges();
         page = SignalBoxPage.OPERATION;
-        initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
         helpPage.helpUsageMode(null);
         disableBottomEntity();

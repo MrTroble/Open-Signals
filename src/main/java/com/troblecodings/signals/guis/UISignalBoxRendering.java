@@ -59,6 +59,7 @@ public class UISignalBoxRendering extends UIComponent {
             new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/zs3.png");
 
     public static final int TILE_WIDTH = 10;
+    public static final int HALF_TILE = UISignalBoxRendering.TILE_WIDTH/2;
     public static final int TILE_COUNT = 100;
     public static final int GRID_COLOR = 0xFF5B5B5B;
     private static final float[] ALL_LINES = getLines();
@@ -129,10 +130,10 @@ public class UISignalBoxRendering extends UIComponent {
     private void drawModeSets(final DrawInfo info, final Map<ModeSet, ModeRenderInfo> render) {
         render.forEach((set, rInfo) -> {
             info.push();
-            info.translate(TILE_WIDTH / 2, TILE_WIDTH / 2, 0);
+            info.translate(HALF_TILE, HALF_TILE, 0);
             info.rotate(QuaternionWrapper.fromXYZ(0, 0,
                     set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
-            info.translate(-TILE_WIDTH / 2, -TILE_WIDTH / 2, set.mode.depth);
+            info.translate(-HALF_TILE, -HALF_TILE, set.mode.depth);
             rInfo.component.accept(info);
             info.pop();
         });
