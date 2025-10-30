@@ -69,6 +69,7 @@ public final class SignalBoxUtil {
 
     public static PathwayRequestResult requestPathway(final SignalBoxGrid grid, final Point p1,
             final Point p2, final PathType pathType) {
+        // TODO Redo to really identifiy problem, why PW can't be set
         final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return PathwayRequestResult.NOT_IN_GRID;
@@ -121,8 +122,8 @@ public final class SignalBoxUtil {
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                result = checker.check();
-                if (nextPoint.equals(p2) || result.isPass()) {
+                final PathwayRequestResult checkResult = checker.check();
+                if (nextPoint.equals(p2) || checkResult.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
