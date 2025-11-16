@@ -209,7 +209,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
-        
+
         final ModeSet modeSet = new ModeSet(mode, rotation);
 
         container.grid.updateMode(point, modeSet);
@@ -465,6 +465,7 @@ public class GuiSignalBox extends GuiBase {
         reset();
         sendModeChanges();
         page = SignalBoxPage.OPERATION;
+        initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
         helpPage.helpUsageMode(null);
         disableBottomEntity();
