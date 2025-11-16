@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -59,7 +60,7 @@ public class UISignalBoxRendering extends UIComponent {
             new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/zs3.png");
 
     public static final int TILE_WIDTH = 10;
-    public static final int HALF_TILE = UISignalBoxRendering.TILE_WIDTH/2;
+    public static final int HALF_TILE = UISignalBoxRendering.TILE_WIDTH / 2;
     public static final int TILE_COUNT = 100;
     public static final int GRID_COLOR = 0xFF5B5B5B;
     private static final float[] ALL_LINES = getLines();
@@ -143,8 +144,22 @@ public class UISignalBoxRendering extends UIComponent {
         trainNumbers.put(point, text);
     }
 
-    public void addSelection(final int c, final Point point, final SelectionType type) {
-        colorSelections[type.ordinal()] = new ColorPoint(point, c);
+    public boolean hasSelection(int c, Point point, SelectionType type) {
+        final ColorPoint colorPoint = colorSelections[type.ordinal()];
+        return colorPoint == null ? false : colorPoint.equals(new ColorPoint(point, c));
+    }
+
+    public void addSelection(int c, Point point, SelectionType type) {
+        final ColorPoint colorPoint = new ColorPoint(point, c);
+        if (colorSelections[type.ordinal()] == colorPoint) {
+            colorSelections[type.ordinal()] = null;
+        } else {
+            colorSelections[type.ordinal()] = colorPoint;
+        }
+    }
+
+    public void removeSelection(final SelectionType type) {
+        colorSelections[type.ordinal()] = null;
     }
 
     public void clearSelection() {
@@ -315,6 +330,24 @@ public class UISignalBoxRendering extends UIComponent {
             this.point = point;
             this.color = color;
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(color, point);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ColorPoint other = (ColorPoint) obj;
+            return color == other.color && Objects.equals(point, other.point);
+        }
+
     }
 
     public static interface SignalBoxConsumer

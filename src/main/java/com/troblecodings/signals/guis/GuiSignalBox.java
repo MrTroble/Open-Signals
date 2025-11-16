@@ -288,11 +288,17 @@ public class GuiSignalBox extends GuiBase {
     private void openNodeShortcuts(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
-        rendering.addSelection(EDIT_COLOR, node.getPoint(), SelectionType.FIRST);
-        lastTile = null;
-
-        helpPage.helpUsageMode(node);
-        helpPage.setShowHelpPage(true);
+        final Point point = node.getPoint();
+        final boolean alredySelected = rendering.hasSelection(EDIT_COLOR, point,
+                SelectionType.FIRST);
+        if (!alredySelected) {
+            rendering.addSelection(EDIT_COLOR, point, SelectionType.FIRST);
+            helpPage.helpUsageMode(node);
+            lastTile = null;
+        } else {
+            rendering.removeSelection(SelectionType.FIRST);
+        }
+        helpPage.setShowHelpPage(!alredySelected);
     }
 
     protected void initializePageTileConfig(final SignalBoxNode node) {
