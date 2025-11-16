@@ -47,7 +47,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
@@ -224,17 +224,17 @@ public class GuiSignalBox extends GuiBase {
             final int mouse) {
         if (mouse == MouseEvent.RIGHT_MOUSE) {
             this.container.grid.getNodeChecked(tile).ifPresentOrElse(this::openNodeShortcuts,
-                    () -> { 
-                    	this.helpPage.setShowHelpPage(false); 
+                    () -> {
+                        this.helpPage.setShowHelpPage(false);
                         rendering.clearSelection();
                         this.lastTile = null;
                     });
             return;
         }
-    	this.helpPage.setShowHelpPage(false); 
+        this.helpPage.setShowHelpPage(false);
         rendering.clearSelection();
         if (mouse != MouseEvent.LEFT_MOUSE)
-        	return;
+            return;
         this.container.grid.getNodeChecked(tile).ifPresent(node -> {
             if (lastTile == null) {
                 if (node.isValidStart()) {
@@ -257,8 +257,8 @@ public class GuiSignalBox extends GuiBase {
     private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
         final List<PathType> possibleTypes = start.getPossibleTypes(end);
         if (possibleTypes.isEmpty()) {
-            infoUpdate(I18Wrapper
-                    .format("error." + PathwayRequestResult.NO_EQUAL_PATH_TYPE.getName()));
+            infoUpdate(
+                    I18Wrapper.format("error." + PathwayRequestMode.NO_EQUAL_PATH_TYPE.getName()));
         } else if (possibleTypes.size() == 1) {
             sendPWRequest(lastTile.getPoint(), end.getPoint(), possibleTypes.get(0));
         } else if (possibleTypes.size() > 1) {
@@ -290,7 +290,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         rendering.addSelection(EDIT_COLOR, node.getPoint(), SelectionType.FIRST);
         lastTile = null;
-        
+
         helpPage.helpUsageMode(node);
         helpPage.setShowHelpPage(true);
     }
@@ -887,8 +887,8 @@ public class GuiSignalBox extends GuiBase {
     private void buildColors(final List<SignalBoxNode> nodes) {
         nodes.forEach(node -> {
             this.rendering.setColor(node.getPoint(), mode -> {
-            	if(mode.mode == EnumGuiMode.TRAIN_NUMBER)
-            		return mode.mode.getDefaultColor();
+                if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
+                    return mode.mode.getDefaultColor();
                 if (node.containsManuellOutput(mode))
                     return OUTPUT_COLOR;
                 return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)

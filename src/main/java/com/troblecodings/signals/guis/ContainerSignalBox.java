@@ -26,6 +26,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
@@ -151,12 +152,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 break;
             }
             case PW_REQUEST_RESPONSE: {
-                final PathwayRequestResult result = buffer.getEnumValue(PathwayRequestResult.class);
+                final PathwayRequestMode result = buffer.getEnumValue(PathwayRequestMode.class);
                 infoUpdates.accept(I18Wrapper.format("error." + result.getName()));
                 break;
             }
             case ADDED_TO_SAVER: {
-                final PathwayRequestResult result = buffer.getEnumValue(PathwayRequestResult.class);
+                final PathwayRequestMode result = buffer.getEnumValue(PathwayRequestMode.class);
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
                 final PathType type = buffer.getEnumValue(PathType.class);
@@ -292,14 +293,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final Point end = Point.of(buffer);
                 final PathType type = buffer.getEnumValue(PathType.class);
                 final PathwayRequestResult request = grid.requestWay(start, end, type);
-                if (!request.isPass()) {
+                if (!request.wasSuccesfull()) {
                     final SignalBoxNode endNode = grid.getNode(end);
-                    if (request.canBeAddedToSaver() && type.equals(PathType.NORMAL)
-                            && !endNode.containsOutConnection()
+                    if (request.canBeAddedToSaver(type) && !endNode.containsOutConnection()
                             && grid.addNextPathway(start, end, type)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
-                        sucess.putEnumValue(request);
+                        sucess.putEnumValue(request.getMode());
                         start.writeNetwork(sucess);
                         end.writeNetwork(sucess);
                         sucess.putEnumValue(type);
@@ -308,7 +308,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     }
                     final WriteBuffer error = new WriteBuffer();
                     error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
-                    error.putEnumValue(request);
+                    error.putEnumValue(request.getMode());
                     OpenSignalsMain.network.sendTo(info.player, error);
                 }
                 break;

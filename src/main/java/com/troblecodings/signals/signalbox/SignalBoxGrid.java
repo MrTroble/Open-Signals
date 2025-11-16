@@ -28,6 +28,7 @@ import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -138,14 +139,14 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void updateMode(final Point point, final ModeSet mode) {
-    	final SignalBoxNode node = this.modeGrid.computeIfAbsent(point, SignalBoxNode::new);
-    	if(!node.has(mode)) {
-    		node.add(mode);
-    	} else {
-    		node.remove(mode);
-    	}
+        final SignalBoxNode node = this.modeGrid.computeIfAbsent(point, SignalBoxNode::new);
+        if (!node.has(mode)) {
+            node.add(mode);
+        } else {
+            node.remove(mode);
+        }
     }
-    
+
     protected void updateToNet(final SignalBoxPathway pathway) {
         if (tile == null || !tile.isBlocked())
             return;
@@ -161,15 +162,17 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2, final PathType type) {
         final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
-        if (!result.isPass())
-            return result;
-        final PathwayData data = result.getPathwayData();
-        if (data.isEmpty())
-            return PathwayRequestResult.NO_PATH;
-        if (checkPathwayData(data))
-            return PathwayRequestResult.ALREADY_USED;
-        addPathway(data);
-        tile.setChanged();
+        if (result.wasSuccesfull()) {
+            final PathwayData data = result.getPathwayData();
+            if (checkPathwayData(data)) {
+                return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
+            }
+            if (data.isEmpty()) {
+                return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+            }
+            addPathway(data);
+            tile.setChanged();
+        }
         return result;
     }
 
@@ -294,7 +297,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final Map<Map.Entry<Point, Point>, PathType> toRemove = new HashMap<>();
         nextPathways.forEach((entry, type) -> {
             final PathwayRequestResult request = requestWay(entry.getKey(), entry.getValue(), type);
-            if (request == PathwayRequestResult.PASS) {
+            if (request.wasSuccesfull()) {
                 if (tile == null || !tile.isBlocked()) {
                     toRemove.put(entry, type);
                     return;

@@ -24,6 +24,7 @@ public final class ConfigHandler {
 
         public final ConfigValue<Integer> lightEmission;
         public final ConfigValue<Boolean> debugMode;
+        public final ConfigValue<Boolean> canAddRSPathToSaver;
 
         public General(final ForgeConfigSpec.Builder builder) {
             String desc;
@@ -36,6 +37,9 @@ public final class ConfigHandler {
 
             desc = "Toggle debug mode.";
             debugMode = builder.comment(desc).define("Debug Mode", false);
+
+            desc = "ShuntingPaths can be added to PathwaySaver.";
+            canAddRSPathToSaver = builder.comment(desc).define("canAddRSPathToSaver", false);
 
             builder.pop();
         }
@@ -60,30 +64,30 @@ public final class ConfigHandler {
             builder.push("Client Only");
 
             desc = "Change the background color of the signalbox gui. Default: -7631989";
-            signalboxBackgroundColor =
-                    builder.comment(desc).define("Signalbox background color", 0xFF8B8B8B);
+            signalboxBackgroundColor = builder.comment(desc).define("Signalbox background color",
+                    0xFF8B8B8B);
 
             desc = "Change the color of normal path elements. Default: -16777216";
             signalboxFreeColor = builder.comment(desc).define("Signalbox free color", 0xFF000000);
 
             desc = "Change the color of a selected path. Default: -16711936";
-            signalboxSelectColor =
-                    builder.comment(desc).define("Signalbox select color", 0xFF00FF00);
+            signalboxSelectColor = builder.comment(desc).define("Signalbox select color",
+                    0xFF00FF00);
 
             desc = "Change the color of a blocked path. Default: -65536";
             signalboxUsedColor = builder.comment(desc).define("Signalbox used color", 0xFFFF0000);
 
             desc = "Change the color of a prepared path. Default: 16776960";
-            signalboxPreparedColor =
-                    builder.comment(desc).define("Signalbox prepared color", 0xffff00);
+            signalboxPreparedColor = builder.comment(desc).define("Signalbox prepared color",
+                    0xffff00);
 
             desc = "Change the color of the TrainNumber in the UI. Default: -1";
             signalboxTrainNumberColor =
                     builder.comment(desc).define("Signalbox TrainNumber color", 0xFFFFFFFF);
 
             desc = "Change the color of a selected shunting path. Default: -16711936";
-            signalboxShuntingColor =
-                    builder.comment(desc).define("Signalbox shunting color", 0xFF00FF00);
+            signalboxShuntingColor = builder.comment(desc).define("Signalbox shunting color",
+                    0xFF00FF00);
 
             desc = "Change the color of trainnumber in the signalbox. Default: -65536";
             signalboxTrainnumberColor =
@@ -94,16 +98,16 @@ public final class ConfigHandler {
                     .define("Signalbox trainnumber background color", 0xFF500000);
 
             desc = "Change the color of a default text. Default: -16777216";
-            GuiConfigHandler.basicTextColor =
-                    builder.comment(desc).define("Basic text color", 0xFF000000);
+            GuiConfigHandler.basicTextColor = builder.comment(desc).define("Basic text color",
+                    0xFF000000);
 
             desc = "Change the color of an info text. Default: -16777046";
-            GuiConfigHandler.infoTextColor =
-                    builder.comment(desc).define("info text color", 0xFF0000AA);
+            GuiConfigHandler.infoTextColor = builder.comment(desc).define("info text color",
+                    0xFF0000AA);
 
             desc = "Change the color of an error text. Default: -16776961";
-            GuiConfigHandler.errorTextColor =
-                    builder.comment(desc).define("Error text color", 0xFF0000FF);
+            GuiConfigHandler.errorTextColor = builder.comment(desc).define("Error text color",
+                    0xFF0000FF);
 
             desc = "Change the render distance for animated signals. Default: 128";
             renderDistance = builder.comment(desc).define("Render distance", 128);

@@ -19,7 +19,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -53,18 +53,19 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
-        final PathOptionEntry optionEntry =
-                possibleModes.computeIfAbsent(mode, _u -> SignalBoxFactory.getFactory().getEntry());
+        final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
+                _u -> SignalBoxFactory.getFactory().getEntry());
         optionEntry.setEntry(entry, type);
     }
-    
+
     public void updateState(final ModeSet modeSet, final SignalState state) {
-    	if(state == SignalState.RED) this.signalStates.remove(modeSet);
-    	this.signalStates.put(modeSet, state);
+        if (state == SignalState.RED)
+            this.signalStates.remove(modeSet);
+        this.signalStates.put(modeSet, state);
     }
-    
+
     public SignalState getState(final ModeSet modeSet) {
-    	return this.signalStates.getOrDefault(modeSet, SignalState.RED);
+        return this.signalStates.getOrDefault(modeSet, SignalState.RED);
     }
 
     public boolean has(final ModeSet modeSet) {
@@ -285,10 +286,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final Set<EnumGuiMode> otherMode = other.possibleModes.keySet().stream()
                 .map(mode -> mode.mode).collect(Collectors.toSet());
         for (final PathType type : PathType.values()) {
-            final boolean thisContains =
-                    Arrays.stream(type.getModes()).anyMatch(thisMode::contains);
-            final boolean otherContains =
-                    Arrays.stream(type.getModes()).anyMatch(otherMode::contains);
+            final boolean thisContains = Arrays.stream(type.getModes())
+                    .anyMatch(thisMode::contains);
+            final boolean otherContains = Arrays.stream(type.getModes())
+                    .anyMatch(otherMode::contains);
             if (thisContains && otherContains) {
                 possibleTypes.add(type);
             }
@@ -296,10 +297,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return possibleTypes;
     }
 
-    public PathwayRequestResult canMakePath(final Path path, final PathType type) {
+    public PathwayRequestMode canMakePath(final Path path, final PathType type) {
         final ModeSet modeSet = this.possibleConnections.get(path);
         if (modeSet == null)
-            return PathwayRequestResult.NO_PATH;
+            return PathwayRequestMode.NO_PATH;
         final Rotation rotation = SignalBoxUtil.getRotationFromDelta(path.point1.delta(this.point));
         for (final EnumGuiMode mode : type.getModes()) {
             final ModeSet possibleOverStepping = new ModeSet(mode, rotation);
@@ -308,11 +309,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 if (option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false)) {
                     continue;
                 }
-                return PathwayRequestResult.OVERSTEPPING; // Found another signal on the path that
-                                                          // is not the target
+                return PathwayRequestMode.OVERSTEPPING; // Found another signal on the path that
+                                                        // is not the target
             }
         }
-        return PathwayRequestResult.PASS;
+        return PathwayRequestMode.PASS;
     }
 
     public boolean isUsed() {
@@ -495,5 +496,5 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public Map<ModeSet, PathOptionEntry> getModes() {
         return ImmutableMap.copyOf(possibleModes);
     }
-    
+
 }

@@ -13,6 +13,7 @@ import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.util.Rotation;
@@ -71,10 +72,10 @@ public final class SignalBoxUtil {
             final Point p2, final PathType pathType) {
         final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
-            return PathwayRequestResult.NOT_IN_GRID;
+            return PathwayRequestResult.getByMode(PathwayRequestMode.NOT_IN_GRID);
         final SignalBoxNode firstNode = modeGrid.get(p1);
         if (pathType.equals(PathType.NONE))
-            return PathwayRequestResult.NO_EQUAL_PATH_TYPE;
+            return PathwayRequestResult.getByMode(PathwayRequestMode.NO_EQUAL_PATH_TYPE);
 
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
@@ -83,7 +84,7 @@ public final class SignalBoxUtil {
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(pathType);
         checker.type = pathType;
         checker.visited = visited;
-        PathwayRequestResult result = PathwayRequestResult.NO_PATH;
+        PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
             scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
@@ -108,21 +109,21 @@ public final class SignalBoxUtil {
                     grid.sendDebugPointUpdates(debugPointList);
                     debugPointList.clear();
                 }
-                result = PathwayRequestResult.PASS;
-                return result.setPathwayData(PathwayData.of(grid, nodes, pathType));
+                return new PathwayRequestResult(PathwayRequestMode.PASS,
+                        PathwayData.of(grid, nodes, pathType));
             }
             checker.previousPoint = previousPoint;
             final SignalBoxNode nextNode = modeGrid.get(nextPoint);
             if (nextNode == null) {
-                result = PathwayRequestResult.NO_PATH;
+                mode = PathwayRequestMode.NO_PATH;
                 continue;
             }
 
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                result = checker.check();
-                if (nextPoint.equals(p2) || result.isPass()) {
+                mode = checker.check();
+                if (nextPoint.equals(p2) || mode.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
@@ -134,7 +135,7 @@ public final class SignalBoxUtil {
             grid.sendDebugPointUpdates(debugPointList);
             debugPointList.clear();
         }
-        return result;
+        return PathwayRequestResult.getByMode(mode);
     }
 
     public static List<SignalBoxNode> requestProtectionWay(final Point p1, final Point p2,
@@ -178,7 +179,7 @@ public final class SignalBoxUtil {
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                final PathwayRequestResult result = checker.check();
+                final PathwayRequestMode result = checker.check();
                 if (nextPoint.equals(p2) || result.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);

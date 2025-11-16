@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
@@ -20,7 +20,7 @@ public abstract class ConnectionChecker {
     public Path path;
     public Set<Path> visited;
 
-    public abstract PathwayRequestResult check();
+    public abstract PathwayRequestMode check();
 
     @Override
     public int hashCode() {
@@ -55,38 +55,38 @@ public abstract class ConnectionChecker {
     public static class ConnectionCheckerNormal extends ConnectionChecker {
 
         @Override
-        public PathwayRequestResult check() {
+        public PathwayRequestMode check() {
             if (nextNode == null)
-                return PathwayRequestResult.NO_PATH;
-            final PathwayRequestResult nodeResult = nextNode.canMakePath(path, type);
+                return PathwayRequestMode.NO_PATH;
+            final PathwayRequestMode nodeResult = nextNode.canMakePath(path, type);
             if (!nodeResult.isPass())
                 return nodeResult;
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.FREE)
                     || optional.get().equals(EnumPathUsage.PROTECTED)))
-                return PathwayRequestResult.ALREADY_USED;
+                return PathwayRequestMode.ALREADY_USED;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
-            return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
+            return isValid ? PathwayRequestMode.PASS : PathwayRequestMode.NO_PATH;
         }
     }
 
     public static class ConnectionCheckerShunting extends ConnectionChecker {
 
         @Override
-        public PathwayRequestResult check() {
+        public PathwayRequestMode check() {
             if (nextNode == null)
-                return PathwayRequestResult.NO_PATH;
-            final PathwayRequestResult nodeResult = nextNode.canMakePath(path, type);
+                return PathwayRequestMode.NO_PATH;
+            final PathwayRequestMode nodeResult = nextNode.canMakePath(path, type);
             if (!nodeResult.isPass())
                 return nodeResult;
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.BLOCKED)
                     || optional.get().equals(EnumPathUsage.FREE)))
-                return PathwayRequestResult.ALREADY_USED;
+                return PathwayRequestMode.ALREADY_USED;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
-            return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
+            return isValid ? PathwayRequestMode.PASS : PathwayRequestMode.NO_PATH;
         }
 
     }
