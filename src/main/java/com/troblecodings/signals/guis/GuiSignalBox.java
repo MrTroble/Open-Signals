@@ -100,7 +100,7 @@ public class GuiSignalBox extends GuiBase {
     private boolean allPacketsRecived = false;
     private SidePanel helpPage;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
-    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    protected final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
