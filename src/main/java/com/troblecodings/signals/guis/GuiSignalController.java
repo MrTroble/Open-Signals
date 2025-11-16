@@ -241,7 +241,8 @@ public class GuiSignalController extends GuiBase {
 
         final String name = I18Wrapper.format("tile." + signal.delegate.name().getPath() + ".name")
                 + "; Name: "
-                + ClientNameHandler.getClientName(new StateInfo(mc.level, controller.getPos()));
+                + ClientNameHandler.getClientName(new StateInfo(mc.level, controller.getPos()))
+                        .replace("[n]", " ");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);

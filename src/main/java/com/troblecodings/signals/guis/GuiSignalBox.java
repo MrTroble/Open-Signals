@@ -182,7 +182,7 @@ public class GuiSignalBox extends GuiBase {
     public static String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final Minecraft mc = Minecraft.getInstance();
         final String customName = ClientNameHandler
-                .getClientName(new StateInfo(mc.level, signalPos));
+                .getClientName(new StateInfo(mc.level, signalPos)).replace("[n]", " ");
         return String.format("%s (x=%d, y=%d. z=%d)", customName == null
                 ? (type.equals(LinkType.SIGNAL) ? "" : I18Wrapper.format("type." + type.name()))
                 : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
