@@ -24,7 +24,7 @@ public class ModeSet implements INetworkSavable {
 
     public ModeSet(final EnumGuiMode mode, final Rotation rotation) {
         this.mode = Objects.requireNonNull(mode);
-        this.rotation = Objects.requireNonNull(rotation);
+        this.rotation = mode.getLocalRotation(Objects.requireNonNull(rotation));
     }
 
     private ModeSet(final ReadBuffer buffer) {

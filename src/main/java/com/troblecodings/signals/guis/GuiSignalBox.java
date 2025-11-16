@@ -209,6 +209,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
+        
         final ModeSet modeSet = new ModeSet(mode, rotation);
 
         container.grid.updateMode(point, modeSet);

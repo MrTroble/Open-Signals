@@ -51,7 +51,7 @@ public class UIMenu extends UIComponentEntity {
             final UIEntity preview = new UIEntity();
             preview.add(new UIColor(BACKGROUND_COLOR));
             preview.add(new UIReentrantScissor());
-            
+
             final UIComponent sbt = SidePanel.fromEnum(mode.ordinal(), rotation, 1.95f);
             preview.add(sbt);
             preview.setHeight(20);
@@ -75,9 +75,8 @@ public class UIMenu extends UIComponentEntity {
         final UIEntity previousEntity = modeForEntity.get(EnumGuiMode.values()[selection]);
         if (previousEntity != null) {
             previousEntity.findRecursive(UIColor.class).forEach(c -> {
-                if (c.getColor() == HIGHLIGHT_COLOR) {
+                if (c.getColor() == HIGHLIGHT_COLOR)
                     previousEntity.remove(c);
-                }
             });
         }
         final UIEntity newEntity = modeForEntity.get(newMode);
@@ -102,7 +101,7 @@ public class UIMenu extends UIComponentEntity {
     }
 
     @Override
-    public void onAdd(final UIEntity entity) {
+    public void onAdd(UIEntity entity) {
         super.onAdd(entity);
         this.entity.onAdd(entity);
         this.entity.updateEvent(entity.getLastUpdateEvent());

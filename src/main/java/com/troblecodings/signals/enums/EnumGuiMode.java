@@ -1,5 +1,14 @@
 package com.troblecodings.signals.enums;
 
+import static com.troblecodings.signals.guis.UISignalBoxRendering.ARROW_ICON;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.ICON;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.INCOMING_ICON;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.NE1_ICON;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.NE5_ICON;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.OUTGOING_ICON;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.SIGNALS;
+import static com.troblecodings.signals.guis.UISignalBoxRendering.ZS3_ICON;
+
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -8,82 +17,94 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.*;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Rotation;
 
 public enum EnumGuiMode {
-	STRAIGHT(new float[] { 0, 0.5f, 1, 0.5f }), CORNER(new float[] { 0, 0.5f, 0.5f, 1 }),
-	END(new float[] { 0.9f, 0.2f, 0.9f, 0.8f }, PathwayModeType.END, 0),
-	PLATFORM(new float[] { 0, 0.15f, 1, 0.15f }, PathwayModeType.NONE, 0, SignalBoxUtil.FREE_COLOR, 3),
-	BUE(new float[] { 0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1 }), HP(0, true, PathwayModeType.START_END, 2),
-	VP(1, true, PathwayModeType.NONE, 1), RS(2, true, PathwayModeType.START_END, 1), RA10(3, PathwayModeType.END, 1),
-	SH2(4, PathwayModeType.NONE, 1), IN_CONNECTION(INCOMING_ICON, PathwayModeType.START, 1),
-	OUT_CONNECTION(OUTGOING_ICON, PathwayModeType.END, 1),
-	ARROW(ARROW_ICON, PathwayModeType.END, 1),
-	NE1(NE1_ICON, PathwayModeType.START_END, 1),
-	NE5(NE5_ICON, PathwayModeType.START_END, 1), ZS3(ZS3_ICON, PathwayModeType.NONE, 1),
-	TRAIN_NUMBER(new float[] { 0, 0.5f, 2, 0.5f }, PathwayModeType.NONE, 2, GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR, 6),
-	CROSSING(new float[] { 0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f });
+    STRAIGHT(new float[] {
+            0, 0.5f, 1, 0.5f
+    }), CORNER(new float[] {
+            0, 0.5f, 0.5f, 1
+    }), END(new float[] {
+            0.9f, 0.2f, 0.9f, 0.8f
+    }, PathwayModeType.END, 0), PLATFORM(new float[] {
+            0, 0.15f, 1, 0.15f
+    }, PathwayModeType.NONE, 0, SignalBoxUtil.FREE_COLOR, 3), BUE(new float[] {
+            0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
+    }), HP(0, true, PathwayModeType.START_END, 2), VP(1, true, PathwayModeType.NONE, 1),
+    RS(2, true, PathwayModeType.START_END, 1), RA10(3, PathwayModeType.END, 1),
+    SH2(4, PathwayModeType.NONE, 1), IN_CONNECTION(INCOMING_ICON, PathwayModeType.START, 1),
+    OUT_CONNECTION(OUTGOING_ICON, PathwayModeType.END, 1),
+    ARROW(ARROW_ICON, PathwayModeType.END, 1), NE1(NE1_ICON, PathwayModeType.START_END, 1),
+    NE5(NE5_ICON, PathwayModeType.START_END, 1), ZS3(ZS3_ICON, PathwayModeType.NONE, 1),
+    TRAIN_NUMBER(new float[] {
+            0, 0.5f, 2, 0.5f
+    }, PathwayModeType.NONE, 2, GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR, 6),
+    CROSSING(new float[] {
+            0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
+    });
 
     /**
      * Naming
      */
 
-	public final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer;
-	public final int depth;
-	private int defaultColor;
-	private final PathwayModeType type;
+    public final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer;
+    public final int depth;
+    private int defaultColor;
+    private final PathwayModeType type;
 
-	private EnumGuiMode(final int id, final PathwayModeType type, final int depth) {
-		this((_u) -> ((info, c) -> info.drawTexture(ICON, UISignalBoxRendering.TILE_WIDTH,
-				UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0, id * 0.2 + 0.2, 0.5)), type, depth);
-	}
+    private EnumGuiMode(final int id, final PathwayModeType type, final int depth) {
+        this((_u) -> ((info, c) -> info.drawTexture(ICON, UISignalBoxRendering.TILE_WIDTH,
+                UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0, id * 0.2 + 0.2, 0.5)), type, depth);
+    }
 
-	private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type, final int depth) {
-		this((state) -> {
-			final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-			return (info, c) -> info.drawTexture(SIGNALS, UISignalBoxRendering.TILE_WIDTH,
-					UISignalBoxRendering.TILE_WIDTH, (id + factor) * 0.0666667f, 0.0f,
-					(id + factor) * 0.066667f + 0.06f, 1.0f);
-		}, type, depth);
-	}
+    private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type,
+            final int depth) {
+        this((state) -> {
+            final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
+            return (info, c) -> info.drawTexture(SIGNALS, UISignalBoxRendering.TILE_WIDTH,
+                    UISignalBoxRendering.TILE_WIDTH, (id + factor) * 0.0666667f, 0.0f,
+                    (id + factor) * 0.066667f + 0.06f, 1.0f);
+        }, type, depth);
+    }
 
     private EnumGuiMode(final float[] array) {
         this(array, PathwayModeType.NONE, 0);
     }
 
-	private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth) {
-		this(array, type, depth, SignalBoxUtil.FREE_COLOR, 2);
-	}
+    private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth) {
+        this(array, type, depth, SignalBoxUtil.FREE_COLOR, 2);
+    }
 
-	private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth, final int color,
-			final int width) {
-		this((_u) -> {
-			float[] currentArray = Arrays.copyOf(array, array.length);
-			for (int i = 0; i < array.length; i++) {
-				currentArray[i] *= UISignalBoxRendering.TILE_WIDTH;
-			}
-			return (info, c) -> info.lines(c, width, currentArray);
-		}, type, depth);
-		this.defaultColor = color;
-	}
+    private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth,
+            final int color, final int width) {
+        this((_u) -> {
+            float[] currentArray = Arrays.copyOf(array, array.length);
+            for (int i = 0; i < array.length; i++) {
+                currentArray[i] *= UISignalBoxRendering.TILE_WIDTH;
+            }
+            return (info, c) -> info.lines(c, width, currentArray);
+        }, type, depth);
+        this.defaultColor = color;
+    }
 
-	private EnumGuiMode(final ResourceLocation location, final PathwayModeType type, final int depth) {
-		this.consumer = (state) -> ((info, color) -> info.drawTexture(location, UISignalBoxRendering.TILE_WIDTH,
-				UISignalBoxRendering.TILE_WIDTH, 0, 0, 1, 1));
-		this.type = type;
-		this.depth = depth;
-	}
+    private EnumGuiMode(final ResourceLocation location, final PathwayModeType type,
+            final int depth) {
+        this.consumer = (state) -> ((info, color) -> info.drawTexture(location,
+                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, 0, 0, 1, 1));
+        this.type = type;
+        this.depth = depth;
+    }
 
-	private EnumGuiMode(final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer, final PathwayModeType type,
-			final int depth) {
-		this.consumer = consumer;
-		this.type = type;
-		this.depth = depth;
-	}
+    private EnumGuiMode(final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer,
+            final PathwayModeType type, final int depth) {
+        this.consumer = consumer;
+        this.type = type;
+        this.depth = depth;
+    }
 
     public PathwayModeType getModeType() {
         return type;
@@ -95,5 +116,11 @@ public enum EnumGuiMode {
 
     public int getDefaultColor() {
         return defaultColor;
+    }
+
+    public Rotation getLocalRotation(final Rotation rot) {
+        if (!this.equals(STRAIGHT))
+            return rot;
+        return Rotation.values()[rot.ordinal() % 2];
     }
 }
