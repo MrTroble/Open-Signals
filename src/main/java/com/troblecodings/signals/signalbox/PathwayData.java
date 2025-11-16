@@ -352,6 +352,9 @@ public class PathwayData {
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
                         EnumGuiMode.VP);
             }).collect(Collectors.toList()));
+        } else {
+            startSignal = Optional.empty();
+            preSignals = ImmutableList.of();
         }
         this.speed = atomic.get();
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
