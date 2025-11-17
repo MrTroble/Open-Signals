@@ -16,6 +16,8 @@ import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIReentrantScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
+import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
+import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.enums.EnumGuiMode;
 
 import net.minecraft.util.Rotation;
@@ -27,6 +29,7 @@ public class UIMenu extends UIComponentEntity {
 
     private final Map<EnumGuiMode, UIEntity> modeForEntity = new HashMap<>();
 
+    private final UIRotate rotate = new UIRotate();
     private int selection = 0;
     private int rotation = 0;
     private BiConsumer<Integer, Integer> consumer = (i1, i2) -> {
@@ -52,6 +55,10 @@ public class UIMenu extends UIComponentEntity {
             preview.add(new UIColor(BACKGROUND_COLOR));
             preview.add(new UIReentrantScissor());
 
+            preview.add(new UIIndependentTranslate(10, 10, 0));
+            preview.add(rotate);
+            preview.add(new UIIndependentTranslate(-10, -10, 0));
+
             final UIComponent sbt = SidePanel.fromEnum(mode.ordinal(), rotation, 1.95f);
             preview.add(sbt);
             preview.setHeight(20);
@@ -60,6 +67,7 @@ public class UIMenu extends UIComponentEntity {
             if (mode.ordinal() == this.selection) {
                 preview.add(new UIColor(HIGHLIGHT_COLOR));
             }
+
             list.add(preview);
             modeForEntity.put(mode, preview);
         }
@@ -116,6 +124,7 @@ public class UIMenu extends UIComponentEntity {
                 this.rotation = 0;
             }
             consumer.accept(selection, rotation);
+            rotate.setRotateZ(rotation * UIRotate.PERPENDICULAR_ANGLE);
         }
     }
 
