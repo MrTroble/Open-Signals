@@ -1,12 +1,12 @@
 package com.troblecodings.signals.guis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -185,27 +185,28 @@ public class SidePanel {
         counterLabel.setText(String.format("%04d", gui.container.grid.getCurrentCounter()));
     }
 
-    
-    private static void drawMenuFromEnum(DrawInfo info, EnumGuiMode modes, int rotation, final float scale) {
-		info.push();				
-		info.scale(scale, scale, 1.0f);
-		info.translate(UISignalBoxRendering.HALF_TILE, UISignalBoxRendering.HALF_TILE, 0);
-		info.rotate(0, 0, rotation * UIRotate.PERPENDICULAR_ANGLE);
-		info.translate(-UISignalBoxRendering.HALF_TILE, -UISignalBoxRendering.HALF_TILE, 0);
-		modes.consumer.apply(SignalState.RED).accept(info, modes.getDefaultColor());
-		info.pop();
+    private static void drawMenuFromEnum(DrawInfo info, EnumGuiMode modes, int rotation,
+            final float scale) {
+        info.push();
+        info.scale(scale, scale, 1.0f);
+        info.translate(UISignalBoxRendering.HALF_TILE, UISignalBoxRendering.HALF_TILE, 0);
+        info.rotate(0, 0, rotation * UIRotate.PERPENDICULAR_ANGLE);
+        info.translate(-UISignalBoxRendering.HALF_TILE, -UISignalBoxRendering.HALF_TILE, 0);
+        modes.consumer.apply(SignalState.RED).accept(info, modes.getDefaultColor());
+        info.pop();
     }
-    
+
     public static UIComponent fromEnum(int selection, int rotation, final float scale) {
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         return new UIComponent() {
-			
-			@Override
-			public void draw(DrawInfo info) {
-				if(this.parent == null) return;
-				drawMenuFromEnum(info, modes, rotation, scale);
-			}
-		};
+
+            @Override
+            public void draw(DrawInfo info) {
+                if (this.parent == null)
+                    return;
+                drawMenuFromEnum(info, modes, rotation, scale);
+            }
+        };
     }
 
     public void updateNextNode(final int selection, final int rotation) {
@@ -718,7 +719,7 @@ public class SidePanel {
         final List<SignalBoxNode> allNodes = gui.container.grid.getNodes();
         final Minecraft mc = Minecraft.getInstance();
 
-        final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
+        final List<Map.Entry<String, UIEntity>> nameToUIEntity = new ArrayList<>();
         allNodes.forEach(currentNode -> {
             final UILabel currentStatus = new UILabel(I18Wrapper.format("info.usage.status") + " : "
                     + I18Wrapper.format("info.usage.status.free"));
@@ -801,7 +802,7 @@ public class SidePanel {
                     }));
                     gui.push(GuiElements.createScreen(entity -> entity.add(info)));
                 });
-                nameToUIEntity.put(name.toLowerCase(), button);
+                nameToUIEntity.add(Maps.immutableEntry(name.toLowerCase(), button));
             });
         });
 
