@@ -83,6 +83,7 @@ public abstract class ConnectionChecker {
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.BLOCKED)
+                    || optional.get().equals(EnumPathUsage.PROTECTED)
                     || optional.get().equals(EnumPathUsage.FREE)))
                 return PathwayRequestMode.ALREADY_USED;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);

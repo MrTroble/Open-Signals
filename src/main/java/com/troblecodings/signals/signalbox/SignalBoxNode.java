@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
@@ -320,13 +322,13 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         for (final Point point : Arrays.asList(this.point.delta(new Point(1, 0)),
                 this.point.delta(new Point(-1, 0)), this.point.delta(new Point(0, 1)),
                 this.point.delta(new Point(0, -1)))) {
-            if (isUsedInDirection(point))
+            if (isUsedInDirection(point, null))
                 return true;
         }
         return false;
     }
 
-    public boolean isUsedInDirection(final Point point) {
+    public boolean isUsedInDirection(final Point point, @Nullable final EnumPathUsage exclude) {
         for (final Path path : possibleConnections.keySet()) {
             if (!(path.point1.equals(point) || path.point2.equals(point))) {
                 continue;
@@ -335,8 +337,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             if (mode == null) {
                 continue;
             }
-            if (!getOption(mode).orElse(new PathOptionEntry()).getEntry(PathEntryType.PATHUSAGE)
-                    .orElse(EnumPathUsage.FREE).equals(EnumPathUsage.FREE))
+            final EnumPathUsage usage = getOption(mode).orElse(new PathOptionEntry())
+                    .getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
+            if (!(usage.equals(exclude) || usage.equals(EnumPathUsage.FREE)))
                 return true;
         }
         return false;

@@ -144,7 +144,7 @@ public class PathwayData {
             }
             final EnumPathUsage usage = option.getEntry(PathEntryType.PATHUSAGE)
                     .orElse(EnumPathUsage.FREE);
-            if (!usage.equals(EnumPathUsage.FREE)) {
+            if (!(usage.equals(EnumPathUsage.FREE) || usage.equals(EnumPathUsage.PROTECTED))) {
                 final ArrayList<SignalBoxNode> listOfNodes = new ArrayList<>();
                 for (Point point = previous; point != null; point = newNodes.get(point)) {
                     listOfNodes.add(grid.getNode(point));
@@ -155,7 +155,7 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(newPos))
+            if (current.isUsedInDirection(newPos, EnumPathUsage.PROTECTED))
                 return false;
         }
         return true;
