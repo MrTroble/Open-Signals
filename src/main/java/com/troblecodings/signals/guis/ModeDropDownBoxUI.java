@@ -94,6 +94,8 @@ public class ModeDropDownBoxUI {
     public void addElements(final UIEntity parent) {
         if (!open)
             return;
+
+        final SignalBoxGrid grid = gui.container.grid;
         final Set<Map.Entry<BlockPos, LinkType>> entrySet = gui.container.getPositionForTypes()
                 .entrySet();
         final EnumGuiMode mode = modeSet.mode;
@@ -212,33 +214,37 @@ public class ModeDropDownBoxUI {
                 preSignalEntity.add(new UIToolTip(I18Wrapper.format("property.presignals.desc")));
                 parent.add(preSignalEntity);
 
-                final Point selcetedPoint = option.getEntry(PathEntryType.PROTECTIONWAY_END)
-                        .orElse(new Point(-1, -1));
                 final UIEntity protectionWay = GuiElements
                         .createButton(I18Wrapper.format("property.protectionway.name"), e -> {
+                            final Point selcetedPoint = option
+                                    .getEntry(PathEntryType.PROTECTIONWAY_END)
+                                    .orElse(new Point(-1, -1));
+
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
                             screen.add(new UIBox(UIBox.VBOX, 5));
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
-                            final AtomicReference<UIEntity> previous = new AtomicReference<>();
-                            /*
-                             * SignalBoxUIHelper.initializeGrid(screen, gui.container.grid, (tile,
-                             * sbt) -> { if (sbt.getNode().isEmpty()) return; final Point point =
-                             * sbt.getPoint(); final UIColor color = new
-                             * UIColor(GuiSignalBox.SELECTION_COLOR); if
-                             * (point.equals(selcetedPoint)) { tile.add(color); previous.set(tile);
-                             * } tile.add(new UIClickable(e1 -> { if
-                             * (!tile.getParent().getParent().getParent() .isHovered()) return; if
-                             * (previous.get() != null) {
-                             * previous.get().findRecursive(UIColor.class)
-                             * .forEach(previous.get()::remove); } if (point.equals(selcetedPoint))
-                             * { gui.removeEntryFromServer(node, mode, rotation,
-                             * PathEntryType.PROTECTIONWAY_END); } else { tile.add(color);
-                             * previous.set(tile); gui.sendPointEntry(point, node, mode, rotation,
-                             * PathEntryType.PROTECTIONWAY_END);
-                             * option.setEntry(PathEntryType.PROTECTIONWAY_END, point); } })); });
-                             */
+
+                            final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
+                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                        final SignalBoxNode node = grid.getNodeChecked(point)
+                                                .orElse(new SignalBoxNode());
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
+                                            return;
+                                        rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
+                                                SelectionType.FIRST);
+
+                                        gui.sendPointEntry(point, this.node, mode, rotation,
+                                                PathEntryType.PROTECTIONWAY_END);
+                                        option.setEntry(PathEntryType.PROTECTIONWAY_END, point);
+                                    });
+
+                            if (!selcetedPoint.equals(new Point(-1, -1)))
+                                boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                        selcetedPoint, SelectionType.FIRST);
+
+                            screen.add(boxEntity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 protectionWay.add(new UIToolTip(I18Wrapper.format("property.protectionway.desc")));
@@ -294,6 +300,8 @@ public class ModeDropDownBoxUI {
                 parent.add(hentity);
             }
             case RS: {
+                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
+                        PathEntryType.SIGNAL, mode, rotation);
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
                         e -> {
                             final boolean state = e == 1 ? true : false;
@@ -302,8 +310,6 @@ public class ModeDropDownBoxUI {
                                     PathEntryType.CAN_BE_OVERSTPEPPED);
                         },
                         option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false) ? 1 : 0));
-                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
-                        PathEntryType.SIGNAL, mode, rotation);
                 break;
             }
             case BUE: {
