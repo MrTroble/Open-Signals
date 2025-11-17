@@ -161,19 +161,27 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2, final PathType type) {
-        final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
-        if (result.wasSuccesfull()) {
-            final PathwayData data = result.getPathwayData();
-            if (checkPathwayData(data)) {
-                return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
+        try {
+            final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
+            if (result.wasSuccesfull()) {
+                final PathwayData data = result.getPathwayData();
+                if (checkPathwayData(data)) {
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
+                }
+                if (data.isEmpty()) {
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+                }
+                addPathway(data);
+                tile.setChanged();
             }
-            if (data.isEmpty()) {
-                return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
-            }
-            addPathway(data);
-            tile.setChanged();
+            return result;
+        } catch (final Exception e) {
+            OpenSignalsMain.getLogger().error("There was an issue with creating a pathway from "
+                    + p1 + " to " + " p2! Resetting!");
+            e.printStackTrace();
+            resetPathway(p1);
         }
-        return result;
+        return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
     }
 
     private boolean checkPathwayData(final PathwayData data) {
@@ -212,6 +220,7 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetAllPathways() {
         ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
         clearPaths();
+        modeGrid.values().forEach(SignalBoxNode::resetEnumPathUsage);
     }
 
     public void resetAllSignals() {
@@ -258,32 +267,50 @@ public class SignalBoxGrid implements INetworkSavable {
 
     private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
         pathways.forEach(pathway -> {
-            if (pathway.tryBlock(pos)) {
-                updatePrevious(pathway);
+            try {
+                if (pathway.tryBlock(pos)) {
+                    updatePrevious(pathway);
+                    updateToNet(pathway);
+                }
+            } catch (final Exception e) {
+                OpenSignalsMain.getLogger().error(
+                        "There was an issue while trying to block " + pathway + "! Resetting!");
+                e.printStackTrace();
+                resetPathway(pathway);
                 updateToNet(pathway);
+                tryNextPathways();
             }
+
         });
     }
 
     private void tryReset(final List<SignalBoxPathway> pathways, final BlockPos pos) {
         pathways.forEach(pathway -> {
-            final Point first = pathway.getFirstPoint();
-            final Optional<Point> optPoint = pathway.tryReset(pos);
-            if (optPoint.isPresent()) {
-                if (pathway.isEmptyOrBroken()) {
-                    resetPathway(pathway);
-                    updateToNet(pathway);
-                    pathway.checkReRequest();
-                } else {
-                    updateToNet(pathway);
-                    pathway.compact(optPoint.get());
-                    this.startsToPath.remove(first);
-                    this.startsToPath.put(pathway.getFirstPoint(), pathway);
+            try {
+                final Point first = pathway.getFirstPoint();
+                final Optional<Point> optPoint = pathway.tryReset(pos);
+                if (optPoint.isPresent()) {
+                    if (pathway.isEmptyOrBroken()) {
+                        resetPathway(pathway);
+                        updateToNet(pathway);
+                        pathway.checkReRequest();
+                    } else {
+                        updateToNet(pathway);
+                        pathway.compact(optPoint.get());
+                        this.startsToPath.remove(first);
+                        this.startsToPath.put(pathway.getFirstPoint(), pathway);
+                    }
                 }
-            }
-            if (pathway.checkResetOfProtectionWay(pos)) {
+                if (pathway.checkResetOfProtectionWay(pos)) {
+                    updateToNet(pathway);
+                    pathway.removeProtectionWay();
+                }
+            } catch (final Exception e) {
+                OpenSignalsMain.getLogger().error(
+                        "There was an issue while trying to reset " + pathway + "! Resetting!");
+                e.printStackTrace();
+                resetPathway(pathway);
                 updateToNet(pathway);
-                pathway.removeProtectionWay();
             }
         });
         tryNextPathways();

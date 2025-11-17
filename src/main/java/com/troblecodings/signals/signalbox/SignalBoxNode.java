@@ -500,4 +500,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return ImmutableMap.copyOf(possibleModes);
     }
 
+    public void resetEnumPathUsage() {
+        possibleModes.values().forEach(entry -> entry.removeEntry(PathEntryType.PATHUSAGE));
+    }
+
 }
