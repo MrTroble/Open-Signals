@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -18,9 +17,9 @@ import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
-import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
@@ -132,14 +131,8 @@ public class ModeDropDownBoxUI {
                 gui.selectLink(parent, node, option, entrySet, LinkType.OUTPUT,
                         PathEntryType.OUTPUT, mode, rotation);
 
-                final SizeIntegerables<Integer> pathwayCosts = new SizeIntegerables<>(
-                        "pathway_costs", 20, i -> i);
-                final UIEntity costSelection = GuiElements.createEnumElement(pathwayCosts, i -> {
-                    option.setEntry(PathEntryType.PATHWAY_COSTS, i);
-                    gui.sendIntEntryToServer(i, node, mode, rotation, PathEntryType.PATHWAY_COSTS);
-                }, option.getEntry(PathEntryType.PATHWAY_COSTS)
-                        .orElse(SignalBoxUtil.getDefaultCosts(modeSet)));
-                parent.add(costSelection);
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
+                        I18Wrapper.format("property.pathway_costs.name")));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
@@ -232,12 +225,21 @@ public class ModeDropDownBoxUI {
                                                 .orElse(new SignalBoxNode());
                                         if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
                                             return;
-                                        rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
-                                                SelectionType.FIRST);
-
-                                        gui.sendPointEntry(point, this.node, mode, rotation,
-                                                PathEntryType.PROTECTIONWAY_END);
-                                        option.setEntry(PathEntryType.PROTECTIONWAY_END, point);
+                                        final Point select = option
+                                                .getEntry(PathEntryType.PROTECTIONWAY_END)
+                                                .orElse(new Point(-1, -1));
+                                        if (point.equals(select)) {
+                                            rendering.removeSelection(SelectionType.FIRST);
+                                            gui.removeEntryFromServer(this.node, mode, rotation,
+                                                    PathEntryType.PROTECTIONWAY_END);
+                                            option.removeEntry(PathEntryType.PROTECTIONWAY_END);
+                                        } else {
+                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                                    point, SelectionType.FIRST);
+                                            gui.sendPointEntry(point, this.node, mode, rotation,
+                                                    PathEntryType.PROTECTIONWAY_END);
+                                            option.setEntry(PathEntryType.PROTECTIONWAY_END, point);
+                                        }
                                     });
 
                             if (!selcetedPoint.equals(new Point(-1, -1)))
@@ -252,52 +254,8 @@ public class ModeDropDownBoxUI {
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.PROTECTIONWAY_RESET, mode, rotation, ".protectionway_reset");
 
-                final UIEntity hentity = new UIEntity();
-                hentity.setInheritWidth(true);
-                hentity.setHeight(20);
-                hentity.add(new UIBox(UIBox.HBOX, 0));
-
-                final UIEntity labelEntity = new UIEntity();
-                labelEntity.setInheritWidth(true);
-                labelEntity.setHeight(20);
-                labelEntity.add(
-                        new UILabel(I18Wrapper.format("property.reset_protectionway_delay.name")));
-                hentity.add(labelEntity);
-
-                final UIEntity textInputEntity = new UIEntity();
-                textInputEntity.setInheritWidth(true);
-                textInputEntity.setHeight(20);
-
-                final UITextInput input = new UITextInput(
-                        String.valueOf(option.getEntry(PathEntryType.DELAY).orElse(0)));
-                input.setValidator(str -> {
-                    if (str.isEmpty())
-                        return true;
-                    try {
-                        final int i = Integer.valueOf(str);
-                        if (i < 0 || i > 120) {
-                            return false;
-                        }
-                    } catch (final Exception e) {
-                        return false;
-                    }
-                    return true;
-                });
-                input.setOnTextUpdate(str -> {
-                    int i = 0;
-                    if (!str.isEmpty()) {
-                        try {
-                            i = Integer.valueOf(str);
-                        } catch (final Exception e) {
-                        }
-                    }
-                    option.setEntry(PathEntryType.DELAY, i);
-                    gui.sendIntEntryToServer(i, node, mode, rotation, PathEntryType.DELAY);
-                });
-                textInputEntity.add(input);
-
-                hentity.add(textInputEntity);
-                parent.add(hentity);
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.DELAY,
+                        I18Wrapper.format("property.reset_protectionway_delay.name")));
             }
             case RS: {
                 gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
@@ -327,6 +285,7 @@ public class ModeDropDownBoxUI {
                 if (!boxPos.isPresent()) {
                     break;
                 }
+
                 final List<Point> validInConnections = gui.container.validInConnections
                         .getOrDefault(boxPos.get(), new ArrayList<>());
                 if (validInConnections.isEmpty()) {
@@ -352,29 +311,50 @@ public class ModeDropDownBoxUI {
                         .map(point -> validInConnections.indexOf(point)).orElse(-1)));
                 break;
             }
+
             case IN_CONNECTION: {
-                final List<Point> validEnds = gui.container.grid.getValidEnds();
-                if (validEnds.isEmpty()) {
-                    break;
-                }
-                final IIntegerable<String> integerable = new DisableIntegerable<>(
-                        SizeIntegerables.of("inconnection", validEnds.size(), id -> {
-                            final Point point = validEnds.get(id);
-                            if (point == null)
-                                return "Disabled";
-                            return point.toShortString();
-                        }));
-                parent.add(GuiElements.createEnumElement(integerable, e -> {
-                    final Point point = e >= 0 ? validEnds.get(e) : null;
-                    if (point == null) {
-                        option.removeEntry(PathEntryType.POINT);
-                        gui.removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
-                    } else {
-                        option.setEntry(PathEntryType.POINT, point);
-                        gui.sendPointEntry(point, node, mode, rotation, PathEntryType.POINT);
-                    }
-                }, option.getEntry(PathEntryType.POINT).map(point -> validEnds.indexOf(point))
-                        .orElse(-1)));
+                final UIEntity inConnections = GuiElements
+                        .createButton(I18Wrapper.format("property.inconnection.name"), e -> {
+                            final Point selcetedPoint = option.getEntry(PathEntryType.POINT)
+                                    .orElse(new Point(-1, -1));
+
+                            final UIEntity screen = new UIEntity();
+                            screen.setInherits(true);
+                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
+                                    e1 -> gui.pop()));
+
+                            final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
+                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                        final SignalBoxNode node = grid.getNodeChecked(point)
+                                                .orElse(new SignalBoxNode());
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE || !node.isValidEnd())
+                                            return;
+                                        final Point select = option.getEntry(PathEntryType.POINT)
+                                                .orElse(new Point(-1, -1));
+                                        if (point.equals(select)) {
+                                            rendering.removeSelection(SelectionType.FIRST);
+                                            gui.removeEntryFromServer(this.node, mode, rotation,
+                                                    PathEntryType.POINT);
+                                            option.removeEntry(PathEntryType.POINT);
+                                        } else {
+                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                                    point, SelectionType.FIRST);
+                                            gui.sendPointEntry(point, this.node, mode, rotation,
+                                                    PathEntryType.POINT);
+                                            option.setEntry(PathEntryType.POINT, point);
+                                        }
+                                    });
+
+                            if (!selcetedPoint.equals(new Point(-1, -1)))
+                                boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                        selcetedPoint, SelectionType.FIRST);
+
+                            screen.add(boxEntity.entity);
+                            gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
+                        });
+                inConnections.add(new UIToolTip(I18Wrapper.format("property.inconnection.desc")));
+                parent.add(inConnections);
                 break;
             }
             case ZS3: {
@@ -518,6 +498,55 @@ public class ModeDropDownBoxUI {
     private void changeShowState() {
         open = !open;
         update.run();
+    }
+    
+    private UIEntity getTextFieldEntityforType(final EnumGuiMode mode, final Rotation rotation,
+            final PathEntryType<Integer> type, final String labelName) {
+        final UIEntity hentity = new UIEntity();
+        hentity.setInheritWidth(true);
+        hentity.setHeight(20);
+        hentity.add(new UIBox(UIBox.HBOX, 0));
+
+        final UIEntity labelEntity = new UIEntity();
+        labelEntity.setInheritWidth(true);
+        labelEntity.setHeight(20);
+        labelEntity.add(new UILabel(labelName));
+        hentity.add(labelEntity);
+
+        final UIEntity textInputEntity = new UIEntity();
+        textInputEntity.setInheritWidth(true);
+        textInputEntity.setHeight(20);
+
+        final UITextInput input = new UITextInput(String
+                .valueOf(option.getEntry(type).orElse(SignalBoxUtil.getDefaultCosts(modeSet))));
+        input.setValidator(str -> {
+            if (str.isEmpty())
+                return true;
+            try {
+                final int i = Integer.valueOf(str);
+                if (i < 0 || i > 120) {
+                    return false;
+                }
+            } catch (final Exception e) {
+                return false;
+            }
+            return true;
+        });
+        input.setOnTextUpdate(str -> {
+            int i = 0;
+            if (!str.isEmpty()) {
+                try {
+                    i = Integer.valueOf(str);
+                } catch (final Exception e) {
+                }
+            }
+            option.setEntry(type, i);
+            gui.sendIntEntryToServer(i, node, mode, rotation, type);
+        });
+        textInputEntity.add(input);
+
+        hentity.add(textInputEntity);
+        return hentity;
     }
 
 }
