@@ -363,7 +363,6 @@ public class ModeDropDownBoxUI {
                 break;
             }
             case TRAIN_NUMBER: {
-                // TODO Rework this shit
                 final UIEntity button = GuiElements
                         .createButton(I18Wrapper.format("btn.connect.trainnumber"), e -> {
                             final ModeIdentifier identifier = option
