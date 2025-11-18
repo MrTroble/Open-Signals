@@ -48,6 +48,18 @@ public final class SignalBoxUtil {
             return Rotation.CLOCKWISE_90;
     }
 
+    public static Point getDeltaFromRotation(final Rotation rot) {
+        if (rot.equals(Rotation.NONE))
+            return new Point(1, 0);
+        else if (rot.equals(Rotation.CLOCKWISE_90))
+            return new Point(0, 1);
+        else if (rot.equals(Rotation.CLOCKWISE_180))
+            return new Point(-1, 0);
+        else if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
+            return new Point(0, -1);
+        return new Point();
+    }
+
     public static class PathIdentifier {
 
         public Path path;
@@ -86,7 +98,7 @@ public final class SignalBoxUtil {
         checker.visited = visited;
         PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
-        for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
+        for (final PathIdentifier pathIdent : firstNode.getStartIdentifiers()) {
             scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
         }
 
@@ -108,6 +120,12 @@ public final class SignalBoxUtil {
                 if (ConfigHandler.GENERAL.debugMode.get()) {
                     grid.sendDebugPointUpdates(debugPointList);
                     debugPointList.clear();
+                }
+                if (nodes.size() < 2) {
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+                }
+                if (!checkForValidEnd(pathType, nodes.get(0), nodes.get(1))) {
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.NO_EQUAL_PATH_TYPE);
                 }
                 return new PathwayRequestResult(PathwayRequestMode.PASS,
                         PathwayData.of(grid, nodes, pathType));
@@ -197,6 +215,21 @@ public final class SignalBoxUtil {
             final Point currentPoint, final Point endPoint) {
         return calculateHeuristic(currentPoint, endPoint) + currentNode.getOption(mode).get()
                 .getEntry(PathEntryType.PATHWAY_COSTS).orElse(getDefaultCosts(mode));
+    }
+
+    private static boolean checkForValidEnd(final PathType type, final SignalBoxNode lastNode,
+            final SignalBoxNode previous) {
+        final Point delta = lastNode.getPoint().delta(previous.getPoint());
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta)
+                .getRotated(Rotation.CLOCKWISE_180);
+        for (final EnumGuiMode mode : type.getModes()) {
+            if (!mode.getModeType().isValidEnd())
+                continue;
+            final ModeSet modeSet = new ModeSet(mode, rotation);
+            if (lastNode.has(modeSet))
+                return true;
+        }
+        return false;
     }
 
     public static int getDefaultCosts(final ModeSet mode) {

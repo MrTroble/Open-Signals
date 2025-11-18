@@ -401,6 +401,24 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 .collect(Collectors.toList());
     }
 
+    public List<PathIdentifier> getStartIdentifiers() {
+        final List<PathIdentifier> starts = new ArrayList<>();
+        final Set<Path> paths = possibleConnections.keySet();
+        possibleModes.keySet().forEach(mode -> {
+            if (!mode.mode.getModeType().isValidStart())
+                return;
+            final Point delta = SignalBoxUtil.getDeltaFromRotation(mode.rotation);
+            final Point start = new Point(point);
+            start.translate(delta.getX(), delta.getY());
+            for (final Path path : paths) {
+                if (path.point2.equals(start)) {
+                    starts.add(new PathIdentifier(path, this.point, possibleConnections.get(path)));
+                }
+            }
+        });
+        return starts;
+    }
+
     @Override
     public Iterator<ModeSet> iterator() {
         return this.possibleModes.keySet().iterator();
