@@ -1,9 +1,11 @@
 package com.troblecodings.signals.guis;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -93,6 +95,7 @@ public class UISignalBoxRendering extends UIComponent {
     private final UIEntity gridParent;
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
     private final Map<Point, String> trainNumbers = new HashMap<>();
+    private final Set<ColorPoint> additionalPoints = new HashSet<>();
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final boolean showLines,
             final SignalBoxConsumer consumer, final UIEntity gridParent) {
@@ -168,6 +171,14 @@ public class UISignalBoxRendering extends UIComponent {
         }
     }
 
+    public void addColoredPoint(final int c, final Point point) {
+        additionalPoints.add(new ColorPoint(point, c));
+    }
+
+    public void removeColoredPoint(final int c, final Point point) {
+        additionalPoints.remove(new ColorPoint(point, c));
+    }
+
     @Override
     public void mouseEvent(final MouseEvent event) {
         if (!this.visible)
@@ -195,18 +206,11 @@ public class UISignalBoxRendering extends UIComponent {
             info.pop();
         });
         for (final ColorPoint c : colorSelections) {
-            if (c != null) {
-                info.push();
-                info.translate(c.point.getX() * TILE_WIDTH, c.point.getY() * TILE_WIDTH, 0);
-                info.alphaOn();
-                info.blendOn();
-                info.applyColor();
-                final BufferWrapper wrapper =
-                        info.builder(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                wrapper.quad(0, TILE_WIDTH, 0, TILE_WIDTH, c.color);
-                info.end();
-                info.pop();
-            }
+            if (c != null)
+                renderColorPoint(info, c);
+        }
+        for (final ColorPoint c : additionalPoints) {
+            renderColorPoint(info, c);
         }
         final int signalBoxTrainNumberColor = ConfigHandler.CLIENT.signalboxTrainNumberColor.get();
         RenderSystem.enableBlend();
@@ -222,6 +226,18 @@ public class UISignalBoxRendering extends UIComponent {
             info.pop();
         });
         RenderSystem.blendColor(1, 1, 1, 1);
+    }
+
+    private void renderColorPoint(final DrawInfo info, final ColorPoint c) {
+        info.push();
+        info.translate(c.point.getX() * TILE_WIDTH, c.point.getY() * TILE_WIDTH, 0);
+        info.alphaOn();
+        info.blendOn();
+        info.applyColor();
+        final BufferWrapper wrapper = info.builder(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        wrapper.quad(0, (int) TILE_WIDTH, 0, (int) TILE_WIDTH, c.color);
+        info.end();
+        info.pop();
     }
 
     @Override
