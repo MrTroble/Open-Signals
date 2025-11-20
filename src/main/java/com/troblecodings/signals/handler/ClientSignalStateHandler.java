@@ -23,7 +23,8 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 
 public class ClientSignalStateHandler implements INetworkSync {
 
-    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
+    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES =
+            new HashMap<>();
 
     public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -60,6 +61,9 @@ public class ClientSignalStateHandler implements INetworkSync {
             properties = CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
 
             for (int i = 0; i < propertiesSize; i++) {
+                if (propertyIDs[i] > signalProperties.size() - 1) {
+                    continue;
+                }
                 final SEProperty property = signalProperties.get(propertyIDs[i]);
                 final String value = property.getObjFromID(valueIDs[i]);
                 properties.put(property, value);
