@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.TCBoolean;
@@ -408,9 +406,12 @@ public class ModeDropDownBoxUI {
                                         if (node.isEmpty())
                                             return;
 
-                                        final List<ModeSet> pathModes = node.toPathIdentifier()
-                                                .stream().map(ident -> ident.getMode())
-                                                .collect(Collectors.toList());
+                                        final List<ModeSet> pathModes = new ArrayList<>();
+                                        node.toPathIdentifier().stream()
+                                                .map(ident -> ident.getMode()).forEach(modeSet -> {
+                                                    if (!pathModes.contains(modeSet))
+                                                        pathModes.add(modeSet);
+                                                });
 
                                         if (pathModes.isEmpty()) {
                                             final UIToolTip tip = new UIToolTip(
@@ -418,26 +419,34 @@ public class ModeDropDownBoxUI {
                                             screen.add(tip);
                                             gui.executor.schedule(() -> screen.remove(tip), 3,
                                                     TimeUnit.SECONDS);
-                                        } else if (pathModes.size() <= 2) {
-                                            consumer.accept(node, pathModes.get(0));
+                                        } else if (pathModes.size() == 1) {
+                                            handleTrainNumberChange(node, pathModes.get(0),
+                                                    rendering, false);
                                         } else {
                                             final UIEnumerable enumerable = new UIEnumerable(
                                                     pathModes.size(), "mode_select");
+                                            enumerable.setMin(-1);
+                                            enumerable.setIndex(-1);
                                             enumerable.setOnChange(i -> {
                                                 final ModeSet modeSet = pathModes.get(i);
-                                                consumer.accept(node, modeSet);
+                                                handleTrainNumberChange(node, modeSet, rendering,
+                                                        true);
                                             });
                                             gui.push(GuiElements.createSelectionScreen(enumerable,
                                                     SizeIntegerables.of("mode_select",
                                                             pathModes.size(), id -> {
-                                                                return pathModes.get(id).mode
-                                                                        .toString();
+                                                                final ModeSet modeSet = pathModes
+                                                                        .get(id);
+                                                                return modeSet.mode.toString()
+                                                                        + " - "
+                                                                        + SignalBoxUtil
+                                                                                .getDegreeStringFromRotation(
+                                                                                        modeSet.rotation);
                                                             })));
                                         }
                                     });
                             entity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
                                     identifier.point, SelectionType.FIRST);
-
                             screen.add(entity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
@@ -449,14 +458,14 @@ public class ModeDropDownBoxUI {
         }
     }
 
-    private final BiConsumer<SignalBoxNode, ModeSet> consumer = (node, mode) -> {
+    private void handleTrainNumberChange(final SignalBoxNode node, final ModeSet mode,
+            final UISignalBoxRendering rendering, final boolean wereMultipleEntries) {
         final PathOptionEntry optionEntry = node.getOption(mode).get();
         final ModeIdentifier thisIdent = new ModeIdentifier(this.node.getPoint(), modeSet);
         if (optionEntry.containsEntry(PathEntryType.CONNECTED_TRAINNUMBER)) {
             final ModeIdentifier otherIdent = optionEntry
                     .getEntry(PathEntryType.CONNECTED_TRAINNUMBER).get();
             if (!thisIdent.equals(otherIdent)) {
-                gui.pop();
                 gui.push(GuiElements.createScreen(screen -> {
                     final UIEntity entity = new UIEntity();
                     entity.setInherits(true);
@@ -474,25 +483,35 @@ public class ModeDropDownBoxUI {
                         disconnectFromEachOther(thisIdent, otherIdent, gui.container.grid, gui);
                         connectToEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
                                 gui.container.grid, gui);
+                        rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
+                                SelectionType.FIRST);
                         gui.pop();
+                        if (wereMultipleEntries)
+                            gui.pop();
                     }));
                     lowerEntity.add(GuiElements.createSpacerH(20));
                     lowerEntity.add(GuiElements.createButton(I18Wrapper.format("btn.no"), e -> {
                         gui.pop();
+                        if (wereMultipleEntries)
+                            gui.pop();
                     }));
                     entity.add(lowerEntity);
                     screen.add(entity);
                 }));
+                if (wereMultipleEntries)
+                    gui.push(new UIEntity());
                 return;
             }
             disconnectFromEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
                     gui.container.grid, gui);
+            rendering.removeSelection(SelectionType.FIRST);
         } else {
             connectToEachOther(new ModeIdentifier(node.getPoint(), mode), thisIdent,
                     gui.container.grid, gui);
+            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
+                    SelectionType.FIRST);
         }
-        gui.pop();
-    };
+    }
 
     private static void connectToEachOther(final ModeIdentifier ident1, final ModeIdentifier ident2,
             final SignalBoxGrid grid, final GuiSignalBox gui) {

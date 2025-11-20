@@ -60,6 +60,16 @@ public final class SignalBoxUtil {
         return new Point();
     }
 
+    public static String getDegreeStringFromRotation(final Rotation rot) {
+        if (rot.equals(Rotation.CLOCKWISE_90))
+            return "90°";
+        if (rot.equals(Rotation.CLOCKWISE_180))
+            return "180°";
+        if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
+            return "270°";
+        return "0°";
+    }
+
     public static class PathIdentifier {
 
         public Path path;
