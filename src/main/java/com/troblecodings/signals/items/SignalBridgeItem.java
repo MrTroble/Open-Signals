@@ -134,7 +134,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, posToSet, signal);
         SignalStateHandler.createStates(info, signalProperties, player);
-        NameHandler.createName(info, nametoSet, player);
+        NameHandler.createName(info.toStateInfo(), nametoSet, player);
     }
 
     private static Map<BlockPos, BasicBlock> calculatePositions(final SignalBridgeBuilder builder,

@@ -341,8 +341,9 @@ public final class SignalStateHandler implements INetworkSync {
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
-        if (NameHandler.isNameLoaded(stateInfo)) {
-            final String customName = NameHandler.getName(stateInfo);
+        final StateInfo info = stateInfo.toStateInfo();
+        if (NameHandler.isNameLoaded(info)) {
+            final String customName = NameHandler.getName(info);
             if (customName == null || customName.isEmpty()
                     || customName.equals(stateInfo.signal.getSignalTypeName())) {
                 map.put(Signal.CUSTOMNAME, "false");
@@ -350,17 +351,16 @@ public final class SignalStateHandler implements INetworkSync {
                 map.put(Signal.CUSTOMNAME, "true");
             }
         } else {
-            NameHandler.runTaskWhenNameLoaded(new StateInfo(stateInfo.world, stateInfo.pos),
-                    (info, name, changed) -> {
-                        if (name == null || name.isEmpty()
-                                || name.equals(stateInfo.signal.getSignalTypeName())) {
-                            runTaskWhenSignalLoaded(stateInfo, (_u1, _u2,
-                                    _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "false"));
-                        } else {
-                            runTaskWhenSignalLoaded(stateInfo, (_u1, _u2,
-                                    _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "true"));
-                        }
-                    });
+            NameHandler.runTaskWhenNameLoaded(info, (infoState, name, changed) -> {
+                if (name == null || name.isEmpty()
+                        || name.equals(stateInfo.signal.getSignalTypeName())) {
+                    runTaskWhenSignalLoaded(stateInfo,
+                            (_u1, _u2, _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "false"));
+                } else {
+                    runTaskWhenSignalLoaded(stateInfo,
+                            (_u1, _u2, _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "true"));
+                }
+            });
         }
         return map;
     }
