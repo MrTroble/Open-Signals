@@ -230,7 +230,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                         new StateInfo(level, worldPosition));
                 SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
                 SignalStateHandler.addListener(info, listener);
-                NameHandler.loadName(new StateLoadHolder(info, holder));
+                NameHandler.loadName(new StateLoadHolder(info.toStateInfo(), holder));
             }
         }
     }
@@ -242,7 +242,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final LoadHolder<StateInfo> holder = new LoadHolder<>(
                     new StateInfo(level, worldPosition));
             SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, holder));
-            NameHandler.unloadName(new StateLoadHolder(info, holder));
+            NameHandler.unloadName(new StateLoadHolder(info.toStateInfo(), holder));
         }
     }
 
