@@ -311,6 +311,11 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(stateInfo.world);
         }
+        if (file == null) {
+            OpenSignalsMain.getLogger().error("SignalStateFile for World [" + stateInfo.world
+                    + "] is null! This shouldn't be the case!");
+            return map;
+        }
         ByteBuffer buffer;
         synchronized (file) {
             SignalStatePosV2 pos = file.find(stateInfo.pos);
