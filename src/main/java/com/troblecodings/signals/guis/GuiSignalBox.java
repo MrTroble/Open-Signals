@@ -37,11 +37,10 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -109,13 +108,27 @@ public class GuiSignalBox extends GuiBase {
         container.setColorUpdater(this::applyColorChanges);
         container.setConuterUpdater(this::updateCounter);
         container.setTrainNumberUpdater(this::updateTrainNumbers);
-        container.updatePoint = (p, m) -> rendering.updateSignalState(p, m,
-                container.grid.getNode(p).getState(m));
+        container.updateSignalState = this::updateSignalState;
         this.info = info;
     }
 
     public SignalBoxPage getPage() {
         return page;
+    }
+
+    private void updateSignalState(final SignalBoxNode node) {
+        node.forEach((mode) -> {
+            checkForSubsidiary(node, mode);
+            rendering.updateSignalState(node.getPoint(), mode, node.getState(mode));
+        });
+    }
+
+    private void checkForSubsidiary(final SignalBoxNode node, final ModeSet mode) {
+        final Map<ModeSet, SubsidiaryState> subsidiary = container.enabledSubsidiaryTypes
+                .getOrDefault(node.getPoint(), new HashMap<>());
+        final SubsidiaryState state = subsidiary.get(mode);
+        if (state != null)
+            node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
     }
 
     public void infoUpdate(final String errorString) {
@@ -189,13 +202,14 @@ public class GuiSignalBox extends GuiBase {
     }
 
     protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
-        final SubsidiaryEntry entry = new SubsidiaryEntry(holder.entry.enumValue, false);
-        sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
-        container.grid.setClientState(holder.point, holder.modeSet, entry);
+        final SubsidiaryState state = holder.entry;
+        sendSubsidiaryRequest(state, holder.point, holder.modeSet, false);
+        container.updateClientSubsidiary(holder.point, holder.modeSet, state, false);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
 
         container.grid.getNodeChecked(holder.point).ifPresent(node -> {
+            node.removeSubsidiaryState(holder.modeSet);
             node.updateState(holder.modeSet, SignalState.RED);
             rendering.updateSignalState(holder.point, holder.modeSet, SignalState.RED);
         });
@@ -715,8 +729,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_CHANGED_MODES);
-        buffer.putMap(changedModes, NetworkBufferWrappers.POINT_CONSUMER,
-                NetworkBufferWrappers.SIGNALBOXNODE_CONSUMER);
+        buffer.putINetworkSaveableMap(changedModes);
         container.grid.putAllNodes(changedModes);
         changedModes.clear();
         OpenSignalsMain.network.sendTo(info.player, buffer);
@@ -731,8 +744,8 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    protected void sendSubsidiaryRequest(final SubsidiaryEntry entry, final Point point,
-            final ModeSet mode) {
+    protected void sendSubsidiaryRequest(final SubsidiaryState entry, final Point point,
+            final ModeSet mode, final boolean enable) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
@@ -740,6 +753,7 @@ public class GuiSignalBox extends GuiBase {
         entry.writeNetwork(buffer);
         point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
+        buffer.putBoolean(enable);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -844,7 +858,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_POSIDENT_LIST);
-        buffer.putList(list, NetworkBufferWrappers.POS_IDENTIFIER_CONSUMER);
+        buffer.putISaveableList(list);
         node.getPoint().writeNetwork(buffer);
         buffer.putByte((byte) mode.ordinal());
         buffer.putByte((byte) rotation.ordinal());
@@ -866,6 +880,19 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
+    protected void updateSignalStateOnServer(final Point point, final ModeSet mode,
+            final SignalState state) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SET_SIGNAL_STATE);
+        point.writeNetwork(buffer);
+        buffer.putByte((byte) mode.mode.ordinal());
+        buffer.putByte((byte) mode.rotation.ordinal());
+        buffer.putEnumValue(state);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
     private void reset() {
         lowerEntity.clear();
     }
@@ -875,14 +902,14 @@ public class GuiSignalBox extends GuiBase {
         if (!allPacketsRecived) {
             updateEnabledSubsidiaries();
             initializeBasicUI();
+            enabledSubsidiaries.values()
+                    .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
             allPacketsRecived = true;
         }
     }
 
     private void updateEnabledSubsidiaries() {
         container.enabledSubsidiaryTypes.forEach((point, map) -> map.forEach((modeSet, state) -> {
-            if (!state.state)
-                return;
             final SignalBoxNode node = container.grid.getNode(point);
             if (node == null)
                 return;

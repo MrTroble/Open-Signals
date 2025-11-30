@@ -11,10 +11,10 @@ import net.minecraft.world.World;
 public class SignalStateInfo {
 
     public final BlockPos pos;
-    public final Level world;
+    public final World world;
     public final Signal signal;
 
-    public SignalStateInfo(final Level world, final BlockPos pos, final Signal signal) {
+    public SignalStateInfo(final World world, final BlockPos pos, final Signal signal) {
         this.pos = pos;
         this.world = world;
         this.signal = signal;

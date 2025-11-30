@@ -91,7 +91,7 @@ public class ContainerSignalBridge extends ContainerBase {
                 break;
             }
             case SET_SIGNAL: {
-                final VectorWrapper vec = VectorWrapper.of(buf);
+                final VectorWrapper vec = buf.getINetworkSaveable(VectorWrapper.class);
                 builder.setNewSignalPos(Signal.SIGNAL_IDS.get(buf.getInt()), buf.getString(), vec);
                 break;
             }

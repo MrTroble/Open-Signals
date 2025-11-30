@@ -5,18 +5,23 @@ import java.util.Objects;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.core.interfaces.INetworkSaveable;
+import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.enums.EnumGuiMode;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 import net.minecraft.util.Rotation;
 
-public class ModeSet implements INetworkSavable {
+public class ModeSet implements INetworkSaveable, ISaveable {
 
     private static final String MODE = "mode";
     private static final String ROTATION = "rotation";
 
     public EnumGuiMode mode;
     public Rotation rotation;
+
+    public ModeSet() {
+
+    }
 
     public ModeSet(final NBTWrapper compound) {
         this.read(Objects.requireNonNull(compound));

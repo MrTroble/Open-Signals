@@ -30,7 +30,6 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -436,35 +435,31 @@ public class SidePanel {
                                         possibleSubsidiaries.getOrDefault(signalPos,
                                                 SubsidiaryState.ALL_STATES);
                                 possibleSubsidiaires.forEach(state -> {
-                                    final int defaultValue =
-                                            gui.container.grid.getSubsidiaryState(node.getPoint(),
-                                                    mode, state) ? 0 : 1;
+                                    final int defaultValue = state
+                                            .equals(node.getSubsidiaryState(mode)) ? 0 : 1;
                                     list.add(GuiElements.createEnumElement(
                                             new SizeIntegerables<>(state.getName(), 2,
                                                     i -> i == 1 ? "false" : "true"),
                                             a -> {
-                                                final SubsidiaryEntry entry = new SubsidiaryEntry(
-                                                        state, a == 0 ? true : false);
-                                                gui.sendSubsidiaryRequest(entry, node.getPoint(),
-                                                        mode);
-                                                gui.container.grid.setClientState(node.getPoint(),
-                                                        mode, entry);
-                                                if (signalPos != null) {
-                                                    if (entry.state) {
-                                                        subsidiaries.put(signalPos,
-                                                                new SubsidiaryHolder(entry,
-                                                                        node.getPoint(), mode));
-                                                    } else {
-                                                        subsidiaries.remove(signalPos);
-                                                    }
+                                                final boolean enable = a == 0 ? true : false;
+                                                if (enable) {
+                                                    subsidiaries.put(signalPos,
+                                                            new SubsidiaryHolder(state,
+                                                                    node.getPoint(), mode));
+                                                    node.setSubsidiaryState(mode, state);
+                                                } else {
+                                                    node.updateState(mode, SignalState.RED);
+                                                    node.removeSubsidiaryState(mode);
+                                                    subsidiaries.remove(signalPos);
                                                 }
+                                                gui.sendSubsidiaryRequest(state, node.getPoint(),
+                                                        mode, enable);
+                                                gui.container.updateClientSubsidiary(
+                                                        node.getPoint(), mode, state, enable);
+                                                gui.container.updateSignalState.accept(node);
                                                 gui.pop();
                                                 helpUsageMode(node);
-                                                node.updateState(mode, SignalState
-                                                        .combine(state.getSubsidiaryShowType()));
-                                                gui.container.updatePoint.accept(node.getPoint(),
-                                                        mode);
-                                                if (state.isCountable() && entry.state) {
+                                                if (state.isCountable() && enable) {
                                                     gui.container.grid.countOne();
                                                     gui.updateCounter();
                                                     gui.sendCurrentCounterToServer();
@@ -666,7 +661,7 @@ public class SidePanel {
                         selectionEntity.add(hbox);
                         final UIEntity question = new UIEntity();
                         final UILabel label = new UILabel(
-                                name + " : " + holder.entry.enumValue.toString().toUpperCase());
+                                name + " : " + holder.entry.toString().toUpperCase());
                         label.setTextColor(0xFFFFFFFF);
                         question.setScaleX(1.1f);
                         question.setScaleY(1.1f);
@@ -684,6 +679,7 @@ public class SidePanel {
                                 GuiElements.createButton(I18Wrapper.format("btn.yes"), e1 -> {
                                     gui.pop();
                                     gui.disableSubsidiary(pos, holder);
+                                    subsidiaries.remove(pos);
                                 });
                         final UIEntity buttonNo = GuiElements
                                 .createButton(I18Wrapper.format("btn.no"), e2 -> gui.pop());

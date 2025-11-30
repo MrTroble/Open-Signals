@@ -147,12 +147,12 @@ public class UISignalBoxRendering extends UIComponent {
         trainNumbers.put(point, text);
     }
 
-    public boolean hasSelection(int c, Point point, SelectionType type) {
+    public boolean hasSelection(final int c, final Point point, final SelectionType type) {
         final ColorPoint colorPoint = colorSelections[type.ordinal()];
         return colorPoint == null ? false : colorPoint.equals(new ColorPoint(point, c));
     }
 
-    public void addSelection(int c, Point point, SelectionType type) {
+    public void addSelection(final int c, final Point point, final SelectionType type) {
         final ColorPoint colorPoint = new ColorPoint(point, c);
         if (colorSelections[type.ordinal()] == colorPoint) {
             colorSelections[type.ordinal()] = null;
@@ -206,8 +206,9 @@ public class UISignalBoxRendering extends UIComponent {
             info.pop();
         });
         for (final ColorPoint c : colorSelections) {
-            if (c != null)
+            if (c != null) {
                 renderColorPoint(info, c);
+            }
         }
         for (final ColorPoint c : additionalPoints) {
             renderColorPoint(info, c);
@@ -234,8 +235,9 @@ public class UISignalBoxRendering extends UIComponent {
         info.alphaOn();
         info.blendOn();
         info.applyColor();
-        final BufferWrapper wrapper = info.builder(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        wrapper.quad(0, (int) TILE_WIDTH, 0, (int) TILE_WIDTH, c.color);
+        final BufferWrapper wrapper =
+                info.builder(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        wrapper.quad(0, TILE_WIDTH, 0, TILE_WIDTH, c.color);
         info.end();
         info.pop();
     }
@@ -353,7 +355,7 @@ public class UISignalBoxRendering extends UIComponent {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
             if (obj == null)

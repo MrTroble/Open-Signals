@@ -19,7 +19,6 @@ import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -176,7 +175,7 @@ public class SignalBridgeBuilder {
         final List<NBTWrapper> signalList = new ArrayList<>();
         vecForSignal.forEach((entry, vec) -> {
             final NBTWrapper tag = new NBTWrapper();
-            vec.writeNBT(tag);
+            vec.write(tag);
             tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getPath());
             tag.putString(CUSTOMNAME, entry.getKey());
             signalList.add(tag);
@@ -219,24 +218,23 @@ public class SignalBridgeBuilder {
     }
 
     public void writeNetwork(final WriteBuffer buffer) {
-        // TODO needs to be cheked
-        buffer.putMap(pointForBlocks, NetworkBufferWrappers.POINT_CONSUMER,
+        buffer.putMap(pointForBlocks, WriteBuffer.getINetworkSaveableConsumer(),
                 (buf, block) -> buf.putInt(block.getID()));
         buffer.putMap(vecForSignal, (buf, entry) -> {
             buf.putString(entry.getKey());
             buf.putInt(entry.getValue().getID());
-        }, WriteBuffer.VEC_CONSUMER);
+        }, WriteBuffer.getINetworkSaveableConsumer());
         startPoint.writeNetwork(buffer);
     }
 
     public void readNetwork(final ReadBuffer buffer) {
         pointForBlocks.clear();
         vecForSignal.clear();
-        pointForBlocks.putAll(buffer.getMap(NetworkBufferWrappers.POINT_FUNCTION,
+        pointForBlocks.putAll(buffer.getMap(ReadBuffer.getINetworkSaveableFunction(Point.class),
                 (buf) -> SignalBridgeBasicBlock.ALL_SIGNALBRIDGE_BLOCKS.get(buf.getInt())));
         vecForSignal.putAll(buffer.getMap(
                 buf -> Maps.immutableEntry(buf.getString(), Signal.SIGNAL_IDS.get(buf.getInt())),
-                ReadBuffer.VEC_FUNCTION));
+                ReadBuffer.getINetworkSaveableFunction(VectorWrapper.class)));
         this.startPoint = Point.of(buffer);
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }

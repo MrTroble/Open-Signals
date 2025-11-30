@@ -5,9 +5,10 @@ import java.util.Objects;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.core.interfaces.INetworkSaveable;
+import com.troblecodings.core.interfaces.ISaveable;
 
-public class Point implements INetworkSavable {
+public class Point implements INetworkSaveable, ISaveable {
 
     private int x, y;
 

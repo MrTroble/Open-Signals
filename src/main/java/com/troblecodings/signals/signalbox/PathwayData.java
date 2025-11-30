@@ -296,7 +296,7 @@ public class PathwayData {
                                     .getEntry(PathEntryType.SIGNAL_REPEATER);
                             final OtherSignalIdentifier ident = new OtherSignalIdentifier(
                                     node.getPoint(), modeSet, position,
-                                    repeaterOption.isPresent() && repeaterOption.get(), mode);
+                                    repeaterOption.isPresent() && repeaterOption.get(), mode, grid);
                             final BlockPosSignalHolder holder = new BlockPosSignalHolder(position);
                             if (otherBuilder.containsKey(holder)) {
                                 final OtherSignalIdentifier otherIdent = otherBuilder.get(holder);
@@ -350,7 +350,7 @@ public class PathwayData {
                         .getOption(ident.getModeSet()).orElse(new PathOptionEntry());
                 return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
-                        EnumGuiMode.VP);
+                        EnumGuiMode.VP, grid);
             }).collect(Collectors.toList()));
         } else {
             startSignal = Optional.empty();
@@ -371,7 +371,7 @@ public class PathwayData {
             final BlockPos possiblePosition = first.getOption(modeSet)
                     .flatMap(option -> option.getEntry(PathEntryType.SIGNAL)).orElse(null);
             if (possiblePosition != null)
-                return new MainSignalIdentifier(first.getPoint(), modeSet, possiblePosition);
+                return new MainSignalIdentifier(first.getPoint(), modeSet, possiblePosition, grid);
         }
         return null;
     }

@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.core.interfaces.INetworkSaveable;
+import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 
-public class PathOptionEntry implements INetworkSavable {
+public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
 
@@ -102,17 +104,6 @@ public class PathOptionEntry implements INetworkSavable {
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
         buffer.putMap(pathEntrys, NetworkBufferWrappers.PATHENTRYTYPE_CONSUMER,
-                NetworkBufferWrappers.PATHENTRY_CONSUMER);
-    }
-
-    public void writeUpdateNetwork(final WriteBuffer builder) {
-        // TODO rework this updateNetwork
-        final Map<PathEntryType<?>, IPathEntry<?>> entriesToSend = new HashMap<>();
-        pathEntrys.entrySet().stream()
-                .filter(entry -> entry.getKey().equals(PathEntryType.PATHUSAGE)
-                        || entry.getKey().equals(PathEntryType.TRAINNUMBER))
-                .forEach(entry -> entriesToSend.put(entry.getKey(), entry.getValue()));
-        builder.putMap(entriesToSend, NetworkBufferWrappers.PATHENTRYTYPE_CONSUMER,
-                NetworkBufferWrappers.PATHENTRY_CONSUMER);
+                WriteBuffer.getINetworkSaveableConsumer());
     }
 }
