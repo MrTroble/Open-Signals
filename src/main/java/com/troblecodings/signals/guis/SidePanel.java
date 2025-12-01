@@ -154,7 +154,7 @@ public class SidePanel {
         emergencyEntity.setWidth(20);
         emergencyEntity.add(new UITexture(EMERGENCY));
         emergencyEntity.add(new UIClickable(e -> gui.resetAllSignals()));
-        emergencyEntity.add(new UIToolTip(I18Wrapper.format("info.usage.sh.desc")));
+        emergencyEntity.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
         list.add(emergencyEntity);
 
         final UIEntity rsOutputEntity = new UIEntity();
@@ -212,7 +212,7 @@ public class SidePanel {
     public void updateNextNode(final int selection, final int rotation) {
         infoEntity.clearChildren();
         infoEntity.add(GuiElements.createSpacerV(2));
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.nextelement"),
+        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.editor.nextelement"),
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
@@ -237,13 +237,15 @@ public class SidePanel {
 
         infoEntity.add(preview);
         infoEntity.add(getSpacerLine());
+        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
+                new UIEntity().getBasicTextColor(), 0.8f));
         infoEntity.add(GuiElements.createLabel("[R] = " + I18Wrapper.format("info.editor.key.r"),
                 new UIEntity().getInfoTextColor(), 0.5f));
         infoEntity
                 .add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.editor.key.lmb"),
                         new UIEntity().getInfoTextColor(), 0.5f));
         infoEntity.add(getSpacerLine());
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.description"),
+        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.editor.description"),
                 new UIEntity().getBasicTextColor(), 0.8f));
         final EnumGuiMode mode = EnumGuiMode.values()[selection];
         infoEntity.add(
@@ -286,8 +288,8 @@ public class SidePanel {
         helpList.add(getSpacerLine());
 
         final UIEntity shButton = GuiElements.createButton(
-                "     " + I18Wrapper.format("info.usage.sh"), e -> gui.resetAllSignals());
-        shButton.add(new UIToolTip(I18Wrapper.format("info.usage.sh.desc")));
+                "     " + I18Wrapper.format("info.usage.emergency"), e -> gui.resetAllSignals());
+        shButton.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
 
         final UIEntity emergencyEntity = new UIEntity();
         emergencyEntity.setHeight(20);
@@ -623,7 +625,7 @@ public class SidePanel {
                             layout.add(new UIClickable(e1 -> gui.pop(), 1));
                             gui.push(GuiElements.createScreen(screen -> screen.add(layout)));
                         });
-                trainNumberButton.add(new UIToolTip("info.usage.trainnumber.desc"));
+                trainNumberButton.add(new UIToolTip(I18Wrapper.format("info.usage.trainnumber.desc")));
                 trainNumberButton.setScale(0.95f);
                 helpList.add(trainNumberButton);
             }

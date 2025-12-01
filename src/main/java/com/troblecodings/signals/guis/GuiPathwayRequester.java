@@ -27,7 +27,7 @@ public class GuiPathwayRequester extends GuiBase {
         this.container = (ContainerPathwayRequester) info.base;
         this.player = info.player;
         entity.clear();
-        entity.add(new UILabel("Not connected"));
+        entity.add(new UILabel(I18Wrapper.format("gui.notconnected")));
     }
 
     private void initOwn() {
@@ -39,8 +39,9 @@ public class GuiPathwayRequester extends GuiBase {
         higherEntity.setHeight(20);
         higherEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity label =
-                GuiElements.createLabel(I18Wrapper.format("tile.pathwayrequester"), 0x7678a0, 1f);
+        final UIEntity label = GuiElements.createLabel(
+                I18Wrapper.format("block." + OpenSignalsMain.MODID + ".pathwayrequester"), 0x7678a0,
+                1f);
         higherEntity.add(label);
 
         final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(container.grid,
@@ -58,7 +59,7 @@ public class GuiPathwayRequester extends GuiBase {
                             rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
                                     SelectionType.SECOND);
                             sendPWToServer();
-                            infoUpdate(I18Wrapper.format("gui.saved"));
+                            infoUpdate(I18Wrapper.format("gui.pwr.saved"));
                         }
                     });
                 });

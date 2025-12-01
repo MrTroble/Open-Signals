@@ -74,17 +74,17 @@ public class GuiSignalBox extends GuiBase {
     public static final int BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
-    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor
-            .get();
+    public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
+            ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
 
-    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(
-            OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(
-            OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
+    public static final ResourceLocation REDSTONE_OFF =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
@@ -124,11 +124,12 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void checkForSubsidiary(final SignalBoxNode node, final ModeSet mode) {
-        final Map<ModeSet, SubsidiaryState> subsidiary = container.enabledSubsidiaryTypes
-                .getOrDefault(node.getPoint(), new HashMap<>());
+        final Map<ModeSet, SubsidiaryState> subsidiary =
+                container.enabledSubsidiaryTypes.getOrDefault(node.getPoint(), new HashMap<>());
         final SubsidiaryState state = subsidiary.get(mode);
-        if (state != null)
+        if (state != null) {
             node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
+        }
     }
 
     public void infoUpdate(final String errorString) {
@@ -304,8 +305,8 @@ public class GuiSignalBox extends GuiBase {
         if (node.isEmpty())
             return;
         final Point point = node.getPoint();
-        final boolean alredySelected = rendering.hasSelection(EDIT_COLOR, point,
-                SelectionType.FIRST);
+        final boolean alredySelected =
+                rendering.hasSelection(EDIT_COLOR, point, SelectionType.FIRST);
         if (!alredySelected) {
             rendering.addSelection(EDIT_COLOR, point, SelectionType.FIRST);
             helpPage.helpUsageMode(node);
@@ -341,8 +342,8 @@ public class GuiSignalBox extends GuiBase {
         nameEntity.setHeight(20);
         nameEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity labelEntity = GuiElements.createLabel(I18Wrapper.format("info.node.text"),
-                1.25f);
+        final UIEntity labelEntity =
+                GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
         labelEntity.setInheritWidth(false);
         labelEntity.setWidth(100);
         nameEntity.add(labelEntity);
@@ -524,8 +525,8 @@ public class GuiSignalBox extends GuiBase {
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"),
-                    e -> pop());
+            final UIEntity buttonNo =
+                    GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -538,8 +539,8 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final SignalBoxConsumer consumer,
             final boolean showLines) {
-        BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines,
-                consumer);
+        BoxEntity entitys =
+                UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines, consumer);
         splitter = entitys.entity;
         rendering = entitys.rendering;
 
@@ -557,7 +558,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeBasicUI() {
-        final String name = I18Wrapper.format("tile.signalbox.name");
+        final String name = I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalbox");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
@@ -578,8 +579,8 @@ public class GuiSignalBox extends GuiBase {
                 this::initializePageSettings));
         header.add(
                 GuiElements.createButton(I18Wrapper.format("btn.edit"), this::initializeFieldEdit));
-        mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"),
-                this::initializeFieldUsage);
+        mainButton =
+                GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 

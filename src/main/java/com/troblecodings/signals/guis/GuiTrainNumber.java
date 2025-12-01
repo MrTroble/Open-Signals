@@ -10,6 +10,7 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 
@@ -21,7 +22,7 @@ public class GuiTrainNumber extends GuiBase {
         super(info);
         this.container = (ContainerTrainNumber) info.base;
         this.entity.clear();
-        this.entity.add(new UILabel("Not connected"));
+        this.entity.add(new UILabel(I18Wrapper.format("gui.notconnected")));
     }
 
     private void initOwn() {
@@ -35,8 +36,9 @@ public class GuiTrainNumber extends GuiBase {
         inner.add(new UIBox(UIBox.VBOX, 5));
         inner.add(GuiElements.createSpacerV(10));
 
-        final UIEntity label =
-                GuiElements.createLabel(I18Wrapper.format("tile.trainnumberchanger"), 0x7678a0);
+        final UIEntity label = GuiElements.createLabel(
+                I18Wrapper.format("block." + OpenSignalsMain.MODID + ".trainnumberblock"),
+                0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.setX(-6);
