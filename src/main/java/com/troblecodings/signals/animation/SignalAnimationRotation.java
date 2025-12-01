@@ -57,9 +57,8 @@ public class SignalAnimationRotation implements SignalAnimation {
                 break;
         }
         this.step = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
-        if (finalRotationValue < progress) {
+        if (finalRotationValue < progress)
             this.step *= -1;
-        }
     }
 
     @Override

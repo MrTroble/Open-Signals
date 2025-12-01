@@ -109,7 +109,7 @@ public class UIMenu extends UIComponentEntity {
     }
 
     @Override
-    public void onAdd(UIEntity entity) {
+    public void onAdd(final UIEntity entity) {
         super.onAdd(entity);
         this.entity.onAdd(entity);
         this.entity.updateEvent(entity.getLastUpdateEvent());

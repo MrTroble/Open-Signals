@@ -13,6 +13,10 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 public final class NetworkBufferWrappers {
 
+    private NetworkBufferWrappers() {
+
+    }
+
     public static final BiConsumer<WriteBuffer, SignalBoxNode> POINT_SIGNALBOXNODE_CONSUMER = (
             buffer, node) -> {
         node.getPoint().writeNetwork(buffer);

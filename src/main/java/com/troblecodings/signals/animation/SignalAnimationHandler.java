@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Quaternion;
+import net.minecraftforge.client.model.SeparatePerspectiveModel.BakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 
 public class SignalAnimationHandler {
@@ -40,7 +41,7 @@ public class SignalAnimationHandler {
         this.tile = tile;
     }
 
-    private final Map<IBakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel = //
+    private final Map<BakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel =
             new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
@@ -145,20 +146,18 @@ public class SignalAnimationHandler {
     }
 
     public void updateAnimationListFromBlock() {
-        synchronized (animationPerModel) {
-            animationPerModel.clear();
-            final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = //
-                    SignalAnimationConfigParser.ALL_ANIMATIONS.get(tile.getSignal());
-            map.forEach((entry, animations) -> {
-                final IBakedModel model = SignalCustomModel.getModelFromLocation(
-                        new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-                final ModelTranslation translation =
-                        new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
-                translation.setModelTranslation(entry.getValue().copy());
-                animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
-                        .map(animation -> animation.copy()).collect(Collectors.toList())));
-            });
-        }
+        animationPerModel.clear();
+        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = //
+                SignalAnimationConfigParser.ALL_ANIMATIONS.get(tile.getSignal());
+        map.forEach((entry, animations) -> {
+            final IBakedModel model = SignalCustomModel.getModelFromLocation(
+                    new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
+            translation.setModelTranslation(entry.getValue().copy());
+            animationPerModel.put((BakedModel) model, Maps.immutableEntry(translation, animations
+                    .stream().map(animation -> animation.copy()).collect(Collectors.toList())));
+        });
     }
 
 }

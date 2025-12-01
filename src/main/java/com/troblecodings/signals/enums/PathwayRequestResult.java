@@ -9,17 +9,17 @@ import com.troblecodings.signals.signalbox.PathwayData;
 
 public class PathwayRequestResult {
 
-    private static final Map<PathwayRequestMode, PathwayRequestResult> modeToResult = new HashMap<>();
+    private static final Map<PathwayRequestMode, PathwayRequestResult> MODE_TO_RESULT = new HashMap<>();
 
     static {
         for (final PathwayRequestMode mode : PathwayRequestMode.values()) {
             if (mode == PathwayRequestMode.PASS)
                 continue;
-            modeToResult.put(mode, new PathwayRequestResult(mode));
+            MODE_TO_RESULT.put(mode, new PathwayRequestResult(mode));
         }
     }
 
-    private static final boolean canAddRSPathToSaver = ConfigHandler.GENERAL.canAddRSPathToSaver
+    private static final boolean CAN_ADD_RS_PATH_TO_SAVER = ConfigHandler.GENERAL.canAddRSPathToSaver
             .get();
 
     private final PathwayRequestMode mode;
@@ -35,7 +35,7 @@ public class PathwayRequestResult {
     }
 
     public static PathwayRequestResult getByMode(final PathwayRequestMode mode) {
-        return modeToResult.getOrDefault(mode,
+        return MODE_TO_RESULT.getOrDefault(mode,
                 new PathwayRequestResult(PathwayRequestMode.NO_PATH));
     }
 
@@ -53,7 +53,7 @@ public class PathwayRequestResult {
 
     public boolean canBeAddedToSaver(final PathType type) {
         return mode.canBeAddedToSaver() && (type.equals(PathType.NORMAL)
-                || (type.equals(PathType.SHUNTING) && canAddRSPathToSaver));
+                || (type.equals(PathType.SHUNTING) && CAN_ADD_RS_PATH_TO_SAVER));
     }
 
     public boolean wasSuccesfull() {

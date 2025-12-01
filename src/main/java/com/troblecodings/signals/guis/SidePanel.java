@@ -184,8 +184,8 @@ public class SidePanel {
         counterLabel.setText(String.format("%04d", gui.container.grid.getCurrentCounter()));
     }
 
-    private static void drawMenuFromEnum(DrawInfo info, EnumGuiMode modes, int rotation,
-            final float scale) {
+    private static void drawMenuFromEnum(final DrawInfo info, final EnumGuiMode modes,
+            final int rotation, final float scale) {
         info.push();
         info.scale(scale, scale, 1.0f);
         info.translate(UISignalBoxRendering.HALF_TILE, UISignalBoxRendering.HALF_TILE, 0);
@@ -195,12 +195,12 @@ public class SidePanel {
         info.pop();
     }
 
-    public static UIComponent fromEnum(int selection, int rotation, final float scale) {
+    public static UIComponent fromEnum(final int selection, final int rotation, final float scale) {
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         return new UIComponent() {
 
             @Override
-            public void draw(DrawInfo info) {
+            public void draw(final DrawInfo info) {
                 if (this.parent == null)
                     return;
                 drawMenuFromEnum(info, modes, rotation, scale);

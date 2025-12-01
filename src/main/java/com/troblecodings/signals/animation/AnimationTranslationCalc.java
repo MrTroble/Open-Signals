@@ -48,7 +48,7 @@ public class AnimationTranslationCalc {
         }
     }
 
-    public void updateAnimation(float tick) {
+    public void updateAnimation(final float tick) {
         if (!finishedX) {
             progressX += stepX * tick;
             this.finishedX = isAnimationOnAxisIsFinished(stepX, progressX, maxX);
