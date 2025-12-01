@@ -632,6 +632,7 @@
 	"error.overstepping": "Überschreiten",
 	"error.no_path": "Kein Fahrstraße möglich",
 	"error.no_intersignalbox_selected": "Kein Stellwerk verbunden",
+    "error.input_blocking" : "aktiver Input blockiert",
 	"error.pass": "Erfolg",
 	"property.pathway_costs.name": "Zusätzliche Fahrstraßenkosten",
 	"property.pathay_costs.desc": "Mit dieser Option können Sie die \"Kosten\" für bestimmte Fahrstraßenelemente erhöhen, so dass der Pfadalgorithmus diesen Pfad nach Möglichkeit vermeidet. Dies ist besonders hilfreich, wenn Sie den Fahrstraße manuell beeinflussen wollen.",

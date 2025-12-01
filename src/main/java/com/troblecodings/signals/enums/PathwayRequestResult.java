@@ -85,7 +85,8 @@ public class PathwayRequestResult {
     public enum PathwayRequestMode {
 
         NO_EQUAL_PATH_TYPE("no_equal_path_type"), NOT_IN_GRID("not_in_grid"),
-        ALREADY_USED("already_used"), OVERSTEPPING("overstepping"), NO_PATH("no_path"),
+        ALREADY_USED("already_used"), OVERSTEPPING("overstepping"),
+        INPUT_BLOCKING("input_blocking"), NO_PATH("no_path"),
         NO_INTERSIGNALBOX_SELECTED("no_intersignalbox_selected"), PASS("pass");
 
         private final String name;
@@ -99,7 +100,7 @@ public class PathwayRequestResult {
         }
 
         public boolean canBeAddedToSaver() {
-            return this == ALREADY_USED || this == NO_PATH;
+            return this == ALREADY_USED || this == NO_PATH || this == INPUT_BLOCKING;
         }
 
         public boolean isPass() {

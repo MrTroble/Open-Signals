@@ -632,6 +632,7 @@
 	"error.overstepping": "Overstepped",
 	"error.no_path": "No path available",
 	"error.no_intersignalbox_selected": "No signalbox connected",
+	"error.input_blocking": "active Input is blocking",
 	"error.pass": "Pass",
 	"property.pathway_costs.name": "Additional pathway costs",
 	"property.pathway_costs.desc": "This option can be used to increase the 'costs' for certain path elements so that the path algorithm avoids this path if possible. This is particularly helpful if you want to influence the pathway manually.",
