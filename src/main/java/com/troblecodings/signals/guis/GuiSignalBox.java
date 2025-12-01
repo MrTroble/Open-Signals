@@ -95,9 +95,9 @@ public class GuiSignalBox extends GuiBase {
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
     private UIEntity splitter = new UIEntity();
-    private UISignalBoxRendering rendering;
     private boolean allPacketsRecived = false;
     private SidePanel helpPage;
+    protected UISignalBoxRendering rendering;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     protected final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 

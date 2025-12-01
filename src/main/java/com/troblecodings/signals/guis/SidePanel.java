@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -864,15 +865,12 @@ public class SidePanel {
     }
 
     private void addColorToTile(final Point start, final Point end, final int color) {
-        // WTF ???
-        /*
-         * if (startTile == null || endTile == null) return; final UIColor uiColor = new
-         * UIColor(color); new Thread(() -> { startTile.getParent().add(uiColor);
-         * endTile.getParent().add(uiColor); try { Thread.sleep(3000); } catch (final
-         * InterruptedException e) { e.printStackTrace(); }
-         * startTile.getParent().remove(uiColor); endTile.getParent().remove(uiColor);
-         * }, "GuiSignalBox:showNextPathway").start();
-         */
+        gui.rendering.addColoredPoint(color, start);
+        gui.rendering.addColoredPoint(color, end);
+        gui.executor.schedule(() -> {
+            gui.rendering.removeColoredPoint(color, start);
+            gui.rendering.removeColoredPoint(color, end);
+        }, 3, TimeUnit.SECONDS);
     }
 
     private static UIEntity getSpacerLine() {
