@@ -87,14 +87,12 @@ public class ContainerTrainNumber extends ContainerBase implements IChunkLoadabl
 
     protected void sendNewTrainNumber(final String number) {
         final WriteBuffer buffer = getBufferByEnum(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
-        buffer.putEnumValue(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
         buffer.putString(number);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     protected void setTrainNumber() {
-        final WriteBuffer buffer = getBufferByEnum(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
-        buffer.putEnumValue(TrainNumberNetwork.SET_TRAINNUMBER);
+        final WriteBuffer buffer = getBufferByEnum(TrainNumberNetwork.SET_TRAINNUMBER);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
