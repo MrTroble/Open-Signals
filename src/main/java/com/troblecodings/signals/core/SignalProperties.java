@@ -31,7 +31,6 @@ public class SignalProperties {
     public final List<ValuePack> redstoneOutputPacks;
     public final int defaultItemDamage;
     public final boolean isBridgeSignal;
-    public final boolean hasAnimation;
     public final Optional<AxisAlignedBB> shape;
 
     public SignalProperties(final Placementtool placementtool, final float customNameRenderHeight,
@@ -42,7 +41,7 @@ public class SignalProperties {
             final List<PredicateProperty<Float>> renderheights, final List<SoundProperty> sounds,
             final List<ValuePack> redstoneOutputs, final int defaultItemDamage,
             final List<ValuePack> redstoneOutputPacks, final boolean isBridgeSignal,
-            final boolean hasAnimation, final Optional<AxisAlignedBB> shape) {
+            final Optional<AxisAlignedBB> shape) {
         this.placementtool = placementtool;
         this.customNameRenderHeight = customNameRenderHeight;
         this.defaultHeight = height;
@@ -62,7 +61,6 @@ public class SignalProperties {
         this.defaultItemDamage = defaultItemDamage;
         this.redstoneOutputPacks = redstoneOutputPacks;
         this.isBridgeSignal = isBridgeSignal;
-        this.hasAnimation = hasAnimation;
         this.shape = shape;
     }
 }

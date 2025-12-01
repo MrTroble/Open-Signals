@@ -46,7 +46,6 @@ public class SignalPropertiesBuilder {
     private Map<String, String> remoteRedstoneOutputs;
     private int defaultItemDamage = 1;
     private boolean isBridgeSignal = false;
-    private boolean hasAnimation = false;
     private List<Integer> customRenderBoundingBox;
 
     public SignalProperties build(final FunctionParsingInfo info) {
@@ -149,13 +148,13 @@ public class SignalPropertiesBuilder {
         }
 
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
-        
+
         Optional<AxisAlignedBB> shape = Optional.empty();
         if (customRenderBoundingBox != null && customRenderBoundingBox.size() == 6) {
-            shape = Optional
-                    .of(new AxisAlignedBB(customRenderBoundingBox.get(0), customRenderBoundingBox.get(1),
-                            customRenderBoundingBox.get(2), customRenderBoundingBox.get(3),
-                            customRenderBoundingBox.get(4), customRenderBoundingBox.get(5)));
+            shape = Optional.of(new AxisAlignedBB(customRenderBoundingBox.get(0),
+                    customRenderBoundingBox.get(1), customRenderBoundingBox.get(2),
+                    customRenderBoundingBox.get(3), customRenderBoundingBox.get(4),
+                    customRenderBoundingBox.get(5)));
         }
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
@@ -163,6 +162,6 @@ public class SignalPropertiesBuilder {
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
                 ImmutableList.copyOf(redstoneValuePacks), defaultItemDamage,
-                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal, hasAnimation, shape);
+                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal, shape);
     }
 }
