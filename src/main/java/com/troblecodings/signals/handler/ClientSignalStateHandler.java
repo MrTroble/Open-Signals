@@ -23,8 +23,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 
 public class ClientSignalStateHandler implements INetworkSync {
 
-    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES =
-            new HashMap<>();
+    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
     public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -71,10 +70,6 @@ public class ClientSignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
         mc.addScheduledTask(() -> {
-            final TileEntity tile = level.getTileEntity(signalPos);
-            if (tile != null && tile instanceof SignalTileEntity) {
-                ((SignalTileEntity) tile).updateAnimationStates(properties, !contains);
-            }
             final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
             if (chunk == null)
                 return;
@@ -85,6 +80,10 @@ public class ClientSignalStateHandler implements INetworkSync {
             mc.renderGlobal.notifyLightSet(signalPos);
             mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
             level.notifyBlockUpdate(signalPos, state, state, 3);
+            final TileEntity tile = level.getTileEntity(signalPos);
+            if (tile != null && tile instanceof SignalTileEntity) {
+                ((SignalTileEntity) tile).updateAnimationStates(properties, !contains);
+            }
         });
     }
 
