@@ -198,7 +198,10 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void resetAllPathways() {
-        ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
+        ImmutableSet.copyOf(this.startsToPath.values()).forEach(pw -> {
+            pw.directResetOfProtectionWay();
+            resetPathway(pw);
+        });
         clearPaths();
         modeGrid.values().forEach(SignalBoxNode::resetEnumPathUsage);
     }
@@ -535,8 +538,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             return null;
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
-        final EnumPathUsage usage =
-                entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
+        final EnumPathUsage usage = entry.getEntry(PathEntryType.PATHUSAGE)
+                .orElse(EnumPathUsage.FREE);
         if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
             return null;
         if (state) {
