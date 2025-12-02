@@ -236,10 +236,9 @@ public class SidePanel {
         preview.add(new UIScale(0.9f, 0.9f, 0));
 
         final EnumGuiMode mode = EnumGuiMode.values()[selection];
-        final UIEntity label = GuiElements.createLabel(
-                I18Wrapper.format("info." + mode.toString().toLowerCase()),
-                new UIEntity().getInfoTextColor(), 0.5f);
-        infoEntity.add(label);
+        infoEntity.add(
+                GuiElements.createLabel(I18Wrapper.format("info." + mode.toString().toLowerCase()),
+                        new UIEntity().getInfoTextColor(), 0.5f));
         infoEntity.add(preview);
         infoEntity.add(getSpacerLine());
         infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
