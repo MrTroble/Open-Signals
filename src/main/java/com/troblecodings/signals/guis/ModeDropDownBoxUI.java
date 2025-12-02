@@ -131,7 +131,8 @@ public class ModeDropDownBoxUI {
                         PathEntryType.OUTPUT, mode, rotation);
 
                 parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
-                        I18Wrapper.format("property.pathway_costs.name")));
+                        I18Wrapper.format("property.pathway_costs.name"),
+                        SignalBoxUtil.getDefaultCosts(modeSet)));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
@@ -279,7 +280,7 @@ public class ModeDropDownBoxUI {
                         PathEntryType.PROTECTIONWAY_RESET, mode, rotation, ".protectionway_reset");
 
                 parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.DELAY,
-                        I18Wrapper.format("property.reset_protectionway_delay.name")));
+                        I18Wrapper.format("property.reset_protectionway_delay.name"), 0));
             }
             case RS: {
                 gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
@@ -545,7 +546,7 @@ public class ModeDropDownBoxUI {
     }
     
     private UIEntity getTextFieldEntityforType(final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<Integer> type, final String labelName) {
+            final PathEntryType<Integer> type, final String labelName, final int defaultValue) {
         final UIEntity hentity = new UIEntity();
         hentity.setInheritWidth(true);
         hentity.setHeight(20);
@@ -561,8 +562,8 @@ public class ModeDropDownBoxUI {
         textInputEntity.setInheritWidth(true);
         textInputEntity.setHeight(20);
 
-        final UITextInput input = new UITextInput(String
-                .valueOf(option.getEntry(type).orElse(SignalBoxUtil.getDefaultCosts(modeSet))));
+        final UITextInput input = new UITextInput(
+                String.valueOf(option.getEntry(type).orElse(defaultValue)));
         input.setValidator(str -> {
             if (str.isEmpty())
                 return true;
@@ -584,8 +585,13 @@ public class ModeDropDownBoxUI {
                 } catch (final Exception e) {
                 }
             }
-            option.setEntry(type, i);
-            gui.sendIntEntryToServer(i, node, mode, rotation, type);
+            if (i != defaultValue) {
+                option.setEntry(type, i);
+                gui.sendIntEntryToServer(i, node, mode, rotation, type);
+            } else {
+                option.removeEntry(type);
+                gui.removeEntryFromServer(node, mode, rotation, type);
+            }
         });
         textInputEntity.add(input);
 
