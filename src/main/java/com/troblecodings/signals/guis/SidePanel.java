@@ -235,6 +235,11 @@ public class SidePanel {
         preview.add(sbtEntity);
         preview.add(new UIScale(0.9f, 0.9f, 0));
 
+        final EnumGuiMode mode = EnumGuiMode.values()[selection];
+        final UIEntity label = GuiElements.createLabel(
+                I18Wrapper.format("info." + mode.toString().toLowerCase()),
+                new UIEntity().getInfoTextColor(), 0.5f);
+        infoEntity.add(label);
         infoEntity.add(preview);
         infoEntity.add(getSpacerLine());
         infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
@@ -244,13 +249,7 @@ public class SidePanel {
         infoEntity
                 .add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.editor.key.lmb"),
                         new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity.add(getSpacerLine());
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.editor.description"),
-                new UIEntity().getBasicTextColor(), 0.8f));
-        final EnumGuiMode mode = EnumGuiMode.values()[selection];
-        infoEntity.add(
-                GuiElements.createLabel(I18Wrapper.format("info." + mode.toString().toLowerCase()),
-                        new UIEntity().getInfoTextColor(), 0.5f));
+
         addHelpPageToPlane();
     }
 
@@ -625,7 +624,8 @@ public class SidePanel {
                             layout.add(new UIClickable(e1 -> gui.pop(), 1));
                             gui.push(GuiElements.createScreen(screen -> screen.add(layout)));
                         });
-                trainNumberButton.add(new UIToolTip(I18Wrapper.format("info.usage.trainnumber.desc")));
+                trainNumberButton
+                        .add(new UIToolTip(I18Wrapper.format("info.usage.trainnumber.desc")));
                 trainNumberButton.setScale(0.95f);
                 helpList.add(trainNumberButton);
             }
