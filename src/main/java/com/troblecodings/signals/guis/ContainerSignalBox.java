@@ -189,7 +189,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 break;
             }
             case SEND_COUNTER: {
-                grid.setCurrentCounter(buffer.getInt());
+                grid.setCounter(buffer.getInt());
                 counterUpdater.run();
                 break;
             }
@@ -257,7 +257,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final SignalBoxPathway pw = grid.getPathwayByStartPoint(point);
                 final boolean isShuntingPath = pw != null ? pw.isShuntingPath() : false;
                 if (grid.resetPathway(point) && !isShuntingPath) {
-                    grid.countOne();
+                    grid.count();
                     final WriteBuffer sucess = new WriteBuffer();
                     sucess.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
                     sucess.putInt(grid.getCurrentCounter());
@@ -351,7 +351,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 break;
             }
             case SEND_COUNTER: {
-                grid.setCurrentCounter(buffer.getInt());
+                grid.setCounter(buffer.getInt());
                 break;
             }
             case SEND_TRAIN_NUMBER: {

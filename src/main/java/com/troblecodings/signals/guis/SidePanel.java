@@ -436,8 +436,8 @@ public class SidePanel {
                                         possibleSubsidiaries.getOrDefault(signalPos,
                                                 SubsidiaryState.ALL_STATES);
                                 possibleSubsidiaires.forEach(state -> {
-                                    final int defaultValue = state
-                                            .equals(node.getSubsidiaryState(mode)) ? 0 : 1;
+                                    final int defaultValue =
+                                            state.equals(node.getSubsidiaryState(mode)) ? 0 : 1;
                                     list.add(GuiElements.createEnumElement(
                                             new SizeIntegerables<>(state.getName(), 2,
                                                     i -> i == 1 ? "false" : "true"),
@@ -461,7 +461,7 @@ public class SidePanel {
                                                 gui.pop();
                                                 helpUsageMode(node);
                                                 if (state.isCountable() && enable) {
-                                                    gui.container.grid.countOne();
+                                                    gui.container.grid.count();
                                                     gui.updateCounter();
                                                     gui.sendCurrentCounterToServer();
                                                 }
@@ -662,8 +662,8 @@ public class SidePanel {
                         final UIBox hbox = new UIBox(UIBox.VBOX, 3);
                         selectionEntity.add(hbox);
                         final UIEntity question = new UIEntity();
-                        final UILabel label = new UILabel(
-                                name + " : " + holder.entry.toString().toUpperCase());
+                        final UILabel label =
+                                new UILabel(name + " : " + holder.entry.toString().toUpperCase());
                         label.setTextColor(0xFFFFFFFF);
                         question.setScaleX(1.1f);
                         question.setScaleY(1.1f);

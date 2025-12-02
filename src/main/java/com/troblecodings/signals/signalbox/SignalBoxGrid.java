@@ -45,6 +45,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     private static final String END_POINT = "endPoint";
     private static final String PATH_TYPE = "pathType";
 
+    private static final int MAX_COUNTS = 9999;
+
     protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     protected final Map<Map.Entry<Point, Point>, PathType> nextPathways = new HashMap<>();
@@ -145,12 +147,10 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
             if (result.wasSuccesfull()) {
                 final PathwayData data = result.getPathwayData();
-                if (checkPathwayData(data)) {
+                if (checkPathwayData(data))
                     return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
-                }
-                if (data.isEmpty()) {
+                if (data.isEmpty())
                     return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
-                }
                 addPathway(data);
                 tile.setChanged();
                 return result;
@@ -482,20 +482,12 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         return counter;
     }
 
-    public void countOne() {
-        if (counter < 9999) {
-            counter++;
-        } else {
-            counter = 0;
-        }
+    public void count() {
+        setCounter(this.counter + 1);
     }
 
-    public void setCurrentCounter(final int counter) {
-        if (counter < 9999) {
-            this.counter = counter;
-        } else {
-            this.counter = 0;
-        }
+    public void setCounter(final int counter) {
+        this.counter = (counter < MAX_COUNTS ? counter : 0);
     }
 
     protected Map<Point, SignalBoxNode> getModeGrid() {
@@ -543,8 +535,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             return null;
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
-        final EnumPathUsage usage = entry.getEntry(PathEntryType.PATHUSAGE)
-                .orElse(EnumPathUsage.FREE);
+        final EnumPathUsage usage =
+                entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
         if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
             return null;
         if (state) {
