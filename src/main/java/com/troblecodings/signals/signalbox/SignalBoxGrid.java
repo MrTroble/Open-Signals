@@ -153,8 +153,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                 }
                 addPathway(data);
                 tile.setChanged();
+                return result;
             }
-            return result;
         } catch (final Exception e) {
             OpenSignalsMain.getLogger().error("There was an issue with creating a pathway from "
                     + p1 + " to " + " p2! Resetting!");

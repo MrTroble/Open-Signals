@@ -241,12 +241,18 @@ public final class SignalBoxUtil {
         for (final EnumGuiMode mode : type.getModes()) {
             if (!mode.getModeType().isValidEnd()) {
                 continue;
+                final ModeSet modeSet = new ModeSet(mode, getModeRot(rotation, mode));
+                if (lastNode.has(modeSet))
+                    return true;
             }
-            final ModeSet modeSet = new ModeSet(mode, rotation);
-            if (lastNode.has(modeSet))
-                return true;
         }
         return false;
+    }
+
+    private static Rotation getModeRot(final Rotation rot, final EnumGuiMode mode) {
+        if (!mode.equals(EnumGuiMode.OUT_CONNECTION))
+            return rot;
+        return rot.getRotated(Rotation.CLOCKWISE_180);
     }
 
     private static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,

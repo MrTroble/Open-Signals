@@ -192,12 +192,17 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     @Override
     protected void updateSignalStates() {
         final List<SignalBoxNode> nodes = new ArrayList<>();
+        final MainSignalIdentifier startSignal = data.getStartSignal();
         final MainSignalIdentifier lastSignal = data.getEndSignal();
-        if (lastSignal != null) {
+        if (startSignal != null) {
             if (isBlocked)
                 return;
-            lastSignal.updateSignalState(SignalState.GREEN);
-            nodes.add(lastSignal.node);
+            startSignal.updateSignalState(SignalState.GREEN);
+            nodes.add(startSignal.node);
+            data.getPreSignals().forEach(signalIdent -> {
+                signalIdent.updateSignalState(SignalState.GREEN);
+                nodes.add(signalIdent.node);
+            });
         }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                 .getOtherSignals();
