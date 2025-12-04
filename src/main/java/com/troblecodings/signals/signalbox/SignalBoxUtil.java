@@ -6,16 +6,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 
 public final class SignalBoxUtil {
 
@@ -47,6 +52,28 @@ public final class SignalBoxUtil {
             return Rotation.CLOCKWISE_90;
     }
 
+    public static Point getDeltaFromRotation(final Rotation rot) {
+        if (rot.equals(Rotation.NONE))
+            return new Point(1, 0);
+        else if (rot.equals(Rotation.CLOCKWISE_90))
+            return new Point(0, 1);
+        else if (rot.equals(Rotation.CLOCKWISE_180))
+            return new Point(-1, 0);
+        else if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
+            return new Point(0, -1);
+        return new Point();
+    }
+
+    public static String getDegreeStringFromRotation(final Rotation rot) {
+        if (rot.equals(Rotation.CLOCKWISE_90))
+            return "90°";
+        if (rot.equals(Rotation.CLOCKWISE_180))
+            return "180°";
+        if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
+            return "270°";
+        return "0°";
+    }
+
     public static class PathIdentifier {
 
         public Path path;
@@ -69,13 +96,12 @@ public final class SignalBoxUtil {
 
     public static PathwayRequestResult requestPathway(final SignalBoxGrid grid, final Point p1,
             final Point p2, final PathType pathType) {
-        // TODO Redo to really identifiy problem, why PW can't be set
         final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
-            return PathwayRequestResult.NOT_IN_GRID;
+            return PathwayRequestResult.getByMode(PathwayRequestMode.NOT_IN_GRID);
         final SignalBoxNode firstNode = modeGrid.get(p1);
         if (pathType.equals(PathType.NONE))
-            return PathwayRequestResult.NO_EQUAL_PATH_TYPE;
+            return PathwayRequestResult.getByMode(PathwayRequestMode.NO_EQUAL_PATH_TYPE);
 
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
@@ -84,9 +110,9 @@ public final class SignalBoxUtil {
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(pathType);
         checker.type = pathType;
         checker.visited = visited;
-        PathwayRequestResult result = PathwayRequestResult.NO_PATH;
+        PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
-        for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
+        for (final PathIdentifier pathIdent : firstNode.getStartIdentifiers()) {
             scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
         }
 
@@ -109,21 +135,29 @@ public final class SignalBoxUtil {
                     grid.sendDebugPointUpdates(debugPointList);
                     debugPointList.clear();
                 }
-                result = PathwayRequestResult.PASS;
-                return result.setPathwayData(PathwayData.of(grid, nodes, pathType));
+                if (nodes.size() < 2) {
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+                }
+                if (!checkForValidEnd(pathType, nodes.get(0), nodes.get(1))) {
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.NO_EQUAL_PATH_TYPE);
+                }
+                return new PathwayRequestResult(PathwayRequestMode.PASS,
+                        PathwayData.of(grid, nodes, pathType));
             }
             checker.previousPoint = previousPoint;
             final SignalBoxNode nextNode = modeGrid.get(nextPoint);
             if (nextNode == null) {
-                result = PathwayRequestResult.NO_PATH;
+                mode = PathwayRequestMode.NO_PATH;
                 continue;
             }
 
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                final PathwayRequestResult checkResult = checker.check();
-                if (nextPoint.equals(p2) || checkResult.isPass()) {
+                mode = isPathBlocked(grid, nextNode, pathIdent.path)
+                        ? PathwayRequestMode.INPUT_BLOCKING
+                        : checker.check();
+                if (nextPoint.equals(p2) || mode.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
@@ -135,7 +169,7 @@ public final class SignalBoxUtil {
             grid.sendDebugPointUpdates(debugPointList);
             debugPointList.clear();
         }
-        return result;
+        return PathwayRequestResult.getByMode(mode);
     }
 
     public static List<SignalBoxNode> requestProtectionWay(final Point p1, final Point p2,
@@ -179,7 +213,9 @@ public final class SignalBoxUtil {
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                final PathwayRequestResult result = checker.check();
+                final PathwayRequestMode result = isPathBlocked(grid, nextNode, pathIdent.path)
+                        ? PathwayRequestMode.INPUT_BLOCKING
+                        : checker.check();
                 if (nextPoint.equals(p2) || result.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
@@ -197,6 +233,46 @@ public final class SignalBoxUtil {
             final Point currentPoint, final Point endPoint) {
         return calculateHeuristic(currentPoint, endPoint) + currentNode.getOption(mode).get()
                 .getEntry(PathEntryType.PATHWAY_COSTS).orElse(getDefaultCosts(mode));
+    }
+
+    private static boolean checkForValidEnd(final PathType type, final SignalBoxNode lastNode,
+            final SignalBoxNode previous) {
+        final Point delta = lastNode.getPoint().delta(previous.getPoint());
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta)
+                .add(Rotation.CLOCKWISE_180);
+        for (final EnumGuiMode mode : type.getModes()) {
+            if (!mode.getModeType().isValidEnd())
+                continue;
+            final ModeSet modeSet = new ModeSet(mode, getModeRot(rotation, mode));
+            if (lastNode.has(modeSet))
+                return true;
+        }
+        return false;
+    }
+
+    private static Rotation getModeRot(final Rotation rot, final EnumGuiMode mode) {
+        if (!mode.equals(EnumGuiMode.OUT_CONNECTION))
+            return rot;
+        return rot.add(Rotation.CLOCKWISE_180);
+    }
+
+    private static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,
+            final Path path) {
+        final AtomicBoolean bool = new AtomicBoolean(false);
+        node.getOption(path)
+                .ifPresent(entry -> entry.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
+                    if (isPowerd(grid.tile, pos))
+                        bool.set(true);
+                }));
+
+        return bool.get();
+    }
+
+    private static boolean isPowerd(final SignalBoxTileEntity tile, final BlockPos pos) {
+        final IBlockState state = tile.getWorld().getBlockState(pos);
+        if (state == null || !(state.getBlock() instanceof RedstoneIO))
+            return false;
+        return state.getValue(RedstoneIO.POWER);
     }
 
     public static int getDefaultCosts(final ModeSet mode) {
@@ -226,5 +302,4 @@ public final class SignalBoxUtil {
         else
             return PathType.NONE;
     }
-
 }

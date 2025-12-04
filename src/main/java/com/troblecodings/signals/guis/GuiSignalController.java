@@ -232,15 +232,18 @@ public class GuiSignalController extends GuiBase {
         this.entity.clear();
         final Signal signal = this.controller.getSignal();
         if (signal == null) {
-            this.entity.add(new UILabel("Not connected"));
+            this.entity.add(new UILabel(I18Wrapper.format("gui.notconnected")));
             return;
         }
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
 
         final String name = I18Wrapper
-                .format("tile." + signal.getRegistryName().getResourcePath() + ".name") + "; Name: "
-                + ClientNameHandler.getClientName(new StateInfo(mc.world, controller.getPos()));
+                .format("block." + OpenSignalsMain.MODID + "."
+                        + signal.getRegistryName().getResourcePath())
+                + "; Name: "
+                + ClientNameHandler.getClientName(new StateInfo(mc.world, controller.getPos()))
+                        .replace("[n]", " ");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);

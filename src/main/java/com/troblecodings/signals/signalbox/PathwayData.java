@@ -143,7 +143,7 @@ public class PathwayData {
             }
             final EnumPathUsage usage = option.getEntry(PathEntryType.PATHUSAGE)
                     .orElse(EnumPathUsage.FREE);
-            if (!usage.equals(EnumPathUsage.FREE)) {
+            if (!(usage.equals(EnumPathUsage.FREE) || usage.equals(EnumPathUsage.PROTECTED))) {
                 final ArrayList<SignalBoxNode> listOfNodes = new ArrayList<>();
                 for (Point point = previous; point != null; point = newNodes.get(point)) {
                     listOfNodes.add(grid.getNode(point));
@@ -154,7 +154,7 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(newPos))
+            if (current.isUsedInDirection(newPos, EnumPathUsage.PROTECTED))
                 return false;
         }
         return true;
@@ -296,7 +296,7 @@ public class PathwayData {
                                 .getEntry(PathEntryType.SIGNAL_REPEATER);
                         final OtherSignalIdentifier ident = new OtherSignalIdentifier(
                                 node.getPoint(), modeSet, position,
-                                repeaterOption.isPresent() && repeaterOption.get(), mode);
+                                repeaterOption.isPresent() && repeaterOption.get(), mode, grid);
                         final BlockPosSignalHolder holder = new BlockPosSignalHolder(position);
                         if (otherBuilder.containsKey(holder)) {
                             final OtherSignalIdentifier otherIdent = otherBuilder.get(holder);
@@ -350,7 +350,7 @@ public class PathwayData {
                         .getOption(ident.getModeSet()).orElse(new PathOptionEntry());
                 return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
-                        EnumGuiMode.VP);
+                        EnumGuiMode.VP, grid);
             }).collect(Collectors.toList()));
         } else {
             startSignal = Optional.empty();
@@ -371,7 +371,7 @@ public class PathwayData {
             final BlockPos possiblePosition = first.getOption(modeSet)
                     .flatMap(option -> option.getEntry(PathEntryType.SIGNAL)).orElse(null);
             if (possiblePosition != null)
-                return new MainSignalIdentifier(first.getPoint(), modeSet, possiblePosition);
+                return new MainSignalIdentifier(first.getPoint(), modeSet, possiblePosition, grid);
         }
         return null;
     }
@@ -570,7 +570,7 @@ public class PathwayData {
                         return;
                     final PathwayRequestResult endRequeset = SignalBoxUtil.requestPathway(endGrid,
                             otherStartPoint.get(), otherEndPoint.get(), PathType.NORMAL);
-                    if (endRequeset.isPass()) {
+                    if (endRequeset.wasSuccesfull()) {
                         returnResult.set(endRequeset.getPathwayData());
                     }
                 });

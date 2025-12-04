@@ -225,57 +225,52 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void updateSignalStates() {
-        final List<MainSignalIdentifier> redSignals = new ArrayList<>();
-        final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
+        final List<SignalBoxNode> nodes = new ArrayList<>();
         final MainSignalIdentifier startSignal = data.getStartSignal();
+        final MainSignalIdentifier lastSignal = data.getEndSignal();
         if (startSignal != null) {
             if (isBlocked)
                 return;
-            final SignalState previous = startSignal.state;
-            startSignal.state = SignalState.GREEN;
-            if (!startSignal.state.equals(previous))
-                greenSignals.add(startSignal);
+            startSignal.updateSignalState(SignalState.GREEN);
+            nodes.add(startSignal.node);
+            data.getPreSignals().forEach(signalIdent -> {
+                signalIdent.updateSignalState(SignalState.GREEN);
+                nodes.add(signalIdent.node);
+            });
         }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                 .getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff()) {
-                position.state = SignalState.OFF;
-                greenSignals.add(position);
+                position.updateSignalState(SignalState.OFF);
+                nodes.add(position.node);
                 return;
             }
             final SignalBoxPathway next = getNextPathway();
-            final SignalState previous = position.state;
-            if (startSignal != null && next != null && !next.isEmptyOrBroken()) {
+            SignalState toSet = SignalState.RED;
+            if (lastSignal != null && next != null && !next.isEmptyOrBroken()) {
                 if (!next.isExecutingSignalSet)
-                    position.state = SignalState.GREEN;
+                    toSet = SignalState.GREEN;
             } else if (pathwayToBlock != null) {
                 final SignalBoxPathway otherNext = pathwayToBlock.getNextPathway();
                 if (otherNext != null && !otherNext.isEmptyOrBroken()) {
                     if (!otherNext.isExecutingSignalSet)
-                        position.state = SignalState.GREEN;
+                        toSet = SignalState.GREEN;
                 } else {
-                    position.state = SignalState.RED;
+                    toSet = SignalState.RED;
                 }
             } else {
-                position.state = SignalState.RED;
+                toSet = SignalState.RED;
             }
             if (position.guiMode.equals(EnumGuiMode.RS)) {
-                position.state = SignalState.GREEN;
+                toSet = SignalState.GREEN;
             } else if (position.guiMode.equals(EnumGuiMode.HP)) {
-                position.state = SignalState.OFF;
+                toSet = SignalState.OFF;
             }
-            if (position.state.equals(previous)) {
-                return;
-            } else {
-                if (position.state.equals(SignalState.RED)) {
-                    redSignals.add(position);
-                } else if (position.state.equals(SignalState.GREEN)) {
-                    greenSignals.add(position);
-                }
-            }
+            position.updateSignalState(toSet);
+            nodes.add(position.node);
         });
-        updateSignalsOnClient(redSignals, greenSignals);
+        updateSignalsOnClient(nodes);
     }
 
     public void setOtherPathwayToBlock(final InterSignalBoxPathway pathway) {

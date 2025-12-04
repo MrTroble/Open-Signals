@@ -97,6 +97,10 @@ public class Signal extends BasicBlock {
         setLightLevel(ConfigHandler.lightEmission / 15.0f);
     }
 
+    public static Signal getSignalByID(final int id) {
+        return SIGNAL_IDS.get(id);
+    }
+
     public int getID() {
         return id;
     }
@@ -241,6 +245,10 @@ public class Signal extends BasicBlock {
 
     public List<SEProperty> getProperties() {
         return this.signalProperties;
+    }
+
+    public SEProperty getPropertyByIndex(final int index) {
+        return this.signalProperties.get(index);
     }
 
     public String getSignalTypeName() {

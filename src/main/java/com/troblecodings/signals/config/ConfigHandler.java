@@ -25,6 +25,10 @@ public final class ConfigHandler {
     })
     public static int lightEmission = 1;
 
+    @Name("canAddRSPathToSaver")
+    @Comment("ShuntingPaths can be added to PathwaySaver.")
+    public static boolean canAddRSPathToSaver = false;
+
     @Name("Signalbox background color")
     @Comment("Change the background color of the signalbox gui. Default: -7631989")
     public static int signalboxBackgroundColor = 0xFF8B8B8B;

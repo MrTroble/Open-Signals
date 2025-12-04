@@ -11,14 +11,15 @@ import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public class SignalAnimationRotation implements SignalAnimation {
 
-    private AnimationRotationCalc calc;
-
     private final Predicate<ModelInfoWrapper> predicate;
     private final float animationSpeed;
     private final RotationAxis axis;
     private final float rotation;
     private final VectorWrapper pivot;
     private final float finalRotationValue;
+
+    private float step;
+    private float progress;
 
     public SignalAnimationRotation(final Predicate<ModelInfoWrapper> predicate,
             final float animationSpeed, final RotationAxis axis, final float rotation,
@@ -32,31 +33,32 @@ public class SignalAnimationRotation implements SignalAnimation {
     }
 
     @Override
-    public void updateAnimation() {
-        calc.updateAnimation();
+    public void updateAnimation(final float tick) {
+        progress += step * tick;
     }
 
     @Override
     public void setUpAnimationValues(final ModelTranslation currentTranslation) {
         final Vector3f vec = QuaternionWrapper.toYXZ(currentTranslation.getQuaternion());
-        Vector3f maxPos = new Vector3f(0, 0, 0);
         switch (axis) {
             case X: {
-                maxPos = new Vector3f(finalRotationValue, 0, 0);
+                progress = vec.getX();
                 break;
             }
             case Y: {
-                maxPos = new Vector3f(0, finalRotationValue, 0);
+                progress = vec.getY();
                 break;
             }
             case Z: {
-                maxPos = new Vector3f(0, 0, finalRotationValue);
+                progress = vec.getZ();
                 break;
             }
             default:
                 break;
         }
-        this.calc = new AnimationRotationCalc(vec, maxPos, animationSpeed, axis);
+        this.step = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        if (finalRotationValue < progress)
+            this.step *= -1;
     }
 
     @Override
@@ -66,19 +68,16 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public ModelTranslation getModelTranslation() {
-        return new ModelTranslation(pivot, calc.getQuaternion());
+        return new ModelTranslation(pivot, axis.getForAxis(progress));
     }
 
     @Override
     public boolean isFinished() {
-        if (calc == null)
-            return true;
-        return calc.isAnimationFinished();
+        return this.step > 0 ? (progress > finalRotationValue) : (finalRotationValue > progress);
     }
 
     @Override
     public void reset() {
-        calc = null;
     }
 
     @Override
@@ -98,8 +97,7 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, axis, calc, finalRotationValue, pivot, predicate,
-                rotation);
+        return Objects.hash(animationSpeed, axis, finalRotationValue, pivot, predicate, rotation);
     }
 
     @Override
@@ -112,7 +110,7 @@ public class SignalAnimationRotation implements SignalAnimation {
             return false;
         final SignalAnimationRotation other = (SignalAnimationRotation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && axis == other.axis && Objects.equals(calc, other.calc)
+                && axis == other.axis
                 && Float.floatToIntBits(finalRotationValue) == Float
                         .floatToIntBits(other.finalRotationValue)
                 && Objects.equals(pivot, other.pivot) && Objects.equals(predicate, other.predicate)

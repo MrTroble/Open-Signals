@@ -7,6 +7,10 @@ public class ResetInfo {
     public final SignalStateInfo current;
     public final boolean isRepeater;
 
+    public ResetInfo(final SignalStateInfo current) {
+        this(current, false);
+    }
+
     public ResetInfo(final SignalStateInfo current, final boolean isRepeater) {
         this.current = current;
         this.isRepeater = isRepeater;

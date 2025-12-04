@@ -2,7 +2,10 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.Objects;
 
-public abstract class IPathEntry<T> implements INetworkSavable {
+import com.troblecodings.core.interfaces.INetworkSaveable;
+import com.troblecodings.core.interfaces.ISaveable;
+
+public abstract class IPathEntry<T> implements INetworkSaveable, ISaveable {
 
     private String name = "defaultEntry";
 
