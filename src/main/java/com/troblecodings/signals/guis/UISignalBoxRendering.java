@@ -232,7 +232,7 @@ public class UISignalBoxRendering extends UIComponent {
         info.blendOn();
         info.applyColor();
         final BufferWrapper wrapper = info.builder(GL11.GL_QUADS,
-                DefaultVertexFormats.POSITION_TEX);
+                DefaultVertexFormats.POSITION_COLOR);
         wrapper.quad(0, (int) TILE_WIDTH, 0, (int) TILE_WIDTH, c.color);
         info.end();
         info.pop();
