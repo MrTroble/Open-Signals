@@ -715,8 +715,8 @@ public class GuiSignalBridge extends GuiBase {
         if (showName) {
             final UILabel label = new UILabel(
                     customName.isEmpty()
-                            ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "."
-                                    + block.delegate.name().getResourcePath())
+                            ? I18Wrapper.format("tile."
+                                    + block.delegate.name().getResourcePath() + ".name")
                             : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());

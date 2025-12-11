@@ -560,7 +560,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeBasicUI() {
-        final String name = I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalbox");
+        final String name = I18Wrapper.format("tile.signalbox.name");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);

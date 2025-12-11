@@ -38,7 +38,7 @@ public class GuiTrainNumber extends GuiBase {
         inner.add(GuiElements.createSpacerV(10));
 
         final UIEntity label = GuiElements.createLabel(
-                I18Wrapper.format("block." + OpenSignalsMain.MODID + ".trainnumberblock"),
+                I18Wrapper.format("tile.trainnumberblock.name"),
                 0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);

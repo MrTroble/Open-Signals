@@ -239,8 +239,8 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.setInheritWidth(true);
 
         final String name = I18Wrapper
-                .format("block." + OpenSignalsMain.MODID + "."
-                        + signal.getRegistryName().getResourcePath())
+                .format("tile."
+                        + signal.getRegistryName().getResourcePath() + ".name")
                 + "; Name: "
                 + ClientNameHandler.getClientName(new StateInfo(mc.world, controller.getPos()))
                         .replace("[n]", " ");

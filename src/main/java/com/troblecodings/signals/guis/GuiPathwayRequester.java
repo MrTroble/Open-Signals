@@ -41,7 +41,7 @@ public class GuiPathwayRequester extends GuiBase {
         higherEntity.add(new UIBox(UIBox.HBOX, 5));
 
         final UIEntity label = GuiElements.createLabel(
-                I18Wrapper.format("block." + OpenSignalsMain.MODID + ".pathwayrequester"), 0x7678a0,
+                I18Wrapper.format("tile.pathwayrequester.name"), 0x7678a0,
                 1f);
         higherEntity.add(label);
 
