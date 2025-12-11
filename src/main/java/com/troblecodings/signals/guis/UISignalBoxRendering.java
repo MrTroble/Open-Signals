@@ -134,8 +134,8 @@ public class UISignalBoxRendering extends UIComponent {
         render.forEach((set, rInfo) -> {
             info.push();
             info.translate(HALF_TILE, HALF_TILE, 0);
-            info.rotate(QuaternionWrapper.fromXYZ(0, 0,
-                    set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
+            info.rotate(QuaternionWrapper.fromXYZ(0, 0, (float) (set.rotation.ordinal()
+                    * Math.toRadians(UIRotate.PERPENDICULAR_ANGLE))));
             info.translate(-HALF_TILE, -HALF_TILE, set.mode.depthFunc.apply(rInfo.state));
             rInfo.component.accept(info);
             info.pop();
