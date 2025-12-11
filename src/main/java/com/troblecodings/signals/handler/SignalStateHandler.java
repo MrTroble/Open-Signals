@@ -442,6 +442,7 @@ public final class SignalStateHandler implements INetworkSync {
             throw new IllegalStateException("Too many SEProperties!");
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
+        buffer.putInt(stateInfo.signal.getID());
         buffer.putBoolean(false);
         buffer.putMapWithCombinedValueConsumer(properties,
                 NetworkBufferWrappers.getSEPropertyConsumer(stateInfo.signal),
