@@ -54,8 +54,8 @@ public final class ConfigHandler {
     public static int signalboxShuntingColor = 0xFF00FF00;
 
     @Name("Signalbox TrainNumber color")
-    @Comment("Change the color of the TrainNumber in the UI. Default: -1")
-    public static int signalboxTrainNumberColor = 0xFFFFFFFF;
+    @Comment("Change the color of the TrainNumber in the UI. Default: -65536")
+    public static int signalboxTrainNumberColor = 0xFFFF0000;
 
     @Name("Basic text color")
     @Comment("Change the color of a default text. Default: -16777216")

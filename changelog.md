@@ -1,13 +1,13 @@
 # Changelog
 
-
-## [1.18.2 - 3.7.2]
+## [1.12.2 - 3.7.2]
 * feat: added signal custom render bounding boxes `"customRenderBoundingBox": [x1,y1,z1,x2,y2,z2]`
 * feat: shunting path can now be set over overlap/protection path
 * feat/fix: Straight path element rotate only 0° and 90°
 * feat/fix: "[n]" is now not shown in UI
 * feat/fix: signals now need to be in correct rotation for pathway
 * feat: added option to prevent the setting a pathway with an active input in the pathway
+* fix: bounding box clipping
 * fix: UI text rotation
 * fix: UI scissor
 * fix: wrong UI borders
