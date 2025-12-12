@@ -11,7 +11,6 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 
@@ -37,9 +36,8 @@ public class GuiTrainNumber extends GuiBase {
         inner.add(new UIBox(UIBox.VBOX, 5));
         inner.add(GuiElements.createSpacerV(10));
 
-        final UIEntity label = GuiElements.createLabel(
-                I18Wrapper.format("tile.trainnumberblock.name"),
-                0x7678a0);
+        final UIEntity label = GuiElements
+                .createLabel(I18Wrapper.format("tile.trainnumberblock.name"), 0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.setX(-6);
@@ -129,9 +127,8 @@ public class GuiTrainNumber extends GuiBase {
     }
 
     @Override
-    public ContainerBase getNewGuiContainer(GuiInfo info) {
-        // TODO Auto-generated method stub
-        return null;
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerTrainNumber(info);
     }
 
 }
