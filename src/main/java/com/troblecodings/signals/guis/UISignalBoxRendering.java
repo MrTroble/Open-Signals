@@ -24,6 +24,7 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
+import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
@@ -38,7 +39,6 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
@@ -211,16 +211,21 @@ public class UISignalBoxRendering extends UIComponent {
             renderColorPoint(info, c);
         }
         final int signalBoxTrainNumberColor = ConfigHandler.signalboxTrainNumberColor;
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-                GlStateManager.DestFactor.ZERO);
+        // GlStateManager.enableBlend();
+        // GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+        // GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+        // GlStateManager.SourceFactor.ONE,
+        // GlStateManager.DestFactor.ZERO);
         trainNumbers.forEach((point, number) -> {
             final float translateWidth = (4 * TILE_WIDTH - font.getStringWidth(number)) / 2;
             info.push();
+            info.blendOn();
+            info.applyTexture(UIButton.BUTTON_TEXTURES);
             info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
             info.scale(0.5f, 0.5f, 0.5f);
             font.drawString(number, (int) translateWidth, (int) 6.5f, signalBoxTrainNumberColor);
+            info.blendOff();
+            info.color();
             info.pop();
         });
     }
