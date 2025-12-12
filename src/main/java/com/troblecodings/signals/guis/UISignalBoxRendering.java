@@ -211,11 +211,6 @@ public class UISignalBoxRendering extends UIComponent {
             renderColorPoint(info, c);
         }
         final int signalBoxTrainNumberColor = ConfigHandler.signalboxTrainNumberColor;
-        // GlStateManager.enableBlend();
-        // GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-        // GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-        // GlStateManager.SourceFactor.ONE,
-        // GlStateManager.DestFactor.ZERO);
         trainNumbers.forEach((point, number) -> {
             final float translateWidth = (4 * TILE_WIDTH - font.getStringWidth(number)) / 2;
             info.push();
