@@ -269,7 +269,7 @@ public class UISignalBoxRendering extends UIComponent {
         entity.add(rendering);
 
         grid.add(new UIScroll(s -> {
-            final float newScale = (float) (entity.getScaleX() + s * 0.01f);
+            final float newScale = (float) (entity.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
             entity.setScaleX(newScale);
