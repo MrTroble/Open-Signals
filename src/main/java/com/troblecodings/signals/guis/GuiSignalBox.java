@@ -363,6 +363,7 @@ public class GuiSignalBox extends GuiBase {
         namingInput.setOnTextUpdate(str -> {
             node.setCustomText(str);
             sendName(node.getPoint(), str);
+            rendering.updateNodeLabeling(node.getPoint(), str);
         });
 
         dropDowns.forEach(dropDown -> {

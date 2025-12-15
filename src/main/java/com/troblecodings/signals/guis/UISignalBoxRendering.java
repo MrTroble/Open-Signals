@@ -71,6 +71,7 @@ public class UISignalBoxRendering extends UIComponent {
 
     private boolean showLines = false;
     private Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
+    private Map<Point, String> nodeLabeling;
     private final FontRenderer font = Minecraft.getMinecraft().fontRenderer;
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
@@ -84,6 +85,7 @@ public class UISignalBoxRendering extends UIComponent {
         this.consumer = consumer;
         this.gridParent = gridParent;
         gridRender = Maps.newHashMap();
+        nodeLabeling = Maps.newHashMap();
         final List<SignalBoxNode> nodes = grid.getNodes();
         nodes.forEach(this::addNode);
     }
@@ -94,6 +96,14 @@ public class UISignalBoxRendering extends UIComponent {
         node.forEach(modeSet -> modesets.put(modeSet,
                 new ModeRenderInfo(modeSet.mode, node.getState(modeSet))));
         gridRender.put(node.getPoint(), modesets);
+        nodeLabeling.put(node.getPoint(), node.getCustomText());
+    }
+
+    public void updateNodeLabeling(final Point point, final String labeling) {
+        if (labeling.isEmpty())
+            nodeLabeling.remove(point);
+        else
+            nodeLabeling.put(point, labeling);
     }
 
     public void removeMode(final Point point, final ModeSet modeSet) {
@@ -193,18 +203,25 @@ public class UISignalBoxRendering extends UIComponent {
             renderColorPoint(info, c);
         }
         final int signalBoxTrainNumberColor = ConfigHandler.signalboxTrainNumberColor;
-        trainNumbers.forEach((point, number) -> {
-            final float translateWidth = (4 * TILE_WIDTH - font.getStringWidth(number)) / 2;
-            info.push();
-            info.blendOn();
-            info.applyTexture(UIButton.BUTTON_TEXTURES);
-            info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
-            info.scale(0.5f, 0.5f, 0.5f);
-            font.drawString(number, (int) translateWidth, (int) 6.5f, signalBoxTrainNumberColor);
-            info.blendOff();
-            info.color();
-            info.pop();
-        });
+        trainNumbers.forEach((point, number) -> renderText(info, point, number, (int) 6.5f,
+                (4 * TILE_WIDTH - font.getStringWidth(number)) / 2, signalBoxTrainNumberColor,
+                0.5f));
+        nodeLabeling.forEach((point, label) -> renderText(info, point, label,
+                (TILE_WIDTH - font.FONT_HEIGHT) / 2 - 5,
+                (TILE_WIDTH - font.getStringWidth(label) + 4) / 2, 0xFFFFFFFF, 0.7f));
+    }
+
+    private void renderText(final DrawInfo info, final Point point, final String str,
+            final int restHeight, final int restWidth, final int color, final float scale) {
+        info.push();
+        info.blendOn();
+        info.applyTexture(UIButton.BUTTON_TEXTURES);
+        info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
+        info.scale(scale, scale, scale);
+        font.drawString(str, restWidth, restHeight, color);
+        info.blendOff();
+        info.color();
+        info.pop();
     }
 
     private void renderColorPoint(final DrawInfo info, final ColorPoint c) {
