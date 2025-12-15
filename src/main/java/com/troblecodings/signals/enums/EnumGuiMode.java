@@ -1,13 +1,13 @@
 package com.troblecodings.signals.enums;
 
-import static com.troblecodings.signals.guis.UISignalBoxRendering.ARROW_ICON;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.ICON;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.INCOMING_ICON;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.NE1_ICON;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.NE5_ICON;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.OUTGOING_ICON;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.SIGNALS;
-import static com.troblecodings.signals.guis.UISignalBoxRendering.ZS3_ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.ARROW_ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.INCOMING_ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.NE1_ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.NE5_ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.OUTGOING_ICON;
+import static com.troblecodings.signals.guis.ContainerSignalBox.SIGNALS;
+import static com.troblecodings.signals.guis.ContainerSignalBox.ZS3_ICON;
 
 import java.util.Arrays;
 import java.util.function.BiConsumer;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
-import com.troblecodings.signals.guis.GuiSignalBox;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
@@ -24,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 
 public enum EnumGuiMode {
+
     STRAIGHT(new float[] {
             0, 0.5f, 1, 0.5f
     }), CORNER(new float[] {
@@ -43,7 +44,7 @@ public enum EnumGuiMode {
     NE5(NE5_ICON, PathwayModeType.START_END, 1), ZS3(ZS3_ICON, PathwayModeType.NONE, 1),
     TRAIN_NUMBER(new float[] {
             0, 0.5f, 2, 0.5f
-    }, PathwayModeType.NONE, 2, GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR, 6),
+    }, PathwayModeType.NONE, 2, ConfigHandler.signalboxTrainnumberBackgroundColor, 6),
     CROSSING(new float[] {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
     });

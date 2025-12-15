@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.TCBoolean;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
-import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -449,7 +449,7 @@ public class GuiSignalBox extends GuiBase {
             final UITexture texture = t.equals(LinkType.SIGNALBOX)
                     ? new UITexture(new ResourceLocation(OpenSignalsMain.MODID,
                             "textures/blocks/signalbox.png"))
-                    : new UITexture(UISignalBoxRendering.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
+                    : new UITexture(ContainerSignalBox.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
             icon.add(texture);
             icon.setHeight(20);
             icon.setWidth(20);
