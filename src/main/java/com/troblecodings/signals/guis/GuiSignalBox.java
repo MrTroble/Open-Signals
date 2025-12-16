@@ -144,10 +144,15 @@ public class GuiSignalBox extends GuiBase {
             node.iterator().forEachRemaining(modeSet -> {
                 if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
                     return;
-                node.getOption(modeSet)
-                        .ifPresent(option -> option.getEntry(PathEntryType.TRAINNUMBER)
-                                .ifPresent(trainNumber -> rendering.putTrainNumber(node.getPoint(),
-                                        trainNumber.trainNumber)));
+                node.getOption(modeSet).ifPresent(option -> {
+                    final TrainNumber number = option.getEntry(PathEntryType.TRAINNUMBER)
+                            .orElse(TrainNumber.DEFAULT);
+                    if (number.trainNumber.isEmpty()) {
+                        rendering.removeTrainNumber(node.getPoint());
+                    } else {
+                        rendering.putTrainNumber(node.getPoint(), number.trainNumber);
+                    }
+                });
             });
         });
     }
@@ -726,6 +731,7 @@ public class GuiSignalBox extends GuiBase {
         buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_PW);
         OpenSignalsMain.network.sendTo(info.player, buffer);
         resetColors(container.grid.getNodes());
+        rendering.clearTrainNumbers();
     }
 
     private void sendModeChanges() {

@@ -138,6 +138,14 @@ public class UISignalBoxRendering extends UIComponent {
         trainNumbers.put(point, text);
     }
 
+    public void removeTrainNumber(final Point point) {
+        trainNumbers.remove(point);
+    }
+
+    public void clearTrainNumbers() {
+        trainNumbers.clear();
+    }
+
     public boolean hasSelection(final int c, final Point point, final SelectionType type) {
         final ColorPoint colorPoint = colorSelections[type.ordinal()];
         return colorPoint == null ? false : colorPoint.equals(new ColorPoint(point, c));
