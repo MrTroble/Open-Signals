@@ -372,7 +372,7 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
 
     public boolean isUsedInDirection(final Point point, @Nullable final EnumPathUsage exclude) {
         for (final Path path : possibleConnections.keySet()) {
-            if (!(path.point1.equals(point) || path.point2.equals(point))) {
+            if (!path.point1.equals(point) && !path.point2.equals(point)) {
                 continue;
             }
             final ModeSet mode = getMode(path);

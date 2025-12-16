@@ -154,7 +154,7 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(newPos, EnumPathUsage.PROTECTED))
+            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED))
                 return false;
         }
         return true;
