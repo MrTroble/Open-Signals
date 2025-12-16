@@ -520,7 +520,9 @@ public class SignalBoxPathway implements IChunkLoadable {
     private void getTrainNumberFromPrevious() {
         final SignalBoxPathway previous = grid.getPathwayByLastPoint(getFirstPoint());
         if (previous != null) {
-            updateTrainNumber(previous.trainNumber);
+            final TrainNumber number = previous.trainNumber;
+            if (number != null && !number.trainNumber.isEmpty())
+                updateTrainNumber(previous.trainNumber);
         }
     }
 
