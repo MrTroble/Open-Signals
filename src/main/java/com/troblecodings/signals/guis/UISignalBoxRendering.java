@@ -29,7 +29,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
@@ -41,25 +40,8 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 
 public class UISignalBoxRendering extends UIComponent {
-    public static final ResourceLocation ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/symbols.png");
-    public static final ResourceLocation ARROW_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/arrow.png");
-    public static final ResourceLocation INCOMING_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_in.png");
-    public static final ResourceLocation OUTGOING_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_out.png");
-    public static final ResourceLocation SIGNALS =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/signals.png");
-    public static final ResourceLocation NE1_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne1.png");
-    public static final ResourceLocation NE5_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne5.png");
-    public static final ResourceLocation ZS3_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/zs3.png");
 
     public static final int TILE_WIDTH = 10;
     public static final int HALF_TILE = UISignalBoxRendering.TILE_WIDTH / 2;
@@ -90,6 +72,7 @@ public class UISignalBoxRendering extends UIComponent {
 
     private boolean showLines = false;
     private final Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
+    private final Map<Point, String> nodeLabeling;
     private final FontRenderer font = Minecraft.getInstance().font;
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
@@ -103,16 +86,26 @@ public class UISignalBoxRendering extends UIComponent {
         this.consumer = consumer;
         this.gridParent = gridParent;
         gridRender = Maps.newHashMap();
+        nodeLabeling = Maps.newHashMap();
         final List<SignalBoxNode> nodes = grid.getNodes();
         nodes.forEach(this::addNode);
     }
 
     private void addNode(final SignalBoxNode node) {
-        final Map<ModeSet, ModeRenderInfo> modesets = gridRender.computeIfAbsent(node.getPoint(),
-                k -> Maps.newHashMap());
+        final Map<ModeSet, ModeRenderInfo> modesets =
+                gridRender.computeIfAbsent(node.getPoint(), k -> Maps.newHashMap());
         node.forEach(modeSet -> modesets.put(modeSet,
                 new ModeRenderInfo(modeSet.mode, node.getState(modeSet))));
         gridRender.put(node.getPoint(), modesets);
+        nodeLabeling.put(node.getPoint(), node.getCustomText());
+    }
+
+    public void updateNodeLabeling(final Point point, final String labeling) {
+        if (labeling.isEmpty()) {
+            nodeLabeling.remove(point);
+        } else {
+            nodeLabeling.put(point, labeling);
+        }
     }
 
     public void removeMode(final Point point, final ModeSet modeSet) {
@@ -218,15 +211,21 @@ public class UISignalBoxRendering extends UIComponent {
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
                 GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
                 GlStateManager.DestFactor.ZERO);
-        trainNumbers.forEach((point, number) -> {
-            final float translateWidth = (4 * TILE_WIDTH - font.width(number)) / 2;
-            info.push();
-            info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
-            info.scale(0.5f, 0.5f, 0.5f);
-            font.draw(info.stack, number, translateWidth, 6.5f, signalBoxTrainNumberColor);
-            info.pop();
-        });
+        trainNumbers.forEach((point, number) -> renderText(info, point, number, (int) 6.5f,
+                (4 * TILE_WIDTH - font.width(number)) / 2, signalBoxTrainNumberColor, 0.5f));
+        nodeLabeling.forEach((point, label) -> renderText(info, point, label,
+                (TILE_WIDTH - font.lineHeight) / 2 - 5, (TILE_WIDTH - font.width(label) + 4) / 2,
+                0xFFFFFFFF, 0.7f));
         RenderSystem.blendColor(1, 1, 1, 1);
+    }
+
+    private void renderText(final DrawInfo info, final Point point, final String str,
+            final int restHeight, final int restWidth, final int color, final float scale) {
+        info.push();
+        info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
+        info.scale(scale, scale, scale);
+        font.draw(info.stack, str, restWidth, restHeight, color);
+        info.pop();
     }
 
     private void renderColorPoint(final DrawInfo info, final ColorPoint c) {
