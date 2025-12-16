@@ -50,14 +50,14 @@ import net.minecraft.util.math.BlockPos;
 
 public class SidePanel {
 
-    public static final ResourceLocation COUNTER_TEXTURE =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/counter.png");
-    public static final ResourceLocation REDSTONE =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone.png");
-    public static final ResourceLocation SAVE =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/save.png");
-    public static final ResourceLocation EMERGENCY =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/emergency.png");
+    public static final ResourceLocation COUNTER_TEXTURE = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/counter.png");
+    public static final ResourceLocation REDSTONE = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone.png");
+    public static final ResourceLocation SAVE = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/save.png");
+    public static final ResourceLocation EMERGENCY = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/emergency.png");
 
     private boolean showHelpPage = true;
     private final UIEntity helpPage = new UIEntity();
@@ -311,9 +311,9 @@ public class SidePanel {
         manuelButton.setScale(0.95f);
         helpList.add(manuelButton);
 
-        final UIEntity savedPathways =
-                GuiElements.createButton("       " + I18Wrapper.format("info.usage.savedpathways"),
-                        e -> addSavedPathsToUI());
+        final UIEntity savedPathways = GuiElements.createButton(
+                "       " + I18Wrapper.format("info.usage.savedpathways"),
+                e -> addSavedPathsToUI());
 
         final UIEntity savedPathsEntity = new UIEntity();
         savedPathsEntity.setHeight(20);
@@ -348,17 +348,16 @@ public class SidePanel {
         final Minecraft mc = Minecraft.getMinecraft();
 
         final Map<BlockPos, SubsidiaryHolder> subsidiaries = gui.enabledSubsidiaries;
-        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries =
-                gui.container.possibleSubsidiaries;
+        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = gui.container.possibleSubsidiaries;
         if (node != null) {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
-            final List<EnumGuiMode> guiModes =
-                    modes.keySet().stream().map(mode -> mode.mode).collect(Collectors.toList());
+            final List<EnumGuiMode> guiModes = modes.keySet().stream().map(mode -> mode.mode)
+                    .collect(Collectors.toList());
             helpList.add(GuiElements.createLabel(I18Wrapper.format("info.usage.node"),
                     new UIEntity().getBasicTextColor(), 0.8f));
             if (guiModes.contains(EnumGuiMode.HP)) {
-                final UIEntity entity =
-                        GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
+                final UIEntity entity = GuiElements
+                        .createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
                             gui.setAutoPoint(node.getPoint(), (byte) e);
                             node.setAutoPoint(e == 1 ? true : false);
                         }, node.isAutoPoint() ? 1 : 0);
@@ -366,8 +365,8 @@ public class SidePanel {
                 helpList.add(entity);
             }
 
-            final UIEntity reset =
-                    GuiElements.createButton(I18Wrapper.format("button.reset"), e -> {
+            final UIEntity reset = GuiElements.createButton(I18Wrapper.format("button.reset"),
+                    e -> {
                         final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
                             final UIBox hbox = new UIBox(UIBox.VBOX, 3);
                             selectionEntity.add(hbox);
@@ -386,8 +385,8 @@ public class SidePanel {
                             selectionEntity.add(question);
                             selectionEntity.add(infoEntity);
                             final UIEntity buttons = new UIEntity();
-                            final UIEntity buttonYes =
-                                    GuiElements.createButton(I18Wrapper.format("btn.yes"), e1 -> {
+                            final UIEntity buttonYes = GuiElements
+                                    .createButton(I18Wrapper.format("btn.yes"), e1 -> {
                                         gui.pop();
                                         gui.resetPathwayOnServer(node);
                                     });
@@ -415,8 +414,8 @@ public class SidePanel {
 
                 if (option.containsEntry(PathEntryType.SIGNAL)) {
                     final BlockPos signalPos = option.getEntry(PathEntryType.SIGNAL).get();
-                    final String signalName =
-                            ClientNameHandler.getClientName(new StateInfo(mc.world, signalPos));
+                    final String signalName = ClientNameHandler
+                            .getClientName(new StateInfo(mc.world, signalPos)).replace("[n]", "");
                     helpList.add(GuiElements.createLabel(
                             (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
                                     : signalName) + " - " + mode.mode.toString(),
@@ -424,20 +423,19 @@ public class SidePanel {
                     if (!(mode.mode == EnumGuiMode.HP || mode.mode == EnumGuiMode.RS)) {
                         continue;
                     }
-                    final UIEntity entity =
-                            GuiElements.createButton(I18Wrapper.format("btn.subsidiary"), e -> {
+                    final UIEntity entity = GuiElements
+                            .createButton(I18Wrapper.format("btn.subsidiary"), e -> {
                                 final UIBox hbox = new UIBox(UIBox.VBOX, 1);
                                 final UIEntity list = new UIEntity();
                                 list.setInherits(true);
                                 list.add(hbox);
                                 list.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                         a -> gui.pop()));
-                                final List<SubsidiaryState> possibleSubsidiaires =
-                                        possibleSubsidiaries.getOrDefault(signalPos,
-                                                SubsidiaryState.ALL_STATES);
+                                final List<SubsidiaryState> possibleSubsidiaires = possibleSubsidiaries
+                                        .getOrDefault(signalPos, SubsidiaryState.ALL_STATES);
                                 possibleSubsidiaires.forEach(state -> {
-                                    final int defaultValue =
-                                            state.equals(node.getSubsidiaryState(mode)) ? 0 : 1;
+                                    final int defaultValue = state
+                                            .equals(node.getSubsidiaryState(mode)) ? 0 : 1;
                                     list.add(GuiElements.createEnumElement(
                                             new SizeIntegerables<>(state.getName(), 2,
                                                     i -> i == 1 ? "false" : "true"),
@@ -488,14 +486,14 @@ public class SidePanel {
                     statusEntity.add(currentStatus);
 
                     final String modeName = I18Wrapper.format("property." + mode.mode.name());
-                    final String rotationName =
-                            I18Wrapper.format("property." + mode.rotation.name() + ".rotation");
-                    final UIEntity manuelButtonEntity =
-                            GuiElements.createButton(I18Wrapper.format("info.usage.manuel") + " : "
-                                    + modeName + " - " + rotationName, e1 -> {
-                                        final EnumPathUsage usage =
-                                                option.getEntry(PathEntryType.PATHUSAGE)
-                                                        .orElse(EnumPathUsage.FREE);
+                    final String rotationName = I18Wrapper
+                            .format("property." + mode.rotation.name() + ".rotation");
+                    final UIEntity manuelButtonEntity = GuiElements
+                            .createButton(I18Wrapper.format("info.usage.manuel") + " : " + modeName
+                                    + " - " + rotationName, e1 -> {
+                                        final EnumPathUsage usage = option
+                                                .getEntry(PathEntryType.PATHUSAGE)
+                                                .orElse(EnumPathUsage.FREE);
                                         final UIEntity info = new UIEntity();
                                         info.setInherits(true);
                                         info.add(new UIBox(UIBox.VBOX, 5));
@@ -526,8 +524,8 @@ public class SidePanel {
                                             }
                                         }
                                         info.add(textureEntity);
-                                        final UILabel outputStatus =
-                                                new UILabel(((!usage.equals(EnumPathUsage.FREE))
+                                        final UILabel outputStatus = new UILabel(
+                                                ((!usage.equals(EnumPathUsage.FREE))
                                                         || node.containsManuellOutput(mode))
                                                                 ? I18Wrapper.format(
                                                                         "info.usage.rs.true")
@@ -544,8 +542,8 @@ public class SidePanel {
                                         if (canBeManuelChanged) {
                                             info.add(GuiElements.createButton(
                                                     I18Wrapper.format("info.usage.change"), i -> {
-                                                        final boolean turnOff =
-                                                                node.containsManuellOutput(mode);
+                                                        final boolean turnOff = node
+                                                                .containsManuellOutput(mode);
                                                         textureEntity.clear();
                                                         textureEntity.add(new UIToolTip(I18Wrapper
                                                                 .format("info.usage.rs.desc")));
@@ -567,24 +565,24 @@ public class SidePanel {
                                                     }));
                                         }
                                         gui.pop();
-                                        final UIEntity screen =
-                                                GuiElements.createScreen(e -> e.add(info));
+                                        final UIEntity screen = GuiElements
+                                                .createScreen(e -> e.add(info));
                                         gui.push(screen);
                                     });
                     manuelButtonEntity
                             .add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
                     manuellOutputs.add(manuelButtonEntity);
                 }
-                final EnumPathUsage path =
-                        option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
+                final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
+                        .orElse(EnumPathUsage.FREE);
                 if (!(path.equals(EnumPathUsage.FREE) || path.equals(EnumPathUsage.PROTECTED))) {
                     isPathBlocked = true;
                 }
             }
 
             if (isPathBlocked) {
-                final UIEntity trainNumberButton =
-                        GuiElements.createButton(I18Wrapper.format("info.usage.trainnumber"), e -> {
+                final UIEntity trainNumberButton = GuiElements
+                        .createButton(I18Wrapper.format("info.usage.trainnumber"), e -> {
                             final UIEntity layout = new UIEntity();
                             layout.add(new UIBox(UIBox.VBOX, 10));
                             layout.setInherits(true);
@@ -604,8 +602,8 @@ public class SidePanel {
                             lowerEntity.setInherits(true);
                             lowerEntity.add(new UIBox(UIBox.HBOX, 5));
                             lowerEntity.add(GuiElements.createSpacerH(7));
-                            final UIEntity save =
-                                    GuiElements.createButton(I18Wrapper.format("btn.save"), e1 -> {
+                            final UIEntity save = GuiElements
+                                    .createButton(I18Wrapper.format("btn.save"), e1 -> {
                                         gui.sendTrainNumber(node.getPoint(), input.getText());
                                         input.setText("");
                                         gui.pop();
@@ -630,8 +628,8 @@ public class SidePanel {
             }
 
             if (!manuellOutputs.isEmpty()) {
-                final UIEntity manuellOutputList =
-                        GuiElements.createButton(I18Wrapper.format("info.usage.manuel"), e -> {
+                final UIEntity manuellOutputList = GuiElements
+                        .createButton(I18Wrapper.format("info.usage.manuel"), e -> {
                             gui.push(GuiElements.createScreen(screen -> {
                                 manuellOutputs.forEach(screen::add);
                                 screen.add(new UIClickable(e1 -> gui.pop(), 1));
@@ -642,8 +640,8 @@ public class SidePanel {
                 helpList.add(manuellOutputList);
             }
 
-            final UIEntity edit =
-                    GuiElements.createButton(I18Wrapper.format("info.usage.edit"), e -> {
+            final UIEntity edit = GuiElements.createButton(I18Wrapper.format("info.usage.edit"),
+                    e -> {
                         helpUsageMode(null);
                         gui.initializePageTileConfig(node);
                     });
@@ -662,8 +660,8 @@ public class SidePanel {
                         final UIBox hbox = new UIBox(UIBox.VBOX, 3);
                         selectionEntity.add(hbox);
                         final UIEntity question = new UIEntity();
-                        final UILabel label =
-                                new UILabel(name + " : " + holder.entry.toString().toUpperCase());
+                        final UILabel label = new UILabel(
+                                name + " : " + holder.entry.toString().toUpperCase());
                         label.setTextColor(0xFFFFFFFF);
                         question.setScaleX(1.1f);
                         question.setScaleY(1.1f);
@@ -677,8 +675,8 @@ public class SidePanel {
                         selectionEntity.add(question);
                         selectionEntity.add(infoEntity);
                         final UIEntity buttons = new UIEntity();
-                        final UIEntity buttonYes =
-                                GuiElements.createButton(I18Wrapper.format("btn.yes"), e1 -> {
+                        final UIEntity buttonYes = GuiElements
+                                .createButton(I18Wrapper.format("btn.yes"), e1 -> {
                                     gui.pop();
                                     gui.disableSubsidiary(pos, holder);
                                     subsidiaries.remove(pos);
@@ -729,8 +727,8 @@ public class SidePanel {
             statusEntity.add(currentStatus);
             final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
             currentNode.getModes().forEach((mode, entry) -> {
-                final EnumPathUsage pathUsage =
-                        entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
+                final EnumPathUsage pathUsage = entry.getEntry(PathEntryType.PATHUSAGE)
+                        .orElse(EnumPathUsage.FREE);
                 if (!pathUsage.equals(EnumPathUsage.FREE)) {
                     currentStatus.setText(I18Wrapper.format("info.usage.status") + " : "
                             + I18Wrapper.format("info.usage.status.blocked"));
@@ -768,8 +766,8 @@ public class SidePanel {
                         }
                     }
                     info.add(textureEntity);
-                    final UILabel outputStatus =
-                            new UILabel(((!pathUsage.equals(EnumPathUsage.FREE))
+                    final UILabel outputStatus = new UILabel(
+                            ((!pathUsage.equals(EnumPathUsage.FREE))
                                     || currentNode.containsManuellOutput(mode))
                                             ? I18Wrapper.format("info.usage.rs.true")
                                             : I18Wrapper.format("info.usage.rs.false"));
