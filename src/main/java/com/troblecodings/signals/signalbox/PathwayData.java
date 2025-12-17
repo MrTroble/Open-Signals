@@ -282,8 +282,19 @@ public class PathwayData {
                 optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
                 optionEntry.getEntry(PathEntryType.ZS6)
                         .ifPresent(value -> zs6State.set(value.booleanValue()));
-                optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
-                        .ifPresent(ident -> trainNumberDisplays.add(ident));
+                optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER).ifPresent(ident -> {
+                    final Optional<PathOptionEntry> entry = grid.getNodeChecked(ident.point)
+                            .orElse(new SignalBoxNode()).getOption(ident.mode);
+                    if (entry.isPresent()) {
+                        trainNumberDisplays.add(ident);
+                    } else {
+                        OpenSignalsMain.getLogger()
+                                .warn("Removeing invalid linked train number field! Point:"
+                                        + node.getPoint() + ", Identifier of false TrainNumber:"
+                                        + ident);
+                        optionEntry.removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+                    }
+                });
             });
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));

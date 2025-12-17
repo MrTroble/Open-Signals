@@ -65,13 +65,13 @@ public class ModeSet implements INetworkSaveable, ISaveable {
     @Override
     public void read(final NBTWrapper tag) {
         this.mode = EnumGuiMode.valueOf(tag.getString(MODE));
-        this.rotation = Rotation.valueOf(tag.getString(ROTATION));
+        this.rotation = mode.getLocalRotation(Rotation.valueOf(tag.getString(ROTATION)));
     }
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
         this.mode = EnumGuiMode.values()[buffer.getByteToUnsignedInt()];
-        this.rotation = Rotation.values()[buffer.getByteToUnsignedInt()];
+        this.rotation = mode.getLocalRotation(Rotation.values()[buffer.getByteToUnsignedInt()]);
     }
 
     @Override

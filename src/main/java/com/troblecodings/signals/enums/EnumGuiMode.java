@@ -37,14 +37,14 @@ public enum EnumGuiMode {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
     }), HP(0, true, PathwayModeType.START_END, 2), VP(1, true, PathwayModeType.NONE, 1),
     RS(2, true, PathwayModeType.START_END, (state) -> state.equals(SignalState.RED) ? 1 : 3),
-    RA10(3, PathwayModeType.END, 1), SH2(4, PathwayModeType.NONE, 4),
+    RA10(3, PathwayModeType.END, 1), SH2(4, PathwayModeType.NONE, 5),
     IN_CONNECTION(INCOMING_ICON, PathwayModeType.START, 1),
     OUT_CONNECTION(OUTGOING_ICON, PathwayModeType.END, 1),
     ARROW(ARROW_ICON, PathwayModeType.END, 1), NE1(NE1_ICON, PathwayModeType.START_END, 1),
     NE5(NE5_ICON, PathwayModeType.START_END, 1), ZS3(ZS3_ICON, PathwayModeType.NONE, 1),
     TRAIN_NUMBER(new float[] {
             0, 0.5f, 2, 0.5f
-    }, PathwayModeType.NONE, 2, ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get(), 6),
+    }, PathwayModeType.NONE, 6, ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get(), 6),
     CROSSING(new float[] {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
     });
