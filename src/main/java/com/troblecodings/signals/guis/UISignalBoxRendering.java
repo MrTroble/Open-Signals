@@ -129,6 +129,7 @@ public class UISignalBoxRendering extends UIComponent {
     private void drawModeSets(final DrawInfo info, final Map<ModeSet, ModeRenderInfo> render) {
         render.forEach((set, rInfo) -> {
             info.push();
+            info.depthOn();
             info.translate(HALF_TILE, HALF_TILE, 0);
             info.rotate(QuaternionWrapper.fromXYZ(0, 0,
                     set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
