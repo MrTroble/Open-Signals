@@ -147,10 +147,11 @@ public class GuiSignalBox extends GuiBase {
                 node.getOption(modeSet).ifPresent(option -> {
                     final TrainNumber number = option.getEntry(PathEntryType.TRAINNUMBER)
                             .orElse(TrainNumber.DEFAULT);
+                    final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
                     if (number.trainNumber.isEmpty()) {
-                        rendering.removeTrainNumber(node.getPoint());
+                        rendering.removeTrainNumber(modeIdent);
                     } else {
-                        rendering.putTrainNumber(node.getPoint(), number.trainNumber);
+                        rendering.putTrainNumber(modeIdent, number.trainNumber);
                     }
                 });
             });

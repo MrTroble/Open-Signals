@@ -29,6 +29,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -39,6 +40,7 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.Rotation;
 
 public class UISignalBoxRendering extends UIComponent {
 
@@ -76,7 +78,7 @@ public class UISignalBoxRendering extends UIComponent {
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
-    private final Map<Point, String> trainNumbers = new HashMap<>();
+    private final Map<ModeIdentifier, String> trainNumbers = new HashMap<>();
     private final Set<ColorPoint> additionalPoints = new HashSet<>();
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final boolean showLines,
@@ -125,6 +127,7 @@ public class UISignalBoxRendering extends UIComponent {
     private void drawModeSets(final DrawInfo info, final Map<ModeSet, ModeRenderInfo> render) {
         render.forEach((set, rInfo) -> {
             info.push();
+            info.depthOn();
             info.translate(HALF_TILE, HALF_TILE, 0);
             info.rotate(QuaternionWrapper.fromXYZ(0, 0, (float) (set.rotation.ordinal()
                     * Math.toRadians(UIRotate.PERPENDICULAR_ANGLE))));
@@ -134,12 +137,12 @@ public class UISignalBoxRendering extends UIComponent {
         });
     }
 
-    public void putTrainNumber(final Point point, final String text) {
-        trainNumbers.put(point, text);
+    public void putTrainNumber(final ModeIdentifier modeIdent, final String text) {
+        trainNumbers.put(modeIdent, text);
     }
 
-    public void removeTrainNumber(final Point point) {
-        trainNumbers.remove(point);
+    public void removeTrainNumber(final ModeIdentifier modeIdent) {
+        trainNumbers.remove(modeIdent);
     }
 
     public void clearTrainNumbers() {
@@ -211,20 +214,27 @@ public class UISignalBoxRendering extends UIComponent {
             renderColorPoint(info, c);
         }
         final int signalBoxTrainNumberColor = ConfigHandler.signalboxTrainNumberColor;
-        trainNumbers.forEach((point, number) -> renderText(info, point, number, (int) 6.5f,
-                (4 * TILE_WIDTH - font.getStringWidth(number)) / 2, signalBoxTrainNumberColor,
-                0.5f));
-        nodeLabeling.forEach((point, label) -> renderText(info, point, label,
+        trainNumbers.forEach((point, number) -> renderText(info, point.point, point.mode.rotation,
+                number, (int) 6.5f, (4 * TILE_WIDTH - font.getStringWidth(number)) / 2,
+                signalBoxTrainNumberColor, 0.5f));
+        nodeLabeling.forEach((point, label) -> renderText(info, point, Rotation.NONE, label,
                 (TILE_WIDTH - font.FONT_HEIGHT) / 2 - 5,
                 (TILE_WIDTH - font.getStringWidth(label) + 4) / 2, 0xFFFFFFFF, 0.7f));
     }
 
-    private void renderText(final DrawInfo info, final Point point, final String str,
-            final int restHeight, final int restWidth, final int color, final float scale) {
+    private void renderText(final DrawInfo info, final Point point, final Rotation rot,
+            final String str, final int restHeight, final int restWidth, final int color,
+            final float scale) {
         info.push();
         info.blendOn();
         info.applyTexture(UIButton.BUTTON_TEXTURES);
-        info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
+        info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 10);
+        if (!rot.equals(Rotation.NONE)) {
+            info.translate(HALF_TILE, HALF_TILE, 0);
+            info.rotate(QuaternionWrapper.fromXYZ(0, 0,
+                    (float) (rot.ordinal() * Math.toRadians(UIRotate.PERPENDICULAR_ANGLE))));
+            info.translate(-HALF_TILE, -HALF_TILE, 0);
+        }
         info.scale(scale, scale, scale);
         font.drawString(str, restWidth, restHeight, color);
         info.blendOff();
