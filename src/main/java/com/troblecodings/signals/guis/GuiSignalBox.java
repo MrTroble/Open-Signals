@@ -144,10 +144,16 @@ public class GuiSignalBox extends GuiBase {
             node.iterator().forEachRemaining(modeSet -> {
                 if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
                     return;
-                node.getOption(modeSet)
-                        .ifPresent(option -> option.getEntry(PathEntryType.TRAINNUMBER)
-                                .ifPresent(trainNumber -> rendering.putTrainNumber(node.getPoint(),
-                                        trainNumber.trainNumber)));
+                node.getOption(modeSet).ifPresent(option -> {
+                    final TrainNumber number = option.getEntry(PathEntryType.TRAINNUMBER)
+                            .orElse(TrainNumber.DEFAULT);
+                    final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
+                    if (number.trainNumber.isEmpty()) {
+                        rendering.removeTrainNumber(modeIdent);
+                    } else {
+                        rendering.putTrainNumber(modeIdent, number.trainNumber);
+                    }
+                });
             });
         });
     }

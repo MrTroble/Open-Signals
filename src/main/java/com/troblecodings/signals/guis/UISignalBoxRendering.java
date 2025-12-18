@@ -30,6 +30,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -40,6 +41,7 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.Rotation;
 
 public class UISignalBoxRendering extends UIComponent {
 
@@ -77,7 +79,7 @@ public class UISignalBoxRendering extends UIComponent {
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
-    private final Map<Point, String> trainNumbers = new HashMap<>();
+    private final Map<ModeIdentifier, String> trainNumbers = new HashMap<>();
     private final Set<ColorPoint> additionalPoints = new HashSet<>();
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final boolean showLines,
@@ -136,8 +138,16 @@ public class UISignalBoxRendering extends UIComponent {
         });
     }
 
-    public void putTrainNumber(final Point point, final String text) {
-        trainNumbers.put(point, text);
+    public void putTrainNumber(final ModeIdentifier modeIdent, final String text) {
+        trainNumbers.put(modeIdent, text);
+    }
+
+    public void removeTrainNumber(final ModeIdentifier modeIdent) {
+        trainNumbers.remove(modeIdent);
+    }
+
+    public void clearTrainNumbers() {
+        trainNumbers.clear();
     }
 
     public boolean hasSelection(final int c, final Point point, final SelectionType type) {
@@ -211,18 +221,26 @@ public class UISignalBoxRendering extends UIComponent {
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
                 GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
                 GlStateManager.DestFactor.ZERO);
-        trainNumbers.forEach((point, number) -> renderText(info, point, number, (int) 6.5f,
-                (4 * TILE_WIDTH - font.width(number)) / 2, signalBoxTrainNumberColor, 0.5f));
-        nodeLabeling.forEach((point, label) -> renderText(info, point, label,
+        trainNumbers.forEach((point, number) -> renderText(info, point.point, point.mode.rotation,
+                number, (int) 6.5f, (4 * TILE_WIDTH - font.width(number)) / 2,
+                signalBoxTrainNumberColor, 0.5f));
+        nodeLabeling.forEach((point, label) -> renderText(info, point, Rotation.NONE, label,
                 (TILE_WIDTH - font.lineHeight) / 2 - 5, (TILE_WIDTH - font.width(label) + 4) / 2,
                 0xFFFFFFFF, 0.7f));
         RenderSystem.blendColor(1, 1, 1, 1);
     }
 
-    private void renderText(final DrawInfo info, final Point point, final String str,
-            final int restHeight, final int restWidth, final int color, final float scale) {
+    private void renderText(final DrawInfo info, final Point point, final Rotation rot,
+            final String str, final int restHeight, final int restWidth, final int color,
+            final float scale) {
         info.push();
         info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
+        if (!rot.equals(Rotation.NONE)) {
+            info.translate(HALF_TILE, HALF_TILE, 0);
+            info.rotate(
+                    QuaternionWrapper.fromXYZ(0, 0, rot.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
+            info.translate(-HALF_TILE, -HALF_TILE, 0);
+        }
         info.scale(scale, scale, scale);
         font.draw(info.stack, str, restWidth, restHeight, color);
         info.pop();
