@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
@@ -21,6 +22,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public final class SignalBoxUtil {
 
@@ -269,7 +271,14 @@ public final class SignalBoxUtil {
     }
 
     private static boolean isPowerd(final SignalBoxTileEntity tile, final BlockPos pos) {
-        final IBlockState state = tile.getWorld().getBlockState(pos);
+        final World world = tile.getWorld();
+        if (world == null) {
+            OpenSignalsMain.getLogger()
+                    .error("The world is null when trying to load a blockstate to create a pathway!"
+                            + " This should't be so!");
+            return false;
+        }
+        final IBlockState state = world.getBlockState(pos);
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);

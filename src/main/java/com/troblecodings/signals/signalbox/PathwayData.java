@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class PathwayData {
     public static final PathwayData EMPTY_DATA = new PathwayData();
 
     private static final String LIST_OF_NODES = "listOfNodes";
+    private static final String LIST_OF_PROTECTIONWAY_NODES = "listOfProtectionWayNodes";
     private static final String PATH_TYPE = "pathType";
 
     protected SignalBoxGrid grid = null;
@@ -426,30 +428,42 @@ public class PathwayData {
                 .ifPresent(entry -> consumer.accept(entry, current)), point);
     }
 
+    private static final Function<SignalBoxNode, NBTWrapper> NODE_WRAPPER_FUNC = (node) -> {
+        final NBTWrapper entry = new NBTWrapper();
+        node.getPoint().write(entry);
+        return entry;
+    };
+
     public void write(final NBTWrapper tag) {
-        tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
-            final NBTWrapper entry = new NBTWrapper();
-            node.getPoint().write(entry);
-            return entry;
-        })::iterator);
+        tag.putList(LIST_OF_NODES, listOfNodes.stream().map(NODE_WRAPPER_FUNC)::iterator);
+        tag.putList(LIST_OF_PROTECTIONWAY_NODES,
+                protectionWayNodes.stream().map(NODE_WRAPPER_FUNC)::iterator);
         tag.putString(PATH_TYPE, this.type.name());
     }
 
     public void read(final NBTWrapper tag) {
+        this.listOfNodes = getNodesFromNBT(tag, LIST_OF_NODES);
+        this.type = PathType.valueOf(tag.getString(PATH_TYPE));
+        this.initalize();
+        if (tag.contains(LIST_OF_PROTECTIONWAY_NODES)) {
+            this.protectionWayNodes = getNodesFromNBT(tag, LIST_OF_PROTECTIONWAY_NODES);
+        } else {
+            if (!checkForProtectionWay()) {
+                this.emptyOrBroken = true;
+            }
+        }
+    }
+
+    private List<SignalBoxNode> getNodesFromNBT(final NBTWrapper tag, final String keyNBT) {
         final com.google.common.collect.ImmutableList.Builder<SignalBoxNode> nodeBuilder = ImmutableList
                 .builder();
-        tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
+        tag.getList(keyNBT).forEach(nodeNBT -> {
             final SignalBoxNode node = getNodeFromNBT(nodeNBT);
             if (node == null)
                 return;
             nodeBuilder.add(node);
         });
-        this.listOfNodes = nodeBuilder.build();
-        this.type = PathType.valueOf(tag.getString(PATH_TYPE));
-        this.initalize();
-        if (!checkForProtectionWay()) {
-            this.emptyOrBroken = true;
-        }
+        return nodeBuilder.build();
     }
 
     private SignalBoxNode getNodeFromNBT(final NBTWrapper nodeNBT) {
