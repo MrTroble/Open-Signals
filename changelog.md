@@ -20,6 +20,9 @@
 * fix: signal names disappeares randomly
 * fix: Train number block UI
 * fix: show saved pathways
+* fix: NPE with missing tile in signalbox pathway set signal
+* fix: issues with GhostBlock
+* fix: issues with wrong signal state shown in signalbox
 * ref/fix: better networking
 * ref/fix: sorting lang keys
 * ref: better UI performance
@@ -27,6 +30,7 @@
 * ref: catch more exceptions when problems in pathway
 * ref: changed visual signal in signalbox to new system
 * ref: sperated and relocated INetworkSaveable and NSaveable
+* ref: saveing protection way nodes now also in NBT and prevent NPEs during missing world while Reading NBT
 
 ## [1.12.2 - 3.7.1]
 * fix: render bounding box
