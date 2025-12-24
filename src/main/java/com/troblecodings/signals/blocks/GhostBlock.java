@@ -39,8 +39,11 @@ public class GhostBlock extends BasicBlock {
     public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
             final BlockPos pos) {
         final BlockPos downPos = pos.down();
-        final Block lowerBlock = source.getBlockState(downPos).getBlock();
-        return lowerBlock.getBoundingBox(state, source, downPos).offset(0, -1, 0);
+        final IBlockState lowerState = source.getBlockState(downPos);
+        final Block lowerBlock = lowerState.getBlock();
+        if (isRightBlock(lowerBlock))
+            return lowerBlock.getBoundingBox(lowerState, source, downPos).offset(0, -1, 0);
+        return FULL_BLOCK_AABB;
     }
 
     @Override
@@ -53,8 +56,11 @@ public class GhostBlock extends BasicBlock {
     public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
             final World world, final BlockPos pos, final EntityPlayer player) {
         final BlockPos downPos = pos.down();
-        final Block lowerBlock = world.getBlockState(downPos).getBlock();
-        return lowerBlock.getPickBlock(state, target, world, downPos, player);
+        final IBlockState lowerState = world.getBlockState(downPos);
+        final Block lowerBlock = lowerState.getBlock();
+        if (isRightBlock(lowerBlock))
+            return lowerBlock.getPickBlock(lowerState, target, world, downPos, player);
+        return super.getPickBlock(state, target, world, pos, player);
     }
 
     @Override
@@ -79,8 +85,11 @@ public class GhostBlock extends BasicBlock {
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         final BlockPos lowerPos = pos.down();
         final IBlockState lowerState = worldIn.getBlockState(lowerPos);
-        return lowerState.getBlock().onBlockActivated(worldIn, lowerPos, lowerState, playerIn, hand,
-                facing, hitX, hitY, hitZ);
+        final Block lowerBlock = lowerState.getBlock();
+        if (isRightBlock(lowerBlock))
+            return lowerBlock.onBlockActivated(worldIn, lowerPos, lowerState, playerIn, hand,
+                    facing, hitX, hitY, hitZ);
+        return false;
     }
 
     @Override
@@ -89,5 +98,9 @@ public class GhostBlock extends BasicBlock {
         DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new EnumFacing[] {
                 EnumFacing.UP, EnumFacing.DOWN
         }, block -> block instanceof GhostBlock || block instanceof Signal);
+    }
+
+    private static boolean isRightBlock(final Block block) {
+        return block instanceof Signal || block instanceof GhostBlock;
     }
 }
