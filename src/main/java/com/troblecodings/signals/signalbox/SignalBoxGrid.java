@@ -157,7 +157,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             }
         } catch (final Exception e) {
             OpenSignalsMain.getLogger().error("There was an issue with creating a pathway from "
-                    + p1 + " to " + " p2! Resetting!");
+                    + p1 + " to " + p2 + "! Resetting!");
             e.printStackTrace();
             resetPathway(p1);
         }
@@ -538,8 +538,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             return null;
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
-        final EnumPathUsage usage = entry.getEntry(PathEntryType.PATHUSAGE)
-                .orElse(EnumPathUsage.FREE);
+        final EnumPathUsage usage =
+                entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
         if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
             return null;
         if (state) {
