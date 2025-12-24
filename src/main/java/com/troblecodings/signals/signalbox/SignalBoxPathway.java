@@ -193,7 +193,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     protected void setSignals(final SignalStateInfo lastSignal) {
-        if (isExecutingSignalSet)
+        if (isExecutingSignalSet || tile == null)
             return;
         final World world = tile.getLevel();
         final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
