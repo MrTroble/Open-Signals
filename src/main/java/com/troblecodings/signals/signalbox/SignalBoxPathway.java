@@ -92,7 +92,6 @@ public class SignalBoxPathway implements IChunkLoadable {
         }
         this.trainNumber = TrainNumber.of(tag);
         updatePathwayToAutomatic();
-        updateSignalStates();
     }
 
     public void postRead(final NBTWrapper tag) {
