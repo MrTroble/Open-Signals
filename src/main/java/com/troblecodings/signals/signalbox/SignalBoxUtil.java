@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
@@ -21,6 +22,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public final class SignalBoxUtil {
 
@@ -241,10 +243,10 @@ public final class SignalBoxUtil {
         for (final EnumGuiMode mode : type.getModes()) {
             if (!mode.getModeType().isValidEnd()) {
                 continue;
-                final ModeSet modeSet = new ModeSet(mode, getModeRot(rotation, mode));
-                if (lastNode.has(modeSet))
-                    return true;
             }
+            final ModeSet modeSet = new ModeSet(mode, getModeRot(rotation, mode));
+            if (lastNode.has(modeSet))
+                return true;
         }
         return false;
     }
@@ -269,7 +271,14 @@ public final class SignalBoxUtil {
     }
 
     private static boolean isPowerd(final SignalBoxTileEntity tile, final BlockPos pos) {
-        final BlockState state = tile.getLevel().getBlockState(pos);
+        final World world = tile.getLevel();
+        if (world == null) {
+            OpenSignalsMain.getLogger()
+                    .error("The world is null when trying to load a blockstate to create a pathway!"
+                            + " This should't be so!");
+            return false;
+        }
+        final BlockState state = world.getBlockState(pos);
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);
