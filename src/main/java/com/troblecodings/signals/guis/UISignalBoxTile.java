@@ -27,28 +27,25 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraftforge.client.gui.GuiUtils;
 
 public class UISignalBoxTile extends UIComponentEntity {
 
-    public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/symbols.png");
-    public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/arrow.png");
-    public static final ResourceLocation INCOMING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/connection_in.png");
-    public static final ResourceLocation OUTGOING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/connection_out.png");
-    public static final ResourceLocation SIGNALS = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/signals.png");
-    public static final ResourceLocation NE1_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/ne1.png");
-    public static final ResourceLocation NE5_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/ne5.png");
-    public static final ResourceLocation ZS3_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/zs3.png");
+    public static final ResourceLocation ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/symbols.png");
+    public static final ResourceLocation ARROW_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/arrow.png");
+    public static final ResourceLocation INCOMING_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_in.png");
+    public static final ResourceLocation OUTGOING_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_out.png");
+    public static final ResourceLocation SIGNALS =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/signals.png");
+    public static final ResourceLocation NE1_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne1.png");
+    public static final ResourceLocation NE5_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne5.png");
+    public static final ResourceLocation ZS3_ICON =
+            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/zs3.png");
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
@@ -139,15 +136,16 @@ public class UISignalBoxTile extends UIComponentEntity {
         }
 
         entity.add(new UIComponent() {
-			
-			@Override
-			public void update() {}
-			
-			@Override
-			public void draw(DrawInfo info) {
-				modeSet.mode.consumer.apply(state).accept(info, SignalBoxUtil.FREE_COLOR);
-			}
-		});
+
+            @Override
+            public void update() {
+            }
+
+            @Override
+            public void draw(final DrawInfo info) {
+                modeSet.mode.consumer.apply(state).accept(info, SignalBoxUtil.FREE_COLOR);
+            }
+        });
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
         this.entity.setVisible(!setToEntity.isEmpty());
@@ -186,7 +184,7 @@ public class UISignalBoxTile extends UIComponentEntity {
         this.entity.remove(setToEntity.remove(modeSet));
         this.entity.setVisible(!setToEntity.isEmpty());
     }
-    
+
     public void add(final ModeSet modeSet) {
         this.node.add(modeSet);
         localAdd(modeSet);
