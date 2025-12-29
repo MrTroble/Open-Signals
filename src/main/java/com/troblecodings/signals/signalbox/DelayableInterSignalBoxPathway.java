@@ -38,11 +38,10 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
                 Thread.sleep(data.getDelay() * 1000);
             } catch (final InterruptedException e) {
             }
-            if (isEmptyOrBroken()) {
+            if (isEmptyOrBroken())
                 return;
-            }
-            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                    .getOtherSignals();
+            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                    data.getOtherSignals();
             this.isExecutingSignalSet = false;
             pathwayToBlock.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {
@@ -50,15 +49,14 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             }
             tile.getLevel().getServer().execute(() -> {
                 loadTileAndExecute(thisTile -> {
-                    final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
-                            .getPathwayByLastPoint(getLastPoint());
+                    final SignalBoxPathway pw =
+                            thisTile.getSignalBoxGrid().getPathwayByLastPoint(getLastPoint());
                     pw.setPathStatus(EnumPathUsage.SELECTED);
                     pw.updatePathwayOnGrid();
                 });
                 if (pathwayToBlock != null) {
                     pathwayToBlock.loadTileAndExecute(otherTile -> {
-                        pathwayToBlock = (DelayableInterSignalBoxPathway) otherTile
-                                .getSignalBoxGrid()
+                        pathwayToBlock = (InterSignalBoxPathway) otherTile.getSignalBoxGrid()
                                 .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                         pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
                         pathwayToBlock.updatePathwayOnGrid();
