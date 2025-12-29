@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraftforge.client.model.data.IModelData;
 
@@ -47,14 +48,16 @@ public class SignalAnimationHandler {
         if (!(state.getBlock() instanceof Signal))
             return;
         final long currentTick = Util.getMillis();
-        if(lastWorldTick < 0) this.lastWorldTick = currentTick;
+        if (lastWorldTick < 0) {
+            this.lastWorldTick = currentTick;
+        }
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final BlockModelRenderer renderer = info.dispatcher.getModelRenderer();
         final IVertexBuilder vertex =
                 info.source.getBuffer(RenderTypeLookup.getRenderType(state, false));
         final IModelData data = tile.getModelData();
-        
-        final float tick = (float)(currentTick - this.lastWorldTick);
+
+        final float tick = currentTick - this.lastWorldTick;
         this.lastWorldTick = currentTick;
         System.out.println(tick);
 
@@ -72,17 +75,18 @@ public class SignalAnimationHandler {
                         info.lightColor, info.overlayTexture, data);
                 info.stack.popPose();
 
-            if (translation.isAnimationAssigned()) {
-                updateAnimation(translation, tick);
-            }
-        });
+                if (translation.isAnimationAssigned()) {
+                    updateAnimation(translation, tick);
+                }
+            });
+        }
     }
 
-    private void updateAnimation(final ModelTranslation translation, float tick) {
+    private void updateAnimation(final ModelTranslation translation, final float tick) {
         final SignalAnimation animation = translation.getAssigendAnimation();
         animation.updateAnimation(tick);
         if (animation.isFinished()) {
-        	System.out.println("Finished animation!");
+            System.out.println("Finished animation!");
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
             translation.removeAnimation();
             animation.reset();
