@@ -56,79 +56,76 @@ public class ContainerSignalController extends ContainerBase
 
     private void sendProperitesToClient() {
         // TODO redo the SignalController
-        if (info.pos == null) {
+        if (info.pos == null)
             return;
-            controllerEntity =
-                    (SignalControllerTileEntity) info.world.getBlockEntity(getInfo().pos);
-            linkedPos = controllerEntity.getLinkedPosition();
-            if (linkedPos == null)
-                return;
-            currentSignal = controllerEntity.getLinkedSignal();
-            final SignalStateInfo stateInfo =
-                    new SignalStateInfo(info.world, linkedPos, getSignal());
-            final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-            if (properties == null || properties.isEmpty())
-                return;
-            this.properties.clear();
-            this.properties.putAll(properties);
-            final Map<SEProperty, String> propertiesToSend = new HashMap<>();
-            properties.forEach((property, value) -> {
+        controllerEntity = (SignalControllerTileEntity) info.world.getBlockEntity(getInfo().pos);
+        linkedPos = controllerEntity.getLinkedPosition();
+        if (linkedPos == null)
+            return;
+        currentSignal = controllerEntity.getLinkedSignal();
+        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
+        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
+        if (properties == null || properties.isEmpty())
+            return;
+        this.properties.clear();
+        this.properties.putAll(properties);
+        final Map<SEProperty, String> propertiesToSend = new HashMap<>();
+        properties.forEach((property, value) -> {
+            if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)
+                    || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+                    && property.testMap(properties)) {
+                propertiesToSend.put(property, value);
+            }
+        });
+        final Map<Byte, Map<SEProperty, String>> allStates =
+                new HashMap<>(controllerEntity.getAllStates());
+        final Map<Byte, Map<SEProperty, String>> allStatesToSend = new HashMap<>();
+        allStates.forEach((profile, props) -> {
+            final Map<SEProperty, String> propsForProfile = new HashMap<>();
+            props.forEach((property, value) -> {
                 if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)
                         || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
                         && property.testMap(properties)) {
-                    propertiesToSend.put(property, value);
+                    propsForProfile.put(property, value);
                 }
             });
-            final Map<Byte, Map<SEProperty, String>> allStates =
-                    new HashMap<>(controllerEntity.getAllStates());
-            final Map<Byte, Map<SEProperty, String>> allStatesToSend = new HashMap<>();
-            allStates.forEach((profile, props) -> {
-                final Map<SEProperty, String> propsForProfile = new HashMap<>();
-                props.forEach((property, value) -> {
-                    if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)
-                            || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                            && property.testMap(properties)) {
-                        propsForProfile.put(property, value);
-                    }
-                });
-                allStatesToSend.put(profile, propsForProfile);
-            });
-            final Map<Direction, Map<EnumState, Byte>> enabledStates =
-                    controllerEntity.getEnabledStates();
-            currentMode = controllerEntity.getLastMode();
+            allStatesToSend.put(profile, propsForProfile);
+        });
+        final Map<Direction, Map<EnumState, Byte>> enabledStates =
+                controllerEntity.getEnabledStates();
+        currentMode = controllerEntity.getLastMode();
 
-            final WriteBuffer buffer = new WriteBuffer();
-            buffer.putBlockPos(stateInfo.pos);
-            buffer.putInt(getSignal().getID());
-            buffer.putByte((byte) currentMode.ordinal());
-            buffer.putMapWithCombinedValueConsumer(propertiesToSend,
-                    NetworkBufferWrappers.getSEPropertyConsumer(getSignal()), (buf, prop,
-                            value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
-            buffer.putByte((byte) controllerEntity.getProfile());
-            buffer.putMap(allStatesToSend, WriteBuffer.BYTE_CONSUMER,
-                    (buf, props) -> buf.putMapWithCombinedValueConsumer(props,
-                            NetworkBufferWrappers.getSEPropertyConsumer(getSignal()),
-                            (mapBuf, prop, value) -> mapBuf
-                                    .putByte((byte) prop.getParent().getIDFromValue(value))));
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(stateInfo.pos);
+        buffer.putInt(getSignal().getID());
+        buffer.putByte((byte) currentMode.ordinal());
+        buffer.putMapWithCombinedValueConsumer(propertiesToSend,
+                NetworkBufferWrappers.getSEPropertyConsumer(getSignal()),
+                (buf, prop, value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
+        buffer.putByte((byte) controllerEntity.getProfile());
+        buffer.putMap(allStatesToSend, WriteBuffer.BYTE_CONSUMER,
+                (buf, props) -> buf.putMapWithCombinedValueConsumer(props,
+                        NetworkBufferWrappers.getSEPropertyConsumer(getSignal()),
+                        (mapBuf, prop, value) -> mapBuf
+                                .putByte((byte) prop.getParent().getIDFromValue(value))));
 
-            buffer.putMap(enabledStates, WriteBuffer.getEnumConsumer(), (buf, map) -> buf
-                    .putMap(map, WriteBuffer.getEnumConsumer(), WriteBuffer.BYTE_CONSUMER));
-            final BlockPos linkedRSInput = controllerEntity.getLinkedRSInput();
-            buffer.putBoolean(linkedRSInput != null);
-            if (linkedRSInput != null) {
-                buffer.putBlockPos(linkedRSInput);
-            }
-            buffer.putBoolean(controllerEntity.getProfileRSInput() != -1);
-            if (controllerEntity.getProfileRSInput() != -1) {
-                buffer.putByte(controllerEntity.getProfileRSInput());
-            }
-            OpenSignalsMain.network.sendTo(info.player, buffer.build());
+        buffer.putMap(enabledStates, WriteBuffer.getEnumConsumer(), (buf, map) -> buf.putMap(map,
+                WriteBuffer.getEnumConsumer(), WriteBuffer.BYTE_CONSUMER));
+        final BlockPos linkedRSInput = controllerEntity.getLinkedRSInput();
+        buffer.putBoolean(linkedRSInput != null);
+        if (linkedRSInput != null) {
+            buffer.putBlockPos(linkedRSInput);
         }
+        buffer.putBoolean(controllerEntity.getProfileRSInput() != -1);
+        if (controllerEntity.getProfileRSInput() != -1) {
+            buffer.putByte(controllerEntity.getProfileRSInput());
+        }
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
+    public void deserializeClient(final ByteBuffer bufIn) {
+        final ReadBuffer buffer = new ReadBuffer(bufIn);
         linkedPos = buffer.getBlockPos();
         final int signalID = buffer.getInt();
         currentSignal = Signal.SIGNAL_IDS.get(signalID);
