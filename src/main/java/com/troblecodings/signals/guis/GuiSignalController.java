@@ -24,6 +24,7 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
