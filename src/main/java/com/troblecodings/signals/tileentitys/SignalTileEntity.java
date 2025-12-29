@@ -100,8 +100,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public void requestModelDataUpdate() {
-        final Map<SEProperty, String> newProperties = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> newProperties =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
         synchronized (properties) {
             this.properties.clear();
             this.properties.putAll(newProperties);
@@ -139,7 +139,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
-    public AABB getRenderBoundingBox() {
+    public AxisAlignedBB getRenderBoundingBox() {
         return getSignal().getRenderBox().map(box -> box.move(worldPosition))
                 .orElse(super.getRenderBoundingBox());
     }

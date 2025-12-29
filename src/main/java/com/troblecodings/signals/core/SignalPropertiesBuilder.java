@@ -22,31 +22,30 @@ import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProp
 import com.troblecodings.signals.properties.SoundProperty;
 
 import net.minecraft.util.SoundEvent;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.util.math.AxisAlignedBB;
 
 public class SignalPropertiesBuilder {
 
     private transient Placementtool placementtool = null;
-    private final String placementToolName = null;
-    private final int defaultHeight = 1;
+    private String placementToolName = null;
+    private int defaultHeight = 1;
     private Map<String, Integer> signalHeights;
-    private final float customNameRenderHeight = -1;
+    private float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
-    private final float signWidth = 22;
-    private final boolean autoscale = false;
-    private final float offsetX = 0;
-    private final float offsetY = 0;
-    private final float signScale = 1;
+    private float signWidth = 22;
+    private boolean autoscale = false;
+    private float offsetX = 0;
+    private float offsetY = 0;
+    private float signScale = 1;
     private Map<String, Boolean> doubleSidedText;
-    private final int textColor = 0;
-    private final boolean canLink = true;
+    private int textColor = 0;
+    private boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
     private Map<String, String> remoteRedstoneOutputs;
-    private final int defaultItemDamage = 1;
-    private final boolean isBridgeSignal = false;
+    private int defaultItemDamage = 1;
+    private boolean isBridgeSignal = false;
     private List<Integer> customRenderBoundingBox;
 
     public SignalProperties build(final FunctionParsingInfo info) {
@@ -59,10 +58,11 @@ public class SignalPropertiesBuilder {
                 }
             }
         }
-        if (placementtool == null)
+        if (placementtool == null) {
             OpenSignalsMain
                     .exitMinecraftWithMessage("There doesn't exists a placementtool with the name '"
                             + placementToolName + "'!");
+        }
 
         final List<PredicateProperty<Integer>> signalheights = new ArrayList<>();
         if (signalHeights != null) {
@@ -150,12 +150,12 @@ public class SignalPropertiesBuilder {
 
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
-        Optional<AABB> shape = Optional.empty();
+        Optional<AxisAlignedBB> shape = Optional.empty();
         if (customRenderBoundingBox != null && customRenderBoundingBox.size() == 6) {
-            shape = Optional
-                    .of(new AABB(customRenderBoundingBox.get(0), customRenderBoundingBox.get(1),
-                            customRenderBoundingBox.get(2), customRenderBoundingBox.get(3),
-                            customRenderBoundingBox.get(4), customRenderBoundingBox.get(5)));
+            shape = Optional.of(new AxisAlignedBB(customRenderBoundingBox.get(0),
+                    customRenderBoundingBox.get(1), customRenderBoundingBox.get(2),
+                    customRenderBoundingBox.get(3), customRenderBoundingBox.get(4),
+                    customRenderBoundingBox.get(5)));
         }
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
