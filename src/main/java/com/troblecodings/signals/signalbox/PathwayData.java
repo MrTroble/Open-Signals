@@ -140,9 +140,10 @@ public class PathwayData {
             final Point oldPos = listOfNodes.get(i - 1).getPoint();
             final Point newPos = listOfNodes.get(i + 1).getPoint();
             final SignalBoxNode current = listOfNodes.get(i);
+            final Path path = new Path(oldPos, newPos);
             newNodes.put(current.getPoint(), new Point(previous));
             previous = current.getPoint();
-            final PathOptionEntry option = current.getOption(new Path(oldPos, newPos)).orElse(null);
+            final PathOptionEntry option = current.getOption(path).orElse(null);
             if (option == null) {
                 continue;
             }
@@ -159,7 +160,8 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED))
+            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED)
+                    || SignalBoxUtil.isPathBlocked(grid, current, path))
                 return false;
         }
         return true;

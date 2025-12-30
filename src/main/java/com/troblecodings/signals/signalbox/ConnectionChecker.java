@@ -14,6 +14,7 @@ public abstract class ConnectionChecker {
 
     private static final SignalBoxFactory FACTORY = SignalBoxFactory.getFactory();
 
+    public SignalBoxGrid grid;
     public PathType type;
     public SignalBoxNode nextNode;
     public Point previousPoint;
@@ -66,6 +67,8 @@ public abstract class ConnectionChecker {
             if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.FREE)
                     || optional.get().equals(EnumPathUsage.PROTECTED)))
                 return PathwayRequestMode.ALREADY_USED;
+            if (SignalBoxUtil.isPathBlocked(grid, nextNode, path))
+                return PathwayRequestMode.INPUT_BLOCKING;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
             return isValid ? PathwayRequestMode.PASS : PathwayRequestMode.NO_PATH;
         }
