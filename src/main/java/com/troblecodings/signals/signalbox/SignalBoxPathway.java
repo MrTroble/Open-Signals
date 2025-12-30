@@ -80,9 +80,6 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public void read(final NBTWrapper tag) {
-        data.read(tag);
-        if (isEmptyOrBroken())
-            return;
         this.isBlocked = tag.getBoolean(IS_BLOCKED);
         final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
         if (!originalFirstPoint.isTagNull()) {

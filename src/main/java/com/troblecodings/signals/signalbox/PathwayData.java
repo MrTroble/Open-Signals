@@ -49,6 +49,7 @@ public class PathwayData {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String LIST_OF_PROTECTIONWAY_NODES = "listOfProtectionWayNodes";
     private static final String PATH_TYPE = "pathType";
+    private static final String IS_INTERSIGNALBOX_PATHWAY = "isInterSignalBoxPathway";
 
     protected SignalBoxGrid grid = null;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
@@ -70,6 +71,7 @@ public class PathwayData {
     private BlockPos protectionWayReset = null;
     private int protectionWayResetDelay = 0;
     private List<ModeIdentifier> trainNumberDisplays = ImmutableList.of();
+    private boolean isInterSignalBoxPW = false;
 
     private SignalBoxPathway pathway;
 
@@ -82,8 +84,9 @@ public class PathwayData {
             return EMPTY_DATA;
         if (data.isEndOfInterSignalBox()) {
             final PathwayData otherData = data.requestInterSignalBoxPathway(grid);
-            if (otherData == EMPTY_DATA)
+            if (otherData == null || otherData.equals(EMPTY_DATA))
                 return EMPTY_DATA;
+            data.isInterSignalBoxPW = otherData.isInterSignalBoxPW = true;
             data.combineData(otherData);
 
             final InterSignalBoxPathway startPath = (InterSignalBoxPathway) data.createPathway();
@@ -439,12 +442,18 @@ public class PathwayData {
         tag.putList(LIST_OF_PROTECTIONWAY_NODES,
                 protectionWayNodes.stream().map(NODE_WRAPPER_FUNC)::iterator);
         tag.putString(PATH_TYPE, this.type.name());
+        tag.putBoolean(IS_INTERSIGNALBOX_PATHWAY, isInterSignalBoxPW);
     }
 
     public void read(final NBTWrapper tag) {
         this.listOfNodes = getNodesFromNBT(tag, LIST_OF_NODES);
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.initalize();
+        if (tag.contains(IS_INTERSIGNALBOX_PATHWAY)) {
+            this.isInterSignalBoxPW = tag.getBoolean(IS_INTERSIGNALBOX_PATHWAY);
+        } else {
+            this.isInterSignalBoxPW = isStartOfInterSignalBox() || isEndOfInterSignalBox();
+        }
         if (tag.contains(LIST_OF_PROTECTIONWAY_NODES)) {
             this.protectionWayNodes = getNodesFromNBT(tag, LIST_OF_PROTECTIONWAY_NODES);
         } else {
@@ -534,7 +543,7 @@ public class PathwayData {
     }
 
     public boolean isInterSignalBoxPathway() {
-        return isStartOfInterSignalBox() || isEndOfInterSignalBox();
+        return isInterSignalBoxPW;
     }
 
     public boolean isEmpty() {
