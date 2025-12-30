@@ -39,8 +39,8 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             }
             if (isEmptyOrBroken())
                 return;
-            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
-                    data.getOtherSignals();
+            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
+                    .getOtherSignals();
             this.isExecutingSignalSet = false;
             if (pathwayToBlock != null) {
                 pathwayToBlock.isExecutingSignalSet = false;
@@ -50,8 +50,10 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             }
             tile.getWorld().getMinecraftServer().addScheduledTask(() -> {
                 loadTileAndExecute(thisTile -> {
-                    final SignalBoxPathway pw =
-                            thisTile.getSignalBoxGrid().getPathwayByLastPoint(getLastPoint());
+                    final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
+                            .getPathwayByLastPoint(getLastPoint());
+                    if (pw == null || pw.isEmptyOrBroken())
+                        return;
                     pw.setPathStatus(EnumPathUsage.SELECTED);
                     pw.updatePathwayOnGrid();
                 });
