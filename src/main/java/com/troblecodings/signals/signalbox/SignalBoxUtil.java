@@ -138,12 +138,10 @@ public final class SignalBoxUtil {
                     grid.sendDebugPointUpdates(debugPointList);
                     debugPointList.clear();
                 }
-                if (nodes.size() < 2) {
+                if (nodes.size() < 2)
                     return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
-                }
-                if (!checkForValidEnd(pathType, nodes.get(0), nodes.get(1))) {
+                if (!checkForValidEnd(pathType, nodes.get(0), nodes.get(1)))
                     return PathwayRequestResult.getByMode(PathwayRequestMode.NO_EQUAL_PATH_TYPE);
-                }
                 return new PathwayRequestResult(PathwayRequestMode.PASS,
                         PathwayData.of(grid, nodes, pathType));
             }
@@ -184,6 +182,8 @@ public final class SignalBoxUtil {
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(PathType.NORMAL);
         checker.type = PathType.NORMAL;
         checker.visited = visited;
+        checker.grid = grid;
+        PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
             scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
@@ -208,16 +208,15 @@ public final class SignalBoxUtil {
             checker.previousPoint = previousPoint;
             final SignalBoxNode nextNode = modeGrid.get(nextPoint);
             if (nextNode == null) {
+                mode = PathwayRequestMode.NO_PATH;
                 continue;
             }
 
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                final PathwayRequestMode result = isPathBlocked(grid, nextNode, pathIdent.path)
-                        ? PathwayRequestMode.INPUT_BLOCKING
-                        : checker.check();
-                if (nextPoint.equals(p2) || result.isPass()) {
+                mode = checker.check();
+                if (nextPoint.equals(p2) || mode.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
@@ -239,11 +238,12 @@ public final class SignalBoxUtil {
     private static boolean checkForValidEnd(final PathType type, final SignalBoxNode lastNode,
             final SignalBoxNode previous) {
         final Point delta = lastNode.getPoint().delta(previous.getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta)
-                .add(Rotation.CLOCKWISE_180);
+        final Rotation rotation =
+                SignalBoxUtil.getRotationFromDelta(delta).add(Rotation.CLOCKWISE_180);
         for (final EnumGuiMode mode : type.getModes()) {
-            if (!mode.getModeType().isValidEnd())
+            if (!mode.getModeType().isValidEnd()) {
                 continue;
+            }
             final ModeSet modeSet = new ModeSet(mode, getModeRot(rotation, mode));
             if (lastNode.has(modeSet))
                 return true;
@@ -262,8 +262,9 @@ public final class SignalBoxUtil {
         final AtomicBoolean bool = new AtomicBoolean(false);
         node.getOption(path)
                 .ifPresent(entry -> entry.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
-                    if (isPowerd(grid.tile, pos))
+                    if (isPowerd(grid.tile, pos)) {
                         bool.set(true);
+                    }
                 }));
 
         return bool.get();
