@@ -22,7 +22,9 @@ public class SyncableTileEntity extends BasicBlockEntity {
 
     @Override
     public NBTTagCompound getUpdateTag() {
-        return this.writeToNBT(new NBTTagCompound());
+        final NBTWrapper wrapper = new NBTWrapper();
+        saveWrapper(wrapper);
+        return wrapper.tag;
     }
 
     @Override

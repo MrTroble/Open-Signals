@@ -57,6 +57,8 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
+        debug = true;
+        log = LoggerContext.getContext().getLogger(MODID);
     }
 
     @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", //
