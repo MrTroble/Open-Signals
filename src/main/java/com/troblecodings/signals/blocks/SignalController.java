@@ -43,10 +43,12 @@ public class SignalController extends BasicBlock {
 
                     final SignalControllerTileEntity controller = (SignalControllerTileEntity) tile;
 
-                    if (controller.hasLink())
+                    if (controller.hasLink()) {
+                        ClientRenderUpdate.INSTANCE.clearHighlights();
                         ClientRenderUpdate.INSTANCE.addHighlight(controller.getLinkedPosition());
-                    else
+                    } else {
                         playerIn.sendMessage(new TextComponentString("No Link"));
+                    }
                 }
                 return true;
             } else {

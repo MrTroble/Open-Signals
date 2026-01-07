@@ -18,6 +18,10 @@ public class ClientRenderUpdate {
         highlightedBlocks.put(pos, System.currentTimeMillis() + 10000);
     }
 
+    public void clearHighlights() {
+        highlightedBlocks.clear();
+    }
+
     @SubscribeEvent
     public void render(final RenderWorldLastEvent event) {
         if (highlightedBlocks.isEmpty())

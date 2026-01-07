@@ -500,6 +500,7 @@ public class GuiSignalBox extends GuiBase {
             layout.add(icon);
 
             layout.add(GuiElements.createButton(name, e -> {
+                ClientRenderUpdate.INSTANCE.clearHighlights();
                 ClientRenderUpdate.INSTANCE.addHighlight(p);
             }));
             layout.add(GuiElements.createButton("x", 20, e -> {
