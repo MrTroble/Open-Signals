@@ -263,6 +263,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
             onLoad();
+            this.syncClient();
             return true;
         } else if (block instanceof RedstoneInput) {
             linkedRSInput = pos;
@@ -286,6 +287,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         linkedSignal = null;
         allStates.clear();
         enabledStates.clear();
+        this.syncClient();
         return true;
     }
 

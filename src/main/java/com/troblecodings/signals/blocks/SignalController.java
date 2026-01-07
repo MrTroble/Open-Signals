@@ -3,6 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.handler.ClientRenderUpdate;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
@@ -16,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class SignalController extends BasicBlock {
@@ -32,10 +34,25 @@ public class SignalController extends BasicBlock {
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         final Item item = playerIn.getHeldItemMainhand().getItem();
         if (!(item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
-            if (worldIn.isRemote)
+            if (playerIn.isSneaking()) {
+                if (worldIn.isRemote) {
+                    final TileEntity tile = worldIn.getTileEntity(pos);
+
+                    if (!(tile instanceof SignalControllerTileEntity))
+                        return false;
+
+                    final SignalControllerTileEntity controller = (SignalControllerTileEntity) tile;
+
+                    if (controller.hasLink())
+                        ClientRenderUpdate.INSTANCE.addHighlight(controller.getLinkedPosition());
+                    else
+                        playerIn.sendMessage(new TextComponentString("No Link"));
+                }
                 return true;
-            OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
-                    "signalcontroller");
+            } else {
+                OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
+                        "signalcontroller");
+            }
             return true;
         }
         return false;

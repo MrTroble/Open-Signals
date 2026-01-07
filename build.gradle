@@ -16,15 +16,22 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'java'
 
 apply plugin: "com.matthewprenger.cursegradle"
 
 sourceSets{
     main {
         java {
-            srcDirs("guilib/src/", "linkableapi/src/", "contentPackLib/src")
+            srcDirs("src/main/java", "guilib/src/", "linkableapi/src/", "contentPackLib/src")
         }
     }
+}
+repositories {
+    maven {
+            name = "SquidDev"
+            url = "https://squiddev.cc/maven/"
+        }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -79,6 +86,9 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //implementation files('libs/cc-tweaked-1.12.2-1.89.2.jar')
+    compileOnly "org.squiddev:cc-tweaked-1.12.2:1.89.2"
 }
 
 test {

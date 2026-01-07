@@ -15,6 +15,7 @@ import com.troblecodings.signals.guis.GuiPathwayRequester;
 import com.troblecodings.signals.guis.GuiSignalBridge;
 import com.troblecodings.signals.guis.GuiTrainNumber;
 import com.troblecodings.signals.handler.ClientNameHandler;
+import com.troblecodings.signals.handler.ClientRenderUpdate;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -50,5 +51,6 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEntity.class,
                 new SignalSpecialRenderer());
         MinecraftForge.EVENT_BUS.register(OSModels.class);
+        MinecraftForge.EVENT_BUS.register(ClientRenderUpdate.INSTANCE);
     }
 }
