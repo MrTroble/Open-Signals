@@ -119,11 +119,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
         } else if (hasAnimation()) {
             handler.updateAnimationListFromBlock();
-            final Map<SEProperty, String> properties = ClientSignalStateHandler
-                    .getClientStates(new StateInfo(world, pos));
-            if (!properties.isEmpty()) {
-                handler.updateStates(properties, true);
-            }
+            handler.updateStates(
+                    ClientSignalStateHandler.getClientStates(new StateInfo(world, pos)), true);
+
         }
     }
 

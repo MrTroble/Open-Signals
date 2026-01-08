@@ -53,7 +53,7 @@ public class SignalAnimationHandler {
     }
 
     private final Map<Entry<IBakedModel, BufferBuilder>, Entry<ModelTranslation, List<SignalAnimation>>> //
-        animationPerModel = new HashMap<>();
+    animationPerModel = new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
         final World world = tile.getWorld();
@@ -62,14 +62,15 @@ public class SignalAnimationHandler {
         if (!(state.getBlock() instanceof Signal))
             return;
         final long currentTick = Minecraft.getSystemTime();
-        if (lastWorldTick < 0)
+        if (lastWorldTick < 0) {
             this.lastWorldTick = currentTick;
+        }
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         if (blockRenderer == null) {
             blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
         }
 
-        final float tick = (float) (currentTick - this.lastWorldTick);
+        final float tick = currentTick - this.lastWorldTick;
         this.lastWorldTick = currentTick;
 
         animationPerModel.forEach((first, entry) -> {
@@ -118,6 +119,8 @@ public class SignalAnimationHandler {
     }
 
     public void updateStates(final Map<SEProperty, String> properties, final boolean firstLoad) {
+        if (properties == null || properties.isEmpty())
+            return;
         final ModelInfoWrapper wrapper = new ModelInfoWrapper(tile.getBlockType(), properties);
         if (firstLoad) {
             updateToFinalizedAnimations(wrapper);
