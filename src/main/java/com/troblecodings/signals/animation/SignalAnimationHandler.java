@@ -94,12 +94,14 @@ public class SignalAnimationHandler {
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 
-    public void updateStates(final Map<SEProperty, String> newProperties,
-            final Map<SEProperty, String> oldProperties) {
-        if (oldProperties.isEmpty()) {
-            updateToFinalizedAnimations(new ModelInfoWrapper(newProperties));
+    public void updateStates(final Map<SEProperty, String> properties, final boolean firstLoad) {
+        if (properties == null || properties.isEmpty())
+            return;
+        final ModelInfoWrapper wrapper = new ModelInfoWrapper(properties);
+        if (firstLoad) {
+            updateToFinalizedAnimations(wrapper);
         } else {
-            updateAnimations(new ModelInfoWrapper(newProperties));
+            updateAnimations(wrapper);
         }
     }
 
