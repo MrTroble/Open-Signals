@@ -31,19 +31,20 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
                 Thread.sleep(data.getDelay() * 1000);
             } catch (final InterruptedException e) {
             }
-            if (isEmptyOrBroken()) {
+            if (isEmptyOrBroken())
                 return;
-            }
-            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                    .getOtherSignals();
+            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                    data.getOtherSignals();
             this.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {
                 setSignals(getLastSignalInfo());
             }
             tile.getLevel().getServer().execute(() -> {
                 loadTileAndExecute(thisTile -> {
-                    final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
-                            .getPathwayByLastPoint(getLastPoint());
+                    final SignalBoxPathway pw =
+                            thisTile.getSignalBoxGrid().getPathwayByLastPoint(getLastPoint());
+                    if (pw == null || pw.isEmptyOrBroken())
+                        return;
                     pw.setPathStatus(EnumPathUsage.SELECTED);
                     pw.updatePathwayOnGrid();
                 });

@@ -46,22 +46,21 @@ public final class SignalBoxUtil {
     public static Rotation getRotationFromDelta(final Point delta) {
         if (delta.getX() > 0)
             return Rotation.CLOCKWISE_180;
-        else if (delta.getX() < 0)
+        if (delta.getX() < 0)
             return Rotation.NONE;
-        else if (delta.getY() > 0)
+        if (delta.getY() > 0)
             return Rotation.COUNTERCLOCKWISE_90;
-        else
-            return Rotation.CLOCKWISE_90;
+        return Rotation.CLOCKWISE_90;
     }
 
     public static Point getDeltaFromRotation(final Rotation rot) {
         if (rot.equals(Rotation.NONE))
             return new Point(1, 0);
-        else if (rot.equals(Rotation.CLOCKWISE_90))
+        if (rot.equals(Rotation.CLOCKWISE_90))
             return new Point(0, 1);
-        else if (rot.equals(Rotation.CLOCKWISE_180))
+        if (rot.equals(Rotation.CLOCKWISE_180))
             return new Point(-1, 0);
-        else if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
+        if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
             return new Point(0, -1);
         return new Point();
     }
@@ -112,6 +111,7 @@ public final class SignalBoxUtil {
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(pathType);
         checker.type = pathType;
         checker.visited = visited;
+        checker.grid = grid;
         PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.getStartIdentifiers()) {
@@ -154,9 +154,7 @@ public final class SignalBoxUtil {
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                mode = isPathBlocked(grid, nextNode, pathIdent.path)
-                        ? PathwayRequestMode.INPUT_BLOCKING
-                        : checker.check();
+                mode = checker.check();
                 if (nextPoint.equals(p2) || mode.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
@@ -183,6 +181,8 @@ public final class SignalBoxUtil {
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(PathType.NORMAL);
         checker.type = PathType.NORMAL;
         checker.visited = visited;
+        checker.grid = grid;
+        PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
             scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
@@ -207,16 +207,15 @@ public final class SignalBoxUtil {
             checker.previousPoint = previousPoint;
             final SignalBoxNode nextNode = modeGrid.get(nextPoint);
             if (nextNode == null) {
+                mode = PathwayRequestMode.NO_PATH;
                 continue;
             }
 
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                final PathwayRequestMode result = isPathBlocked(grid, nextNode, pathIdent.path)
-                        ? PathwayRequestMode.INPUT_BLOCKING
-                        : checker.check();
-                if (nextPoint.equals(p2) || result.isPass()) {
+                mode = checker.check();
+                if (nextPoint.equals(p2) || mode.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
@@ -257,7 +256,7 @@ public final class SignalBoxUtil {
         return rot.getRotated(Rotation.CLOCKWISE_180);
     }
 
-    private static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,
+    public static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,
             final Path path) {
         final AtomicBoolean bool = new AtomicBoolean(false);
         node.getOption(path)
@@ -306,10 +305,7 @@ public final class SignalBoxUtil {
 
     public static PathType getPathTypeFrom(final SignalBoxNode start, final SignalBoxNode end) {
         final List<PathType> possilbeTypes = start.getPossibleTypes(end);
-        if (!possilbeTypes.isEmpty())
-            return possilbeTypes.get(0);
-        else
-            return PathType.NONE;
+        return !possilbeTypes.isEmpty() ? possilbeTypes.get(0) : PathType.NONE;
     }
 
 }

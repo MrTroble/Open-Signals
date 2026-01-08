@@ -51,6 +51,8 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
                 loadTileAndExecute(thisTile -> {
                     final SignalBoxPathway pw =
                             thisTile.getSignalBoxGrid().getPathwayByLastPoint(getLastPoint());
+                    if (pw == null || pw.isEmptyOrBroken())
+                        return;
                     pw.setPathStatus(EnumPathUsage.SELECTED);
                     pw.updatePathwayOnGrid();
                 });

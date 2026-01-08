@@ -81,9 +81,6 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public void read(final NBTWrapper tag) {
-        data.read(tag);
-        if (isEmptyOrBroken())
-            return;
         this.isBlocked = tag.getBoolean(IS_BLOCKED);
         final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
         if (!originalFirstPoint.isTagNull()) {
@@ -212,17 +209,17 @@ public class SignalBoxPathway implements IChunkLoadable {
             updateSignalStates();
             return;
         }
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff())
                 return;
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
-            final ConfigInfo info = new ConfigInfo(
-                    new SignalStateInfo(world, position.pos, current), lastSignal, data,
-                    position.isRepeater);
+            final ConfigInfo info =
+                    new ConfigInfo(new SignalStateInfo(world, position.pos, current), lastSignal,
+                            data, position.isRepeater);
             if (position.guiMode.equals(EnumGuiMode.HP)) {
                 SignalConfig.loadDisable(info);
             } else {
@@ -240,8 +237,8 @@ public class SignalBoxPathway implements IChunkLoadable {
         final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
         if (first == null)
             return;
-        final SignalStateInfo firstInfo = new SignalStateInfo(tile.getLevel(), startSignal.pos,
-                first);
+        final SignalStateInfo firstInfo =
+                new SignalStateInfo(tile.getLevel(), startSignal.pos, first);
         data.getPreSignals().forEach(posIdent -> {
             final Signal current = SignalBoxHandler.getSignal(identifier, posIdent.pos);
             if (current == null)
@@ -267,8 +264,8 @@ public class SignalBoxPathway implements IChunkLoadable {
                 });
             }
         }
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff()) {
                 position.updateSignalState(SignalState.OFF);
@@ -360,8 +357,8 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     private void resetOther() {
         final List<SignalBoxNode> nodes = new ArrayList<>();
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.values().forEach((position) -> {
             final Signal current = SignalBoxHandler
                     .getSignal(new StateInfo(tile.getLevel(), tile.getBlockPos()), position.pos);
@@ -398,8 +395,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void compact(final Point point) {
         final List<SignalBoxNode> nodes = new ArrayList<>();
         data.foreachPath((path, node) -> {
-            final Rotation rotation = SignalBoxUtil
-                    .getRotationFromDelta(node.getPoint().delta(path.point1));
+            final Rotation rotation =
+                    SignalBoxUtil.getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS,
                     EnumGuiMode.HP, EnumGuiMode.ZS3)) {
                 node.getOption(new ModeSet(mode, rotation)).ifPresent(
@@ -408,8 +405,8 @@ public class SignalBoxPathway implements IChunkLoadable {
                                     new StateInfo(tile.getLevel(), tile.getBlockPos()), position);
                             if (current == null)
                                 return;
-                            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                                    .getOtherSignals();
+                            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                                    data.getOtherSignals();
                             final OtherSignalIdentifier identifier = distantSignalPositions
                                     .getOrDefault(new BlockPosSignalHolder(position),
                                             new OtherSignalIdentifier(point,
@@ -439,12 +436,8 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public Optional<Point> tryReset(final BlockPos position) {
         final SignalBoxNode node = data.tryReset(position);
-        if (node == null) {
-            if (checkReverseReset(position))
-                return Optional.of(getFirstPoint());
-            else
-                return Optional.empty();
-        }
+        if (node == null)
+            return checkReverseReset(position) ? Optional.of(getFirstPoint()) : Optional.empty();
         final Point point = node.getPoint();
         final AtomicBoolean atomic = new AtomicBoolean(false);
         data.foreachEntry((option, cNode) -> {
