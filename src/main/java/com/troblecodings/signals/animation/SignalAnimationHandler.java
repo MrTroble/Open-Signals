@@ -147,18 +147,20 @@ public class SignalAnimationHandler {
     }
 
     public void updateAnimationListFromBlock() {
-        animationPerModel.clear();
-        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = //
-                SignalAnimationConfigParser.ALL_ANIMATIONS.get(tile.getSignal());
-        map.forEach((entry, animations) -> {
-            final IBakedModel model = SignalCustomModel.getModelFromLocation(
-                    new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, Quaternion.ONE);
-            translation.setModelTranslation(entry.getValue().copy());
-            animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
-                    .map(animation -> animation.copy()).collect(Collectors.toList())));
-        });
+        synchronized (animationPerModel) {
+            animationPerModel.clear();
+            final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = //
+                    SignalAnimationConfigParser.ALL_ANIMATIONS.get(tile.getSignal());
+            map.forEach((entry, animations) -> {
+                final IBakedModel model = SignalCustomModel.getModelFromLocation(
+                        new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
+                final ModelTranslation translation =
+                        new ModelTranslation(VectorWrapper.ZERO, Quaternion.ONE);
+                translation.setModelTranslation(entry.getValue().copy());
+                animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
+                        .map(animation -> animation.copy()).collect(Collectors.toList())));
+            });
+        }
     }
 
 }
