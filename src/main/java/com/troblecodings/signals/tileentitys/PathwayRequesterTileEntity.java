@@ -27,8 +27,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
-    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
-            new Point(-1, -1));
+    private Map.Entry<Point, Point> pathway =
+            Maps.immutableEntry(new Point(-1, -1), new Point(-1, -1));
     private boolean addPWToSaver = true;
 
     public PathwayRequesterTileEntity(final TileEntityInfo info) {
@@ -53,8 +53,9 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        if (linkedSignalBox != null)
+        if (linkedSignalBox != null) {
             wrapper.putBlockPos(LINKED_SIGNALBOX, linkedSignalBox);
+        }
         final NBTWrapper startPoint = new NBTWrapper();
         pathway.getKey().write(startPoint);
         final NBTWrapper endPoint = new NBTWrapper();
@@ -71,9 +72,9 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                     final PathType type = SignalBoxUtil.getPathTypeFrom(
                             grid.getNode(pathway.getKey()), grid.getNode(pathway.getValue()));
                     if (!type.equals(PathType.NONE)) {
-                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
-                                pathway.getValue(), type);
-                        if (result.canBeAddedToSaver(type)) {
+                        final PathwayRequestResult result =
+                                grid.requestWay(pathway.getKey(), pathway.getValue(), type);
+                        if (result.canBeAddedToSaver(type) && addPWToSaver) {
                             grid.addNextPathway(pathway.getKey(), pathway.getValue(), type);
                         }
                     }
