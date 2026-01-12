@@ -69,7 +69,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
             if (!type.equals(PathType.NONE)) {
                 final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
                         pathway.getValue(), type);
-                if (result.canBeAddedToSaver(type)) {
+                if (result.canBeAddedToSaver(type) && addPWToSaver) {
                     grid.addNextPathway(pathway.getKey(), pathway.getValue(), type);
                 }
             }
