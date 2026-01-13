@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -130,6 +131,7 @@ public class UISignalBoxRendering extends UIComponent {
         render.forEach((set, rInfo) -> {
             info.push();
             info.depthOn();
+            info.alphaOff();
             info.translate(HALF_TILE, HALF_TILE, 0);
             info.rotate(QuaternionWrapper.fromXYZ(0, 0,
                     set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
@@ -170,9 +172,7 @@ public class UISignalBoxRendering extends UIComponent {
     }
 
     public void clearSelection() {
-        for (int i = 0; i < colorSelections.length; i++) {
-            colorSelections[i] = null;
-        }
+        Arrays.fill(colorSelections, null);
     }
 
     public void addColoredPoint(final int c, final Point point) {
@@ -185,9 +185,7 @@ public class UISignalBoxRendering extends UIComponent {
 
     @Override
     public void mouseEvent(final MouseEvent event) {
-        if (!this.visible)
-            return;
-        if (!this.gridParent.isHovered())
+        if (!this.visible || !this.gridParent.isHovered())
             return;
         final double x = event.x - parent.getLevelX();
         final double y = event.y - parent.getLevelY();
@@ -380,9 +378,7 @@ public class UISignalBoxRendering extends UIComponent {
         public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
+            if ((obj == null) || (getClass() != obj.getClass()))
                 return false;
             final ColorPoint other = (ColorPoint) obj;
             return color == other.color && Objects.equals(point, other.point);
