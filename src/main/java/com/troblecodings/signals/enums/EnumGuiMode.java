@@ -132,7 +132,7 @@ public enum EnumGuiMode {
     }
 
     public Rotation getLocalRotation(final Rotation rot) {
-        if (!this.equals(STRAIGHT))
+        if (!(this.equals(STRAIGHT) || this.equals(BUE)))
             return rot;
         return Rotation.values()[rot.ordinal() % 2];
     }
