@@ -200,10 +200,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void resetAllPathways() {
-        ImmutableSet.copyOf(this.startsToPath.values()).forEach(pw -> {
-            pw.directResetOfProtectionWay();
-            resetPathway(pw);
-        });
+        ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
         clearPaths();
         modeGrid.values().forEach(SignalBoxNode::resetEnumPathUsage);
     }

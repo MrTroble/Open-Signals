@@ -379,7 +379,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
-            resetProtectionWay();
+            directResetOfProtectionWay();
         }
     }
 
@@ -438,8 +438,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (node == null) {
             if (checkReverseReset(position))
                 return Optional.of(getFirstPoint());
-            else
-                return Optional.empty();
+            return Optional.empty();
         }
         final Point point = node.getPoint();
         final AtomicBoolean atomic = new AtomicBoolean(false);
@@ -517,8 +516,9 @@ public class SignalBoxPathway implements IChunkLoadable {
         final SignalBoxPathway previous = grid.getPathwayByLastPoint(getFirstPoint());
         if (previous != null) {
             final TrainNumber number = previous.trainNumber;
-            if (number != null && !number.trainNumber.isEmpty())
+            if (number != null && !number.trainNumber.isEmpty()) {
                 updateTrainNumber(previous.trainNumber);
+            }
         }
     }
 
