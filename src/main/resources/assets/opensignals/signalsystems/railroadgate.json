@@ -3,7 +3,6 @@
         "placementToolName": "signplacementtool",
         "canLink": true,
         "defaultHeight": 1,
-        "hasAnimation": true,
         "customRenderBoundingBox": [-6,0,-6,6,7,6]
     },
     "seProperties": [

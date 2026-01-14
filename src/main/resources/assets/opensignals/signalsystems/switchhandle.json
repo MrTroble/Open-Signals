@@ -8,8 +8,7 @@
         },
         "remoteRedstoneOutputs": {
             "config(manual.FALSE)": "powered"
-        },
-        "hasAnimation": true
+        }
     },
     "seProperties": [
         {
