@@ -131,12 +131,13 @@ public class UISignalBoxRendering extends UIComponent {
         render.forEach((set, rInfo) -> {
             info.push();
             info.depthOn();
-            info.alphaOff();
+            info.alphaOn();
             info.translate(HALF_TILE, HALF_TILE, 0);
             info.rotate(QuaternionWrapper.fromXYZ(0, 0,
                     set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
             info.translate(-HALF_TILE, -HALF_TILE, set.mode.depthFunc.apply(rInfo.state));
             rInfo.component.accept(info);
+            info.alphaOff();
             info.pop();
         });
     }
@@ -233,7 +234,7 @@ public class UISignalBoxRendering extends UIComponent {
             final String str, final int restHeight, final int restWidth, final int color,
             final float scale) {
         info.push();
-        info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
+        info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 10);
         if (!rot.equals(Rotation.NONE)) {
             info.translate(HALF_TILE, HALF_TILE, 0);
             info.rotate(
