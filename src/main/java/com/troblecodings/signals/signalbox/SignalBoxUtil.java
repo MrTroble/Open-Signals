@@ -46,22 +46,21 @@ public final class SignalBoxUtil {
     public static Rotation getRotationFromDelta(final Point delta) {
         if (delta.getX() > 0)
             return Rotation.CLOCKWISE_180;
-        else if (delta.getX() < 0)
+        if (delta.getX() < 0)
             return Rotation.NONE;
-        else if (delta.getY() > 0)
+        if (delta.getY() > 0)
             return Rotation.COUNTERCLOCKWISE_90;
-        else
-            return Rotation.CLOCKWISE_90;
+        return Rotation.CLOCKWISE_90;
     }
 
     public static Point getDeltaFromRotation(final Rotation rot) {
         if (rot.equals(Rotation.NONE))
             return new Point(1, 0);
-        else if (rot.equals(Rotation.CLOCKWISE_90))
+        if (rot.equals(Rotation.CLOCKWISE_90))
             return new Point(0, 1);
-        else if (rot.equals(Rotation.CLOCKWISE_180))
+        if (rot.equals(Rotation.CLOCKWISE_180))
             return new Point(-1, 0);
-        else if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
+        if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
             return new Point(0, -1);
         return new Point();
     }
@@ -108,11 +107,13 @@ public final class SignalBoxUtil {
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
         final Set<Path> visited = new HashSet<>();
+        final List<SignalBoxNode> passedProtectionWay = new ArrayList<>();
 
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(pathType);
         checker.type = pathType;
         checker.visited = visited;
         checker.grid = grid;
+        checker.passedProtectionWay = passedProtectionWay;
         PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.getStartIdentifiers()) {
@@ -129,6 +130,8 @@ public final class SignalBoxUtil {
             debugPointList.add(previousPoint);
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
+                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWay))
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
@@ -178,11 +181,13 @@ public final class SignalBoxUtil {
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
         final Set<Path> visited = new HashSet<>();
+        final List<SignalBoxNode> passedProtectionWayNodes = new ArrayList<>();
 
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(PathType.NORMAL);
         checker.type = PathType.NORMAL;
         checker.visited = visited;
         checker.grid = grid;
+        checker.passedProtectionWay = passedProtectionWayNodes;
         PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
@@ -198,6 +203,8 @@ public final class SignalBoxUtil {
             final Point previousPoint = currentPath.getPoint();
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
+                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWayNodes))
+                    return ImmutableList.of();
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
@@ -238,8 +245,8 @@ public final class SignalBoxUtil {
     private static boolean checkForValidEnd(final PathType type, final SignalBoxNode lastNode,
             final SignalBoxNode previous) {
         final Point delta = lastNode.getPoint().delta(previous.getPoint());
-        final Rotation rotation =
-                SignalBoxUtil.getRotationFromDelta(delta).add(Rotation.CLOCKWISE_180);
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta)
+                .add(Rotation.CLOCKWISE_180);
         for (final EnumGuiMode mode : type.getModes()) {
             if (!mode.getModeType().isValidEnd()) {
                 continue;
@@ -284,6 +291,16 @@ public final class SignalBoxUtil {
         return state.getValue(RedstoneIO.POWER);
     }
 
+    private static boolean checkForPreviousProtectionWay(final SignalBoxGrid grid,
+            final Point start, final List<SignalBoxNode> passedProtectionWayNodes) {
+        if (passedProtectionWayNodes.isEmpty())
+            return true;
+        final SignalBoxPathway previous = grid.getPathwayByLastPoint(start);
+        if (previous == null)
+            return false;
+        return previous.getProtectionWayNodes().containsAll(passedProtectionWayNodes);
+    }
+
     public static int getDefaultCosts(final ModeSet mode) {
         final EnumGuiMode guiMode = mode.mode;
         switch (guiMode) {
@@ -308,7 +325,6 @@ public final class SignalBoxUtil {
         final List<PathType> possilbeTypes = start.getPossibleTypes(end);
         if (!possilbeTypes.isEmpty())
             return possilbeTypes.get(0);
-        else
-            return PathType.NONE;
+        return PathType.NONE;
     }
 }

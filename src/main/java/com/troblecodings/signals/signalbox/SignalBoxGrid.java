@@ -145,15 +145,18 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     public PathwayRequestResult requestWay(final Point p1, final Point p2, final PathType type) {
         try {
             final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
-            if (result.wasSuccesfull()) {
-                final PathwayData data = result.getPathwayData();
-                if (checkPathwayData(data))
-                    return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
-                if (data.isEmpty())
+            if (!result.wasSuccesfull()) {
+                if (result.getMode().equals(PathwayRequestMode.PASS))
                     return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
-                addPathway(data);
                 return result;
             }
+            final PathwayData data = result.getPathwayData();
+            if (checkPathwayData(data))
+                return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
+            if (data.isEmpty())
+                return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+            addPathway(data);
+            return result;
         } catch (final Exception e) {
             OpenSignalsMain.getLogger().error("There was an issue with creating a pathway from "
                     + p1 + " to " + p2 + "! Resetting!");
@@ -452,9 +455,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SignalBoxGrid other = (SignalBoxGrid) obj;
         return Objects.equals(modeGrid, other.modeGrid) && Objects.equals(tile, other.tile);
