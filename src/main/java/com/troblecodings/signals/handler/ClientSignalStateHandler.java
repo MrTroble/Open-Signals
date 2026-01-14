@@ -56,6 +56,8 @@ public class ClientSignalStateHandler implements INetworkSync {
             properties.putAll(newProperties);
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
+        if (level == null)
+            return;
         mc.addScheduledTask(() -> {
             final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
             if (chunk == null)
