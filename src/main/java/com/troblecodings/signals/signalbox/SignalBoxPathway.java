@@ -380,7 +380,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
-            resetProtectionWay();
+            directResetOfProtectionWay();
         }
     }
 

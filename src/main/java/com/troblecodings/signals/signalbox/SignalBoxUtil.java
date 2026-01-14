@@ -107,11 +107,13 @@ public final class SignalBoxUtil {
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
         final Set<Path> visited = new HashSet<>();
+        final List<SignalBoxNode> passedProtectionWay = new ArrayList<>();
 
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(pathType);
         checker.type = pathType;
         checker.visited = visited;
         checker.grid = grid;
+        checker.passedProtectionWay = passedProtectionWay;
         PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.getStartIdentifiers()) {
@@ -128,6 +130,8 @@ public final class SignalBoxUtil {
             debugPointList.add(previousPoint);
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
+                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWay))
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
@@ -177,11 +181,13 @@ public final class SignalBoxUtil {
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
         final Set<Path> visited = new HashSet<>();
+        final List<SignalBoxNode> passedProtectionWayNodes = new ArrayList<>();
 
         final ConnectionChecker checker = ConnectionChecker.getCheckerForType(PathType.NORMAL);
         checker.type = PathType.NORMAL;
         checker.visited = visited;
         checker.grid = grid;
+        checker.passedProtectionWay = passedProtectionWayNodes;
         PathwayRequestMode mode = PathwayRequestMode.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
@@ -197,6 +203,8 @@ public final class SignalBoxUtil {
             final Point previousPoint = currentPath.getPoint();
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
+                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWayNodes))
+                    return ImmutableList.of();
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
@@ -281,6 +289,16 @@ public final class SignalBoxUtil {
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);
+    }
+
+    private static boolean checkForPreviousProtectionWay(final SignalBoxGrid grid,
+            final Point start, final List<SignalBoxNode> passedProtectionWayNodes) {
+        if (passedProtectionWayNodes.isEmpty())
+            return true;
+        final SignalBoxPathway previous = grid.getPathwayByLastPoint(start);
+        if (previous == null)
+            return false;
+        return previous.getProtectionWayNodes().containsAll(passedProtectionWayNodes);
     }
 
     public static int getDefaultCosts(final ModeSet mode) {

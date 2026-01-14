@@ -1,7 +1,7 @@
 package com.troblecodings.signals.signalbox;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -20,6 +20,7 @@ public abstract class ConnectionChecker {
     public Point previousPoint;
     public Path path;
     public Set<Path> visited;
+    public List<SignalBoxNode> passedProtectionWay;
 
     public abstract PathwayRequestMode check();
 
@@ -60,11 +61,15 @@ public abstract class ConnectionChecker {
             final PathwayRequestMode nodeResult = nextNode.canMakePath(path, type);
             if (!nodeResult.isPass())
                 return nodeResult;
-            final Optional<EnumPathUsage> optional = nextNode.getOption(path)
-                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
-            if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.FREE)
-                    || optional.get().equals(EnumPathUsage.PROTECTED)))
+            final EnumPathUsage usage = nextNode.getOption(path)
+                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE))
+                    .orElse(EnumPathUsage.FREE);
+            if (!(usage.equals(EnumPathUsage.FREE) || usage.equals(EnumPathUsage.PROTECTED)))
                 return PathwayRequestMode.ALREADY_USED;
+            if (usage.equals(EnumPathUsage.PROTECTED)
+                    && !this.passedProtectionWay.contains(nextNode)) {
+                this.passedProtectionWay.add(nextNode);
+            }
             if (SignalBoxUtil.isPathBlocked(grid, nextNode, path))
                 return PathwayRequestMode.INPUT_BLOCKING;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
@@ -81,12 +86,16 @@ public abstract class ConnectionChecker {
             final PathwayRequestMode nodeResult = nextNode.canMakePath(path, type);
             if (!nodeResult.isPass())
                 return nodeResult;
-            final Optional<EnumPathUsage> optional = nextNode.getOption(path)
-                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
-            if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.BLOCKED)
-                    || optional.get().equals(EnumPathUsage.PROTECTED)
-                    || optional.get().equals(EnumPathUsage.FREE)))
+            final EnumPathUsage usage = nextNode.getOption(path)
+                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE))
+                    .orElse(EnumPathUsage.FREE);
+            if (!(usage.equals(EnumPathUsage.FREE) || usage.equals(EnumPathUsage.PROTECTED)
+                    || usage.equals(EnumPathUsage.BLOCKED)))
                 return PathwayRequestMode.ALREADY_USED;
+            if (usage.equals(EnumPathUsage.PROTECTED)
+                    && !this.passedProtectionWay.contains(nextNode)) {
+                this.passedProtectionWay.add(nextNode);
+            }
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
             return isValid ? PathwayRequestMode.PASS : PathwayRequestMode.NO_PATH;
         }
