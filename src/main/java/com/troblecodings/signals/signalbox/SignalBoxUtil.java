@@ -245,23 +245,33 @@ public final class SignalBoxUtil {
     private static boolean checkForValidEnd(final PathType type, final SignalBoxNode lastNode,
             final SignalBoxNode previous) {
         final Point delta = lastNode.getPoint().delta(previous.getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta)
-                .add(Rotation.CLOCKWISE_180);
+        final Rotation rotation =
+                SignalBoxUtil.getRotationFromDelta(delta).add(Rotation.CLOCKWISE_180);
         for (final EnumGuiMode mode : type.getModes()) {
             if (!mode.getModeType().isValidEnd()) {
                 continue;
             }
-            final ModeSet modeSet = new ModeSet(mode, getModeRot(rotation, mode));
-            if (lastNode.has(modeSet))
-                return true;
+            for (final Rotation rot : getModeRots(rotation, mode)) {
+                final ModeSet modeSet = new ModeSet(mode, rot);
+                if (lastNode.has(modeSet))
+                    return true;
+            }
         }
         return false;
     }
 
-    private static Rotation getModeRot(final Rotation rot, final EnumGuiMode mode) {
-        if (!mode.equals(EnumGuiMode.OUT_CONNECTION))
-            return rot;
-        return rot.add(Rotation.CLOCKWISE_180);
+    private static Rotation[] getModeRots(final Rotation rot, final EnumGuiMode mode) {
+        if (mode.equals(EnumGuiMode.OUT_CONNECTION))
+            return new Rotation[] {
+                    rot.add(Rotation.CLOCKWISE_180)
+            };
+        if (mode.equals(EnumGuiMode.END))
+            return new Rotation[] {
+                    rot, rot.add(Rotation.CLOCKWISE_180)
+            };
+        return new Rotation[] {
+                rot
+        };
     }
 
     public static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,
