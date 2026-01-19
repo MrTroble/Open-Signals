@@ -13,18 +13,19 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.core.interfaces.ISaveable;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -42,32 +43,50 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
     private final HashMap<ModeSet, SubsidiaryState> enabledSubsidiaryStates = new HashMap<>();
     private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
+    private final SignalBoxNetworkHandler network;
     private boolean isAutoPoint = false;
     private String customText = "";
 
-    public SignalBoxNode() {
-        this(new Point());
+    public SignalBoxNode(final SignalBoxNetworkHandler network) {
+        this(new Point(), network);
     }
 
-    public SignalBoxNode(final Point point) {
+    public SignalBoxNode(final Point point, final SignalBoxNetworkHandler network) {
         this.point = Objects.requireNonNull(point);
+        this.network = Objects.requireNonNull(network);
     }
 
     public void add(final ModeSet modeSet) {
-        possibleModes.put(modeSet, SignalBoxFactory.getFactory().getEntry());
+        final ModeIdentifier ident = new ModeIdentifier(point, modeSet);
+        final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry(ident);
+        entry.setUpNetwork(network);
+        possibleModes.put(modeSet, entry);
+        network.sendModeAdd(ident);
+    }
+
+    public boolean has(final ModeSet modeSet) {
+        return possibleModes.containsKey(modeSet);
+    }
+
+    public void remove(final ModeSet modeSet) {
+        possibleModes.remove(modeSet);
+        network.sendModeRemove(new ModeIdentifier(point, modeSet));
     }
 
     public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
         final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
-                _u -> SignalBoxFactory.getFactory().getEntry());
+                _u -> SignalBoxFactory.getFactory().getEntry(new ModeIdentifier(point, mode)));
+        optionEntry.setUpNetwork(network);
         optionEntry.setEntry(entry, type);
     }
 
     public void updateState(final ModeSet modeSet, final SignalState state) {
-        if (state == SignalState.RED)
+        if (state == SignalState.RED) {
             this.signalStates.remove(modeSet);
-        else
+        } else {
             this.signalStates.put(modeSet, state);
+        }
+        network.sendUpdateSignalStates(this);
     }
 
     public SignalState getState(final ModeSet modeSet) {
@@ -90,18 +109,16 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         return ImmutableMap.copyOf(enabledSubsidiaryStates);
     }
 
-    public boolean has(final ModeSet modeSet) {
-        return possibleModes.containsKey(modeSet);
-    }
-
     public void addManuellOutput(final ModeSet mode) {
         if (!manuellEnabledOutputs.contains(mode)) {
             manuellEnabledOutputs.add(mode);
+            network.sendOutputUpdates(this);
         }
     }
 
     public void removeManuellOutput(final ModeSet mode) {
         manuellEnabledOutputs.remove(mode);
+        network.sendOutputUpdates(this);
     }
 
     public List<BlockPos> clearAllManuellOutputs() {
@@ -109,19 +126,17 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         manuellEnabledOutputs.forEach(mode -> returnList
                 .add(possibleModes.get(mode).getEntry(PathEntryType.OUTPUT).get()));
         manuellEnabledOutputs.clear();
+        network.sendOutputUpdates(this);
         return returnList;
     }
 
-    public List<ModeSet> getManuellEnabledOutputs() {
-        return ImmutableList.copyOf(manuellEnabledOutputs);
-    }
-
-    public void remove(final ModeSet modeSet) {
-        possibleModes.remove(modeSet);
+    public void setAutoPointFromNetwork(final boolean isAutoPoint) {
+        this.isAutoPoint = isAutoPoint;
     }
 
     public void setAutoPoint(final boolean isAutoPoint) {
         this.isAutoPoint = isAutoPoint;
+        network.sendAutoPoint(point, isAutoPoint);
     }
 
     public boolean isAutoPoint() {
@@ -265,9 +280,10 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         final boolean oldOutputSystem = compound.contains(ENABLED_OUTPUTS);
         compound.getList(POINT_LIST).forEach(tag -> {
-            final PathOptionEntry entry = factory.getEntry();
-            entry.read(tag);
             final ModeSet mode = new ModeSet(tag);
+            final PathOptionEntry entry = factory.getEntry(new ModeIdentifier(point, mode));
+            entry.setUpNetwork(network);
+            entry.read(tag);
             possibleModes.put(mode, entry);
             if (!oldOutputSystem)
                 if (tag.getBoolean(ENABLED_OUTPUTS)) {
@@ -278,8 +294,9 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
             final String stateName = tag.getString(SIGNAL_STATE);
             if (stateName != null && !stateName.isEmpty()) {
                 final SignalState state = SignalState.valueOf(stateName);
-                if (!state.equals(SignalState.RED))
+                if (!state.equals(SignalState.RED)) {
                     signalStates.put(mode, state);
+                }
             }
             if (tag.contains(SUBSIDIARY_ENTRY)) {
                 final NBTWrapper subsidiaryWrapper = tag.getWrapper(SUBSIDIARY_ENTRY);
@@ -379,7 +396,9 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
             if (mode == null) {
                 continue;
             }
-            final EnumPathUsage usage = getOption(mode).orElse(new PathOptionEntry())
+            final EnumPathUsage usage = getOption(mode)
+                    .orElse(SignalBoxFactory.getFactory()
+                            .getEntry(new ModeIdentifier(this.point, mode)))
                     .getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
             if (!(usage.equals(exclude) || usage.equals(EnumPathUsage.FREE)))
                 return true;
@@ -471,11 +490,13 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         possibleModes.clear();
         manuellEnabledOutputs.clear();
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
-        buffer.getMap(ReadBuffer.getINetworkSaveableFunction(ModeSet.class), (buf) -> {
-            final PathOptionEntry entry = factory.getEntry();
-            entry.readNetwork(buf);
-            return entry;
-        }).forEach((mode, entry) -> possibleModes.put(mode, entry));
+        buffer.getMapWithCombinedValueFunc(ReadBuffer.getINetworkSaveableFunction(ModeSet.class),
+                (buf, mode) -> {
+                    final PathOptionEntry entry = factory.getEntry(new ModeIdentifier(point, mode));
+                    entry.setUpNetwork(network);
+                    entry.readNetwork(buf);
+                    return entry;
+                }).forEach((mode, entry) -> possibleModes.put(mode, entry));
         buffer.getList(ReadBuffer.getINetworkSaveableFunction(ModeSet.class)).forEach(mode -> {
             if (!manuellEnabledOutputs.contains(mode)) {
                 manuellEnabledOutputs.add(mode);
@@ -505,6 +526,43 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
                 WriteBuffer.getEnumConsumer());
         buffer.putMap(enabledSubsidiaryStates, WriteBuffer.getINetworkSaveableConsumer(),
                 (buf, entry) -> entry.writeNetwork(buf));
+    }
+
+    public void applyModeNetworkChanges(final ModeIdentifier ident) {
+        if (!has(ident.mode)) {
+            final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry(ident);
+            entry.setUpNetwork(network);
+            possibleModes.put(ident.mode, entry);
+        } else {
+            possibleModes.remove(ident.mode);
+        }
+    }
+
+    public void writeManuellEnabledOutputs(final WriteBuffer buffer) {
+        buffer.putISaveableList(manuellEnabledOutputs);
+    }
+
+    public void writeSignalStates(final WriteBuffer buffer) {
+        buffer.putMap(signalStates, WriteBuffer.getINetworkSaveableConsumer(),
+                WriteBuffer.getEnumConsumer());
+        buffer.putMap(enabledSubsidiaryStates, WriteBuffer.getINetworkSaveableConsumer(),
+                (buf, state) -> state.writeNetwork(buf));
+    }
+
+    public void readManuellEnabledOutputs(final ReadBuffer buffer) {
+        manuellEnabledOutputs.clear();
+        manuellEnabledOutputs
+                .addAll(buffer.getList(ReadBuffer.getINetworkSaveableFunction(ModeSet.class)));
+    }
+
+    public void readSignalStates(final ReadBuffer buffer) {
+        signalStates.clear();
+        enabledSubsidiaryStates.clear();
+        signalStates.putAll(buffer.getMap(ReadBuffer.getINetworkSaveableFunction(ModeSet.class),
+                ReadBuffer.getEnumFunction(SignalState.class)));
+        enabledSubsidiaryStates
+                .putAll(buffer.getMap(ReadBuffer.getINetworkSaveableFunction(ModeSet.class),
+                        buf -> SubsidiaryState.of(buf)));
     }
 
     public String getCustomText() {

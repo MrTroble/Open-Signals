@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox.debug;
 
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.signalbox.ConnectionChecker;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -25,9 +26,9 @@ public class DebugFactory extends SignalBoxFactory {
     }
 
     @Override
-    public PathOptionEntry getEntry() {
+    public PathOptionEntry getEntry(final ModeIdentifier ident) {
         if (enableDebugPathEntry)
-            return new DebugOptionEntry();
-        return super.getEntry();
+            return new DebugOptionEntry(ident);
+        return super.getEntry(ident);
     }
 }
