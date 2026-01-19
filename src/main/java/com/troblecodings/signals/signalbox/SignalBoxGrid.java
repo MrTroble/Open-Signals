@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,8 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.guis.ContainerSignalBox;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -54,6 +54,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     protected final SignalBoxFactory factory;
     protected SignalBoxTileEntity tile;
     private int counter;
+    private final SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
@@ -96,7 +97,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             return false;
         }
         resetPathway(pathway);
-        updateToNet(pathway);
         tryNextPathways();
         return true;
     }
@@ -107,7 +107,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             return false;
         final boolean isReset = pathway.directResetOfProtectionWay();
         if (isReset) {
-            updateToNet(pathway);
             pathway.removeProtectionWay();
         }
         return isReset;
@@ -122,7 +121,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void updateMode(final Point point, final ModeSet mode) {
-        final SignalBoxNode node = this.modeGrid.computeIfAbsent(point, SignalBoxNode::new);
+        final SignalBoxNode node = this.modeGrid.computeIfAbsent(point,
+                p -> new SignalBoxNode(p, network));
         if (!node.has(mode)) {
             node.add(mode);
         } else {
@@ -130,16 +130,16 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         }
     }
 
-    protected void updateToNet(final SignalBoxPathway pathway) {
-        if (tile == null || !tile.isBlocked())
-            return;
-        final List<SignalBoxNode> allNodes = new ArrayList<>();
-        allNodes.addAll(pathway.getListOfNodes());
-        allNodes.addAll(pathway.getProtectionWayNodes());
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_PW_UPDATE);
-        buffer.putList(allNodes, NetworkBufferWrappers.POINT_SIGNALBOXNODE_CONSUMER);
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+    public void setUpNetwork(final ContainerSignalBox container) {
+        network.setUpNetwork(container);
+    }
+
+    public void removeNetwork() {
+        network.removeNetwork();
+    }
+
+    public SignalBoxNetworkHandler getNetwork() {
+        return network;
     }
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2, final PathType type) {
@@ -179,7 +179,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         way.setUpPathwayStatus();
         way.updatePathwaySignals();
         onWayAdd(way);
-        updateToNet(way);
     }
 
     protected void updatePrevious(final SignalBoxPathway pathway) {
@@ -240,14 +239,12 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             try {
                 if (pathway.tryBlock(pos)) {
                     updatePrevious(pathway);
-                    updateToNet(pathway);
                 }
             } catch (final Exception e) {
                 OpenSignalsMain.getLogger().error(
                         "There was an issue while trying to block " + pathway + "! Resetting!");
                 e.printStackTrace();
                 resetPathway(pathway);
-                updateToNet(pathway);
                 tryNextPathways();
             }
 
@@ -262,24 +259,21 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                 if (optPoint.isPresent()) {
                     if (pathway.isEmptyOrBroken()) {
                         resetPathway(pathway);
-                        updateToNet(pathway);
                         pathway.checkReRequest();
                     } else {
-                        updateToNet(pathway);
                         pathway.compact(optPoint.get());
                         this.startsToPath.remove(first);
                         this.startsToPath.put(pathway.getFirstPoint(), pathway);
                     }
                 }
                 if (pathway.checkResetOfProtectionWay(pos)) {
-                    updateToNet(pathway);
+                    pathway.removeProtectionWay();
                 }
             } catch (final Exception e) {
                 OpenSignalsMain.getLogger().error(
                         "There was an issue while trying to reset " + pathway + "! Resetting!");
                 e.printStackTrace();
                 resetPathway(pathway);
-                updateToNet(pathway);
             }
         });
         tryNextPathways();
@@ -303,6 +297,9 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                     pointEntry.getValue().writeNetwork(buffer);
                     OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
                 }
+                network.sendRemoveSavedPathway(entry.getKey(), entry.getValue());
+                toRemove.put(entry, type);
+                return;
             }
         });
         executingTryNextPWs = false;
@@ -333,7 +330,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void updateTrainNumber(final Point point, final TrainNumber number) {
-        final SignalBoxNode node = modeGrid.computeIfAbsent(point, p -> new SignalBoxNode(p));
+        final SignalBoxNode node = modeGrid.computeIfAbsent(point,
+                p -> new SignalBoxNode(p, network));
         startsToPath.values().forEach(pathway -> pathway.checkTrainNumberUpdate(number, node));
         tile.setChanged();
     }
@@ -381,7 +379,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     public void read(final NBTWrapper tag) {
         modeGrid.clear();
         tag.getList(NODE_LIST).forEach(comp -> {
-            final SignalBoxNode node = new SignalBoxNode();
+            final SignalBoxNode node = new SignalBoxNode(network);
             node.read(comp);
             modeGrid.put(node.getPoint(), node);
             final List<NBTWrapper> subsidiaryTags = comp.getList(SUBSIDIARY_LIST);
@@ -456,6 +454,10 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         return modeGrid.get(point);
     }
 
+    public SignalBoxNode getOrCreateNode(final Point point) {
+        return modeGrid.computeIfAbsent(point, p -> new SignalBoxNode(p, network));
+    }
+
     public Optional<SignalBoxNode> getNodeChecked(final Point point) {
         return Optional.ofNullable(getNode(point));
     }
@@ -474,6 +476,11 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
 
     public void setCounter(final int counter) {
         this.counter = (counter < MAX_COUNTS ? counter : 0);
+        network.sendCounter();
+    }
+
+    public void setCounterFromNetwork(final int counter) {
+        this.counter = counter;
     }
 
     protected Map<Point, SignalBoxNode> getModeGrid() {
@@ -489,7 +496,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         modeGrid.clear();
         modeGrid.putAll(buffer.getMapWithCombinedValueFunc(
                 ReadBuffer.getINetworkSaveableFunction(Point.class),
-                (b, point) -> NetworkBufferWrappers.getSignalBoxNodeFunc(point).apply(b)));
+                (b, point) -> NetworkBufferWrappers.getSignalBoxNodeFunc(point, network).apply(b)));
         counter = buffer.getInt();
     }
 
@@ -504,9 +511,9 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             final Point point = Point.of(buf);
             SignalBoxNode node;
             if (override) {
-                node = new SignalBoxNode(point);
+                node = new SignalBoxNode(point, network);
             } else {
-                node = modeGrid.computeIfAbsent(point, _u -> new SignalBoxNode(point));
+                node = modeGrid.computeIfAbsent(point, _u -> new SignalBoxNode(point, network));
             }
             node.readNetwork(buf);
             modeGrid.put(point, node);
@@ -538,11 +545,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void sendDebugPointUpdates(final List<Point> points) {
-        if (tile == null || !tile.isBlocked())
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_DEBUG_POINTS);
-        buffer.putISaveableList(points);
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+        network.sendDebugPoints(points);
     }
 }

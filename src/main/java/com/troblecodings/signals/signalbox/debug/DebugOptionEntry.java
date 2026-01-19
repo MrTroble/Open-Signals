@@ -4,11 +4,16 @@ import java.util.Optional;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 public class DebugOptionEntry extends PathOptionEntry {
+
+    public DebugOptionEntry(final ModeIdentifier ident) {
+        super(ident);
+    }
 
     @Override
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
@@ -21,7 +26,6 @@ public class DebugOptionEntry extends PathOptionEntry {
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
         final Optional<T> entry = super.getEntry(type);
         if (entry.filter(n -> n.equals(EnumPathUsage.SELECTED)).isPresent()) {
-            return entry;
         }
         return entry;
     }

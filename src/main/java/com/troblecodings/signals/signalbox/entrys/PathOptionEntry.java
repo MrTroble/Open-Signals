@@ -12,11 +12,19 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.core.interfaces.ISaveable;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 
 public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
+    private SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
+    private final ModeIdentifier ident;
+
+    public PathOptionEntry(final ModeIdentifier ident) {
+        this.ident = ident;
+    }
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
@@ -34,22 +42,32 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
                 pType -> pType.newValue());
         pathEntry.setValue(value);
+        network.sendEntryAdd(ident, type, pathEntry);
     }
 
     public void addEntry(final PathEntryType<?> entryType, final IPathEntry<?> entry) {
-        if (entryType == null) {
+        if (entry == null) {
             pathEntrys.remove(entryType);
             return;
         }
         pathEntrys.put(entryType, entry);
     }
 
+    public void removeEntryNoNetwork(final PathEntryType<?> type) {
+        pathEntrys.remove(type);
+    }
+
     public void removeEntry(final PathEntryType<?> type) {
         pathEntrys.remove(type);
+        network.sendEntryRemove(ident, type);
     }
 
     public boolean containsEntry(final PathEntryType<?> type) {
         return pathEntrys.containsKey(type);
+    }
+
+    public void setUpNetwork(final SignalBoxNetworkHandler network) {
+        this.network = network;
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.troblecodings.signals.network;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -13,9 +13,9 @@ public class SignalBoxNetworkMode {
     private static final List<SignalBoxNetworkMode> NETWORK_ENTRIES = new ArrayList<>();
 
     private int id;
-    private final Consumer<ReadBuffer> read;
+    private final BiConsumer<ReadBuffer, SignalBoxNetworkHandler> read;
 
-    public SignalBoxNetworkMode(final Consumer<ReadBuffer> read) {
+    public SignalBoxNetworkMode(final BiConsumer<ReadBuffer, SignalBoxNetworkHandler> read) {
         this.read = read;
         this.id = NETWORK_ENTRIES.size();
         NETWORK_ENTRIES.add(this);
@@ -25,8 +25,8 @@ public class SignalBoxNetworkMode {
         return NETWORK_ENTRIES.get(buffer.getInt());
     }
 
-    public void executeRead(final ReadBuffer buffer) {
-        read.accept(buffer);
+    public void executeRead(final ReadBuffer buffer, final SignalBoxNetworkHandler network) {
+        read.accept(buffer, network);
     }
 
     public WriteBuffer getBuffer() {
