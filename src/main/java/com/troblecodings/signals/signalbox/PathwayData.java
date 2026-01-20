@@ -160,8 +160,7 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED)
-                    || SignalBoxUtil.isPathBlocked(grid, current, path))
+            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED))
                 return false;
         }
         return true;
@@ -173,9 +172,7 @@ public class PathwayData {
         final MainSignalIdentifier signalIdent = endSignal.get();
         final PathOptionEntry option = grid.getNode(signalIdent.getPoint())
                 .getOption(signalIdent.getModeSet()).orElse(null);
-        if (option == null)
-            return true;
-        if (grid.startsToPath.containsKey(lastPoint))
+        if ((option == null) || grid.startsToPath.containsKey(lastPoint))
             return true;
         final Point protectionWayEnd = option.getEntry(PathEntryType.PROTECTIONWAY_END)
                 .orElse(lastPoint);
@@ -458,10 +455,8 @@ public class PathwayData {
         }
         if (tag.contains(LIST_OF_PROTECTIONWAY_NODES)) {
             this.protectionWayNodes = getNodesFromNBT(tag, LIST_OF_PROTECTIONWAY_NODES);
-        } else {
-            if (!checkForProtectionWay()) {
-                this.emptyOrBroken = true;
-            }
+        } else if (!checkForProtectionWay()) {
+            this.emptyOrBroken = true;
         }
     }
 
@@ -684,9 +679,7 @@ public class PathwayData {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         PathwayData other = (PathwayData) obj;
         return Objects.equals(firstPoint, other.firstPoint)
