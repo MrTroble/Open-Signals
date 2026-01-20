@@ -1,7 +1,6 @@
 package com.troblecodings.signals.signalbox.debug;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.signalbox.ConnectionChecker;
 import com.troblecodings.signals.signalbox.ConnectionChecker.ConnectionCheckerNormal;
 import com.troblecodings.signals.signalbox.ConnectionChecker.ConnectionCheckerShunting;
@@ -40,8 +39,8 @@ public class SignalBoxFactory {
         return new SignalBoxGrid();
     }
 
-    public PathOptionEntry getEntry(final ModeIdentifier ident) {
-        return new PathOptionEntry(ident);
+    public PathOptionEntry getEntry() {
+        return new PathOptionEntry();
     }
 
     public PathwayData getPathwayData() {

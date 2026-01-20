@@ -20,6 +20,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -27,6 +28,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.guis.ContainerSignalBox;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
@@ -521,23 +523,19 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         });
     }
 
-    public BlockPos updateManuellRSOutput(final Point point, final ModeSet mode,
-            final boolean state) {
+    public void updateManuellRSOutput(final Point point, final ModeSet mode, final boolean state) {
         final SignalBoxNode node = modeGrid.get(point);
         if (node == null)
-            return null;
+            return;
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
         final EnumPathUsage usage =
                 entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
         if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
-            return null;
-        if (state) {
-            node.addManuellOutput(mode);
-        } else {
-            node.removeManuellOutput(mode);
-        }
-        return outputPos.get();
+            return;
+        node.handleManuellEnabledOutputUpdate(mode, state);
+        SignalBoxHandler.updateRedstoneOutput(new StateInfo(tile.getLevel(), outputPos.get()),
+                state);
     }
 
     public List<Point> getAllPoints() {

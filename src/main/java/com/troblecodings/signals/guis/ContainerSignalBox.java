@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Maps;
@@ -60,13 +61,17 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     protected SignalBoxTileEntity tile;
 
     private final Map<BlockPos, LinkType> posForType = new HashMap<>();
-    private Consumer<String> infoUpdates;
-    private Consumer<SignalBoxNode> nodeUpdate;
-    private Runnable counterUpdater;
-    private Consumer<List<Point>> debugPoints;
     private SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
 
     protected Consumer<SignalBoxNode> updateSignalState = (node) -> {
+    };
+    protected Consumer<String> infoUpdates = (label) -> {
+    };
+    protected BiConsumer<SignalBoxNode, PathEntryType<?>> nodeUpdate = (node, entry) -> {
+    };
+    protected Runnable counterUpdater = () -> {
+    };
+    protected Consumer<List<Point>> debugPoints = (list) -> {
     };
 
     public ContainerSignalBox(final GuiInfo info) {
@@ -180,28 +185,23 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     }
 
     public void handleRemoveSavedPathway(final Point p1, final Point p2) {
-        if (!isClientSide())
-            return;
         nextPathways.remove(Maps.immutableEntry(p1, p2));
     }
 
     public void handleDebugPoints(final List<Point> debugPoints) {
-        if (!isClientSide())
-            return;
         this.debugPoints.accept(debugPoints);
     }
 
     public void handleCounterUpdate() {
-        if (!isClientSide())
-            return;
         counterUpdater.run();
     }
 
-    public void handleNodeUpdate(final SignalBoxNode node) {
-        if (!isClientSide())
-            return;
-        nodeUpdate.accept(node);
+    public void handleNodeUpdate(final SignalBoxNode node, final PathEntryType<?> type) {
+        nodeUpdate.accept(node, type);
+    }
 
+    public void handleSignalStateUpdate(final SignalBoxNode node) {
+        updateSignalState.accept(node);
     }
 
     private void initializeNetwork() {
@@ -239,16 +239,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     }
 
-    protected void updateClientSubsidiary(final Point point, final ModeSet mode,
+    protected void updateClientSubsidiary(final SignalBoxNode node, final ModeSet mode,
             final SubsidiaryState state, final boolean enable) {
-        final Map<ModeSet, SubsidiaryState> map =
-                enabledSubsidiaryTypes.computeIfAbsent(point, (_u) -> new HashMap<>());
+        final Map<ModeSet, SubsidiaryState> map = enabledSubsidiaryTypes
+                .computeIfAbsent(node.getPoint(), (_u) -> new HashMap<>());
         if (enable) {
             map.put(mode, state);
+            node.setSubsidiaryState(mode, state);
         } else {
             map.remove(mode);
+            node.removeSubsidiaryState(mode);
             if (map.isEmpty()) {
-                enabledSubsidiaryTypes.remove(point);
+                enabledSubsidiaryTypes.remove(node.getPoint());
             }
         }
     }
@@ -266,13 +268,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                         final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
                         if (enable) {
                             SignalConfig.loadSubsidiary(info, state);
-                            node.updateState(ident.mode,
-                                    SignalState.combine(state.getSubsidiaryShowType()));
                             node.setSubsidiaryState(ident.mode, state);
+                            node.updateStateNoNetwork(ident.mode,
+                                    SignalState.combine(state.getSubsidiaryShowType()));
                         } else {
                             SignalConfig.reset(new ResetInfo(info));
-                            node.updateState(ident.mode, SignalState.RED);
                             node.removeSubsidiaryState(ident.mode);
+                            node.updateStateNoNetwork(ident.mode, SignalState.RED);
                         }
                     }));
         });
@@ -318,21 +320,5 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             this.tile.add(this);
         }
         return true;
-    }
-
-    protected void setInfoConsumer(final Consumer<String> consumer) {
-        this.infoUpdates = consumer;
-    }
-
-    protected void setNodeUpdater(final Consumer<SignalBoxNode> consumer) {
-        this.nodeUpdate = consumer;
-    }
-
-    protected void setConuterUpdater(final Runnable run) {
-        this.counterUpdater = run;
-    }
-
-    protected void setDebugPointUpdater(final Consumer<List<Point>> points) {
-        this.debugPoints = points;
     }
 }

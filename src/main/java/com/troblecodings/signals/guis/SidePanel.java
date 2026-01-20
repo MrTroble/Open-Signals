@@ -451,15 +451,15 @@ public class SidePanel {
                                                                     node.getPoint(), mode));
                                                     node.setSubsidiaryState(mode, state);
                                                 } else {
-                                                    node.updateState(mode, SignalState.RED);
                                                     node.removeSubsidiaryState(mode);
+                                                    node.updateState(mode, SignalState.RED);
                                                     subsidiaries.remove(signalPos);
                                                 }
                                                 gui.network.sendSubsidiary(
                                                         new ModeIdentifier(node.getPoint(), mode),
                                                         state, enable);
-                                                gui.container.updateClientSubsidiary(
-                                                        node.getPoint(), mode, state, enable);
+                                                gui.container.updateClientSubsidiary(node, mode,
+                                                        state, enable);
                                                 gui.updateSignalState(node);
                                                 gui.pop();
                                                 helpUsageMode(node);
@@ -550,13 +550,15 @@ public class SidePanel {
                                                         textureEntity.add(new UIToolTip(I18Wrapper
                                                                 .format("info.usage.rs.desc")));
                                                         if (turnOff) {
-                                                            node.removeManuellOutput(mode);
+                                                            gui.network.sendManuellOutputRemove(
+                                                                    node.getPoint(), mode);
                                                             outputStatus.setText(I18Wrapper
                                                                     .format("info.usage.rs.false"));
                                                             textureEntity.add(new UITexture(
                                                                     GuiSignalBox.REDSTONE_OFF));
                                                         } else {
-                                                            node.addManuellOutput(mode);
+                                                            gui.network.sendManuellOutputAdd(
+                                                                    node.getPoint(), mode);
                                                             outputStatus.setText(I18Wrapper
                                                                     .format("info.usage.rs.true"));
                                                             textureEntity.add(new UITexture(
@@ -790,11 +792,11 @@ public class SidePanel {
                         textureEntity.clear();
                         textureEntity.add(new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
                         if (turnOff) {
-                            currentNode.removeManuellOutput(mode);
+                            gui.network.sendManuellOutputRemove(currentNode.getPoint(), mode);
                             outputStatus.setText(I18Wrapper.format("info.usage.rs.false"));
                             textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
                         } else {
-                            currentNode.addManuellOutput(mode);
+                            gui.network.sendManuellOutputAdd(currentNode.getPoint(), mode);
                             outputStatus.setText(I18Wrapper.format("info.usage.rs.true"));
                             textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
                         }

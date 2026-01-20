@@ -26,6 +26,7 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
+import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
@@ -47,6 +48,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     protected SignalBoxTileEntity tile;
     protected TrainNumber trainNumber;
     protected boolean isExecutingSignalSet = false;
+
+    protected final SignalBoxFactory factory = SignalBoxFactory.getFactory();
 
     public void setTile(final SignalBoxTileEntity tile) {
         this.tile = tile;
@@ -489,7 +492,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             return;
         trainNumberDisplays.forEach(ident -> {
             final PathOptionEntry entry = grid.getNode(ident.point).getOption(ident.mode)
-                    .orElse(new PathOptionEntry(ident));
+                    .orElse(factory.getEntry());
             if (number.equals(TrainNumber.DEFAULT)) {
                 entry.removeEntry(PathEntryType.TRAINNUMBER);
             } else {
@@ -509,7 +512,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                 final SignalBoxNode node = grid.getNode(ident.point);
                 if (node == null)
                     return;
-                node.getOption(ident.mode).orElse(new PathOptionEntry(ident))
+                node.getOption(ident.mode).orElse(factory.getEntry())
                         .removeEntry(PathEntryType.TRAINNUMBER);
             });
         }
