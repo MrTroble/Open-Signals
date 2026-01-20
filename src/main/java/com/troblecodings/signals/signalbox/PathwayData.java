@@ -361,8 +361,7 @@ public class PathwayData {
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
                 final PathOptionEntry vpEntry = grid.getNode(ident.getPoint())
                         .getOption(ident.getModeSet())
-                        .orElse(SignalBoxFactory.getFactory().getEntry(
-                                new ModeIdentifier(ident.getPoint(), ident.getModeSet())));
+                        .orElse(SignalBoxFactory.getFactory().getEntry());
                 return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
                         EnumGuiMode.VP, grid);

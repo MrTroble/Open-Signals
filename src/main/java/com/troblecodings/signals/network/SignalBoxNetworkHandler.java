@@ -16,6 +16,7 @@ import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -212,13 +213,18 @@ public class SignalBoxNetworkHandler {
         sendBuffer(buffer);
     }
 
-    public void sendOutputUpdates(final SignalBoxNode node) {
-        if (!containerConnected())
-            return;
-        if (node == null)
-            throw new IllegalArgumentException("Node is null, this shouldn't be the case!");
-        final WriteBuffer buffer = getNodeBuffer(node.getPoint(), NodeNetworkMode.MANUELL_OUTPUT);
-        node.writeManuellEnabledOutputs(buffer);
+    public void sendManuellOutputAdd(final Point point, final ModeSet mode) {
+        sendManuellOutput(point, mode, NodeNetworkMode.MANUELL_OUTPUT_ADD);
+    }
+
+    public void sendManuellOutputRemove(final Point point, final ModeSet mode) {
+        sendManuellOutput(point, mode, NodeNetworkMode.MANUELL_OUTPUT_REMOVE);
+    }
+
+    private void sendManuellOutput(final Point point, final ModeSet mode,
+            final NodeNetworkMode network) {
+        final WriteBuffer buffer = getNodeBuffer(point, network);
+        mode.writeNetwork(buffer);
         sendBuffer(buffer);
     }
 
@@ -259,13 +265,13 @@ public class SignalBoxNetworkHandler {
         final Optional<PathOptionEntry> optionEntry = node.getOption(ident.mode);
         if (mode.equals(EntryNetworkMode.ENTRY_REMOVE)) {
             optionEntry.ifPresent(entry -> entry.removeEntryNoNetwork(entryType));
-            container.handleNodeUpdate(node);
+            container.handleNodeUpdate(node, entryType);
             return;
         }
         final IPathEntry<?> entry = entryType.newValue();
         entry.readNetwork(buffer);
         optionEntry.ifPresent(e -> e.addEntry(entryType, entry));
-        container.handleNodeUpdate(node);
+        container.handleNodeUpdate(node, entryType);
     }
 
     private void readForGrid(final ReadBuffer buffer) {
@@ -296,13 +302,23 @@ public class SignalBoxNetworkHandler {
             node.setAutoPointFromNetwork(buffer.getBoolean());
             grid.updatePathwayToAutomatic(point);
         }
-        if (mode.equals(NodeNetworkMode.MANUELL_OUTPUT)) {
-            // TODO Set off Output in World
-            node.readManuellEnabledOutputs(buffer);
+        if (mode.equals(NodeNetworkMode.MANUELL_OUTPUT_ADD)
+                || mode.equals(NodeNetworkMode.MANUELL_OUTPUT_REMOVE)) {
+            handleManuellOutput(node, buffer.getINetworkSaveable(ModeSet.class), mode);
         }
         if (mode.equals(NodeNetworkMode.SIGNAL_STATE)) {
             node.readSignalStates(buffer);
-            container.handleNodeUpdate(node);
+            container.handleSignalStateUpdate(node);
+        }
+    }
+
+    private void handleManuellOutput(final SignalBoxNode node, final ModeSet mode,
+            final NodeNetworkMode network) {
+        final boolean state = network.equals(NodeNetworkMode.MANUELL_OUTPUT_ADD) ? true : false;
+        if (container.isClientSide()) {
+            node.handleManuellEnabledOutputUpdate(mode, state);
+        } else {
+            getGrid().updateManuellRSOutput(node.getPoint(), mode, state);
         }
     }
 
@@ -447,7 +463,7 @@ public class SignalBoxNetworkHandler {
     }
 
     private static enum NodeNetworkMode {
-        LABEL, AUTO_POINT, MANUELL_OUTPUT, SIGNAL_STATE;
+        LABEL, AUTO_POINT, MANUELL_OUTPUT_ADD, MANUELL_OUTPUT_REMOVE, SIGNAL_STATE;
     }
 
     private static enum GridNetworkMode {

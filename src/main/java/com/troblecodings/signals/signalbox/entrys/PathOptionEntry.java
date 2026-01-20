@@ -12,19 +12,13 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.core.interfaces.ISaveable;
-import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
-import com.troblecodings.signals.network.SignalBoxNetworkHandler;
+import com.troblecodings.signals.network.PathOptionEntryNetwork;
 
 public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
-    private SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
+    private PathOptionEntryNetwork network = new PathOptionEntryNetwork();
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
-    private final ModeIdentifier ident;
-
-    public PathOptionEntry(final ModeIdentifier ident) {
-        this.ident = ident;
-    }
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
@@ -42,7 +36,7 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
                 pType -> pType.newValue());
         pathEntry.setValue(value);
-        network.sendEntryAdd(ident, type, pathEntry);
+        network.sendEntryAdd(type, pathEntry);
     }
 
     public void addEntry(final PathEntryType<?> entryType, final IPathEntry<?> entry) {
@@ -59,14 +53,14 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
     public void removeEntry(final PathEntryType<?> type) {
         pathEntrys.remove(type);
-        network.sendEntryRemove(ident, type);
+        network.sendEntryRemove(type);
     }
 
     public boolean containsEntry(final PathEntryType<?> type) {
         return pathEntrys.containsKey(type);
     }
 
-    public void setUpNetwork(final SignalBoxNetworkHandler network) {
+    public void setUpNetwork(final PathOptionEntryNetwork network) {
         this.network = network;
     }
 

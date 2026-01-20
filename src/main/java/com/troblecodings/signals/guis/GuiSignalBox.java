@@ -99,9 +99,9 @@ public class GuiSignalBox extends GuiBase {
         super(info);
         this.container = (ContainerSignalBox) info.base;
         this.network = container.getNetwork();
-        container.setInfoConsumer(this::infoUpdate);
-        container.setConuterUpdater(this::updateCounter);
-        container.setNodeUpdater(this::updateNode);
+        container.infoUpdates = this::infoUpdate;
+        container.counterUpdater = this::updateCounter;
+        container.nodeUpdate = this::updateNode;
         container.updateSignalState = this::updateSignalState;
     }
 
@@ -109,10 +109,13 @@ public class GuiSignalBox extends GuiBase {
         return page;
     }
 
-    private void updateNode(final SignalBoxNode node) {
-        updateSignalState(node);
-        updateTrainNumbers(node);
-        updateColor(node);
+    private void updateNode(final SignalBoxNode node, final PathEntryType<?> type) {
+        if (type.equals(PathEntryType.PATHUSAGE)) {
+            updateColor(node);
+        }
+        if (type.equals(PathEntryType.TRAINNUMBER)) {
+            updateTrainNumbers(node);
+        }
     }
 
     protected void updateSignalState(final SignalBoxNode node) {
@@ -123,15 +126,13 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void checkForSubsidiary(final SignalBoxNode node, final ModeSet mode) {
-        final Map<ModeSet, SubsidiaryState> subsidiary =
-                container.enabledSubsidiaryTypes.getOrDefault(node.getPoint(), new HashMap<>());
-        final SubsidiaryState state = subsidiary.get(mode);
+        final SubsidiaryState state = node.getSubsidiaryState(mode);
         if (state != null) {
             node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
         }
     }
 
-    public void infoUpdate(final String errorString) {
+    protected void infoUpdate(final String errorString) {
         final UIToolTip tooltip = new UIToolTip(errorString, true);
         lowerEntity.add(tooltip);
         executor.schedule(() -> lowerEntity.remove(tooltip), 3, TimeUnit.SECONDS);
@@ -206,11 +207,11 @@ public class GuiSignalBox extends GuiBase {
     protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
         final SubsidiaryState state = holder.entry;
         network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state, false);
-        container.updateClientSubsidiary(holder.point, holder.modeSet, state, false);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
 
         container.grid.getNodeChecked(holder.point).ifPresent(node -> {
+            container.updateClientSubsidiary(node, holder.modeSet, state, false);
             node.removeSubsidiaryState(holder.modeSet);
             node.updateState(holder.modeSet, SignalState.RED);
             rendering.updateSignalState(holder.point, holder.modeSet, SignalState.RED);
@@ -558,7 +559,7 @@ public class GuiSignalBox extends GuiBase {
         nodes.forEach(this::updateTrainNumbers);
     }
 
-    public void updateCounter() {
+    protected void updateCounter() {
         helpPage.updateCounterButton();
     }
 
@@ -624,13 +625,14 @@ public class GuiSignalBox extends GuiBase {
 
     @Override
     public void updateFromContainer() {
-        updateEnabledSubsidiaries();
+        updateAllEnabledSubsidiaries();
         initializeBasicUI();
         enabledSubsidiaries.values()
                 .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
     }
 
-    private void updateEnabledSubsidiaries() {
+    private void updateAllEnabledSubsidiaries() {
+        enabledSubsidiaries.clear();
         container.enabledSubsidiaryTypes.forEach((point, map) -> map.forEach((modeSet, state) -> {
             final SignalBoxNode node = container.grid.getNode(point);
             if (node == null)
