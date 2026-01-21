@@ -59,6 +59,13 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
+
+        contentPacks = new ContentPackHandler(MODID, "assets/" + MODID, log, name -> {
+            final Optional<Path> path = getRessourceLocation(name);
+            if (path.isPresent())
+                return path.get().toAbsolutePath();
+            return Paths.get("");
+        });
     }
 
     @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", //
@@ -87,12 +94,7 @@ public class OpenSignalsMain {
     public void preinit(final FMLPreInitializationEvent event) {
         debug = Files.isDirectory(event.getSourceFile().toPath());
         log = event.getModLog();
-        contentPacks = new ContentPackHandler(MODID, "assets/" + MODID, log, name -> {
-            final Optional<Path> path = getRessourceLocation(name);
-            if (path.isPresent())
-                return path.get().toAbsolutePath();
-            return Paths.get("");
-        });
+
         proxy.initModEvent(event);
     }
 

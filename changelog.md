@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.12.2 - 3.7.2]
+* feat: added Linked Signal Highlighting to Signal Box and Controller
+* ref: updated guilib
+
 ## [1.12.2 - 3.7.1]
 * fix: render bounding box
 * fix: animation is not signalblock

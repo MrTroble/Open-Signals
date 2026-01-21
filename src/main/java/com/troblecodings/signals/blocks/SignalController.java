@@ -32,24 +32,26 @@ public class SignalController extends BasicBlock {
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (worldIn.isRemote)
+            return true;
+
         final Item item = playerIn.getHeldItemMainhand().getItem();
         if (!(item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
             if (playerIn.isSneaking()) {
-                if (worldIn.isRemote) {
-                    final TileEntity tile = worldIn.getTileEntity(pos);
+                final TileEntity tile = worldIn.getTileEntity(pos);
 
-                    if (!(tile instanceof SignalControllerTileEntity))
-                        return false;
+                if (!(tile instanceof SignalControllerTileEntity))
+                    return false;
 
-                    final SignalControllerTileEntity controller = (SignalControllerTileEntity) tile;
+                final SignalControllerTileEntity controller = (SignalControllerTileEntity) tile;
 
-                    if (controller.hasLink()) {
-                        ClientRenderUpdate.INSTANCE.clearHighlights();
-                        ClientRenderUpdate.INSTANCE.addHighlight(controller.getLinkedPosition());
-                    } else {
-                        playerIn.sendMessage(new TextComponentString("No Link"));
-                    }
+                if (controller.hasLink()) {
+                    ClientRenderUpdate.INSTANCE.clearHighlights();
+                    ClientRenderUpdate.INSTANCE.addHighlight(controller.getLinkedPosition());
+                } else {
+                    playerIn.sendMessage(new TextComponentString("No Link"));
                 }
+
                 return true;
             } else {
                 OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
@@ -58,6 +60,7 @@ public class SignalController extends BasicBlock {
             return true;
         }
         return false;
+
     }
 
     @Override

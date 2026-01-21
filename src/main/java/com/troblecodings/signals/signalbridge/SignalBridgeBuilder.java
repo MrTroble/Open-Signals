@@ -153,7 +153,7 @@ public class SignalBridgeBuilder {
         final List<NBTWrapper> signalList = new ArrayList<>();
         vecForSignal.forEach((entry, vec) -> {
             final NBTWrapper tag = new NBTWrapper();
-            vec.writeNBT(tag);
+            vec.write(tag);
             tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getResourcePath());
             tag.putString(CUSTOMNAME, entry.getKey());
             signalList.add(tag);

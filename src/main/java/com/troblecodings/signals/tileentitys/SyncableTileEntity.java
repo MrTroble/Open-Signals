@@ -28,11 +28,6 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(getPos(), 1, getUpdateTag());
-    }
-
-    @Override
     public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
         handleUpdateTag(pkt.getNbtCompound());
     }

@@ -1,7 +1,7 @@
 package com.troblecodings.signals.handler;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.troblecodings.guilib.ecs.entitys.DrawInfo;
+import com.troblecodings.signals.config.ConfigHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,42 +15,51 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ClientRenderUpdate {
 
     public static final ClientRenderUpdate INSTANCE = new ClientRenderUpdate();
-    private final Map<BlockPos, Long> highlightedBlocks = new HashMap<>();
+
+    private BlockPos pos;
+    private long time;
 
     public void addHighlight(final BlockPos pos) {
-        highlightedBlocks.put(pos, System.currentTimeMillis() + 10000);
+        this.pos = pos;
+        this.time = System.currentTimeMillis() + ConfigHandler.highlightDuration * 1000;
     }
 
     public void clearHighlights() {
-        highlightedBlocks.clear();
+        this.pos = null;
+        this.time = 0;
     }
 
     @SubscribeEvent
     public void render(final RenderWorldLastEvent event) {
-        if (highlightedBlocks.isEmpty())
+        if (this.pos == null)
             return;
         final long current = System.currentTimeMillis();
-        highlightedBlocks.entrySet().removeIf(entry -> entry.getValue() < current);
+        if (current > this.time) {
+            this.pos = null;
+            this.time = 0;
+            return;
+        }
 
         final Entity player = Minecraft.getMinecraft().getRenderViewEntity();
         if (player == null)
             return;
 
-        final double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * event.getPartialTicks();
-        final double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * event.getPartialTicks();
-        final double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * event.getPartialTicks();
+        final float partialTicks = event.getPartialTicks();
+        final double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        final double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        final double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
-        GlStateManager.disableDepth();
-        GlStateManager.disableTexture2D();
+        DrawInfo drawInfo = new DrawInfo(0, 0, partialTicks);
 
-        highlightedBlocks.forEach((pos, time) -> {
-            RenderGlobal.drawSelectionBoundingBox(new AxisAlignedBB(pos), 1, 0, 0, 1);
-        });
+        drawInfo.push();
+        drawInfo.translate(-doubleX, -doubleY, -doubleZ);
+        drawInfo.disableTexture();
+        drawInfo.depthOff();
 
-        GlStateManager.enableTexture2D();
-        GlStateManager.enableDepth();
-        GlStateManager.popMatrix();
+        RenderGlobal.drawSelectionBoundingBox(new AxisAlignedBB(this.pos), 1, 0, 0, 1);
+
+        drawInfo.depthOn();
+        drawInfo.enableTexture(); // TODO: add a drawInfo method for this!
+        drawInfo.pop();
     }
 }
