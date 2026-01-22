@@ -16,13 +16,14 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'java'
 
 apply plugin: "com.matthewprenger.cursegradle"
 
 sourceSets{
     main {
         java {
-            srcDirs("guilib/src/", "linkableapi/src/", "contentPackLib/src")
+            srcDirs("src/main/", "guilib/src/", "linkableapi/src/", "contentPackLib/src")
         }
     }
 }

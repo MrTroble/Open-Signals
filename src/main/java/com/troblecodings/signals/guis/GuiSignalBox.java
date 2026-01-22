@@ -55,6 +55,8 @@ import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SignalBoxConsumer;
 import com.troblecodings.signals.handler.ClientNameHandler;
+import com.troblecodings.signals.handler.ClientRenderUpdate;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Path;
@@ -463,7 +465,11 @@ public class GuiSignalBox extends GuiBase {
             icon.add(new UIToolTip(I18Wrapper.format("type." + t.name())));
             layout.add(icon);
 
-            layout.add(GuiElements.createButton(name));
+            UIEntity btn = GuiElements.createButton(name, e -> {
+                ClientRenderUpdate.INSTANCE.addHighlight(p);
+            });
+            btn.add(new UIToolTip(I18Wrapper.format("sb.highlight")));
+            layout.add(btn);
             layout.add(GuiElements.createButton("x", 20, e -> {
                 removeBlockPos(p);
                 list.remove(layout);

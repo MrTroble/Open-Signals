@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.12.2 - 3.7.2]
+## [1.12.2 - 3.7.3]
 * feat: added signal custom render bounding boxes `"customRenderBoundingBox": [x1,y1,z1,x2,y2,z2]`
 * feat: shunting path can now be set over overlap/protection path
 * feat/fix: Straight path element rotate only 0° and 90°
@@ -31,6 +31,10 @@
 * ref: changed visual signal in signalbox to new system
 * ref: sperated and relocated INetworkSaveable and NSaveable
 * ref: saveing protection way nodes now also in NBT and prevent NPEs during missing world while Reading NBT
+
+## [1.12.2 - 3.7.2]
+* feat: added Linked Signal Highlighting to Signal Box and Controller
+* ref: updated guilib
 
 ## [1.12.2 - 3.7.1]
 * fix: render bounding box
