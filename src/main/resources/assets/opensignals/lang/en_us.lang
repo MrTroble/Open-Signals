@@ -679,3 +679,4 @@ property.mode_select.name=Select track element
 info.crossing=Crossing element
 property.zs6_state.name=Wrong side of track (Zs6)
 property.zs6_state.desc=Here you can select whether the path leads to the wrong side of tracks.
+sb.highlight=Click to highlight linked signal

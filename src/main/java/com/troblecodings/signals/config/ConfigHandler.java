@@ -78,6 +78,10 @@ public final class ConfigHandler {
     @Comment("Change the render distance for animated signals. Default: 128")
     public static int renderDistance = 128;
 
+    @Name("highlight duration")
+    @Comment("Change the duration of the highlight. Default: 10 (seconds)")
+    public static int highlightDuration = 10;
+
     @Name("Debug Mode")
     @Comment("Toggle debug mode.")
     public static boolean debugMode = false;

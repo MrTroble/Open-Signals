@@ -55,6 +55,7 @@ import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.handler.ClientNameHandler;
+import com.troblecodings.signals.handler.ClientRenderUpdate;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -77,17 +78,16 @@ public class GuiSignalBox extends GuiBase {
     public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
-    public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
-            ConfigHandler.signalboxTrainnumberBackgroundColor;
+    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.signalboxTrainnumberBackgroundColor;
 
-    public static final ResourceLocation REDSTONE_OFF =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
+    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on_blocked.png");
 
     private static final float[] ALL_LINES = getLines();
     protected static final int TILE_WIDTH = 10;
@@ -239,8 +239,7 @@ public class GuiSignalBox extends GuiBase {
 
     public static String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final Minecraft mc = Minecraft.getMinecraft();
-        final String customName =
-                ClientNameHandler.getClientName(new StateInfo(mc.world, signalPos));
+        final String customName = ClientNameHandler.getClientName(new StateInfo(mc.world, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)", customName == null
                 ? (type.equals(LinkType.SIGNAL) ? "" : I18Wrapper.format("type." + type.name()))
                 : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
@@ -254,9 +253,9 @@ public class GuiSignalBox extends GuiBase {
         helpPage.helpUsageMode(null);
         this.resetTileSelection();
 
-        final MainSignalIdentifier identifier =
-                new MainSignalIdentifier(new ModeIdentifier(holder.point, holder.modeSet), pos,
-                        SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
+        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                new ModeIdentifier(holder.point, holder.modeSet), pos,
+                SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
         final List<MainSignalIdentifier> greenSignals = container.greenSignals
                 .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
         greenSignals.remove(identifier);
@@ -388,8 +387,7 @@ public class GuiSignalBox extends GuiBase {
         nameEntity.setHeight(20);
         nameEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity labelEntity =
-                GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
+        final UIEntity labelEntity = GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
         labelEntity.setInheritWidth(false);
         labelEntity.setWidth(100);
         nameEntity.add(labelEntity);
@@ -500,7 +498,11 @@ public class GuiSignalBox extends GuiBase {
             icon.add(new UIToolTip(I18Wrapper.format("type." + t.name())));
             layout.add(icon);
 
-            layout.add(GuiElements.createButton(name));
+            UIEntity btn = GuiElements.createButton(name, e -> {
+                ClientRenderUpdate.INSTANCE.addHighlight(p);
+            });
+            btn.add(new UIToolTip(I18Wrapper.format("sb.highlight")));
+            layout.add(btn);
             layout.add(GuiElements.createButton("x", 20, e -> {
                 removeBlockPos(p);
                 list.remove(layout);
@@ -571,8 +573,7 @@ public class GuiSignalBox extends GuiBase {
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo =
-                    GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
+            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -681,8 +682,7 @@ public class GuiSignalBox extends GuiBase {
                 this::initializePageSettings));
         header.add(
                 GuiElements.createButton(I18Wrapper.format("btn.edit"), this::initializeFieldEdit));
-        mainButton =
-                GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
+        mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 

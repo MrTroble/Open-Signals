@@ -8,6 +8,8 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.world.World;
 
 public class SyncableTileEntity extends BasicBlockEntity {
@@ -23,6 +25,11 @@ public class SyncableTileEntity extends BasicBlockEntity {
         final NBTWrapper wrapper = new NBTWrapper();
         saveWrapper(wrapper);
         return wrapper.tag;
+    }
+
+    @Override
+    public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
+        handleUpdateTag(pkt.getNbtCompound());
     }
 
     @Override
