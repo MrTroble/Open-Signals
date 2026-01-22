@@ -23,7 +23,7 @@ apply plugin: "com.matthewprenger.cursegradle"
 sourceSets{
     main {
         java {
-            srcDirs("src/main/", "guilib/src/", "linkableapi/src/", "contentPackLib/src")
+            srcDirs("guilib/src/", "linkableapi/src/", "contentPackLib/src")
         }
     }
 }
