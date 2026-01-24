@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.12.2 - 3.7.3]
+## [1.12.2 - 3.8.0]
 * feat: added signal custom render bounding boxes `"customRenderBoundingBox": [x1,y1,z1,x2,y2,z2]`
 * feat: shunting path can now be set over overlap/protection path
 * feat/fix: Straight path element rotate only 0° and 90°
