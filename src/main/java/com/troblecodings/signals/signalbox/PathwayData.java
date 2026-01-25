@@ -215,19 +215,22 @@ public class PathwayData {
         if (protectionWayNodes.isEmpty())
             return false;
         if (protectionWayResetDelay > 0) {
-            final List<SignalBoxNode> copy = ImmutableList.copyOf(protectionWayNodes);
             new Thread(() -> {
                 try {
                     Thread.sleep(protectionWayResetDelay * 1000);
                 } catch (final InterruptedException e) {
                 }
-                this.protectionWayNodes = copy;
-                directResetOfProtectionWay();
                 final World world = pathway.tile.getWorld();
-                world.getMinecraftServer().addScheduledTask(() -> {
-                    pathway.grid.updateToNet(pathway);
-                    removeProtectionWay();
-                });
+                world.getMinecraftServer()
+                        .addScheduledTask(() -> pathway.loadTileAndExecute(tile -> {
+                            final SignalBoxGrid grid = tile.getSignalBoxGrid();
+                            final SignalBoxPathway pw = grid.getPathwayByLastPoint(getLastPoint());
+                            if (pw == null)
+                                return;
+                            pw.directResetOfProtectionWay();
+                            pw.removeProtectionWay();
+                            grid.updateToNet(pw);
+                        }));
             }).start();
             return true;
         }
