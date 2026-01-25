@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -285,33 +286,20 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         tryNextPathways();
     }
 
-    private final Map<Map.Entry<Point, Point>, PathType> toAdd = new HashMap<>();
-    private boolean executingForEach = false;
-
     private void tryNextPathways() {
-        executingForEach = true;
-        final Map<Map.Entry<Point, Point>, PathType> toRemove = new HashMap<>();
-        nextPathways.forEach((entry, type) -> {
-            final PathwayRequestResult request = requestWay(entry.getKey(), entry.getValue(), type);
-            if (request.wasSuccesfull()) {
-                if (tile == null || !tile.isBlocked()) {
-                    toRemove.put(entry, type);
-                    return;
-                }
+        nextPathways.entrySet().removeIf(mapEntry -> {
+            final Entry<Point, Point> pointEntry = mapEntry.getKey();
+            final PathwayRequestResult request = requestWay(pointEntry.getKey(),
+                    pointEntry.getValue(), mapEntry.getValue());
+            if (request.wasSuccesfull() && tile != null && tile.isBlocked()) {
                 final WriteBuffer buffer = new WriteBuffer();
                 buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
-                entry.getKey().writeNetwork(buffer);
-                entry.getValue().writeNetwork(buffer);
+                pointEntry.getKey().writeNetwork(buffer);
+                pointEntry.getValue().writeNetwork(buffer);
                 OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
-                toRemove.put(entry, type);
-                return;
             }
+            return request.wasSuccesfull();
         });
-        executingForEach = false;
-        toRemove.keySet().forEach(nextPathways::remove);
-        toRemove.clear();
-        toAdd.forEach(nextPathways::put);
-        toAdd.clear();
         if (startsToPath.isEmpty()) {
             nextPathways.clear();
         }
@@ -327,11 +315,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             final SignalBoxPathway pw = startsToPath.get(start);
             if (pw != null && pw.isInterSignalBoxPathway())
                 return false;
-            if (executingForEach) {
-                toAdd.put(entry, type);
-            } else {
-                nextPathways.put(entry, type);
-            }
+            nextPathways.put(entry, type);
             return true;
         }
         return false;
