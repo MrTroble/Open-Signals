@@ -285,8 +285,9 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         tryNextPathways();
     }
 
+    private boolean executingTryNextPWs = false;
+
     private void tryNextPathways() {
-        nextPathways.entrySet().removeIf(mapEntry -> {
         if (executingTryNextPWs)
             return;
         executingTryNextPWs = true;
