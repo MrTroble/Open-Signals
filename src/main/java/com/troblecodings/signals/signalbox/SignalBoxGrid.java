@@ -273,7 +273,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                 }
                 if (pathway.checkResetOfProtectionWay(pos)) {
                     updateToNet(pathway);
-                    pathway.removeProtectionWay();
                 }
             } catch (final Exception e) {
                 OpenSignalsMain.getLogger().error(
