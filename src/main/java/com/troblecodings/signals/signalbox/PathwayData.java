@@ -221,17 +221,16 @@ public class PathwayData {
                     Thread.sleep(protectionWayResetDelay * 1000);
                 } catch (final InterruptedException e) {
                 }
-                final World world = pathway.tile.getWorld();
-                world.getMinecraftServer()
-                        .addScheduledTask(() -> pathway.loadTileAndExecute(tile -> {
-                            final SignalBoxGrid grid = tile.getSignalBoxGrid();
-                            final SignalBoxPathway pw = grid.getPathwayByLastPoint(getLastPoint());
-                            if (pw == null)
-                                return;
-                            pw.directResetOfProtectionWay();
-                            pw.removeProtectionWay();
-                            grid.updateToNet(pw);
-                        }));
+                final World world = pathway.tile.getLevel();
+                world.getServer().execute(() -> pathway.loadTileAndExecute(tile -> {
+                    final SignalBoxGrid grid = tile.getSignalBoxGrid();
+                    final SignalBoxPathway pw = grid.getPathwayByLastPoint(getLastPoint());
+                    if (pw == null)
+                        return;
+                    pw.directResetOfProtectionWay();
+                    pw.removeProtectionWay();
+                    grid.updateToNet(pw);
+                }));
             }).start();
             return true;
         }
