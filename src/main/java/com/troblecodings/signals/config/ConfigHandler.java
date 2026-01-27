@@ -25,6 +25,8 @@ public final class ConfigHandler {
         public final ConfigValue<Integer> lightEmission;
         public final ConfigValue<Boolean> debugMode;
 
+        public final ConfigValue<Integer> displayFetchInterval;
+
         public General(final ForgeConfigSpec.Builder builder) {
             String desc;
             builder.push("General");
@@ -36,6 +38,9 @@ public final class ConfigHandler {
 
             desc = "Toggle debug mode.";
             debugMode = builder.comment(desc).define("Debug Mode", false);
+
+            desc = "Set fetch interval for displays in seconds.";
+            displayFetchInterval = builder.comment(desc).define("Display Fetch Interval", 30);
 
             builder.pop();
         }
