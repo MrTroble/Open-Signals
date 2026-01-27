@@ -542,13 +542,14 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
                 (buf, entry) -> entry.writeNetwork(buf));
     }
 
-    public void applyModeNetworkChanges(final ModeIdentifier ident) {
-        if (!has(ident.mode)) {
+    public void applyModeNetworkChanges(final ModeSet mode) {
+        if (!has(mode)) {
             final PathOptionEntry entry = factory.getEntry();
-            entry.setUpNetwork(new PathOptionEntryNetwork().setUpNetwork(network, ident));
-            possibleModes.put(ident.mode, entry);
+            entry.setUpNetwork(new PathOptionEntryNetwork().setUpNetwork(network,
+                    new ModeIdentifier(point, mode)));
+            possibleModes.put(mode, entry);
         } else {
-            possibleModes.remove(ident.mode);
+            possibleModes.remove(mode);
         }
     }
 

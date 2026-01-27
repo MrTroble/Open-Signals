@@ -512,21 +512,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         buffer.putInt(counter);
     }
 
-    public List<SignalBoxNode> readUpdateNetwork(final ReadBuffer buffer, final boolean override) {
-        return buffer.getList((buf) -> {
-            final Point point = Point.of(buf);
-            SignalBoxNode node;
-            if (override) {
-                node = new SignalBoxNode(point, network);
-            } else {
-                node = modeGrid.computeIfAbsent(point, _u -> new SignalBoxNode(point, network));
-            }
-            node.readNetwork(buf);
-            modeGrid.put(point, node);
-            return node;
-        });
-    }
-
     public void updateManuellRSOutput(final Point point, final ModeSet mode, final boolean state) {
         final SignalBoxNode node = modeGrid.get(point);
         if (node == null)
