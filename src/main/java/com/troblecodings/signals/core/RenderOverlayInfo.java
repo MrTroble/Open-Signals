@@ -1,7 +1,7 @@
 package com.troblecodings.signals.core;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.troblecodings.signals.tileentitys.SignalTileEntity;
+import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.gui.Font;
 
@@ -11,7 +11,7 @@ public class RenderOverlayInfo {
     public final double x;
     public final double y;
     public final double z;
-    public SignalTileEntity tileEntity;
+    public BasicBlockEntity tileEntity;
     public final Font font;
 
     public RenderOverlayInfo(final PoseStack stack, final double x, final double y, final double z,
@@ -23,7 +23,7 @@ public class RenderOverlayInfo {
         this.font = font;
     }
 
-    public RenderOverlayInfo with(final SignalTileEntity tileEntity) {
+    public RenderOverlayInfo with(final BasicBlockEntity tileEntity) {
         this.tileEntity = tileEntity;
         return this;
     }

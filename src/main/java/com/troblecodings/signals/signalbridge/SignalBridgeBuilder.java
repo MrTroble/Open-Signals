@@ -28,8 +28,8 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class SignalBridgeBuilder {
 
-    public static final ModelInfoWrapper EMPTY_WRAPPER = new ModelInfoWrapper(
-            EmptyModelData.INSTANCE);
+    public static final ModelInfoWrapper EMPTY_WRAPPER =
+            new ModelInfoWrapper(EmptyModelData.INSTANCE);
 
     public static final String SIGNALBRIDGE_BLOCKS = "signalBridgeBlocks";
     public static final String SIGNALS_ON_BRIDGE = "signalsOnBridge";
@@ -115,9 +115,8 @@ public class SignalBridgeBuilder {
 
     private List<Entry<VectorWrapper, BasicBlock>> calculateRelativesToPoint(
             final Point startPoint) {
-        if (startPoint == null) {
+        if (startPoint == null)
             return new ArrayList<>();
-        }
         final Builder<Map.Entry<VectorWrapper, BasicBlock>> builder = ImmutableList.builder();
         final VectorWrapper startVec = new VectorWrapper(startPoint.getX(), startPoint.getY(), 0);
         pointForBlocks.forEach((point, block) -> {
@@ -130,9 +129,8 @@ public class SignalBridgeBuilder {
     }
 
     public Map<Entry<String, Signal>, VectorWrapper> getAllSignalsInRelativeToStart() {
-        if (startPoint == null) {
+        if (startPoint == null)
             return new HashMap<>();
-        }
         final VectorWrapper startVec = new VectorWrapper(startPoint.getX(), startPoint.getY(), 0);
         final Map<Entry<String, Signal>, VectorWrapper> map = new HashMap<>();
         vecForSignal.forEach((entry, vec) -> map.put(entry, startVec.subtract(vec)));
@@ -172,7 +170,7 @@ public class SignalBridgeBuilder {
         final List<NBTWrapper> signalList = new ArrayList<>();
         vecForSignal.forEach((entry, vec) -> {
             final NBTWrapper tag = new NBTWrapper();
-            vec.writeNBT(tag);
+            vec.write(tag);
             tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getPath());
             tag.putString(CUSTOMNAME, entry.getKey());
             signalList.add(tag);

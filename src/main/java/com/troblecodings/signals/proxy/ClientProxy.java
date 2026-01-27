@@ -2,25 +2,28 @@ package com.troblecodings.signals.proxy;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.Display;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.TrainNumberBlock;
+import com.troblecodings.signals.guis.GuiPathwayRequester;
 import com.troblecodings.signals.guis.GuiPlacementtool;
 import com.troblecodings.signals.guis.GuiSignalBox;
-import com.troblecodings.signals.guis.GuiSignalController;
-import com.troblecodings.signals.guis.NamableGui;
-import com.troblecodings.signals.guis.GuiPathwayRequester;
 import com.troblecodings.signals.guis.GuiSignalBridge;
+import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.GuiTrainNumber;
+import com.troblecodings.signals.guis.NamableGui;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
+import com.troblecodings.signals.tileentitys.DisplaySpecialRenderer;
+import com.troblecodings.signals.tileentitys.DisplayTileEntity;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -54,5 +57,8 @@ public class ClientProxy extends CommonProxy {
         BlockEntityRenderers.register(
                 (BlockEntityType<SignalTileEntity>) BasicBlock.BLOCK_ENTITYS.get(Signal.SUPPLIER),
                 SignalSpecialRenderer::new);
+        BlockEntityRenderers.register(
+                (BlockEntityType<DisplayTileEntity>) BasicBlock.BLOCK_ENTITYS.get(Display.SUPPLIER),
+                DisplaySpecialRenderer::new);
     }
 }

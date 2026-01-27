@@ -1,0 +1,20 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "opensignals:block/displaydouble",
+            "y": 90
+        },
+        "facing=south": {
+            "model": "opensignals:block/displaydouble",
+            "y": 180
+        },
+        "facing=west": {
+            "model": "opensignals:block/displaydouble",
+            "y": 270
+        },
+        "facing=north": {
+            "model": "opensignals:block/displaydouble",
+            "y": 0
+        }
+    }
+}
