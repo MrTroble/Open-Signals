@@ -1,13 +1,13 @@
 package com.troblecodings.signals.core;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.gui.Font;
 
-public class RenderOverlayInfo {
+public class RenderOverlayInfo extends DrawInfo {
 
-    public final PoseStack stack;
     public final double x;
     public final double y;
     public final double z;
@@ -16,7 +16,7 @@ public class RenderOverlayInfo {
 
     public RenderOverlayInfo(final PoseStack stack, final double x, final double y, final double z,
             final Font font) {
-        this.stack = stack;
+        super(stack);
         this.x = x;
         this.y = y;
         this.z = z;

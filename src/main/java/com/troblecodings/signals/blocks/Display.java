@@ -2,7 +2,6 @@ package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
 
-import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.tileentitys.DisplayTileEntity;
@@ -80,8 +79,6 @@ public class Display extends BasicBlock {
         final float zMod;
         final float doubleXMod;
         final float doubleZMod;
-        final int colorDirectionX;
-        final int colorDirectionZ;
         BlockEntity te = info.tileEntity;
         final BlockState state = te.getLevel().getBlockState(te.getBlockPos());
         if (!(state.getBlock() instanceof Display))
@@ -93,8 +90,6 @@ public class Display extends BasicBlock {
                 xMod = -50;
                 doubleZMod = -70;
                 doubleXMod = -120;
-                colorDirectionZ = 0;
-                colorDirectionX = 0;
                 break;
             case EAST:
                 angleMod = 3;
@@ -102,8 +97,6 @@ public class Display extends BasicBlock {
                 xMod = -60;
                 doubleZMod = -72;
                 doubleXMod = -115;
-                colorDirectionZ = 0;
-                colorDirectionX = 0;
                 break;
             case WEST:
                 angleMod = 1;
@@ -111,8 +104,6 @@ public class Display extends BasicBlock {
                 xMod = 11;
                 doubleZMod = -70;
                 doubleXMod = -120;
-                colorDirectionZ = 0;
-                colorDirectionX = 0;
                 break;
             default:
                 angleMod = 0;
@@ -120,40 +111,37 @@ public class Display extends BasicBlock {
                 xMod = 0;
                 doubleZMod = -71;
                 doubleXMod = -110;
-                colorDirectionZ = 0;
-                colorDirectionX = 1;
                 break;
         }
-        DrawInfo draw = new DrawInfo(info.stack);
 
-        draw.push();
-        draw.translate(info.x, info.y + 0.95f, info.z + 0.5f);
-        draw.scale(-0.015f, 0.015f, 0.015f);
-        draw.translate(offsetX + xMod, 0, offsetZ + zMod);
-        draw.scale(-1f, 1f, 1f);
-        draw.rotate((float) Math.PI, 0, 0);
-        draw.rotate(0, (float) Math.PI * 0.5f * angleMod, 0);
+        info.push();
+        info.translate(info.x, info.y + 0.95f, info.z + 0.5f);
+        info.scale(-0.015f, 0.015f, 0.015f);
+        info.translate(offsetX + xMod, 0, offsetZ + zMod);
+        info.scale(-1f, 1f, 1f);
+        info.rotate((float) Math.PI, 0, 0);
+        info.rotate(0, (float) Math.PI * 0.5f * angleMod, 0);
         // this.drawColoredString(info.font, line_1, colorDirectionX, colorDirectionZ);
         info.font.draw(info.stack, "Line1", 0, 0, 0xFFFFFFFF);
-        draw.translate(0, 10, 0);
+        info.translate(0, 10, 0);
         // this.drawColoredString(font, line_2, colorDirectionX, colorDirectionZ);
         info.font.draw(info.stack, "Line2", 0, 0, 0xFFFFFFFF);
-        draw.translate(0, 10, 0);
+        info.translate(0, 10, 0);
         // this.drawColoredString(font, line_3, colorDirectionX, colorDirectionZ);
         info.font.draw(info.stack, "Line3", 0, 0, 0xFFFFFFFF);
 
         if (this.isDoubleSided) {
-            draw.rotate(0, (float) Math.PI, 0);
-            draw.translate(doubleXMod, 0, doubleZMod);
+            info.rotate(0, (float) Math.PI, 0);
+            info.translate(doubleXMod, 0, doubleZMod);
             info.font.draw(info.stack, "Line1", 0, 0, 0xFFFFFFFF);
-            draw.translate(0, -10, 0);
+            info.translate(0, -10, 0);
             // font.drawString(line_2, 0, 0, 0xFFFFFFFF);
             info.font.draw(info.stack, "Line2", 0, 0, 0xFFFFFFFF);
-            draw.translate(0, -10, 0);
+            info.translate(0, -10, 0);
             // font.drawString(line_1, 0, 0, 0xFFFFFFFF);
             info.font.draw(info.stack, "Line3", 0, 0, 0xFFFFFFFF);
         }
-        draw.pop();
+        info.pop();
     }
 
     @Override

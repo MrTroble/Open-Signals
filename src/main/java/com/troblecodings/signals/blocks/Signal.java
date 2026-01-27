@@ -267,9 +267,9 @@ public class Signal extends BasicBlock {
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final Quaternion angle = face.getQuaternion();
 
-        info.stack.pushPose();
-        info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        info.stack.mulPose(angle);
+        info.push();
+        info.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
+        info.rotate(angle);
 
         if (!this.prop.autoscale) {
             renderSingleOverlay(info);
@@ -280,8 +280,8 @@ public class Signal extends BasicBlock {
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
                     Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
-            info.stack.mulPose(quad);
-            info.stack.mulPose(face.getQuaternion());
+            info.rotate(quad);
+            info.rotate(face.getQuaternion());
 
             if (!this.prop.autoscale) {
                 renderSingleOverlay(info);
@@ -289,7 +289,7 @@ public class Signal extends BasicBlock {
                 renderSingleScaleOverlay(info);
             }
         }
-        info.stack.popPose();
+        info.pop();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -301,10 +301,10 @@ public class Signal extends BasicBlock {
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
 
-        info.stack.pushPose();
+        info.push();
         // TODO Eig erst Translate, dann Scale
-        info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
-        info.stack.translate(offsetX, 0, -4.2f + offsetZ);
+        info.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
+        info.translate(offsetX, 0, -4.2f + offsetZ);
 
         for (int j = 0; j < splitNames.length; j++) {
             final String text = splitNames[j];
@@ -312,7 +312,7 @@ public class Signal extends BasicBlock {
             final float center = (signWidth - textWidth) / 2;
             info.font.draw(info.stack, text, (int) center - 10, j * 10, this.prop.textColor);
         }
-        info.stack.popPose();
+        info.pop();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -323,11 +323,11 @@ public class Signal extends BasicBlock {
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
 
-        info.stack.pushPose();
-        info.stack.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
-        info.stack.scale(-scale, -scale, 1);
+        info.push();
+        info.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
+        info.scale(-scale, -scale, 1);
         info.font.draw(info.stack, name, -nameWidth / 2, 0, this.prop.textColor);
-        info.stack.popPose();
+        info.pop();
     }
 
     public Placementtool getPlacementtool() {
@@ -422,14 +422,10 @@ public class Signal extends BasicBlock {
 
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
-            } else {
-                if (world.getBlockTicks().hasScheduledTick(pos, this))
-                    return;
-                else {
-                    if (sound.predicate.test(properties)) {
-                        world.scheduleTick(pos, this, 1);
-                    }
-                }
+            } else if (world.getBlockTicks().hasScheduledTick(pos, this))
+                return;
+            else if (sound.predicate.test(properties)) {
+                world.scheduleTick(pos, this, 1);
             }
         });
     }
