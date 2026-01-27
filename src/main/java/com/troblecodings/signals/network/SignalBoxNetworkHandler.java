@@ -2,7 +2,6 @@ package com.troblecodings.signals.network;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -32,31 +31,31 @@ public class SignalBoxNetworkHandler {
     private static final byte REMOVE = 0;
     private static final byte ADD = 1;
 
-    private static final SignalBoxNetworkMode GRID = new SignalBoxNetworkMode(
-            (b, n) -> n.readForGrid(b));
+    protected static final SignalBoxNetworkMode GRID =
+            new SignalBoxNetworkMode((b, n) -> n.readForGrid(b));
 
-    private static final SignalBoxNetworkMode ENTRY = new SignalBoxNetworkMode(
-            (b, n) -> n.readEntry(b));
+    protected static final SignalBoxNetworkMode ENTRY =
+            new SignalBoxNetworkMode((b, n) -> n.readEntry(b));
 
-    private static final SignalBoxNetworkMode NODE_SPECIAL_ENTRIES = new SignalBoxNetworkMode(
-            (b, n) -> n.readNodeSpecialEntries(b));
+    protected static final SignalBoxNetworkMode NODE_SPECIAL_ENTRIES =
+            new SignalBoxNetworkMode((b, n) -> n.readNodeSpecialEntries(b));
 
-    private static final SignalBoxNetworkMode PATHWAY = new SignalBoxNetworkMode(
-            (b, n) -> n.readPathwayAction(b));
+    protected static final SignalBoxNetworkMode PATHWAY =
+            new SignalBoxNetworkMode((b, n) -> n.readPathwayAction(b));
 
-    private static final SignalBoxNetworkMode PATHWAY_SAVER = new SignalBoxNetworkMode(
-            (b, n) -> n.readSavedPathway(b));
+    protected static final SignalBoxNetworkMode PATHWAY_SAVER =
+            new SignalBoxNetworkMode((b, n) -> n.readSavedPathway(b));
 
-    private static final SignalBoxNetworkMode SUBSIDIARY = new SignalBoxNetworkMode(
-            (b, n) -> n.readSubsidiary(b));
+    protected static final SignalBoxNetworkMode SUBSIDIARY =
+            new SignalBoxNetworkMode((b, n) -> n.readSubsidiary(b));
 
-    private static final SignalBoxNetworkMode TRAINNUMBER = new SignalBoxNetworkMode(
-            (b, n) -> n.readUpdateTrainNumber(b));
+    protected static final SignalBoxNetworkMode TRAINNUMBER =
+            new SignalBoxNetworkMode((b, n) -> n.readUpdateTrainNumber(b));
 
-    private static final SignalBoxNetworkMode DEBUG_POINTS = new SignalBoxNetworkMode(
-            (b, n) -> n.readDebugPoints(b));
+    protected static final SignalBoxNetworkMode DEBUG_POINTS =
+            new SignalBoxNetworkMode((b, n) -> n.readDebugPoints(b));
 
-    private ContainerSignalBox container = null;
+    protected ContainerSignalBox container = null;
 
     public void setUpNetwork(final ContainerSignalBox container) {
         this.container = container;
@@ -66,7 +65,7 @@ public class SignalBoxNetworkHandler {
         this.container = null;
     }
 
-    private boolean containerConnected() {
+    protected boolean containerConnected() {
         return container != null;
     }
 
@@ -253,7 +252,7 @@ public class SignalBoxNetworkHandler {
         sendBuffer(buffer);
     }
 
-    private void readEntry(final ReadBuffer buffer) {
+    protected void readEntry(final ReadBuffer buffer) {
         final EntryNetworkMode mode = buffer.getEnumValue(EntryNetworkMode.class);
         final ModeIdentifier ident = ModeIdentifier.of(buffer);
         final SignalBoxNode node = getGrid().getOrCreateNode(ident.point);
@@ -262,19 +261,19 @@ public class SignalBoxNetworkHandler {
             return;
         }
         final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES.get(buffer.getInt());
-        final Optional<PathOptionEntry> optionEntry = node.getOption(ident.mode);
+        final PathOptionEntry optionEntry = node.getOrCreateOption(ident.mode);
         if (mode.equals(EntryNetworkMode.ENTRY_REMOVE)) {
-            optionEntry.ifPresent(entry -> entry.removeEntryNoNetwork(entryType));
+            optionEntry.removeEntryNoNetwork(entryType);
             container.handleNodeUpdate(node, entryType);
             return;
         }
         final IPathEntry<?> entry = entryType.newValue();
         entry.readNetwork(buffer);
-        optionEntry.ifPresent(e -> e.addEntry(entryType, entry));
+        optionEntry.addEntry(entryType, entry);
         container.handleNodeUpdate(node, entryType);
     }
 
-    private void readForGrid(final ReadBuffer buffer) {
+    protected void readForGrid(final ReadBuffer buffer) {
         final SignalBoxGrid grid = getGrid();
         final GridNetworkMode mode = buffer.getEnumValue(GridNetworkMode.class);
         if (mode.equals(GridNetworkMode.SEND_ALL)) {
@@ -290,7 +289,7 @@ public class SignalBoxNetworkHandler {
         }
     }
 
-    private void readNodeSpecialEntries(final ReadBuffer buffer) {
+    protected void readNodeSpecialEntries(final ReadBuffer buffer) {
         final NodeNetworkMode mode = buffer.getEnumValue(NodeNetworkMode.class);
         final Point point = Point.of(buffer);
         final SignalBoxGrid grid = getGrid();
@@ -312,7 +311,7 @@ public class SignalBoxNetworkHandler {
         }
     }
 
-    private void handleManuellOutput(final SignalBoxNode node, final ModeSet mode,
+    protected void handleManuellOutput(final SignalBoxNode node, final ModeSet mode,
             final NodeNetworkMode network) {
         final boolean state = network.equals(NodeNetworkMode.MANUELL_OUTPUT_ADD) ? true : false;
         if (container.isClientSide()) {
@@ -322,7 +321,7 @@ public class SignalBoxNetworkHandler {
         }
     }
 
-    private void readPathwayAction(final ReadBuffer buffer) {
+    protected void readPathwayAction(final ReadBuffer buffer) {
         final SignalBoxGrid grid = getGrid();
         final PathwayNetworkMode mode = buffer.getEnumValue(PathwayNetworkMode.class);
         if (mode.equals(PathwayNetworkMode.RESPONSE)) {
@@ -355,7 +354,7 @@ public class SignalBoxNetworkHandler {
         }
     }
 
-    private void resetPathway(final Point p1) {
+    protected void resetPathway(final Point p1) {
         final SignalBoxGrid grid = getGrid();
         final SignalBoxPathway pw = grid.getPathwayByStartPoint(p1);
         final boolean isShuntingPath = pw != null ? pw.isShuntingPath() : false;
@@ -364,7 +363,7 @@ public class SignalBoxNetworkHandler {
         }
     }
 
-    private void readSavedPathway(final ReadBuffer buffer) {
+    protected void readSavedPathway(final ReadBuffer buffer) {
         final Point p1 = Point.of(buffer);
         final Point p2 = Point.of(buffer);
         final byte state = buffer.getByte();
@@ -377,51 +376,51 @@ public class SignalBoxNetworkHandler {
         container.handleAddSavedPathway(p1, p2, type, result);
     }
 
-    private void readSubsidiary(final ReadBuffer buffer) {
+    protected void readSubsidiary(final ReadBuffer buffer) {
         final ModeIdentifier ident = ModeIdentifier.of(buffer);
         final SubsidiaryState entry = SubsidiaryState.of(buffer);
         final boolean state = buffer.getBoolean();
         container.updateServerSubsidiary(ident, entry, state);
     }
 
-    private void readUpdateTrainNumber(final ReadBuffer buffer) {
+    protected void readUpdateTrainNumber(final ReadBuffer buffer) {
         final Point point = Point.of(buffer);
         final TrainNumber number = TrainNumber.of(buffer);
         getGrid().updateTrainNumber(point, number);
     }
 
-    private void readDebugPoints(final ReadBuffer buffer) {
+    protected void readDebugPoints(final ReadBuffer buffer) {
         container.handleDebugPoints(
                 buffer.getList(ReadBuffer.getINetworkSaveableFunction(Point.class)));
     }
 
-    private WriteBuffer getSavedPathwayBuffer(final Point p1, final Point p2) {
+    protected WriteBuffer getSavedPathwayBuffer(final Point p1, final Point p2) {
         final WriteBuffer buffer = PATHWAY_SAVER.getBuffer();
         p1.writeNetwork(buffer);
         p2.writeNetwork(buffer);
         return buffer;
     }
 
-    private WriteBuffer getNodeBuffer(final Point point, final NodeNetworkMode mode) {
+    protected WriteBuffer getNodeBuffer(final Point point, final NodeNetworkMode mode) {
         final WriteBuffer buffer = NODE_SPECIAL_ENTRIES.getBuffer();
         buffer.putEnumValue(mode);
         point.writeNetwork(buffer);
         return buffer;
     }
 
-    private WriteBuffer getGridBuffer(final GridNetworkMode mode) {
+    protected WriteBuffer getGridBuffer(final GridNetworkMode mode) {
         final WriteBuffer buffer = GRID.getBuffer();
         buffer.putEnumValue(mode);
         return buffer;
     }
 
-    private WriteBuffer getPathwayBuffer(final PathwayNetworkMode mode) {
+    protected WriteBuffer getPathwayBuffer(final PathwayNetworkMode mode) {
         final WriteBuffer buffer = PATHWAY.getBuffer();
         buffer.putEnumValue(mode);
         return buffer;
     }
 
-    private WriteBuffer getEntryBuffer(final ModeIdentifier ident, final EntryNetworkMode mode) {
+    protected WriteBuffer getEntryBuffer(final ModeIdentifier ident, final EntryNetworkMode mode) {
         final WriteBuffer buffer = ENTRY.getBuffer();
         buffer.putEnumValue(mode);
         ident.writeNetwork(buffer);
@@ -437,7 +436,7 @@ public class SignalBoxNetworkHandler {
         mode.executeRead(buffer, this);
     }
 
-    private void sendBuffer(final WriteBuffer buffer) {
+    protected void sendBuffer(final WriteBuffer buffer) {
         if (!containerConnected())
             return;
         OpenSignalsMain.network.sendTo(container.getPlayer(), buffer);
@@ -458,19 +457,19 @@ public class SignalBoxNetworkHandler {
         return Objects.equals(container, other.container);
     }
 
-    private static enum PathwayNetworkMode {
+    protected static enum PathwayNetworkMode {
         REQUEST, RESET, RESPONSE, RESET_ALL_PATHWAYS, RESET_ALL_SIGNALS;
     }
 
-    private static enum NodeNetworkMode {
+    protected static enum NodeNetworkMode {
         LABEL, AUTO_POINT, MANUELL_OUTPUT_ADD, MANUELL_OUTPUT_REMOVE, SIGNAL_STATE;
     }
 
-    private static enum GridNetworkMode {
+    protected static enum GridNetworkMode {
         SEND_ALL, COUNTER, REMOVE_POS;
     }
 
-    private static enum EntryNetworkMode {
+    protected static enum EntryNetworkMode {
         MODE_ADD, MODE_REMOVE, ENTRY_ADD, ENTRY_REMOVE;
     }
 }
