@@ -148,8 +148,11 @@ public class ModeDropDownBoxUI {
                 Optional<TCBoolean> opt = option.getEntry(PathEntryType.ZS6);
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("zs6_state"), e -> {
                     final boolean state = e == 1 ? true : false;
-                    // TODO
-                    option.setEntry(PathEntryType.ZS6, TCBoolean.valueOf(state));
+                    if (state) {
+                        option.setEntry(PathEntryType.ZS6, TCBoolean.valueOf(state));
+                    } else {
+                        option.removeEntry(PathEntryType.ZS6);
+                    }
                 }, opt.isPresent() && opt.get().booleanValue() ? 1 : 0));
             }
                 break;
