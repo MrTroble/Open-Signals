@@ -507,6 +507,11 @@ public class ModeDropDownBoxUI {
                     gui.container.grid, gui);
             rendering.removeSelection(SelectionType.FIRST);
         } else {
+            this.node.getOption(modeSet)
+                    .ifPresent(numberOption -> numberOption
+                            .getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
+                            .ifPresent(entry -> disconnectFromEachOther(thisIdent, entry,
+                                    gui.container.grid, gui)));
             connectToEachOther(new ModeIdentifier(node.getPoint(), mode), thisIdent,
                     gui.container.grid, gui);
             rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
