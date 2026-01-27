@@ -148,6 +148,7 @@ public class ModeDropDownBoxUI {
                 Optional<TCBoolean> opt = option.getEntry(PathEntryType.ZS6);
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("zs6_state"), e -> {
                     final boolean state = e == 1 ? true : false;
+                    // TODO
                     option.setEntry(PathEntryType.ZS6, TCBoolean.valueOf(state));
                 }, opt.isPresent() && opt.get().booleanValue() ? 1 : 0));
             }
@@ -159,7 +160,11 @@ public class ModeDropDownBoxUI {
                 parent.add(
                         GuiElements.createBoolElement(BoolIntegerables.of("signal_repeater"), e -> {
                             final boolean state = e == 1 ? true : false;
-                            option.setEntry(PathEntryType.SIGNAL_REPEATER, state);
+                            if (state) {
+                                option.setEntry(PathEntryType.SIGNAL_REPEATER, state);
+                            } else {
+                                option.removeEntry(PathEntryType.SIGNAL_REPEATER);
+                            }
                         }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
             case HP: {
@@ -275,7 +280,11 @@ public class ModeDropDownBoxUI {
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
                         e -> {
                             final boolean state = e == 1 ? true : false;
-                            option.setEntry(PathEntryType.CAN_BE_OVERSTPEPPED, state);
+                            if (state) {
+                                option.setEntry(PathEntryType.CAN_BE_OVERSTPEPPED, state);
+                            } else {
+                                option.removeEntry(PathEntryType.CAN_BE_OVERSTPEPPED);
+                            }
                         },
                         option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false) ? 1 : 0));
                 break;
@@ -283,7 +292,11 @@ public class ModeDropDownBoxUI {
             case BUE: {
                 parent.add(GuiElements.createEnumElement(
                         new SizeIntegerables<>("delay", 60, get -> String.valueOf(get)), i -> {
-                            option.setEntry(PathEntryType.DELAY, i);
+                            if (i == 0) {
+                                option.removeEntry(PathEntryType.DELAY);
+                            } else {
+                                option.setEntry(PathEntryType.DELAY, i);
+                            }
                         }, option.getEntry(PathEntryType.DELAY).orElse(0)));
                 break;
             }
@@ -381,9 +394,9 @@ public class ModeDropDownBoxUI {
                                     gui.container.grid, false, (rendering, point, mouseKey) -> {
                                         if (mouseKey != MouseEvent.LEFT_MOUSE)
                                             return;
-                                        final SignalBoxNode node = gui.container.grid
-                                                .getNodeChecked(point)
-                                                .orElse(new SignalBoxNode(grid.getNetwork()));
+                                        final SignalBoxNode node =
+                                                gui.container.grid.getNodeChecked(point).orElse(
+                                                        new SignalBoxNode(grid.getNetwork()));
                                         if (node.isEmpty())
                                             return;
 

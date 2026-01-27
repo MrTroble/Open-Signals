@@ -591,8 +591,4 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         return ImmutableMap.copyOf(possibleModes);
     }
 
-    public void resetEnumPathUsage() {
-        possibleModes.values().forEach(entry -> entry.removeEntry(PathEntryType.PATHUSAGE));
-    }
-
 }
