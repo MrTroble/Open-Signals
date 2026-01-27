@@ -33,10 +33,15 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
             pathEntrys.remove(type);
             return;
         }
-        final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
-                pType -> pType.newValue());
+        final IPathEntry<T> pathEntry =
+                (IPathEntry<T>) pathEntrys.computeIfAbsent(type, pType -> pType.newValue());
+        final T oldValue = pathEntry.getValue();
         pathEntry.setValue(value);
-        network.sendEntryAdd(type, pathEntry);
+        if (!value.equals(oldValue)) {
+            network.sendEntryAdd(type, pathEntry);
+        } else {
+            System.out.println();
+        }
     }
 
     public void addEntry(final PathEntryType<?> entryType, final IPathEntry<?> entry) {
@@ -95,8 +100,8 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
     @Override
     public void read(final NBTWrapper tag) {
-        final List<PathEntryType<?>> tagSet = tag.keySet().stream().map(PathEntryType::getType)
-                .collect(Collectors.toList());
+        final List<PathEntryType<?>> tagSet =
+                tag.keySet().stream().map(PathEntryType::getType).collect(Collectors.toList());
         tagSet.forEach(entry -> {
             if (entry != null) {
                 if (tag.contains(entry.getName())) {
@@ -114,8 +119,8 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
     public void readNetwork(final ReadBuffer buffer) {
         pathEntrys.putAll(buffer.getMapWithCombinedValueFunc(
                 NetworkBufferWrappers.PATHENTRYTYPE_FUNCTION, (buf, type) -> {
-                    final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type,
-                            _u -> type.newValue());
+                    final IPathEntry<?> entry =
+                            pathEntrys.computeIfAbsent(type, _u -> type.newValue());
                     entry.readNetwork(buffer);
                     return entry;
                 }));

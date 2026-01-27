@@ -134,6 +134,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         } else {
             node.remove(mode);
         }
+        node.post();
     }
 
     public void setUpNetwork(final ContainerSignalBox container) {
@@ -207,7 +208,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     public void resetAllPathways() {
         ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
         clearPaths();
-        modeGrid.values().forEach(SignalBoxNode::resetEnumPathUsage);
     }
 
     public void resetAllSignals() {

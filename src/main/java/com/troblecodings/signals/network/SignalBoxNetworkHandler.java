@@ -258,6 +258,7 @@ public class SignalBoxNetworkHandler {
         final SignalBoxNode node = getGrid().getOrCreateNode(ident.point);
         if (mode.equals(EntryNetworkMode.MODE_ADD) || mode.equals(EntryNetworkMode.MODE_REMOVE)) {
             node.applyModeNetworkChanges(ident);
+            node.post();
             return;
         }
         final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES.get(buffer.getInt());
@@ -326,6 +327,7 @@ public class SignalBoxNetworkHandler {
         final PathwayNetworkMode mode = buffer.getEnumValue(PathwayNetworkMode.class);
         if (mode.equals(PathwayNetworkMode.RESPONSE)) {
             container.handlePathwayRequestResponse(buffer.getEnumValue(PathwayRequestMode.class));
+            return;
         }
         if (mode.equals(PathwayNetworkMode.RESET_ALL_PATHWAYS)) {
             grid.resetAllPathways();
