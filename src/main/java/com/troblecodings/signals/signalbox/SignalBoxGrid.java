@@ -59,7 +59,11 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     private final SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
 
     public SignalBoxGrid() {
-        this.factory = SignalBoxFactory.getFactory();
+        this(SignalBoxFactory.getFactory());
+    }
+
+    public SignalBoxGrid(final SignalBoxFactory factory) {
+        this.factory = factory;
     }
 
     public void setTile(final SignalBoxTileEntity tile) {
@@ -123,8 +127,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void updateMode(final Point point, final ModeSet mode) {
-        final SignalBoxNode node = this.modeGrid.computeIfAbsent(point,
-                p -> new SignalBoxNode(p, network));
+        final SignalBoxNode node =
+                this.modeGrid.computeIfAbsent(point, p -> new SignalBoxNode(p, network));
         if (!node.has(mode)) {
             node.add(mode);
         } else {
@@ -331,8 +335,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void updateTrainNumber(final Point point, final TrainNumber number) {
-        final SignalBoxNode node = modeGrid.computeIfAbsent(point,
-                p -> new SignalBoxNode(p, network));
+        final SignalBoxNode node =
+                modeGrid.computeIfAbsent(point, p -> new SignalBoxNode(p, network));
         startsToPath.values().forEach(pathway -> pathway.checkTrainNumberUpdate(number, node));
     }
 

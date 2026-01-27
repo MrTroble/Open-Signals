@@ -76,8 +76,8 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
     }
 
     public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
-        final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
-                _u -> factory.getEntry());
+        final PathOptionEntry optionEntry =
+                possibleModes.computeIfAbsent(mode, _u -> factory.getEntry());
         optionEntry.setUpNetwork(new PathOptionEntryNetwork().setUpNetwork(network,
                 new ModeIdentifier(point, mode)));
         optionEntry.setEntry(entry, type);
@@ -338,6 +338,13 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         return possibleConnections.get(path);
     }
 
+    public PathOptionEntry getOrCreateOption(final ModeSet mode) {
+        final PathOptionEntry entry = possibleModes.computeIfAbsent(mode, _u -> factory.getEntry());
+        entry.setUpNetwork(new PathOptionEntryNetwork().setUpNetwork(network,
+                new ModeIdentifier(point, mode)));
+        return entry;
+    }
+
     public Optional<PathOptionEntry> getOption(final ModeSet mode) {
         return Optional.ofNullable(possibleModes.get(mode));
     }
@@ -356,10 +363,10 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         final Set<EnumGuiMode> otherMode = other.possibleModes.keySet().stream()
                 .map(mode -> mode.mode).collect(Collectors.toSet());
         for (final PathType type : PathType.values()) {
-            final boolean thisContains = Arrays.stream(type.getModes())
-                    .anyMatch(thisMode::contains);
-            final boolean otherContains = Arrays.stream(type.getModes())
-                    .anyMatch(otherMode::contains);
+            final boolean thisContains =
+                    Arrays.stream(type.getModes()).anyMatch(thisMode::contains);
+            final boolean otherContains =
+                    Arrays.stream(type.getModes()).anyMatch(otherMode::contains);
             if (thisContains && otherContains) {
                 possibleTypes.add(type);
             }

@@ -23,6 +23,10 @@ public class SignalBoxFactory {
         return factory;
     }
 
+    public static void setUpFactoryForTests() {
+        factory = new DebugFactory();
+    }
+
     public ConnectionChecker getConnectionCheckerNormal() {
         return new ConnectionCheckerNormal();
     }
