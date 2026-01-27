@@ -257,7 +257,7 @@ public class SignalBoxNetworkHandler {
         final ModeIdentifier ident = ModeIdentifier.of(buffer);
         final SignalBoxNode node = getGrid().getOrCreateNode(ident.point);
         if (mode.equals(EntryNetworkMode.MODE_ADD) || mode.equals(EntryNetworkMode.MODE_REMOVE)) {
-            node.applyModeNetworkChanges(ident);
+            node.applyModeNetworkChanges(ident.mode);
             node.post();
             return;
         }

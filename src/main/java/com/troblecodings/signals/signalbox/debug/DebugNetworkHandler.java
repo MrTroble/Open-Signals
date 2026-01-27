@@ -84,7 +84,7 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
         final ModeIdentifier ident = ModeIdentifier.of(buffer);
         final SignalBoxNode node = getGrid().getOrCreateNode(ident.point);
         if (mode.equals(EntryNetworkMode.MODE_ADD) || mode.equals(EntryNetworkMode.MODE_REMOVE)) {
-            node.applyModeNetworkChanges(ident);
+            node.applyModeNetworkChanges(ident.mode);
             return;
         }
         final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES.get(buffer.getInt());
