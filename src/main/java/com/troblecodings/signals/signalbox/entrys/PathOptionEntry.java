@@ -39,8 +39,6 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
         pathEntry.setValue(value);
         if (!value.equals(oldValue)) {
             network.sendEntryAdd(type, pathEntry);
-        } else {
-            System.out.println();
         }
     }
 
