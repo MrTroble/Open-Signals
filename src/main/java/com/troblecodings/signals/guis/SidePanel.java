@@ -287,9 +287,9 @@ public class SidePanel {
 
         helpList.add(getSpacerLine());
 
-        final UIEntity shButton = GuiElements.createButton(
-                "     " + I18Wrapper.format("info.usage.emergency"),
-                e -> gui.network.sendResetAllSignals());
+        final UIEntity shButton =
+                GuiElements.createButton("     " + I18Wrapper.format("info.usage.emergency"),
+                        e -> gui.network.sendResetAllSignals());
         shButton.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
 
         final UIEntity emergencyEntity = new UIEntity();
@@ -360,8 +360,8 @@ public class SidePanel {
             helpList.add(GuiElements.createLabel(I18Wrapper.format("info.usage.node"),
                     new UIEntity().getBasicTextColor(), 0.8f));
             if (guiModes.contains(EnumGuiMode.HP)) {
-                final UIEntity entity = GuiElements
-                        .createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
+                final UIEntity entity =
+                        GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
                             node.setAutoPoint(e == 1 ? true : false);
                         }, node.isAutoPoint() ? 1 : 0);
                 entity.setScale(0.95f);
@@ -550,15 +550,13 @@ public class SidePanel {
                                                         textureEntity.add(new UIToolTip(I18Wrapper
                                                                 .format("info.usage.rs.desc")));
                                                         if (turnOff) {
-                                                            gui.network.sendManuellOutputRemove(
-                                                                    node.getPoint(), mode);
+                                                            node.removeManuellOutput(mode);
                                                             outputStatus.setText(I18Wrapper
                                                                     .format("info.usage.rs.false"));
                                                             textureEntity.add(new UITexture(
                                                                     GuiSignalBox.REDSTONE_OFF));
                                                         } else {
-                                                            gui.network.sendManuellOutputAdd(
-                                                                    node.getPoint(), mode);
+                                                            node.addManuellOutput(mode);
                                                             outputStatus.setText(I18Wrapper
                                                                     .format("info.usage.rs.true"));
                                                             textureEntity.add(new UITexture(
@@ -608,8 +606,8 @@ public class SidePanel {
                             lowerEntity.setInherits(true);
                             lowerEntity.add(new UIBox(UIBox.HBOX, 5));
                             lowerEntity.add(GuiElements.createSpacerH(7));
-                            final UIEntity save = GuiElements
-                                    .createButton(I18Wrapper.format("btn.save"), e1 -> {
+                            final UIEntity save =
+                                    GuiElements.createButton(I18Wrapper.format("btn.save"), e1 -> {
                                         gui.network.updateTrainNumber(node.getPoint(),
                                                 new TrainNumber(input.getText()));
                                         input.setText("");
@@ -792,11 +790,11 @@ public class SidePanel {
                         textureEntity.clear();
                         textureEntity.add(new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
                         if (turnOff) {
-                            gui.network.sendManuellOutputRemove(currentNode.getPoint(), mode);
+                            currentNode.removeManuellOutput(mode);
                             outputStatus.setText(I18Wrapper.format("info.usage.rs.false"));
                             textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
                         } else {
-                            gui.network.sendManuellOutputAdd(currentNode.getPoint(), mode);
+                            currentNode.addManuellOutput(mode);
                             outputStatus.setText(I18Wrapper.format("info.usage.rs.true"));
                             textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
                         }
