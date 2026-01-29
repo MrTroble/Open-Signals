@@ -1,7 +1,9 @@
 package com.troblecodings.signals.blocks;
 
 import java.time.LocalTime;
+import java.util.ArrayDeque;
 import java.util.Optional;
+import java.util.Queue;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.RenderOverlayInfo;
@@ -185,6 +187,74 @@ public class Display extends BasicBlock {
         info.pop();
     }
 
+    private String fullString = "";
+    private Queue<Character> shownText = new ArrayDeque<>();
+    private Queue<Character> hiddenText = new ArrayDeque<>();
+    private float addTransX = 0;
+    private float animationSpeed = 0.4f;
+
+    @OnlyIn(Dist.CLIENT)
+    public void renderMovingText(final RenderOverlayInfo info, final int x, final int y) {
+        info.push();
+        info.translate(x, y, 0);
+
+        info.push();
+        info.scale(80, 1, 0);
+        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
+        info.pop();
+        final String text = "Achtung Witterung! Halten Sie Abstand von der Bahnsteigkante!";
+        final int fieldLength = 155;
+        initializeTexts(info, text, fieldLength);
+
+        final StringBuilder textToRender = new StringBuilder();
+        shownText.stream().forEach(c -> textToRender.append(c));
+        final String showString = textToRender.toString();
+
+        final float scale = 0.5f;
+        info.translate(addTransX + 0.5f, 2, -0.5);
+        info.scale(scale, scale, 0);
+        info.font.draw(info.stack, showString, 0, 0, 0xFF000000);
+
+        if (hiddenText.isEmpty()) {
+            info.pop();
+            return;
+        }
+        addTransX -= animationSpeed;
+        if (addTransX <= 0) {
+            final Character toRemove = shownText.poll();
+            addTransX = info.font.width(String.valueOf(toRemove)) * scale;
+            hiddenText.add(toRemove);
+
+        }
+        final char last = hiddenText.element();
+        if ((info.font.width(showString) + info.font.width(String.valueOf(last)) < fieldLength)) {
+            shownText.add(hiddenText.poll());
+        }
+        info.pop();
+    }
+
+    private void initializeTexts(final RenderOverlayInfo info, final String fullText,
+            final int length) {
+        if (fullString.equals(fullText))
+            return;
+        fullString = fullText;
+        shownText = new ArrayDeque<>(fullText.length());
+        hiddenText = new ArrayDeque<>(fullText.length());
+        int textLength = 0;
+        for (final char c : fullText.toCharArray()) {
+            final String s = String.valueOf(c);
+            textLength += info.font.width(s);
+            if (textLength > length) {
+                hiddenText.add(c);
+            } else {
+                shownText.add(c);
+            }
+        }
+        if (!hiddenText.isEmpty()) {
+            hiddenText.add(' ');
+        }
+    }
+
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
         final float offsetX = -10;
@@ -243,6 +313,7 @@ public class Display extends BasicBlock {
         renderDestination(info, 0, 25);
         renderAnalogClock(info, 100, 15);
         renderPlatform(info, 92, 35);
+        renderMovingText(info, 0, 48);
 
         if (this.isDoubleSided) {
             info.rotate(0, (float) Math.PI, 0);
@@ -254,6 +325,7 @@ public class Display extends BasicBlock {
             renderDestination(info, 0, 25);
             renderAnalogClock(info, 100, 15);
             renderPlatform(info, 92, 35);
+            renderMovingText(info, 0, 48);
         }
         info.pop();
     }
