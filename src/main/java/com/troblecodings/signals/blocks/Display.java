@@ -1,13 +1,16 @@
 package com.troblecodings.signals.blocks;
 
+import java.time.LocalTime;
 import java.util.Optional;
 
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.tileentitys.DisplayTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -71,6 +74,118 @@ public class Display extends BasicBlock {
     }
 
     @OnlyIn(Dist.CLIENT)
+    private void renderTime(final RenderOverlayInfo info, final int x, final int y) {
+        LocalTime time = LocalTime.now();
+        int timeS = time.getSecond();
+        int timeM = time.getMinute();
+        int timeH = time.getHour();
+
+        info.push();
+        info.translate(x, y, 0);
+        info.scale(0.5, 0.5, 0);
+        info.font.draw(info.stack, timeH + ":" + timeM + ":" + timeS, 0, 0, 0xFFFFFFFF);
+        info.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void renderAnalogClock(final RenderOverlayInfo info, final int x, final int y) {
+        LocalTime time = LocalTime.now();
+        int timeS = time.getSecond();
+        int timeM = time.getMinute();
+        int timeH = time.getHour();
+
+        info.push();
+        info.translate(x, y, 0);
+
+        // Background
+        info.push();
+        info.translate(-13, -13, 0);
+        info.drawTexture(new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/save.png"), 26,
+                26, 0, 0, 1, 1);
+        info.pop();
+
+        // Hours
+        info.push();
+        info.rotate(0, 0, (float) ((timeH / 6f) * Math.PI + Math.PI));
+        info.translate(-0.75, 0, -0.5);
+        info.scale(1.5, 1.3, 1);
+        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
+        info.pop();
+
+        // Minutes
+        info.push();
+        info.rotate(0, 0, (float) ((timeM / 30f) * Math.PI + Math.PI));
+        info.translate(-0.5, 0, -0.5);
+        info.scale(1, 1.7, 1);
+        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
+        info.pop();
+
+        // Seconds
+        info.push();
+        info.rotate(0, 0, (float) ((timeS / 30f) * Math.PI + Math.PI));
+        info.translate(-0.5, 0, -0.5);
+        info.scale(1, 1.7, 1);
+        info.font.draw(info.stack, "|", 0, 0, 0xFFFF0000);
+        info.pop();
+
+        info.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void renderPlatform(final RenderOverlayInfo info, final int x, final int y) {
+        info.push();
+        info.translate(x, y, 0);
+        info.scale(3, 3, 0);
+        info.font.draw(info.stack, "8", 0, 0, 0xFFFFFFFF);
+        info.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void renderDestTime(final RenderOverlayInfo info, final int x, final int y) {
+        info.push();
+        info.translate(x, y, 0);
+        info.font.draw(info.stack, "16:25", 0, 0, 0xFFFFFFFF);
+
+        info.translate(30, 0, 0);
+        info.push();
+        info.scale(50, 1, 0);
+        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
+        info.pop();
+        info.translate(6, 1.5, -0.5);
+        info.scale(0.5, 0.5, 0);
+        info.font.draw(info.stack, "Fällt heute aus", 0, 0, 0xFF000000);
+        info.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void renderDestination(final RenderOverlayInfo info, final int x, final int y) {
+        info.push();
+        info.translate(x, y, 0);
+
+        info.push();
+        info.scale(1.5, 1.5, 0);
+        info.font.draw(info.stack, "Rödau Hbf", 0, 0, 0xFFFFFFFF);
+        info.pop();
+
+        info.push();
+        info.translate(0, 15, 0);
+        info.scale(0.5, 0.5, 0);
+        info.font.draw(info.stack, "Presslau - Großpostwitz", 0, 0, 0xFFFFFFFF);
+        info.pop();
+
+        info.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void renderTrain(final RenderOverlayInfo info, final int x, final int y) {
+        info.push();
+        info.translate(x, y, 0);
+        info.scale(0.5, 0.5, 0);
+        info.font.draw(info.stack, "RB 31067", 0, 0, 0xFFFFFFFF);
+        info.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
         final float offsetX = -10;
         final float offsetZ = 35;
@@ -121,25 +236,24 @@ public class Display extends BasicBlock {
         info.scale(-1f, 1f, 1f);
         info.rotate((float) Math.PI, 0, 0);
         info.rotate(0, (float) Math.PI * 0.5f * angleMod, 0);
-        // this.drawColoredString(info.font, line_1, colorDirectionX, colorDirectionZ);
-        info.font.draw(info.stack, "Line1", 0, 0, 0xFFFFFFFF);
-        info.translate(0, 10, 0);
-        // this.drawColoredString(font, line_2, colorDirectionX, colorDirectionZ);
-        info.font.draw(info.stack, "Line2", 0, 0, 0xFFFFFFFF);
-        info.translate(0, 10, 0);
-        // this.drawColoredString(font, line_3, colorDirectionX, colorDirectionZ);
-        info.font.draw(info.stack, "Line3", 0, 0, 0xFFFFFFFF);
+
+        renderTime(info, 90, 30);
+        renderDestTime(info, 0, 3);
+        renderTrain(info, 0, 13);
+        renderDestination(info, 0, 25);
+        renderAnalogClock(info, 100, 15);
+        renderPlatform(info, 92, 35);
 
         if (this.isDoubleSided) {
             info.rotate(0, (float) Math.PI, 0);
             info.translate(doubleXMod, 0, doubleZMod);
-            info.font.draw(info.stack, "Line1", 0, 0, 0xFFFFFFFF);
-            info.translate(0, -10, 0);
-            // font.drawString(line_2, 0, 0, 0xFFFFFFFF);
-            info.font.draw(info.stack, "Line2", 0, 0, 0xFFFFFFFF);
-            info.translate(0, -10, 0);
-            // font.drawString(line_1, 0, 0, 0xFFFFFFFF);
-            info.font.draw(info.stack, "Line3", 0, 0, 0xFFFFFFFF);
+
+            renderTime(info, 90, 30);
+            renderDestTime(info, 0, 3);
+            renderTrain(info, 0, 13);
+            renderDestination(info, 0, 25);
+            renderAnalogClock(info, 100, 15);
+            renderPlatform(info, 92, 35);
         }
         info.pop();
     }
