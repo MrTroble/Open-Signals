@@ -102,7 +102,7 @@ public class Display extends BasicBlock {
         // Background
         info.push();
         info.translate(-13, -13, 0);
-        info.drawTexture(new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/save.png"), 26,
+        info.drawTexture(new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/clock.png"), 26,
                 26, 0, 0, 1, 1);
         info.pop();
 
@@ -111,7 +111,7 @@ public class Display extends BasicBlock {
         info.rotate(0, 0, (float) ((timeH / 6f) * Math.PI + Math.PI));
         info.translate(-0.75, 0, -0.5);
         info.scale(1.5, 1.3, 1);
-        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
+        info.font.draw(info.stack, "|", 0, 0, 0xFF000000);
         info.pop();
 
         // Minutes
@@ -119,7 +119,7 @@ public class Display extends BasicBlock {
         info.rotate(0, 0, (float) ((timeM / 30f) * Math.PI + Math.PI));
         info.translate(-0.5, 0, -0.5);
         info.scale(1, 1.7, 1);
-        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
+        info.font.draw(info.stack, "|", 0, 0, 0xFF000000);
         info.pop();
 
         // Seconds
