@@ -9,6 +9,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class UISignalBoxIcons {
 
+    private UISignalBoxIcons() {
+
+    }
+
     public static final ResourceLocation ICON =
             new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/symbols.png");
     public static final ResourceLocation ARROW_ICON =
