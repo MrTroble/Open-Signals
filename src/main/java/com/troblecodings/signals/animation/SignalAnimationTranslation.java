@@ -8,12 +8,24 @@ import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public class SignalAnimationTranslation implements SignalAnimation {
 
-    private AnimationTranslationCalc calc;
-
     private final Predicate<ModelInfoWrapper> predicate;
     private String model;
     private final float animationSpeed;
     private final VectorWrapper dest;
+
+    private float stepX;
+    private float stepY;
+    private float stepZ;
+    private float progressX;
+    private float progressY;
+    private float progressZ;
+    private float maxX;
+    private float maxY;
+    private float maxZ;
+
+    private boolean finishedX = false;
+    private boolean finishedY = false;
+    private boolean finishedZ = false;
 
     public SignalAnimationTranslation(final Predicate<ModelInfoWrapper> predicate,
             final float animationSpeed, final VectorWrapper dest) {
@@ -23,14 +35,47 @@ public class SignalAnimationTranslation implements SignalAnimation {
     }
 
     @Override
-    public void updateAnimation(final float ticks) {
-        calc.updateAnimation(ticks);
+    public void updateAnimation(final float tick) {
+        if (!finishedX) {
+            progressX += stepX * tick;
+            this.finishedX = isAnimationOnAxisIsFinished(stepX, progressX, maxX);
+        }
+        if (!finishedY) {
+            progressY += stepY * tick;
+            this.finishedY = isAnimationOnAxisIsFinished(stepY, progressY, maxY);
+        }
+        if (!finishedZ) {
+            progressZ += stepZ * tick;
+            this.finishedZ = isAnimationOnAxisIsFinished(stepZ, progressZ, maxZ);
+        }
     }
 
     @Override
     public void setUpAnimationValues(final ModelTranslation currentTranslation) {
-        this.calc = new AnimationTranslationCalc(currentTranslation.getTranslation(), dest,
-                animationSpeed);
+        this.stepX = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        this.stepY = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        this.stepZ = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
+        calculateWayAndValues(currentTranslation.getTranslation(), dest);
+    }
+
+    private void calculateWayAndValues(final VectorWrapper start, final VectorWrapper end) {
+        this.progressX = start.getX();
+        this.progressY = start.getY();
+        this.progressZ = start.getZ();
+
+        this.maxX = end.getX();
+        this.maxY = end.getY();
+        this.maxZ = end.getZ();
+
+        if (maxX < progressX) {
+            this.stepX = -stepX;
+        }
+        if (maxY < progressY) {
+            this.stepY = -stepY;
+        }
+        if (maxZ < progressZ) {
+            this.stepZ = -stepZ;
+        }
     }
 
     @Override
@@ -40,19 +85,26 @@ public class SignalAnimationTranslation implements SignalAnimation {
 
     @Override
     public ModelTranslation getModelTranslation() {
-        return new ModelTranslation(calc.getTranslation());
+        return new ModelTranslation(new VectorWrapper(progressX, progressY, progressZ));
     }
 
     @Override
     public boolean isFinished() {
-        if (calc == null)
-            return true;
-        return calc.isAnimationFinished();
+        return finishedX && finishedY && finishedZ;
+    }
+
+    private static boolean isAnimationOnAxisIsFinished(final float step, final float progress,
+            final float max) {
+        if (step > 0) {
+            if (progress < max)
+                return false;
+        } else if (max < progress)
+            return false;
+        return true;
     }
 
     @Override
     public void reset() {
-        calc = null;
     }
 
     @Override
@@ -72,21 +124,30 @@ public class SignalAnimationTranslation implements SignalAnimation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, calc, dest, model, predicate);
+        return Objects.hash(animationSpeed, dest, finishedX, finishedY, finishedZ, maxX, maxY, maxZ,
+                model, predicate, progressX, progressY, progressZ, stepX, stepY, stepZ);
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SignalAnimationTranslation other = (SignalAnimationTranslation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && Objects.equals(calc, other.calc) && Objects.equals(dest, other.dest)
-                && Objects.equals(model, other.model) && Objects.equals(predicate, other.predicate);
+                && Objects.equals(dest, other.dest) && finishedX == other.finishedX
+                && finishedY == other.finishedY && finishedZ == other.finishedZ
+                && Float.floatToIntBits(maxX) == Float.floatToIntBits(other.maxX)
+                && Float.floatToIntBits(maxY) == Float.floatToIntBits(other.maxY)
+                && Float.floatToIntBits(maxZ) == Float.floatToIntBits(other.maxZ)
+                && Objects.equals(model, other.model) && Objects.equals(predicate, other.predicate)
+                && Float.floatToIntBits(progressX) == Float.floatToIntBits(other.progressX)
+                && Float.floatToIntBits(progressY) == Float.floatToIntBits(other.progressY)
+                && Float.floatToIntBits(progressZ) == Float.floatToIntBits(other.progressZ)
+                && Float.floatToIntBits(stepX) == Float.floatToIntBits(other.stepX)
+                && Float.floatToIntBits(stepY) == Float.floatToIntBits(other.stepY)
+                && Float.floatToIntBits(stepZ) == Float.floatToIntBits(other.stepZ);
     }
 
 }

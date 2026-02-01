@@ -1,14 +1,5 @@
 package com.troblecodings.signals.enums;
 
-import static com.troblecodings.signals.guis.ContainerSignalBox.ARROW_ICON;
-import static com.troblecodings.signals.guis.ContainerSignalBox.ICON;
-import static com.troblecodings.signals.guis.ContainerSignalBox.INCOMING_ICON;
-import static com.troblecodings.signals.guis.ContainerSignalBox.NE1_ICON;
-import static com.troblecodings.signals.guis.ContainerSignalBox.NE5_ICON;
-import static com.troblecodings.signals.guis.ContainerSignalBox.OUTGOING_ICON;
-import static com.troblecodings.signals.guis.ContainerSignalBox.SIGNALS;
-import static com.troblecodings.signals.guis.ContainerSignalBox.ZS3_ICON;
-
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -16,6 +7,7 @@ import java.util.function.Function;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.guis.UISignalBoxIcons;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
@@ -38,11 +30,12 @@ public enum EnumGuiMode {
     }), HP(0, true, PathwayModeType.START_END, 2), VP(1, true, PathwayModeType.NONE, 1),
     RS(2, true, PathwayModeType.START_END, (state) -> state.equals(SignalState.RED) ? 1 : 3),
     RA10(3, PathwayModeType.END, 1), SH2(4, PathwayModeType.NONE, 3),
-    IN_CONNECTION(INCOMING_ICON, PathwayModeType.START, 1),
-    OUT_CONNECTION(OUTGOING_ICON, PathwayModeType.END, 1),
-    ARROW(ARROW_ICON, PathwayModeType.END, 1), NE1(NE1_ICON, PathwayModeType.START_END, 1),
-    NE5(NE5_ICON, PathwayModeType.START_END, 1), ZS3(ZS3_ICON, PathwayModeType.NONE, 1),
-    TRAIN_NUMBER(new float[] {
+    IN_CONNECTION(UISignalBoxIcons.INCOMING_ICON, PathwayModeType.START, 1),
+    OUT_CONNECTION(UISignalBoxIcons.OUTGOING_ICON, PathwayModeType.END, 1),
+    ARROW(UISignalBoxIcons.ARROW_ICON, PathwayModeType.END, 1),
+    NE1(UISignalBoxIcons.NE1_ICON, PathwayModeType.START_END, 1),
+    NE5(UISignalBoxIcons.NE5_ICON, PathwayModeType.START_END, 1),
+    ZS3(UISignalBoxIcons.ZS3_ICON, PathwayModeType.NONE, 1), TRAIN_NUMBER(new float[] {
             0, 0.5f, 2, 0.5f
     }, PathwayModeType.NONE, 2, ConfigHandler.signalboxTrainnumberBackgroundColor, 6),
     CROSSING(new float[] {
@@ -59,18 +52,18 @@ public enum EnumGuiMode {
     private final PathwayModeType type;
 
     private EnumGuiMode(final int id, final PathwayModeType type, final int depth) {
-        this((_u) -> ((info, c) -> info.drawTexture(ICON, UISignalBoxRendering.TILE_WIDTH,
-                UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0, id * 0.2 + 0.2, 0.5)), type,
-                (_u) -> depth);
+        this((_u) -> ((info, c) -> info.drawTexture(UISignalBoxIcons.ICON,
+                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0,
+                id * 0.2 + 0.2, 0.5)), type, (_u) -> depth);
     }
 
     private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type,
             final Function<SignalState, Integer> depthFunc) {
         this((state) -> {
             final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> info.drawTexture(SIGNALS, UISignalBoxRendering.TILE_WIDTH,
-                    UISignalBoxRendering.TILE_WIDTH, (id + factor) * 0.0666667f, 0.0f,
-                    (id + factor) * 0.066667f + 0.06f, 1.0f);
+            return (info, c) -> info.drawTexture(UISignalBoxIcons.SIGNALS,
+                    UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
+                    (id + factor) * 0.0666667f, 0.0f, (id + factor) * 0.066667f + 0.06f, 1.0f);
         }, type, depthFunc);
     }
 
@@ -78,9 +71,9 @@ public enum EnumGuiMode {
             final int depth) {
         this((state) -> {
             final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> info.drawTexture(SIGNALS, UISignalBoxRendering.TILE_WIDTH,
-                    UISignalBoxRendering.TILE_WIDTH, (id + factor) * 0.0666667f, 0.0f,
-                    (id + factor) * 0.066667f + 0.06f, 1.0f);
+            return (info, c) -> info.drawTexture(UISignalBoxIcons.SIGNALS,
+                    UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
+                    (id + factor) * 0.0666667f, 0.0f, (id + factor) * 0.066667f + 0.06f, 1.0f);
         }, type, (_u) -> depth);
     }
 

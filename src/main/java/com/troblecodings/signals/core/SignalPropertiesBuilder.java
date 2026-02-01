@@ -46,7 +46,7 @@ public class SignalPropertiesBuilder {
     private Map<String, String> remoteRedstoneOutputs;
     private int defaultItemDamage = 1;
     private boolean isBridgeSignal = false;
-    private List<Integer> customRenderBoundingBox;
+    private List<Float> customRenderBoundingBox;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -58,10 +58,11 @@ public class SignalPropertiesBuilder {
                 }
             }
         }
-        if (placementtool == null)
+        if (placementtool == null) {
             OpenSignalsMain
                     .exitMinecraftWithMessage("There doesn't exists a placementtool with the name '"
                             + placementToolName + "'!");
+        }
 
         final List<PredicateProperty<Integer>> signalheights = new ArrayList<>();
         if (signalHeights != null) {
@@ -124,8 +125,8 @@ public class SignalPropertiesBuilder {
                 .forEach((entry) -> {
                     if (entry.getKey() != null) {
                         entry.getKey().forEach((key, value) -> {
-                            final Predicate<Map<SEProperty, String>> predicate = LogicParser
-                                    .predicate(key, info);
+                            final Predicate<Map<SEProperty, String>> predicate =
+                                    LogicParser.predicate(key, info);
                             final SEProperty property = (SEProperty) info.getProperty(value);
                             entry.getValue().add(new ValuePack(property, predicate));
                         });
@@ -150,7 +151,12 @@ public class SignalPropertiesBuilder {
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
         Optional<AxisAlignedBB> shape = Optional.empty();
-        if (customRenderBoundingBox != null && customRenderBoundingBox.size() == 6) {
+        if (customRenderBoundingBox != null) {
+            if (customRenderBoundingBox.size() != 6) {
+                OpenSignalsMain.exitMinecraftWithMessage(
+                        "Used wrong size of CustomRenderBoundingBox! Excepted: 6" + ", Actual: "
+                                + customRenderBoundingBox.size());
+            }
             shape = Optional.of(new AxisAlignedBB(customRenderBoundingBox.get(0),
                     customRenderBoundingBox.get(1), customRenderBoundingBox.get(2),
                     customRenderBoundingBox.get(3), customRenderBoundingBox.get(4),

@@ -54,25 +54,21 @@ public final class SignalBoxUtil {
     }
 
     public static Point getDeltaFromRotation(final Rotation rot) {
-        if (rot.equals(Rotation.NONE))
-            return new Point(1, 0);
-        if (rot.equals(Rotation.CLOCKWISE_90))
-            return new Point(0, 1);
-        if (rot.equals(Rotation.CLOCKWISE_180))
-            return new Point(-1, 0);
-        if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
-            return new Point(0, -1);
+        switch (rot) {
+            case NONE:
+                return new Point(1, 0);
+            case CLOCKWISE_90:
+                return new Point(0, 1);
+            case CLOCKWISE_180:
+                return new Point(-1, 0);
+            case COUNTERCLOCKWISE_90:
+                return new Point(0, -1);
+        }
         return new Point();
     }
 
     public static String getDegreeStringFromRotation(final Rotation rot) {
-        if (rot.equals(Rotation.CLOCKWISE_90))
-            return "90°";
-        if (rot.equals(Rotation.CLOCKWISE_180))
-            return "180°";
-        if (rot.equals(Rotation.COUNTERCLOCKWISE_90))
-            return "270°";
-        return "0°";
+        return String.valueOf(rot.ordinal() * 90) + "°";
     }
 
     public static class PathIdentifier {
@@ -277,12 +273,12 @@ public final class SignalBoxUtil {
     public static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,
             final Path path) {
         final AtomicBoolean bool = new AtomicBoolean(false);
-        node.getOption(path)
-                .ifPresent(entry -> entry.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
+        node.getOption(path).filter(entry -> entry.containsEntry(PathEntryType.BLOCKING)).get()
+                .getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
                     if (isPowerd(grid.tile, pos)) {
                         bool.set(true);
                     }
-                }));
+                });
 
         return bool.get();
     }

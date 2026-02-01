@@ -15,7 +15,6 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
             tile.renderOverlay(new RenderOverlayInfo(x, y, z, getFontRenderer()));
         }
         if (tile.hasAnimation()) {
-            // TODO Check if tick is correct
             tile.getAnimationHandler()
                     .render(new RenderAnimationInfo(x, y, z,
                             Minecraft.getMinecraft().getRenderPartialTicks(),
