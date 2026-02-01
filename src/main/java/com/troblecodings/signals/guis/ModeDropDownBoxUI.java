@@ -63,8 +63,8 @@ public class ModeDropDownBoxUI {
 
     public UIEntity getTop() {
         final String modeName = I18Wrapper.format("property." + modeSet.mode.name());
-        final String rotationName = I18Wrapper
-                .format("property." + modeSet.rotation.name() + ".rotation");
+        final String rotationName =
+                I18Wrapper.format("property." + modeSet.rotation.name() + ".rotation");
 
         final UIEntity top = new UIEntity();
         top.setInheritWidth(true);
@@ -94,16 +94,16 @@ public class ModeDropDownBoxUI {
             return;
 
         final SignalBoxGrid grid = gui.container.grid;
-        final Set<Map.Entry<BlockPos, LinkType>> entrySet = gui.container.getPositionForTypes()
-                .entrySet();
+        final Set<Map.Entry<BlockPos, LinkType>> entrySet =
+                gui.container.getPositionForTypes().entrySet();
         final EnumGuiMode mode = modeSet.mode;
         final Rotation rotation = modeSet.rotation;
         switch (mode) {
             case CORNER:
             case STRAIGHT:
             case CROSSING: {
-                final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
-                        .orElse(EnumPathUsage.FREE);
+                final EnumPathUsage path =
+                        option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
                 final UIEntity stateEntity = new UIEntity();
                 stateEntity.setInheritWidth(true);
                 stateEntity.setHeight(15);
@@ -171,7 +171,7 @@ public class ModeDropDownBoxUI {
                 break;
             case HP: {
                 final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
-                        .orElse(new ArrayList<>());
+                        .orElseGet(() -> new ArrayList<>());
                 final UIEntity preSignalEntity = GuiElements
                         .createButton(I18Wrapper.format("property.presignals.name"), e -> {
                             final UIEntity screen = new UIEntity();
@@ -183,10 +183,11 @@ public class ModeDropDownBoxUI {
                             final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
                                     grid, false, (rendering, point, mouseKey) -> {
                                         final SignalBoxNode node = grid.getNodeChecked(point)
-                                                .orElse(new SignalBoxNode());
+                                                .orElseGet(() -> new SignalBoxNode());
                                         if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
                                             return;
-                                        final AtomicReference<PosIdentifier> vp = new AtomicReference<>();
+                                        final AtomicReference<PosIdentifier> vp =
+                                                new AtomicReference<>();
                                         node.getModes().forEach((nodeMode, entry) -> {
                                             if (!(nodeMode.mode.equals(EnumGuiMode.VP)
                                                     || nodeMode.mode.equals(EnumGuiMode.ZS3)))
@@ -234,9 +235,9 @@ public class ModeDropDownBoxUI {
 
                 final UIEntity protectionWay = GuiElements
                         .createButton(I18Wrapper.format("property.protectionway.name"), e -> {
-                            final Point selcetedPoint = option
-                                    .getEntry(PathEntryType.PROTECTIONWAY_END)
-                                    .orElse(new Point(-1, -1));
+                            final Point selcetedPoint =
+                                    option.getEntry(PathEntryType.PROTECTIONWAY_END)
+                                            .orElse(new Point(-1, -1));
 
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
@@ -250,9 +251,9 @@ public class ModeDropDownBoxUI {
                                                 .orElse(new SignalBoxNode());
                                         if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
                                             return;
-                                        final Point select = option
-                                                .getEntry(PathEntryType.PROTECTIONWAY_END)
-                                                .orElse(new Point(-1, -1));
+                                        final Point select =
+                                                option.getEntry(PathEntryType.PROTECTIONWAY_END)
+                                                        .orElse(new Point(-1, -1));
                                         if (point.equals(select)) {
                                             rendering.removeSelection(SelectionType.FIRST);
                                             gui.removeEntryFromServer(this.node, mode, rotation,
@@ -267,9 +268,10 @@ public class ModeDropDownBoxUI {
                                         }
                                     });
 
-                            if (!selcetedPoint.equals(new Point(-1, -1)))
+                            if (!selcetedPoint.equals(new Point(-1, -1))) {
                                 boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
                                         selcetedPoint, SelectionType.FIRST);
+                            }
 
                             screen.add(boxEntity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
@@ -340,8 +342,8 @@ public class ModeDropDownBoxUI {
             case IN_CONNECTION: {
                 final UIEntity inConnections = GuiElements
                         .createButton(I18Wrapper.format("property.inconnection.name"), e -> {
-                            final Point selcetedPoint = option.getEntry(PathEntryType.POINT)
-                                    .orElse(new Point(-1, -1));
+                            final Point selcetedPoint =
+                                    option.getEntry(PathEntryType.POINT).orElse(new Point(-1, -1));
 
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
@@ -371,9 +373,10 @@ public class ModeDropDownBoxUI {
                                         }
                                     });
 
-                            if (!selcetedPoint.equals(new Point(-1, -1)))
+                            if (!selcetedPoint.equals(new Point(-1, -1))) {
                                 boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
                                         selcetedPoint, SelectionType.FIRST);
+                            }
 
                             screen.add(boxEntity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
@@ -390,9 +393,9 @@ public class ModeDropDownBoxUI {
             case TRAIN_NUMBER: {
                 final UIEntity button = GuiElements
                         .createButton(I18Wrapper.format("btn.connect.trainnumber"), e -> {
-                            final ModeIdentifier identifier = option
-                                    .getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
-                                    .orElse(new ModeIdentifier(new Point(-1, -1), null));
+                            final ModeIdentifier identifier =
+                                    option.getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
+                                            .orElse(new ModeIdentifier(new Point(-1, -1), null));
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
                             screen.add(new UIBox(UIBox.VBOX, 5));
@@ -410,8 +413,9 @@ public class ModeDropDownBoxUI {
                                         final List<ModeSet> pathModes = new ArrayList<>();
                                         node.toPathIdentifier().stream()
                                                 .map(ident -> ident.getMode()).forEach(modeSet -> {
-                                                    if (!pathModes.contains(modeSet))
+                                                    if (!pathModes.contains(modeSet)) {
                                                         pathModes.add(modeSet);
+                                                    }
                                                 });
 
                                         if (pathModes.isEmpty()) {
@@ -436,8 +440,8 @@ public class ModeDropDownBoxUI {
                                             gui.push(GuiElements.createSelectionScreen(enumerable,
                                                     SizeIntegerables.of("mode_select",
                                                             pathModes.size(), id -> {
-                                                                final ModeSet modeSet = pathModes
-                                                                        .get(id);
+                                                                final ModeSet modeSet =
+                                                                        pathModes.get(id);
                                                                 return modeSet.mode.toString()
                                                                         + " - "
                                                                         + SignalBoxUtil
@@ -464,8 +468,8 @@ public class ModeDropDownBoxUI {
         final PathOptionEntry optionEntry = node.getOption(mode).get();
         final ModeIdentifier thisIdent = new ModeIdentifier(this.node.getPoint(), modeSet);
         if (optionEntry.containsEntry(PathEntryType.CONNECTED_TRAINNUMBER)) {
-            final ModeIdentifier otherIdent = optionEntry
-                    .getEntry(PathEntryType.CONNECTED_TRAINNUMBER).get();
+            final ModeIdentifier otherIdent =
+                    optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER).get();
             if (!thisIdent.equals(otherIdent)) {
                 gui.push(GuiElements.createScreen(screen -> {
                     final UIEntity entity = new UIEntity();
@@ -487,20 +491,23 @@ public class ModeDropDownBoxUI {
                         rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
                                 SelectionType.FIRST);
                         gui.pop();
-                        if (wereMultipleEntries)
+                        if (wereMultipleEntries) {
                             gui.pop();
+                        }
                     }));
                     lowerEntity.add(GuiElements.createSpacerH(20));
                     lowerEntity.add(GuiElements.createButton(I18Wrapper.format("btn.no"), e -> {
                         gui.pop();
-                        if (wereMultipleEntries)
+                        if (wereMultipleEntries) {
                             gui.pop();
+                        }
                     }));
                     entity.add(lowerEntity);
                     screen.add(entity);
                 }));
-                if (wereMultipleEntries)
+                if (wereMultipleEntries) {
                     gui.push(new UIEntity());
+                }
                 return;
             }
             disconnectFromEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
@@ -567,16 +574,15 @@ public class ModeDropDownBoxUI {
         textInputEntity.setInheritWidth(true);
         textInputEntity.setHeight(20);
 
-        final UITextInput input = new UITextInput(
-                String.valueOf(option.getEntry(type).orElse(defaultValue)));
+        final UITextInput input =
+                new UITextInput(String.valueOf(option.getEntry(type).orElse(defaultValue)));
         input.setValidator(str -> {
             if (str.isEmpty())
                 return true;
             try {
                 final int i = Integer.valueOf(str);
-                if (i < 0 || i > 120) {
+                if (i < 0 || i > 120)
                     return false;
-                }
             } catch (final Exception e) {
                 return false;
             }
