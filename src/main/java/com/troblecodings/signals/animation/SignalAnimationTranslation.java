@@ -13,15 +13,7 @@ public class SignalAnimationTranslation implements SignalAnimation {
     private final float animationSpeed;
     private final VectorWrapper dest;
 
-    private float stepX;
-    private float stepY;
-    private float stepZ;
-    private float progressX;
-    private float progressY;
-    private float progressZ;
-    private float maxX;
-    private float maxY;
-    private float maxZ;
+    private float stepX, stepY, stepZ, progressX, progressY, progressZ, maxX, maxY, maxZ;
 
     private boolean finishedX = false;
     private boolean finishedY = false;
@@ -55,27 +47,21 @@ public class SignalAnimationTranslation implements SignalAnimation {
         this.stepX = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
         this.stepY = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
         this.stepZ = SignalAnimationHandler.BASIC_ANIMATION_SPEED * animationSpeed;
-        calculateWayAndValues(currentTranslation.getTranslation(), dest);
-    }
 
-    private void calculateWayAndValues(final VectorWrapper start, final VectorWrapper end) {
+        final VectorWrapper start = currentTranslation.getTranslation();
         this.progressX = start.getX();
         this.progressY = start.getY();
         this.progressZ = start.getZ();
 
-        this.maxX = end.getX();
-        this.maxY = end.getY();
-        this.maxZ = end.getZ();
+        this.maxX = dest.getX();
+        this.maxY = dest.getY();
+        this.maxZ = dest.getZ();
 
-        if (maxX < progressX) {
-            this.stepX = -stepX;
-        }
-        if (maxY < progressY) {
-            this.stepY = -stepY;
-        }
-        if (maxZ < progressZ) {
-            this.stepZ = -stepZ;
-        }
+        this.stepX = maxX < progressX ? -stepX : stepX;
+        this.stepY = maxY < progressY ? -stepY : stepY;
+        this.stepZ = maxZ < progressZ ? -stepZ : stepZ;
+
+        this.finishedX = this.finishedY = this.finishedZ = false;
     }
 
     @Override

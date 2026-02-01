@@ -273,13 +273,12 @@ public final class SignalBoxUtil {
     public static boolean isPathBlocked(final SignalBoxGrid grid, final SignalBoxNode node,
             final Path path) {
         final AtomicBoolean bool = new AtomicBoolean(false);
-        node.getOption(path).filter(entry -> entry.containsEntry(PathEntryType.BLOCKING)).get()
-                .getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
+        node.getOption(path).filter(entry -> entry.containsEntry(PathEntryType.BLOCKING))
+                .ifPresent(option -> option.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
                     if (isPowerd(grid.tile, pos)) {
                         bool.set(true);
                     }
-                });
-
+                }));
         return bool.get();
     }
 
