@@ -8,18 +8,28 @@ import com.troblecodings.signals.core.StateInfo;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SignalStateInfo extends StateInfo {
+public class SignalStateInfo {
 
+    public final World world;
+    public final BlockPos pos;
     public final Signal signal;
 
     public SignalStateInfo(final World world, final BlockPos pos, final Signal signal) {
-        super(world, pos);
+        this.world = world;
+        this.pos = pos;
         this.signal = signal;
     }
 
-    @Override
     public boolean isValid() {
-        return super.isValid() && signal != null;
+        return pos != null && world != null && signal != null;
+    }
+
+    public boolean worldNullOrClientSide() {
+        return world == null || world.isRemote;
+    }
+
+    public StateInfo toStateInfo() {
+        return new StateInfo(world, pos);
     }
 
     @Override

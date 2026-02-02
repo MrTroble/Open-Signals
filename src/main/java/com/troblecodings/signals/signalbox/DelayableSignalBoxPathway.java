@@ -43,6 +43,8 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
                 loadTileAndExecute(thisTile -> {
                     final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                             .getPathwayByLastPoint(getLastPoint());
+                    if (pw == null || pw.isEmptyOrBroken())
+                        return;
                     pw.setPathStatus(EnumPathUsage.SELECTED);
                     pw.updatePathwayOnGrid();
                 });

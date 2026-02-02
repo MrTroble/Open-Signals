@@ -25,6 +25,10 @@ public final class ConfigHandler {
     })
     public static int lightEmission = 1;
 
+    @Name("canAddRSPathToSaver")
+    @Comment("ShuntingPaths can be added to PathwaySaver.")
+    public static boolean canAddRSPathToSaver = false;
+
     @Name("Signalbox background color")
     @Comment("Change the background color of the signalbox gui. Default: -7631989")
     public static int signalboxBackgroundColor = 0xFF8B8B8B;
@@ -50,8 +54,8 @@ public final class ConfigHandler {
     public static int signalboxShuntingColor = 0xFF00FF00;
 
     @Name("Signalbox TrainNumber color")
-    @Comment("Change the color of the TrainNumber in the UI. Default: -1")
-    public static int signalboxTrainNumberColor = 0xFFFFFFFF;
+    @Comment("Change the color of the TrainNumber in the UI. Default: -65536")
+    public static int signalboxTrainNumberColor = 0xFFFF0000;
 
     @Name("Basic text color")
     @Comment("Change the color of a default text. Default: -16777216")

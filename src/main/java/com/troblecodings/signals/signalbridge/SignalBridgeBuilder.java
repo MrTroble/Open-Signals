@@ -195,34 +195,23 @@ public class SignalBridgeBuilder {
     }
 
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putByte((byte) pointForBlocks.size());
-        pointForBlocks.forEach((point, block) -> {
-            point.writeNetwork(buffer);
-            buffer.putInt(block.getID());
-        });
-        buffer.putByte((byte) vecForSignal.size());
-        vecForSignal.forEach((entry, vec) -> {
-            buffer.putString(entry.getKey());
-            buffer.putInt(entry.getValue().getID());
-            vec.writeNetwork(buffer);
-        });
+        buffer.putMap(pointForBlocks, WriteBuffer.getINetworkSaveableConsumer(),
+                (buf, block) -> buf.putInt(block.getID()));
+        buffer.putMap(vecForSignal, (buf, entry) -> {
+            buf.putString(entry.getKey());
+            buf.putInt(entry.getValue().getID());
+        }, WriteBuffer.getINetworkSaveableConsumer());
         startPoint.writeNetwork(buffer);
     }
 
     public void readNetwork(final ReadBuffer buffer) {
         pointForBlocks.clear();
         vecForSignal.clear();
-        final int blockSize = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < blockSize; i++) {
-            pointForBlocks.put(Point.of(buffer),
-                    SignalBridgeBasicBlock.ALL_SIGNALBRIDGE_BLOCKS.get(buffer.getInt()));
-        }
-        final int signalsSize = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < signalsSize; i++) {
-            vecForSignal.put(
-                    Maps.immutableEntry(buffer.getString(), Signal.SIGNAL_IDS.get(buffer.getInt())),
-                    VectorWrapper.of(buffer));
-        }
+        pointForBlocks.putAll(buffer.getMap(ReadBuffer.getINetworkSaveableFunction(Point.class),
+                (buf) -> SignalBridgeBasicBlock.ALL_SIGNALBRIDGE_BLOCKS.get(buf.getInt())));
+        vecForSignal.putAll(buffer.getMap(
+                buf -> Maps.immutableEntry(buf.getString(), Signal.SIGNAL_IDS.get(buf.getInt())),
+                ReadBuffer.getINetworkSaveableFunction(VectorWrapper.class)));
         this.startPoint = Point.of(buffer);
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }

@@ -37,6 +37,7 @@ public class ContainerPlacementtool extends ContainerBase {
     }
 
     private void sendItemProperties(final EntityPlayer player) {
+        // TODO Redo networking
         final ItemStack stack = player.getHeldItemMainhand();
         final Placementtool tool = (Placementtool) stack.getItem();
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);

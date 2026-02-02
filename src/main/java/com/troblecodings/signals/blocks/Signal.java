@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
@@ -71,8 +72,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final PropertyEnum<SignalAngel> ANGEL =
-            PropertyEnum.create("angel", SignalAngel.class);
+    public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
+            SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -94,6 +95,10 @@ public class Signal extends BasicBlock {
             signalPropertiesToInt.put(property, i);
         }
         setLightLevel(ConfigHandler.lightEmission / 15.0f);
+    }
+
+    public static Signal getSignalByID(final int id) {
+        return SIGNAL_IDS.get(id);
     }
 
     public int getID() {
@@ -122,7 +127,11 @@ public class Signal extends BasicBlock {
     @Override
     public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
             final IBlockAccess worldIn, final BlockPos pos) {
-        return FULL_BLOCK_AABB.expand(20, 10, 20).expand(-20, -10, -20);
+        return getBoundingBox(blockState, worldIn, pos);
+    }
+
+    public Optional<AxisAlignedBB> getRenderBox() {
+        return prop.shape;
     }
 
     public static ItemStack pickBlock(final EntityPlayer player, final Item item) {
@@ -148,8 +157,8 @@ public class Signal extends BasicBlock {
     public IBlockState getStateForPlacement(final World world, final BlockPos pos,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
-        final int index =
-                15 - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
+        final int index = 15
+                - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
         return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
     }
 
@@ -236,6 +245,10 @@ public class Signal extends BasicBlock {
 
     public List<SEProperty> getProperties() {
         return this.signalProperties;
+    }
+
+    public SEProperty getPropertyByIndex(final int index) {
+        return this.signalProperties.get(index);
     }
 
     public String getSignalTypeName() {
@@ -535,6 +548,6 @@ public class Signal extends BasicBlock {
     }
 
     public boolean hasAnimation() {
-        return prop.hasAnimation;
+        return SignalAnimationConfigParser.ALL_ANIMATIONS.containsKey(this);
     }
 }

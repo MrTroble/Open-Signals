@@ -80,10 +80,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        if (handler.areAnimationsRunning())
-            return new AxisAlignedBB(getPos().add(-50, -50, -50), getPos().add(50, 50, 50));
-        else
-            return super.getRenderBoundingBox();
+        return getSignal().getRenderBox().map(box -> box.offset(pos))
+                .orElse(super.getRenderBoundingBox());
     }
 
     @Override
@@ -119,12 +117,11 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             world.markBlockRangeForRenderUpdate(pos, pos);
             markDirty();
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
-        } else {
-            if (hasAnimation()) {
-                handler.updateAnimationListFromBlock();
-                handler.updateStates(
-                        ClientSignalStateHandler.getClientStates(new StateInfo(world, pos)), true);
-            }
+        } else if (hasAnimation()) {
+            handler.updateAnimationListFromBlock();
+            handler.updateStates(
+                    ClientSignalStateHandler.getClientStates(new StateInfo(world, pos)), true);
+
         }
     }
 

@@ -7,11 +7,11 @@ import com.troblecodings.signals.signalbox.Point;
 
 public class SubsidiaryHolder {
 
-    public final SubsidiaryEntry entry;
+    public final SubsidiaryState entry;
     public final Point point;
     public final ModeSet modeSet;
 
-    public SubsidiaryHolder(final SubsidiaryEntry entry, final Point point, final ModeSet modeSet) {
+    public SubsidiaryHolder(final SubsidiaryState entry, final Point point, final ModeSet modeSet) {
         this.entry = entry;
         this.point = point;
         this.modeSet = modeSet;
@@ -30,7 +30,7 @@ public class SubsidiaryHolder {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SubsidiaryHolder other = (SubsidiaryHolder) obj;
+        final SubsidiaryHolder other = (SubsidiaryHolder) obj;
         return Objects.equals(entry, other.entry) && Objects.equals(modeSet, other.modeSet)
                 && Objects.equals(point, other.point);
     }

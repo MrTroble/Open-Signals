@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
 public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileEntity> {
-    
+
     @Override
     public void render(final SignalTileEntity tile, final double x, final double y, final double z,
             final float partialTicks, final int destroyStage, final float alpha) {
@@ -15,8 +15,10 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
             tile.renderOverlay(new RenderOverlayInfo(x, y, z, getFontRenderer()));
         }
         if (tile.hasAnimation()) {
-            tile.getAnimationHandler().render(new RenderAnimationInfo(x, y, z,
-                    Minecraft.getMinecraft().getRenderPartialTicks()).with(tile));
+            tile.getAnimationHandler()
+                    .render(new RenderAnimationInfo(x, y, z,
+                            Minecraft.getMinecraft().getRenderPartialTicks(),
+                            Minecraft.getSystemTime()).with(tile));
         }
     }
 

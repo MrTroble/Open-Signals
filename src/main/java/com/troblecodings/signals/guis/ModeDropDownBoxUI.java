@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.TCBoolean;
@@ -17,8 +16,9 @@ import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
-import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
@@ -30,6 +30,8 @@ import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
+import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -90,6 +92,8 @@ public class ModeDropDownBoxUI {
     public void addElements(final UIEntity parent) {
         if (!open)
             return;
+
+        final SignalBoxGrid grid = gui.container.grid;
         final Set<Map.Entry<BlockPos, LinkType>> entrySet =
                 gui.container.getPositionForTypes().entrySet();
         final EnumGuiMode mode = modeSet.mode;
@@ -126,14 +130,9 @@ public class ModeDropDownBoxUI {
                 gui.selectLink(parent, node, option, entrySet, LinkType.OUTPUT,
                         PathEntryType.OUTPUT, mode, rotation);
 
-                final SizeIntegerables<Integer> pathwayCosts =
-                        new SizeIntegerables<>("pathway_costs", 20, i -> i);
-                final UIEntity costSelection = GuiElements.createEnumElement(pathwayCosts, i -> {
-                    option.setEntry(PathEntryType.PATHWAY_COSTS, i);
-                    gui.sendIntEntryToServer(i, node, mode, rotation, PathEntryType.PATHWAY_COSTS);
-                }, option.getEntry(PathEntryType.PATHWAY_COSTS)
-                        .orElse(SignalBoxUtil.getDefaultCosts(modeSet)));
-                parent.add(costSelection);
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
+                        I18Wrapper.format("property.pathway_costs.name"),
+                        SignalBoxUtil.getDefaultCosts(modeSet)));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
@@ -150,7 +149,6 @@ public class ModeDropDownBoxUI {
                     }
                 }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
                 parent.add(zs2Entity);
-
                 Optional<TCBoolean> opt = option.getEntry(PathEntryType.ZS6);
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("zs6_state"), e -> {
                     final boolean state = e == 1 ? true : false;
@@ -172,8 +170,8 @@ public class ModeDropDownBoxUI {
                         }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
             case HP: {
-                final List<PosIdentifier> preSignalsList =
-                        option.getEntry(PathEntryType.PRESIGNALS).orElse(new ArrayList<>());
+                final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
+                        .orElseGet(() -> new ArrayList<>());
                 final UIEntity preSignalEntity = GuiElements
                         .createButton(I18Wrapper.format("property.presignals.name"), e -> {
                             final UIEntity screen = new UIEntity();
@@ -181,11 +179,16 @@ public class ModeDropDownBoxUI {
                             screen.add(new UIBox(UIBox.VBOX, 5));
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
-                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
-                                    (tile, sbt) -> {
+
+                            final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
+                                    grid, false, (rendering, point, mouseKey) -> {
+                                        final SignalBoxNode node = grid.getNodeChecked(point)
+                                                .orElseGet(() -> new SignalBoxNode());
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
+                                            return;
                                         final AtomicReference<PosIdentifier> vp =
                                                 new AtomicReference<>();
-                                        sbt.getNode().getModes().forEach((nodeMode, entry) -> {
+                                        node.getModes().forEach((nodeMode, entry) -> {
                                             if (!(nodeMode.mode.equals(EnumGuiMode.VP)
                                                     || nodeMode.mode.equals(EnumGuiMode.ZS3)))
                                                 return;
@@ -193,97 +196,97 @@ public class ModeDropDownBoxUI {
                                                     .getEntry(PathEntryType.SIGNAL).orElse(null);
                                             if (linkedSignal == null)
                                                 return;
-                                            vp.set(new PosIdentifier(sbt.getPoint(), nodeMode,
+                                            vp.set(new PosIdentifier(point, nodeMode,
                                                     linkedSignal));
                                         });
                                         final PosIdentifier ident = vp.get();
                                         if (ident == null)
                                             return;
-                                        final UIColor color =
-                                                new UIColor(GuiSignalBox.SELECTION_COLOR);
-                                        tile.add(new UIClickable(e1 -> {
-                                            if (preSignalsList.contains(ident)) {
-                                                preSignalsList.remove(ident);
-                                                tile.remove(color);
-                                            } else {
-                                                preSignalsList.add(ident);
-                                                tile.add(color);
-                                            }
-                                            if (preSignalsList.isEmpty()) {
-                                                option.removeEntry(PathEntryType.PRESIGNALS);
-                                                gui.removeEntryFromServer(node, mode, rotation,
-                                                        PathEntryType.PRESIGNALS);
-                                            } else {
-                                                option.setEntry(PathEntryType.PRESIGNALS,
-                                                        preSignalsList);
-                                                gui.sendPosIdentList(preSignalsList, node, mode,
-                                                        rotation, PathEntryType.PRESIGNALS);
-                                            }
-                                        }));
                                         if (preSignalsList.contains(ident)) {
-                                            tile.add(color);
+                                            preSignalsList.remove(ident);
+                                            rendering.removeColoredPoint(
+                                                    GuiSignalBox.SELECTION_COLOR, point);
+                                        } else {
+                                            preSignalsList.add(ident);
+                                            rendering.addColoredPoint(GuiSignalBox.SELECTION_COLOR,
+                                                    point);
+                                        }
+                                        if (preSignalsList.isEmpty()) {
+                                            option.removeEntry(PathEntryType.PRESIGNALS);
+                                            gui.removeEntryFromServer(this.node, mode, rotation,
+                                                    PathEntryType.PRESIGNALS);
+                                        } else {
+                                            option.setEntry(PathEntryType.PRESIGNALS,
+                                                    preSignalsList);
+                                            gui.sendPosIdentList(preSignalsList, this.node, mode,
+                                                    rotation, PathEntryType.PRESIGNALS);
                                         }
                                     });
+                            preSignalsList.forEach(ident -> {
+                                boxEntity.rendering.addColoredPoint(GuiSignalBox.SELECTION_COLOR,
+                                        ident.getPoint());
+                            });
+                            screen.add(boxEntity.entity);
+
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 preSignalEntity.add(new UIToolTip(I18Wrapper.format("property.presignals.desc")));
                 parent.add(preSignalEntity);
 
-                final Point selcetedPoint =
-                        option.getEntry(PathEntryType.PROTECTIONWAY_END).orElse(new Point(-1, -1));
                 final UIEntity protectionWay = GuiElements
                         .createButton(I18Wrapper.format("property.protectionway.name"), e -> {
+                            final Point selcetedPoint =
+                                    option.getEntry(PathEntryType.PROTECTIONWAY_END)
+                                            .orElse(new Point(-1, -1));
+
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
                             screen.add(new UIBox(UIBox.VBOX, 5));
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
-                            final AtomicReference<UIEntity> previous = new AtomicReference<>();
-                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
-                                    (tile, sbt) -> {
-                                        if (sbt.getNode().isEmpty())
+
+                            final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
+                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                        final SignalBoxNode node = grid.getNodeChecked(point)
+                                                .orElse(new SignalBoxNode());
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
                                             return;
-                                        final Point point = sbt.getPoint();
-                                        final UIColor color =
-                                                new UIColor(GuiSignalBox.SELECTION_COLOR);
-                                        if (point.equals(selcetedPoint)) {
-                                            tile.add(color);
-                                            previous.set(tile);
+                                        final Point select =
+                                                option.getEntry(PathEntryType.PROTECTIONWAY_END)
+                                                        .orElse(new Point(-1, -1));
+                                        if (point.equals(select)) {
+                                            rendering.removeSelection(SelectionType.FIRST);
+                                            gui.removeEntryFromServer(this.node, mode, rotation,
+                                                    PathEntryType.PROTECTIONWAY_END);
+                                            option.removeEntry(PathEntryType.PROTECTIONWAY_END);
+                                        } else {
+                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                                    point, SelectionType.FIRST);
+                                            gui.sendPointEntry(point, this.node, mode, rotation,
+                                                    PathEntryType.PROTECTIONWAY_END);
+                                            option.setEntry(PathEntryType.PROTECTIONWAY_END, point);
                                         }
-                                        tile.add(new UIClickable(e1 -> {
-                                            if (!tile.getParent().getParent().getParent()
-                                                    .isHovered())
-                                                return;
-                                            if (previous.get() != null) {
-                                                previous.get().findRecursive(UIColor.class)
-                                                        .forEach(previous.get()::remove);
-                                            }
-                                            if (point.equals(selcetedPoint)) {
-                                                gui.removeEntryFromServer(node, mode, rotation,
-                                                        PathEntryType.PROTECTIONWAY_END);
-                                            } else {
-                                                tile.add(color);
-                                                previous.set(tile);
-                                                gui.sendPointEntry(point, node, mode, rotation,
-                                                        PathEntryType.PROTECTIONWAY_END);
-                                                option.setEntry(PathEntryType.PROTECTIONWAY_END,
-                                                        point);
-                                            }
-                                        }));
                                     });
+
+                            if (!selcetedPoint.equals(new Point(-1, -1))) {
+                                boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                        selcetedPoint, SelectionType.FIRST);
+                            }
+
+                            screen.add(boxEntity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 protectionWay.add(new UIToolTip(I18Wrapper.format("property.protectionway.desc")));
                 parent.add(protectionWay);
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.PROTECTIONWAY_RESET, mode, rotation, ".protectionway_reset");
-                parent.add(GuiElements.createEnumElement(new SizeIntegerables<>(
-                        "reset_protectionway_delay", 60, get -> String.valueOf(get)), i -> {
-                            option.setEntry(PathEntryType.DELAY, i);
-                            gui.sendIntEntryToServer(i, node, mode, rotation, PathEntryType.DELAY);
-                        }, option.getEntry(PathEntryType.DELAY).orElse(0)));
+
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.DELAY,
+                        I18Wrapper.format("property.reset_protectionway_delay.name"), 0));
             }
             case RS: {
+                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
+                        PathEntryType.SIGNAL, mode, rotation);
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
                         e -> {
                             final boolean state = e == 1 ? true : false;
@@ -292,8 +295,6 @@ public class ModeDropDownBoxUI {
                                     PathEntryType.CAN_BE_OVERSTPEPPED);
                         },
                         option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false) ? 1 : 0));
-                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
-                        PathEntryType.SIGNAL, mode, rotation);
                 break;
             }
             case BUE: {
@@ -311,6 +312,7 @@ public class ModeDropDownBoxUI {
                 if (!boxPos.isPresent()) {
                     break;
                 }
+
                 final List<Point> validInConnections = gui.container.validInConnections
                         .getOrDefault(boxPos.get(), new ArrayList<>());
                 if (validInConnections.isEmpty()) {
@@ -336,29 +338,51 @@ public class ModeDropDownBoxUI {
                         .map(point -> validInConnections.indexOf(point)).orElse(-1)));
                 break;
             }
+
             case IN_CONNECTION: {
-                final List<Point> validEnds = gui.container.grid.getValidEnds();
-                if (validEnds.isEmpty()) {
-                    break;
-                }
-                final IIntegerable<String> integerable = new DisableIntegerable<>(
-                        SizeIntegerables.of("inconnection", validEnds.size(), id -> {
-                            final Point point = validEnds.get(id);
-                            if (point == null)
-                                return "Disabled";
-                            return point.toShortString();
-                        }));
-                parent.add(GuiElements.createEnumElement(integerable, e -> {
-                    final Point point = e >= 0 ? validEnds.get(e) : null;
-                    if (point == null) {
-                        option.removeEntry(PathEntryType.POINT);
-                        gui.removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
-                    } else {
-                        option.setEntry(PathEntryType.POINT, point);
-                        gui.sendPointEntry(point, node, mode, rotation, PathEntryType.POINT);
-                    }
-                }, option.getEntry(PathEntryType.POINT).map(point -> validEnds.indexOf(point))
-                        .orElse(-1)));
+                final UIEntity inConnections = GuiElements
+                        .createButton(I18Wrapper.format("property.inconnection.name"), e -> {
+                            final Point selcetedPoint =
+                                    option.getEntry(PathEntryType.POINT).orElse(new Point(-1, -1));
+
+                            final UIEntity screen = new UIEntity();
+                            screen.setInherits(true);
+                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
+                                    e1 -> gui.pop()));
+
+                            final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
+                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                        final SignalBoxNode node = grid.getNodeChecked(point)
+                                                .orElse(new SignalBoxNode());
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE || !node.isValidEnd())
+                                            return;
+                                        final Point select = option.getEntry(PathEntryType.POINT)
+                                                .orElse(new Point(-1, -1));
+                                        if (point.equals(select)) {
+                                            rendering.removeSelection(SelectionType.FIRST);
+                                            gui.removeEntryFromServer(this.node, mode, rotation,
+                                                    PathEntryType.POINT);
+                                            option.removeEntry(PathEntryType.POINT);
+                                        } else {
+                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                                    point, SelectionType.FIRST);
+                                            gui.sendPointEntry(point, this.node, mode, rotation,
+                                                    PathEntryType.POINT);
+                                            option.setEntry(PathEntryType.POINT, point);
+                                        }
+                                    });
+
+                            if (!selcetedPoint.equals(new Point(-1, -1))) {
+                                boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                        selcetedPoint, SelectionType.FIRST);
+                            }
+
+                            screen.add(boxEntity.entity);
+                            gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
+                        });
+                inConnections.add(new UIToolTip(I18Wrapper.format("property.inconnection.desc")));
+                parent.add(inConnections);
                 break;
             }
             case ZS3: {
@@ -377,64 +401,58 @@ public class ModeDropDownBoxUI {
                             screen.add(new UIBox(UIBox.VBOX, 5));
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
-                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
-                                    (nodeEntity, tile) -> {
-                                        if (tile.getPoint().equals(identifier.point)) {
-                                            nodeEntity
-                                                    .add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                                        }
-                                        final SignalBoxNode node = tile.getNode();
+                            final BoxEntity entity = UISignalBoxRendering.createSignalBoxEntity(
+                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE)
+                                            return;
+                                        final SignalBoxNode node = gui.container.grid
+                                                .getNodeChecked(point).orElse(new SignalBoxNode());
                                         if (node.isEmpty())
                                             return;
-                                        nodeEntity.add(new UIClickable(e1 -> {
-                                            final Set<ModeSet> pathModesSet =
-                                                    node.toPathIdentifier().stream()
-                                                            .map(ident -> ident.getMode())
-                                                            .collect(Collectors.toSet());
-                                            if (pathModesSet.isEmpty()) {
-                                                final UIToolTip tip = new UIToolTip(
-                                                        I18Wrapper.format("gui.tile.notvalid"),
-                                                        true);
-                                                screen.add(tip);
-                                                new Thread(() -> {
-                                                    try {
-                                                        Thread.sleep(3000);
-                                                    } catch (final InterruptedException ex) {
+
+                                        final List<ModeSet> pathModes = new ArrayList<>();
+                                        node.toPathIdentifier().stream()
+                                                .map(ident -> ident.getMode()).forEach(modeSet -> {
+                                                    if (!pathModes.contains(modeSet)) {
+                                                        pathModes.add(modeSet);
                                                     }
-                                                    screen.remove(tip);
-                                                }).start();
-                                                return;
-                                            }
-                                            final List<ModeSet> pathModes =
-                                                    new ArrayList<>(pathModesSet);
-                                            if (pathModes.size() > 1) {
-                                                final UIEnumerable enumerable = new UIEnumerable(
-                                                        pathModes.size(), "mode_select");
-                                                enumerable.setMin(-1);
-                                                enumerable.setIndex(-1);
-                                                enumerable.setOnChange(i -> {
-                                                    if (i < 0)
-                                                        return;
-                                                    consumer.accept(node, pathModes.get(i));
-                                                    enumerable.setIndex(-1);
                                                 });
-                                                final UIEntity entity = GuiElements
-                                                        .createSelectionScreen(enumerable,
-                                                                SizeIntegerables.of("mode_select",
-                                                                        pathModes.size(), get -> {
-                                                                            final ModeSet modeSet =
-                                                                                    pathModes.get(
-                                                                                            get);
-                                                                            return modeSet.mode
-                                                                                    .toString();
-                                                                        }));
-                                                entity.setInherits(true);
-                                                gui.push(entity);
-                                            } else {
-                                                consumer.accept(node, pathModes.get(0));
-                                            }
-                                        }));
+
+                                        if (pathModes.isEmpty()) {
+                                            final UIToolTip tip = new UIToolTip(
+                                                    I18Wrapper.format("gui.tile.notvalid"), true);
+                                            screen.add(tip);
+                                            gui.executor.schedule(() -> screen.remove(tip), 3,
+                                                    TimeUnit.SECONDS);
+                                        } else if (pathModes.size() == 1) {
+                                            handleTrainNumberChange(node, pathModes.get(0),
+                                                    rendering, false);
+                                        } else {
+                                            final UIEnumerable enumerable = new UIEnumerable(
+                                                    pathModes.size(), "mode_select");
+                                            enumerable.setMin(-1);
+                                            enumerable.setIndex(-1);
+                                            enumerable.setOnChange(i -> {
+                                                final ModeSet modeSet = pathModes.get(i);
+                                                handleTrainNumberChange(node, modeSet, rendering,
+                                                        true);
+                                            });
+                                            gui.push(GuiElements.createSelectionScreen(enumerable,
+                                                    SizeIntegerables.of("mode_select",
+                                                            pathModes.size(), id -> {
+                                                                final ModeSet modeSet =
+                                                                        pathModes.get(id);
+                                                                return modeSet.mode.toString()
+                                                                        + " - "
+                                                                        + SignalBoxUtil
+                                                                                .getDegreeStringFromRotation(
+                                                                                        modeSet.rotation);
+                                                            })));
+                                        }
                                     });
+                            entity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                    identifier.point, SelectionType.FIRST);
+                            screen.add(entity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
                 parent.add(button);
@@ -445,14 +463,14 @@ public class ModeDropDownBoxUI {
         }
     }
 
-    private final BiConsumer<SignalBoxNode, ModeSet> consumer = (node, mode) -> {
+    private void handleTrainNumberChange(final SignalBoxNode node, final ModeSet mode,
+            final UISignalBoxRendering rendering, final boolean wereMultipleEntries) {
         final PathOptionEntry optionEntry = node.getOption(mode).get();
         final ModeIdentifier thisIdent = new ModeIdentifier(this.node.getPoint(), modeSet);
         if (optionEntry.containsEntry(PathEntryType.CONNECTED_TRAINNUMBER)) {
             final ModeIdentifier otherIdent =
                     optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER).get();
             if (!thisIdent.equals(otherIdent)) {
-                gui.pop();
                 gui.push(GuiElements.createScreen(screen -> {
                     final UIEntity entity = new UIEntity();
                     entity.setInherits(true);
@@ -470,26 +488,43 @@ public class ModeDropDownBoxUI {
                         disconnectFromEachOther(thisIdent, otherIdent, gui.container.grid, gui);
                         connectToEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
                                 gui.container.grid, gui);
+                        rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
+                                SelectionType.FIRST);
                         gui.pop();
+                        if (wereMultipleEntries) {
+                            gui.pop();
+                        }
                     }));
                     lowerEntity.add(GuiElements.createSpacerH(20));
                     lowerEntity.add(GuiElements.createButton(I18Wrapper.format("btn.no"), e -> {
                         gui.pop();
+                        if (wereMultipleEntries) {
+                            gui.pop();
+                        }
                     }));
                     entity.add(lowerEntity);
                     screen.add(entity);
                 }));
+                if (wereMultipleEntries) {
+                    gui.push(new UIEntity());
+                }
                 return;
             }
             disconnectFromEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
                     gui.container.grid, gui);
-            gui.pop();
+            rendering.removeSelection(SelectionType.FIRST);
         } else {
+            this.node.getOption(modeSet)
+                    .ifPresent(numberOption -> numberOption
+                            .getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
+                            .ifPresent(entry -> disconnectFromEachOther(thisIdent, entry,
+                                    gui.container.grid, gui)));
             connectToEachOther(new ModeIdentifier(node.getPoint(), mode), thisIdent,
                     gui.container.grid, gui);
-            gui.pop();
+            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
+                    SelectionType.FIRST);
         }
-    };
+    }
 
     private static void connectToEachOther(final ModeIdentifier ident1, final ModeIdentifier ident2,
             final SignalBoxGrid grid, final GuiSignalBox gui) {
@@ -520,6 +555,59 @@ public class ModeDropDownBoxUI {
     private void changeShowState() {
         open = !open;
         update.run();
+    }
+
+    private UIEntity getTextFieldEntityforType(final EnumGuiMode mode, final Rotation rotation,
+            final PathEntryType<Integer> type, final String labelName, final int defaultValue) {
+        final UIEntity hentity = new UIEntity();
+        hentity.setInheritWidth(true);
+        hentity.setHeight(20);
+        hentity.add(new UIBox(UIBox.HBOX, 0));
+
+        final UIEntity labelEntity = new UIEntity();
+        labelEntity.setInheritWidth(true);
+        labelEntity.setHeight(20);
+        labelEntity.add(new UILabel(labelName));
+        hentity.add(labelEntity);
+
+        final UIEntity textInputEntity = new UIEntity();
+        textInputEntity.setInheritWidth(true);
+        textInputEntity.setHeight(20);
+
+        final UITextInput input =
+                new UITextInput(String.valueOf(option.getEntry(type).orElse(defaultValue)));
+        input.setValidator(str -> {
+            if (str.isEmpty())
+                return true;
+            try {
+                final int i = Integer.valueOf(str);
+                if (i < 0 || i > 120)
+                    return false;
+            } catch (final Exception e) {
+                return false;
+            }
+            return true;
+        });
+        input.setOnTextUpdate(str -> {
+            int i = 0;
+            if (!str.isEmpty()) {
+                try {
+                    i = Integer.valueOf(str);
+                } catch (final Exception e) {
+                }
+            }
+            if (i != defaultValue) {
+                option.setEntry(type, i);
+                gui.sendIntEntryToServer(i, node, mode, rotation, type);
+            } else {
+                option.removeEntry(type);
+                gui.removeEntryFromServer(node, mode, rotation, type);
+            }
+        });
+        textInputEntity.add(input);
+
+        hentity.add(textInputEntity);
+        return hentity;
     }
 
 }
