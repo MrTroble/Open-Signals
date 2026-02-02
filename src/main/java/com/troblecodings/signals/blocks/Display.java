@@ -85,7 +85,8 @@ public class Display extends BasicBlock {
         info.push();
         info.translate(x, y, 0);
         info.scale(0.5, 0.5, 0);
-        info.font.draw(info.stack, timeH + ":" + timeM + ":" + timeS, 0, 0, 0xFFFFFFFF);
+        info.font.draw(info.stack, String.format("%02d", timeH) + ":" + String.format("%02d", timeM)
+                + ":" + String.format("%02d", timeS), 0, 0, 0xFFFFFFFF);
         info.pop();
     }
 
