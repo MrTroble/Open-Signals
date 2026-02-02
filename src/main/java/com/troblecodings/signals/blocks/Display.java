@@ -2,9 +2,11 @@ package com.troblecodings.signals.blocks;
 
 import java.time.LocalTime;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
@@ -219,6 +221,43 @@ public class Display extends BasicBlock {
         info.pop();
     }
 
+    private List<String> texts;
+    private int switchingTime = 0;
+    private int currentText = -1;
+
+    public void renderSwitchingText(final RenderOverlayInfo info, final int x, final int y) {
+        info.push();
+        info.translate(x, y, 0);
+
+        final List<String> texts =
+                ImmutableList.of("Ohne Halt in Presslau!", "Ohne Speisewagen!", "Mit Speisewagen!");
+        final int switchingTime = 100;
+        setUpSwitchingText(texts);
+
+        if (this.switchingTime >= switchingTime) {
+            currentText++;
+            currentText = currentText >= texts.size() ? 0 : currentText;
+            this.switchingTime = 0;
+        }
+
+        renderColoredBackground(info, 60, 7, 0xFFFFFFFF);
+        final String text = texts.get(currentText);
+        info.translate(0.5f, 1, -0.5f);
+        info.scale(0.5f, 0.5f, 0);
+        info.font.draw(info.stack, text, 0, 0, 0xFF000000);
+
+        this.switchingTime++;
+
+        info.pop();
+    }
+
+    private void setUpSwitchingText(final List<String> texts) {
+        if (texts.equals(this.texts))
+            return;
+        this.texts = texts;
+        this.currentText = 0;
+    }
+
     private void checkRemoveFirstElement(final RenderOverlayInfo info, final float scale) {
         if (hiddenText.isEmpty())
             return;
@@ -332,6 +371,7 @@ public class Display extends BasicBlock {
         renderAnalogClock(info, 100, 15);
         renderPlatform(info, 92, 35);
         renderMovingText(info, 0, 48);
+        renderSwitchingText(info, 25, 16);
 
         if (this.isDoubleSided) {
             info.rotate(0, (float) Math.PI, 0);
@@ -344,6 +384,7 @@ public class Display extends BasicBlock {
             renderAnalogClock(info, 100, 15);
             renderPlatform(info, 92, 35);
             renderMovingText(info, 0, 48);
+            renderSwitchingText(info, 25, 16);
         }
         info.pop();
     }
