@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -126,13 +127,14 @@ public final class SignalBoxUtil {
             debugPointList.add(previousPoint);
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
-                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWay))
-                    return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
+                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWay.stream()
+                        .filter(nodes::contains).collect(Collectors.toList())))
+                    return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
                 if (ConfigHandler.GENERAL.debugMode.get()) {
                     grid.sendDebugPointUpdates(debugPointList);
                     debugPointList.clear();
@@ -199,13 +201,14 @@ public final class SignalBoxUtil {
             final Point previousPoint = currentPath.getPoint();
             final Point nextPoint = currentPath.path.point2;
             if (previousPoint.equals(p2)) {
-                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWayNodes))
-                    return ImmutableList.of();
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
+                if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWayNodes.stream()
+                        .filter(nodes::contains).collect(Collectors.toList())))
+                    return ImmutableList.of();
                 return ImmutableList.copyOf(nodes);
             }
             checker.previousPoint = previousPoint;
