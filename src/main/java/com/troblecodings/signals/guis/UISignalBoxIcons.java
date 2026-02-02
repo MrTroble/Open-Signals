@@ -3,10 +3,10 @@ package com.troblecodings.signals.guis;
 import com.troblecodings.signals.OpenSignalsMain;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class UISignalBoxIcons {
 
     private UISignalBoxIcons() {

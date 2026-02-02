@@ -433,14 +433,10 @@ public class Signal extends BasicBlock {
                 return;
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            } else {
-                if (world.getBlockTicks().hasScheduledTick(pos, this))
-                    return;
-                else {
-                    if (sound.predicate.test(properties)) {
-                        world.getBlockTicks().scheduleTick(pos, this, 1);
-                    }
-                }
+            } else if (world.getBlockTicks().hasScheduledTick(pos, this))
+                return;
+            else if (sound.predicate.test(properties)) {
+                world.getBlockTicks().scheduleTick(pos, this, 1);
             }
         });
     }

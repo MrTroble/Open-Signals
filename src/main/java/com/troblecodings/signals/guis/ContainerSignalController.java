@@ -149,6 +149,7 @@ public class ContainerSignalController extends ContainerBase
         if (isInputConnected) {
             linkedRSInput = buffer.getBlockPos();
         }
+        update();
     }
 
     @Override
