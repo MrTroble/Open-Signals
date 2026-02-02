@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraftforge.client.model.data.IModelData;
 
@@ -33,28 +34,31 @@ public class SignalAnimationHandler {
     private int animationsRunning = 0;
     private long lastWorldTick = -1;
 
-    private int calls = 0;
-
-    public static final float BASIC_ANIMATION_SPEED = 0.01f;
-    public static final int MAX_CALLS_PER_TICK = 3;
+    public static final float BASIC_ANIMATION_SPEED = 0.001f;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;
     }
 
-    private final Map<IBakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel = //
+    private final Map<IBakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel =
             new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
         final BlockState state = tile.getBlockState();
         if (!(state.getBlock() instanceof Signal))
             return;
+        final long currentTick = Util.getMillis();
+        if (lastWorldTick < 0) {
+            this.lastWorldTick = currentTick;
+        }
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final BlockModelRenderer renderer = info.dispatcher.getModelRenderer();
         final IVertexBuilder vertex =
                 info.source.getBuffer(RenderTypeLookup.getRenderType(state, false));
         final IModelData data = tile.getModelData();
-        final boolean shouldUpdateAnimation = shouldUpdateAnimation();
+
+        final float tick = currentTick - this.lastWorldTick;
+        this.lastWorldTick = currentTick;
 
         synchronized (animationPerModel) {
             animationPerModel.forEach((model, entry) -> {
@@ -70,27 +74,16 @@ public class SignalAnimationHandler {
                         info.lightColor, info.overlayTexture, data);
                 info.stack.popPose();
 
-                if (translation.isAnimationAssigned() && shouldUpdateAnimation) {
-                    updateAnimation(translation);
+                if (translation.isAnimationAssigned()) {
+                    updateAnimation(translation, tick);
                 }
             });
         }
     }
 
-    private boolean shouldUpdateAnimation() {
-        long currentTick = tile.getLevel().getGameTime();
-        if (currentTick != lastWorldTick) {
-            calls = 0;
-            lastWorldTick = currentTick;
-        }
-        calls++;
-        if (calls <= MAX_CALLS_PER_TICK)
-            return true;
-        return false;
-    }
-
-    private void updateAnimation(final ModelTranslation translation) {
+    private void updateAnimation(final ModelTranslation translation, final float tick) {
         final SignalAnimation animation = translation.getAssigendAnimation();
+        animation.updateAnimation(tick);
         if (animation.isFinished()) {
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
             translation.removeAnimation();
@@ -98,16 +91,17 @@ public class SignalAnimationHandler {
             animationsRunning--;
             return;
         }
-        animation.updateAnimation();
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 
-    public void updateStates(final Map<SEProperty, String> newProperties,
-            final Map<SEProperty, String> oldProperties) {
-        if (oldProperties.isEmpty()) {
-            updateToFinalizedAnimations(new ModelInfoWrapper(newProperties));
+    public void updateStates(final Map<SEProperty, String> properties, final boolean firstLoad) {
+        if (properties == null || properties.isEmpty())
+            return;
+        final ModelInfoWrapper wrapper = new ModelInfoWrapper(properties);
+        if (firstLoad) {
+            updateToFinalizedAnimations(wrapper);
         } else {
-            updateAnimations(new ModelInfoWrapper(newProperties));
+            updateAnimations(wrapper);
         }
     }
 
@@ -161,7 +155,7 @@ public class SignalAnimationHandler {
                 final IBakedModel model = SignalCustomModel.getModelFromLocation(
                         new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
                 final ModelTranslation translation =
-                        new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
+                        new ModelTranslation(VectorWrapper.ZERO, Quaternion.ONE);
                 translation.setModelTranslation(entry.getValue().copy());
                 animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
                         .map(animation -> animation.copy()).collect(Collectors.toList())));

@@ -25,6 +25,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.SignalStateLoadHoler;
@@ -325,6 +326,11 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(stateInfo.world);
         }
+        if (file == null) {
+            OpenSignalsMain.getLogger().error(
+                    "There is no StateFile for " + stateInfo.pos + "! This shouldn't be so!");
+            return map;
+        }
         SignalStatePosV2 pos = file.find(stateInfo.pos);
         if (pos == null) {
             if (stateInfo.world.isClientSide) {
@@ -355,8 +361,9 @@ public final class SignalStateHandler implements INetworkSync {
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
-        if (NameHandler.isNameLoaded(stateInfo)) {
-            final String customName = NameHandler.getName(stateInfo);
+        final StateInfo info = stateInfo.toStateInfo();
+        if (NameHandler.isNameLoaded(info)) {
+            final String customName = NameHandler.getName(info);
             if (customName == null || customName.isEmpty()
                     || customName.equals(stateInfo.signal.getSignalTypeName())) {
                 map.put(Signal.CUSTOMNAME, "false");
@@ -364,17 +371,16 @@ public final class SignalStateHandler implements INetworkSync {
                 map.put(Signal.CUSTOMNAME, "true");
             }
         } else {
-            NameHandler.runTaskWhenNameLoaded(new StateInfo(stateInfo.world, stateInfo.pos),
-                    (info, name, changed) -> {
-                        if (name == null || name.isEmpty()
-                                || name.equals(stateInfo.signal.getSignalTypeName())) {
-                            runTaskWhenSignalLoaded(stateInfo, (_u1, _u2,
-                                    _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "false"));
-                        } else {
-                            runTaskWhenSignalLoaded(stateInfo, (_u1, _u2,
-                                    _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "true"));
-                        }
-                    });
+            NameHandler.runTaskWhenNameLoaded(info, (infoState, name, changed) -> {
+                if (name == null || name.isEmpty()
+                        || name.equals(stateInfo.signal.getSignalTypeName())) {
+                    runTaskWhenSignalLoaded(stateInfo,
+                            (_u1, _u2, _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "false"));
+                } else {
+                    runTaskWhenSignalLoaded(stateInfo,
+                            (_u1, _u2, _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "true"));
+                }
+            });
         }
         return map;
     }
@@ -445,7 +451,7 @@ public final class SignalStateHandler implements INetworkSync {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putInt(info.signal.getID());
-        buffer.putByte((byte) 255);
+        buffer.putBoolean(true);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
@@ -456,11 +462,10 @@ public final class SignalStateHandler implements INetworkSync {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
         buffer.putInt(stateInfo.signal.getID());
-        buffer.putByte((byte) properties.size());
-        properties.forEach((property, value) -> {
-            buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
-            buffer.putByte((byte) property.getParent().getIDFromValue(value));
-        });
+        buffer.putBoolean(false);
+        buffer.putMapWithCombinedValueConsumer(properties,
+                NetworkBufferWrappers.getSEPropertyConsumer(stateInfo.signal),
+                (buf, prop, value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
         return buffer.build();
     }
 

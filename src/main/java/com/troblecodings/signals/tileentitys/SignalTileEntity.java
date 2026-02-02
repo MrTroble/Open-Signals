@@ -98,15 +98,17 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return handler;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void requestModelDataUpdate() {
-        final Map<SEProperty, String> newProperties = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> newProperties =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
+        final boolean wasEmpty = properties.isEmpty();
         synchronized (properties) {
             this.properties.clear();
             this.properties.putAll(newProperties);
         }
-        handler.updateStates(newProperties, properties);
+        handler.updateStates(newProperties, wasEmpty);
         super.requestModelDataUpdate();
     }
 
@@ -120,13 +122,11 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         if (!level.isClientSide) {
             SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
                     listener);
-        } else {
-            if (getSignal().hasAnimation()) {
-                handler.updateAnimationListFromBlock();
-                final Map<SEProperty, String> newProperties = ClientSignalStateHandler
-                        .getClientStates(new StateInfo(level, worldPosition));
-                handler.updateStates(newProperties, properties);
-            }
+        } else if (getSignal().hasAnimation()) {
+            handler.updateAnimationListFromBlock();
+            handler.updateStates(
+                    ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition)),
+                    true);
         }
     }
 
@@ -140,11 +140,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        if (handler.areAnimationsRunning())
-            return new AxisAlignedBB(getBlockPos().offset(-50, -50, -50),
-                    getBlockPos().offset(50, 50, 50));
-        else
-            return super.getRenderBoundingBox();
+        return getSignal().getRenderBox().map(box -> box.move(worldPosition))
+                .orElse(super.getRenderBoundingBox());
     }
 
     @OnlyIn(Dist.CLIENT)

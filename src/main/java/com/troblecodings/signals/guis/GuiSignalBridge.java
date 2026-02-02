@@ -197,7 +197,7 @@ public class GuiSignalBridge extends GuiBase {
         final UIEntity plane = new UIEntity();
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
-        plane.add(new UIBorder(GuiSignalBox.GRID_COLOR, 2));
+        plane.add(new UIBorder(UISignalBoxRendering.GRID_COLOR, 2));
         plane.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
         for (int x = 0; x < TILE_COUNT; x++) {
@@ -210,7 +210,7 @@ public class GuiSignalBridge extends GuiBase {
                 final UIEntity tile = new UIEntity();
                 tile.setHeight(TILE_WIDTH);
                 tile.setWidth(TILE_WIDTH);
-                tile.add(new UIBorder(GuiSignalBox.GRID_COLOR, 0.5f));
+                tile.add(new UIBorder(UISignalBoxRendering.GRID_COLOR, 0.5f));
                 row.add(tile);
                 final SignalBridgeBasicBlock savedBlock = container.builder.getBlockOnPoint(point);
                 if (savedBlock != null) {
@@ -266,7 +266,7 @@ public class GuiSignalBridge extends GuiBase {
         final UIEntity entity = new UIEntity();
         entity.setHeight(TILE_COUNT * TILE_WIDTH);
         entity.setWidth(TILE_COUNT * TILE_WIDTH);
-        entity.add(new UIBorder(GuiSignalBox.GRID_COLOR, 2));
+        entity.add(new UIBorder(UISignalBoxRendering.GRID_COLOR, 2));
         entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         renderEntity = new UIEntity();
         renderEntity.setHeight(TILE_COUNT * TILE_WIDTH);

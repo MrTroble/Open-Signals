@@ -66,12 +66,12 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        this.enumValue = getObjFromID(buffer.getInt());
+        this.enumValue = buffer.getEnumValue(enumClass);
 
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putInt(this.enumValue.ordinal());
+        buffer.putEnumValue(enumValue);
     }
 }

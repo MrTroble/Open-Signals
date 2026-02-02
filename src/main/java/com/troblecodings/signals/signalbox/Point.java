@@ -1,11 +1,14 @@
 package com.troblecodings.signals.signalbox;
 
+import java.util.Objects;
+
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.core.interfaces.INetworkSaveable;
+import com.troblecodings.core.interfaces.ISaveable;
 
-public class Point implements INetworkSavable {
+public class Point implements INetworkSaveable, ISaveable {
 
     private int x, y;
 
@@ -61,17 +64,20 @@ public class Point implements INetworkSavable {
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (obj == null || !(obj instanceof Point))
-            return false;
-        final Point other = (Point) obj;
-        return this.x == other.x && this.y == other.y;
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     @Override
-    public int hashCode() {
-        final int sum = x + y;
-        return sum * (sum + 1) / 2 + x;
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Point other = (Point) obj;
+        return x == other.x && y == other.y;
     }
 
     @Override

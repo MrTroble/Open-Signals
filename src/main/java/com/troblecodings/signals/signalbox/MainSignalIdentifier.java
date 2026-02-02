@@ -12,32 +12,40 @@ import net.minecraft.util.math.BlockPos;
 
 public class MainSignalIdentifier extends PosIdentifier {
 
-    public SignalState state = SignalState.RED;
+    SignalBoxNode node = null;
 
     public MainSignalIdentifier(final ModeIdentifier identifier, final BlockPos pos,
-            final SignalState state) {
+            final SignalBoxGrid grid) {
         super(identifier, pos);
-        this.state = state;
+        this.node = grid.getNodeChecked(getPoint()).orElseThrow(() -> new IllegalArgumentException(
+                "There should be a node for " + getPoint() + " in " + grid + " but there isin't!"));
     }
 
-    public MainSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos) {
-        super(point, mode, pos);
+    public MainSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos,
+            final SignalBoxGrid grid) {
+        this(new ModeIdentifier(point, mode), pos, grid);
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
         super.writeNetwork(buffer);
-        buffer.putEnumValue(state);
     }
 
-    public static MainSignalIdentifier of(final ReadBuffer buffer) {
-        return new MainSignalIdentifier(ModeIdentifier.of(buffer), buffer.getBlockPos(),
-                buffer.getEnumValue(SignalState.class));
+    public static MainSignalIdentifier of(final ReadBuffer buffer, final SignalBoxGrid grid) {
+        return new MainSignalIdentifier(ModeIdentifier.of(buffer), buffer.getBlockPos(), grid);
+    }
+
+    public void updateSignalState(final SignalState state) {
+        node.updateState(getModeSet(), state);
+    }
+
+    public SignalState getSignalState() {
+        return node.getState(getModeSet());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, pos, state);
+        return Objects.hash(identifier, pos);
     }
 
     @Override
@@ -49,19 +57,17 @@ public class MainSignalIdentifier extends PosIdentifier {
         if (getClass() != obj.getClass())
             return false;
         final MainSignalIdentifier other = (MainSignalIdentifier) obj;
-        return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos)
-                && state == other.state;
+        return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos);
     }
 
     @Override
     public String toString() {
-        return "MainSignalIdentifier [ModeIdentifier=" + identifier + ",pos=" + pos + ",state="
-                + state + "]";
+        return "MainSignalIdentifier [ModeIdentifier=" + identifier + ",pos=" + pos + "]";
     }
 
     public static enum SignalState {
 
-        RED, GREEN, OFF, SUBSIDIARY_GREEN, SUBSIDIARY_RED, SUBSIDIARY_OFF;
+        GREEN, RED, OFF, SUBSIDIARY_GREEN, SUBSIDIARY_RED, SUBSIDIARY_OFF;
 
         public static SignalState combine(final ShowSubsidiary show) {
             if (show == null)

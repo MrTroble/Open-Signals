@@ -24,6 +24,7 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
@@ -87,8 +88,8 @@ public class GuiSignalController extends GuiBase {
     private void createPageForSide(final Direction face, final UIEntity leftSide) {
         final UIEntity middlePart = new UIEntity();
 
-        final IIntegerable<String> profile = SizeIntegerables.of("profile", 32,
-                in -> String.valueOf(in));
+        final IIntegerable<String> profile =
+                SizeIntegerables.of("profile", 32, in -> String.valueOf(in));
         final UIEnumerable profileEnum = new UIEnumerable(32, "profile");
         leftSide.add(GuiElements.createEnumElement(profileEnum, profile, x -> {
             currentProfile = x;
@@ -131,8 +132,8 @@ public class GuiSignalController extends GuiBase {
     private void updateProfileProperties(final UIEntity middlePart, final UIEnumerable profile) {
         middlePart.clearChildren();
         profile.setIndex(currentProfile);
-        final Map<SEProperty, String> properties = controller.allRSStates
-                .computeIfAbsent(currentProfile, _u -> new HashMap<>());
+        final Map<SEProperty, String> properties =
+                controller.allRSStates.computeIfAbsent(currentProfile, _u -> new HashMap<>());
         controller.getProperties().forEach((property, value) -> {
             if (!properties.containsKey(property)) {
                 properties.put(property, "DISABLED");
@@ -144,8 +145,11 @@ public class GuiSignalController extends GuiBase {
                             property.getParent().getIDFromValue(value));
                 });
         properties.forEach((property, value) -> {
-            final UIEntity entity = GuiElements
-                    .createEnumElement(new DisableIntegerable<>(property), e -> {
+            final JsonEnum enumJson = property.getParent();
+            previewRedstone.addToRenderNormal(property, enumJson.getIDFromValue(value));
+            final UIEntity entity =
+                    GuiElements.createEnumElement(new DisableIntegerable<>(property), e -> {
+                        sendPropertyToServer(property, e);
                         previewRedstone.addToRenderNormal(property, e);
                         sendPropertyToServer(property, e);
                         if (e == -1) {
@@ -195,8 +199,8 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(toggle);
 
         for (final Direction face : Direction.values()) {
-            final List<BakedQuad> quad = model.getQuads(state, face, SignalCustomModel.RANDOM,
-                    EmptyModelData.INSTANCE);
+            final List<BakedQuad> quad =
+                    model.getQuads(state, face, SignalCustomModel.RANDOM, EmptyModelData.INSTANCE);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
             faceEntity.setHeight(20);
@@ -234,14 +238,16 @@ public class GuiSignalController extends GuiBase {
 
         final Signal signal = this.controller.getSignal();
         if (signal == null) {
-            this.entity.add(new UILabel("Not connected"));
+            this.entity.add(new UILabel(I18Wrapper.format("gui.notconnected")));
             return;
         }
         lowerEntity.setInherits(true);
 
-        final String name = I18Wrapper.format("tile." + signal.delegate.name().getPath() + ".name")
+        final String name = I18Wrapper
+                .format("block." + OpenSignalsMain.MODID + "." + signal.delegate.name().getPath())
                 + "; Name: "
-                + ClientNameHandler.getClientName(new StateInfo(mc.level, controller.getPos()));
+                + ClientNameHandler.getClientName(new StateInfo(mc.level, controller.getPos()))
+                        .replace("[n]", " ");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
@@ -318,11 +324,10 @@ public class GuiSignalController extends GuiBase {
 
     private void sendAndSetProfile(final Direction facing, final int profile,
             final EnumState state) {
-        if (!loaded) {
+        if (!loaded)
             return;
-        }
-        final Map<EnumState, Integer> map = controller.enabledRSStates.computeIfAbsent(facing,
-                _u -> new HashMap<>());
+        final Map<EnumState, Integer> map =
+                controller.enabledRSStates.computeIfAbsent(facing, _u -> new HashMap<>());
         if (profile == -1) {
             map.remove(state);
         } else {
@@ -341,9 +346,8 @@ public class GuiSignalController extends GuiBase {
     }
 
     private void sendCurrentMode() {
-        if (!loaded) {
+        if (!loaded)
             return;
-        }
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalControllerNetwork.SEND_MODE);
         buffer.putByte((byte) currentMode.ordinal());
@@ -351,9 +355,8 @@ public class GuiSignalController extends GuiBase {
     }
 
     private void sendRSProfile(final int profile) {
-        if (!loaded) {
+        if (!loaded)
             return;
-        }
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalControllerNetwork.SEND_RS_PROFILE);
         buffer.putByte((byte) profile);
@@ -361,9 +364,8 @@ public class GuiSignalController extends GuiBase {
     }
 
     private void sendPropertyToServer(final SEProperty property, final int value) {
-        if (!loaded) {
+        if (!loaded)
             return;
-        }
         final WriteBuffer buffer = new WriteBuffer();
         if (value == -1) {
             buffer.putEnumValue(SignalControllerNetwork.REMOVE_PROPERTY);
@@ -376,9 +378,8 @@ public class GuiSignalController extends GuiBase {
     }
 
     private void sendRSInputProfileToServer(final int profile) {
-        if (!loaded) {
+        if (!loaded)
             return;
-        }
         final WriteBuffer buffer = new WriteBuffer();
         if (profile == -1) {
             buffer.putEnumValue(SignalControllerNetwork.REMOVE_RS_INPUT_PROFILE);

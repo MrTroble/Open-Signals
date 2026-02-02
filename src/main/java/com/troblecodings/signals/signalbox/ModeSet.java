@@ -5,12 +5,13 @@ import java.util.Objects;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.core.interfaces.INetworkSaveable;
+import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.enums.EnumGuiMode;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 import net.minecraft.util.Rotation;
 
-public class ModeSet implements INetworkSavable {
+public class ModeSet implements INetworkSaveable, ISaveable {
 
     private static final String MODE = "mode";
     private static final String ROTATION = "rotation";
@@ -18,13 +19,17 @@ public class ModeSet implements INetworkSavable {
     public EnumGuiMode mode;
     public Rotation rotation;
 
+    public ModeSet() {
+
+    }
+
     public ModeSet(final NBTWrapper compound) {
         this.read(Objects.requireNonNull(compound));
     }
 
     public ModeSet(final EnumGuiMode mode, final Rotation rotation) {
         this.mode = Objects.requireNonNull(mode);
-        this.rotation = Objects.requireNonNull(rotation);
+        this.rotation = mode.getLocalRotation(Objects.requireNonNull(rotation));
     }
 
     private ModeSet(final ReadBuffer buffer) {
@@ -60,13 +65,13 @@ public class ModeSet implements INetworkSavable {
     @Override
     public void read(final NBTWrapper tag) {
         this.mode = EnumGuiMode.valueOf(tag.getString(MODE));
-        this.rotation = Rotation.valueOf(tag.getString(ROTATION));
+        this.rotation = mode.getLocalRotation(Rotation.valueOf(tag.getString(ROTATION)));
     }
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
         this.mode = EnumGuiMode.values()[buffer.getByteToUnsignedInt()];
-        this.rotation = Rotation.values()[buffer.getByteToUnsignedInt()];
+        this.rotation = mode.getLocalRotation(Rotation.values()[buffer.getByteToUnsignedInt()]);
     }
 
     @Override

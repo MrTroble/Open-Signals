@@ -47,6 +47,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -92,6 +93,10 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+
+    public static Signal getSignalByID(final int id) {
+        return SIGNAL_IDS.get(id);
     }
 
     public int getID() {
@@ -150,8 +155,11 @@ public class Signal extends BasicBlock {
     @Override
     public VoxelShape getCollisionShape(final BlockState blockState, final IBlockReader worldIn,
             final BlockPos pos, final ISelectionContext context) {
-        return VoxelShapes.create(VoxelShapes.block().bounds().expandTowards(20, 10, 20)
-                .expandTowards(-20, -10, -20));
+        return getShape(blockState, worldIn, pos, context);
+    }
+
+    public Optional<AxisAlignedBB> getRenderBox() {
+        return prop.shape;
     }
 
     @Override
@@ -178,6 +186,10 @@ public class Signal extends BasicBlock {
 
     public List<SEProperty> getProperties() {
         return this.signalProperties;
+    }
+
+    public SEProperty getPropertyByIndex(final int index) {
+        return this.signalProperties.get(index);
     }
 
     public String getSignalTypeName() {
@@ -421,14 +433,10 @@ public class Signal extends BasicBlock {
                 return;
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            } else {
-                if (world.getBlockTicks().hasScheduledTick(pos, this))
-                    return;
-                else {
-                    if (sound.predicate.test(properties)) {
-                        world.getBlockTicks().scheduleTick(pos, this, 1);
-                    }
-                }
+            } else if (world.getBlockTicks().hasScheduledTick(pos, this))
+                return;
+            else if (sound.predicate.test(properties)) {
+                world.getBlockTicks().scheduleTick(pos, this, 1);
             }
         });
     }

@@ -12,8 +12,8 @@ public class OtherSignalIdentifier extends MainSignalIdentifier {
     public final EnumGuiMode guiMode;
 
     public OtherSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos,
-            final boolean isRepeater, final EnumGuiMode guiMode) {
-        super(point, mode, pos);
+            final boolean isRepeater, final EnumGuiMode guiMode, final SignalBoxGrid grid) {
+        super(point, mode, pos, grid);
         this.isRepeater = isRepeater;
         this.guiMode = guiMode;
     }

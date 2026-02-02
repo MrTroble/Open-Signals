@@ -103,9 +103,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void onLoad() {
         grid.setTile(this);
         grid.onLoad();
-        if (level.isClientSide) {
+        if (level.isClientSide)
             return;
-        }
         final StateInfo identifier = new StateInfo(level, worldPosition);
         SignalBoxHandler.putGrid(identifier, grid);
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);

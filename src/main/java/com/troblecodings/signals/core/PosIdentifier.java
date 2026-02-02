@@ -5,17 +5,18 @@ import java.util.Objects;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.util.math.BlockPos;
 
-public class PosIdentifier {
+public class PosIdentifier implements INetworkSaveable {
 
     private static final String BLOCK_POS = "block_pos";
 
-    public final ModeIdentifier identifier;
-    public final BlockPos pos;
+    public ModeIdentifier identifier;
+    public BlockPos pos;
 
     public PosIdentifier(final Point point, final ModeSet mode, final BlockPos pos) {
         this(new ModeIdentifier(point, mode), pos);
@@ -26,9 +27,21 @@ public class PosIdentifier {
         this.pos = pos;
     }
 
+    public PosIdentifier() {
+        identifier = null;
+        pos = null;
+    }
+
+    @Override
     public void writeNetwork(final WriteBuffer buffer) {
         identifier.writeNetwork(buffer);
         buffer.putBlockPos(pos);
+    }
+
+    @Override
+    public void readNetwork(final ReadBuffer buffer) {
+        this.identifier = ModeIdentifier.of(buffer);
+        this.pos = buffer.getBlockPos();
     }
 
     public Point getPoint() {

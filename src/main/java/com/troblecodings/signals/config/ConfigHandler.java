@@ -24,6 +24,7 @@ public final class ConfigHandler {
 
         public final ConfigValue<Integer> lightEmission;
         public final ConfigValue<Boolean> debugMode;
+        public final ConfigValue<Boolean> canAddRSPathToSaver;
 
         public General(final ForgeConfigSpec.Builder builder) {
             String desc;
@@ -36,6 +37,9 @@ public final class ConfigHandler {
 
             desc = "Toggle debug mode.";
             debugMode = builder.comment(desc).define("Debug Mode", false);
+
+            desc = "ShuntingPaths can be added to PathwaySaver.";
+            canAddRSPathToSaver = builder.comment(desc).define("canAddRSPathToSaver", false);
 
             builder.pop();
         }
@@ -77,9 +81,9 @@ public final class ConfigHandler {
             signalboxPreparedColor =
                     builder.comment(desc).define("Signalbox prepared color", 0xffff00);
 
-            desc = "Change the color of the TrainNumber in the UI. Default: -1";
+            desc = "Change the color of the TrainNumber in the UI. Default: -65536";
             signalboxTrainNumberColor =
-                    builder.comment(desc).define("Signalbox TrainNumber color", 0xFFFFFFFF);
+                    builder.comment(desc).define("Signalbox TrainNumber color", 0xFFFF0000);
 
             desc = "Change the color of a selected shunting path. Default: -16711936";
             signalboxShuntingColor =

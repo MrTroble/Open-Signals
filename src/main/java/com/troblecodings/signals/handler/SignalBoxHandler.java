@@ -19,7 +19,6 @@ import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -123,19 +122,6 @@ public final class SignalBoxHandler {
         if (holder == null)
             return;
         holder.getAllRedstoneIOs().forEach(pos -> linkTileToPos(identifier, pos));
-    }
-
-    public static Map<BlockPos, List<SubsidiaryState>> getPossibleSubsidiaries(
-            final StateInfo identifier) {
-        if (identifier.isWorldNullOrClientSide())
-            return new HashMap<>();
-        LinkedPositions holder;
-        synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.get(identifier);
-        }
-        if (holder == null)
-            return new HashMap<>();
-        return holder.getValidSubsidiariesForPos();
     }
 
     public static Signal getSignal(final StateInfo identifier, final BlockPos signalPos) {

@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.16.5 - 3.8.0]
+* feat: added signal custom render bounding boxes `"customRenderBoundingBox": [x1,y1,z1,x2,y2,z2]`
+* feat: shunting path can now be set over overlap/protection path
+* feat/fix: Straight path element rotate only 0° and 90°
+* feat/fix: "[n]" is now not shown in UI
+* feat/fix: signals now need to be in correct rotation for pathway
+* feat: added option to prevent the setting a pathway with an active input in the pathway
+* fix: UI text rotation
+* fix: UI scissor
+* fix: wrong UI borders
+* fix: several UI issues
+* fix: animation not working when looking away
+* fix: requestModelDataUpdate only clientside
+* fix: start signal not removed when path part-reset
+* fix: better train number connection system
+* fix: RS Visual signal not shown in SignalBox when HP is on it
+* fix: signal names disappeares randomly
+* fix: Train number block UI
+* fix: show saved pathways
+* fix: NPE with missing tile in signalbox pathway set signal
+* fix: issues with GhostBlock
+* fix: issues with wrong signal state shown in signalbox
+* ref/fix: better networking
+* ref/fix: sorting lang keys
+* ref: better UI performance
+* ref: code optimization
+* ref: catch more exceptions when problems in pathway
+* ref: changed visual signal in signalbox to new system
+* ref: sperated and relocated INetworkSaveable and NSaveable
+* ref: saveing protection way nodes now also in NBT and prevent NPEs during missing world while Reading NBT
+
 ## [1.16.5 - 3.7.1]
 * feat: emissive textures with "lamp_" or "reflection_"
 * fix: render bounding box

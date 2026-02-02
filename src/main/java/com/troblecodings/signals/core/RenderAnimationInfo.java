@@ -14,14 +14,17 @@ public class RenderAnimationInfo {
     public final IRenderTypeBuffer source;
     public final int lightColor;
     public final int overlayTexture;
+    public final float tick;
 
     public RenderAnimationInfo(final MatrixStack stack, final BlockRendererDispatcher dispatcher,
-            final IRenderTypeBuffer source, final int lightColor, final int overlayTexture) {
+            final IRenderTypeBuffer source, final int lightColor, final int overlayTexture,
+            final float tick) {
         this.stack = stack;
         this.dispatcher = dispatcher;
         this.source = source;
         this.lightColor = lightColor;
         this.overlayTexture = overlayTexture;
+        this.tick = tick;
     }
 
     public RenderAnimationInfo with(final SignalTileEntity tileEntity) {

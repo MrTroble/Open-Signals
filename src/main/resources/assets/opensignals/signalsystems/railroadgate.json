@@ -2,7 +2,8 @@
     "systemProperties": {
         "placementToolName": "signplacementtool",
         "canLink": true,
-        "defaultHeight": 1
+        "defaultHeight": 1,
+        "customRenderBoundingBox": [-6,0,-6,6,7,6]
     },
     "seProperties": [
         {

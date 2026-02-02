@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -47,9 +48,12 @@ public class GhostBlock extends BasicBlock {
     @Override
     public VoxelShape getShape(final BlockState state, final IBlockReader getter,
             final BlockPos pos, final ISelectionContext context) {
-        final BlockPos downPos = pos.below();
-        final Block lowerBlock = getter.getBlockState(downPos).getBlock();
-        return lowerBlock.getShape(state, getter, downPos, context).move(0, -1, 0);
+        final BlockPos lowerPos = pos.below();
+        final BlockState lowerState = getter.getBlockState(lowerPos);
+        final Block lowerBlock = lowerState.getBlock();
+        if (isRightBlock(lowerBlock))
+            return lowerBlock.getShape(lowerState, getter, lowerPos, context).move(0, -1, 0);
+        return VoxelShapes.block();
     }
 
     @Override
@@ -69,10 +73,16 @@ public class GhostBlock extends BasicBlock {
         return super.getStateDefinition();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public ItemStack getCloneItemStack(final IBlockReader reader, final BlockPos pos,
+    public ItemStack getCloneItemStack(final IBlockReader level, final BlockPos pos,
             final BlockState state) {
-        return ItemStack.EMPTY;
+        final BlockPos downPos = pos.below();
+        final BlockState lowerState = level.getBlockState(downPos);
+        final Block lowerBlock = lowerState.getBlock();
+        if (isRightBlock(lowerBlock))
+            return lowerBlock.getCloneItemStack(level, downPos, lowerState);
+        return super.getCloneItemStack(level, pos, state);
     }
 
     @SuppressWarnings("deprecation")
@@ -81,7 +91,13 @@ public class GhostBlock extends BasicBlock {
             final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
         final BlockPos lowerPos = pos.below();
         final BlockState lowerState = world.getBlockState(lowerPos);
-        return lowerState.getBlock().use(lowerState, world, lowerPos, player, hand,
-                result.withPosition(lowerPos));
+        final Block lowerBlock = lowerState.getBlock();
+        if (isRightBlock(lowerBlock))
+            return lowerBlock.use(lowerState, world, lowerPos, player, hand, result);
+        return ActionResultType.FAIL;
+    }
+
+    private static boolean isRightBlock(final Block block) {
+        return block instanceof Signal || block instanceof GhostBlock;
     }
 }

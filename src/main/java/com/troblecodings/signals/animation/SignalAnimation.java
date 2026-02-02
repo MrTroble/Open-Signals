@@ -6,7 +6,7 @@ import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public interface SignalAnimation extends Predicate<ModelInfoWrapper> {
 
-    public void updateAnimation();
+    public void updateAnimation(float ticks);
 
     public ModelTranslation getModelTranslation();
 
