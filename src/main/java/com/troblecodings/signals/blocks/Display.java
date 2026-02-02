@@ -200,31 +200,43 @@ public class Display extends BasicBlock {
         final int fieldLength = 155;
         initializeTexts(info, text, fieldLength);
 
-        final StringBuilder textToRender = new StringBuilder();
-        shownText.stream().forEach(c -> textToRender.append(c));
-        final String showString = textToRender.toString();
+        final char[] array = new char[shownText.size()];
+        int i = 0;
+        for (final Character c : shownText) {
+            array[i] = c;
+            i++;
+        }
+        final String showString = String.valueOf(array);
 
         final float scale = 0.5f;
         info.translate(addTransX + 0.5f, 1, -0.5);
         info.scale(scale, scale, 0);
         info.font.draw(info.stack, showString, 0, 0, 0xFF000000);
 
-        if (hiddenText.isEmpty()) {
-            info.pop();
-            return;
-        }
         addTransX -= animationSpeed;
+        checkRemoveFirstElement(info, scale);
+        checkAddLastElement(info, showString, fieldLength);
+        info.pop();
+    }
+
+    private void checkRemoveFirstElement(final RenderOverlayInfo info, final float scale) {
+        if (hiddenText.isEmpty())
+            return;
         if (addTransX <= 0) {
             final Character toRemove = shownText.poll();
             addTransX = info.font.width(String.valueOf(toRemove)) * scale;
             hiddenText.add(toRemove);
-
         }
+    }
+
+    private void checkAddLastElement(final RenderOverlayInfo info, final String showString,
+            final int fieldLength) {
+        if (hiddenText.isEmpty())
+            return;
         final char last = hiddenText.element();
         if ((info.font.width(showString) + info.font.width(String.valueOf(last)) < fieldLength)) {
             shownText.add(hiddenText.poll());
         }
-        info.pop();
     }
 
     private void initializeTexts(final RenderOverlayInfo info, final String fullText,
