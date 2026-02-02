@@ -5,6 +5,9 @@ import java.util.ArrayDeque;
 import java.util.Optional;
 import java.util.Queue;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
@@ -106,31 +109,27 @@ public class Display extends BasicBlock {
         info.drawTexture(new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/clock.png"), 26,
                 26, 0, 0, 1, 1);
         info.pop();
-
         // Hours
-        info.push();
-        info.rotate(0, 0, (float) ((timeH / 6f) * Math.PI + Math.PI));
-        info.translate(-0.75, 0, -0.5);
-        info.scale(1.5, 1.3, 1);
-        info.font.draw(info.stack, "|", 0, 0, 0xFF000000);
-        info.pop();
+        renderClockHand(info, (float) ((timeH / 6f) * Math.PI + Math.PI), -0.75f, 1.5f, 1.3f,
+                0xFF000000);
 
         // Minutes
-        info.push();
-        info.rotate(0, 0, (float) ((timeM / 30f) * Math.PI + Math.PI));
-        info.translate(-0.5, 0, -0.5);
-        info.scale(1, 1.7, 1);
-        info.font.draw(info.stack, "|", 0, 0, 0xFF000000);
-        info.pop();
+        renderClockHand(info, (float) ((timeM / 30f) * Math.PI + Math.PI), -0.5f, 1, 1.7f,
+                0xFF000000);
 
         // Seconds
-        info.push();
-        info.rotate(0, 0, (float) ((timeS / 30f) * Math.PI + Math.PI));
-        info.translate(-0.5, 0, -0.5);
-        info.scale(1, 1.7, 1);
-        info.font.draw(info.stack, "|", 0, 0, 0xFFFF0000);
+        renderClockHand(info, (float) ((timeS / 30f) * Math.PI + Math.PI), -0.5f, 1, 1.7f,
+                0xFFFF0000);
         info.pop();
+    }
 
+    private void renderClockHand(final RenderOverlayInfo info, final float rotateZ,
+            final float translateX, final float scaleX, final float scaleY, final int color) {
+        info.push();
+        info.rotate(0, 0, rotateZ);
+        info.translate(translateX, 0, -0.5);
+        info.scale(scaleX, scaleY, 1);
+        info.font.draw(info.stack, "|", 0, 0, color);
         info.pop();
     }
 
@@ -150,10 +149,7 @@ public class Display extends BasicBlock {
         info.font.draw(info.stack, "16:25", 0, 0, 0xFFFFFFFF);
 
         info.translate(30, 0, 0);
-        info.push();
-        info.scale(50, 1, 0);
-        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
-        info.pop();
+        renderColoredBackground(info, 50, 6, 0xFFFFFFFF);
         info.translate(6, 1.5, -0.5);
         info.scale(0.5, 0.5, 0);
         info.font.draw(info.stack, "Fällt heute aus", 0, 0, 0xFF000000);
@@ -199,10 +195,7 @@ public class Display extends BasicBlock {
         info.push();
         info.translate(x, y, 0);
 
-        info.push();
-        info.scale(80, 1, 0);
-        info.font.draw(info.stack, "|", 0, 0, 0xFFFFFFFF);
-        info.pop();
+        renderColoredBackground(info, 80, 7, 0xFFFFFFFF);
         final String text = "Achtung Witterung! Halten Sie Abstand von der Bahnsteigkante!";
         final int fieldLength = 155;
         initializeTexts(info, text, fieldLength);
@@ -212,7 +205,7 @@ public class Display extends BasicBlock {
         final String showString = textToRender.toString();
 
         final float scale = 0.5f;
-        info.translate(addTransX + 0.5f, 2, -0.5);
+        info.translate(addTransX + 0.5f, 1, -0.5);
         info.scale(scale, scale, 0);
         info.font.draw(info.stack, showString, 0, 0, 0xFF000000);
 
@@ -254,6 +247,18 @@ public class Display extends BasicBlock {
         if (!hiddenText.isEmpty()) {
             hiddenText.add(' ');
         }
+    }
+
+    private void renderColoredBackground(final RenderOverlayInfo info, final float x, final float y,
+            final int color) {
+        info.push();
+        info.applyColor();
+        info.blendOn();
+        final BufferWrapper wrapper = info.builder(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        wrapper.quad(0, x, 0, y, color);
+        info.end();
+        info.blendOff();
+        info.pop();
     }
 
     @OnlyIn(Dist.CLIENT)
