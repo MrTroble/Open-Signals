@@ -370,6 +370,7 @@ public class SignalBoxNetworkHandler {
         final Point p2 = Point.of(buffer);
         final byte state = buffer.getByte();
         if (state == REMOVE) {
+            getGrid().removeNextPathway(p1, p2);
             container.handleRemoveSavedPathway(p1, p2);
             return;
         }
