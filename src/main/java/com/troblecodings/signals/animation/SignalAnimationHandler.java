@@ -117,11 +117,12 @@ public class SignalAnimationHandler {
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 
-    public void updateStates(final Map<SEProperty, String> properties, final boolean firstLoad) {
+    public void updateStates(final Map<SEProperty, String> properties,
+            final boolean loadToFinalState) {
         if (properties == null || properties.isEmpty())
             return;
         final ModelInfoWrapper wrapper = new ModelInfoWrapper(tile.getBlockType(), properties);
-        if (firstLoad) {
+        if (loadToFinalState) {
             updateToFinalizedAnimations(wrapper);
         } else {
             updateAnimations(wrapper);

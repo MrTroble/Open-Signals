@@ -10,6 +10,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.block.state.IBlockState;
@@ -40,8 +41,9 @@ public class ClientSignalStateHandler implements INetworkSync {
         final BlockPos signalPos = buffer.getBlockPos();
         final StateInfo stateInfo = new StateInfo(level, signalPos);
         final int signalID = buffer.getInt();
-        final boolean remove = buffer.getBoolean();
-        if (remove) {
+        final ChangedState changedState = buffer.getEnumValue(ChangedState.class);
+        if (changedState.equals(ChangedState.REMOVED_FROM_CACHE)
+                || changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
             setRemoved(stateInfo);
             return;
         }
@@ -49,11 +51,9 @@ public class ClientSignalStateHandler implements INetworkSync {
         final Map<SEProperty, String> newProperties =
                 buffer.getMapWithCombinedValueFunc(NetworkBufferWrappers.getSEPropertyFunc(signal),
                         (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
-        final Map<SEProperty, String> properties;
-        boolean contains;
         synchronized (CURRENTLY_LOADED_STATES) {
-            contains = CURRENTLY_LOADED_STATES.containsKey(stateInfo);
-            properties = CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
+            final Map<SEProperty, String> properties =
+                    CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
             properties.putAll(newProperties);
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
