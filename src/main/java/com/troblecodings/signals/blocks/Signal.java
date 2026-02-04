@@ -71,9 +71,9 @@ public class Signal extends BasicBlock {
     };
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
-    public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final PropertyEnum<SignalAngel> ANGEL =
-            PropertyEnum.create("angel", SignalAngel.class);
+    public static final Map<Integer, Signal> SIGNAL_IDS = new HashMap<>();
+    public static final EnumProperty<SignalAngel> ANGEL =
+            EnumProperty.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -86,9 +86,13 @@ public class Signal extends BasicBlock {
     public Signal(final SignalProperties prop) {
         super(Material.ROCK);
         this.prop = prop;
-        this.id = SIGNAL_IDS.size();
-        SIGNAL_IDS.add(this);
-        this.setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
+        this.id = name.hashCode();
+        if (SIGNAL_IDS.containsKey(this.id)) {
+            OpenSignalsMain.exitMinecraftWithMessage("Hash [" + this.id + "] already exists for ["
+                    + name + "]! Need to choose an other name!");
+        }
+        SIGNAL_IDS.put(this.id, this);
+        registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
             final SEProperty property = signalProperties.get(i);
@@ -501,11 +505,11 @@ public class Signal extends BasicBlock {
                 return;
 
             if (sound.duration == 1) {
-                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            } else if (world.isUpdateScheduled(pos, this))
+                world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
+            } else if (world.getBlockTicks().hasScheduledTick(pos, this))
                 return;
             else if (sound.predicate.test(properties)) {
-                world.scheduleUpdate(pos, this, 1);
+                world.scheduleTick(pos, this, 1);
             }
         });
     }
