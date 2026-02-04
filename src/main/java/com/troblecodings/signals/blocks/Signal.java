@@ -68,7 +68,7 @@ public class Signal extends BasicBlock {
     };
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
-    public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
+    public static final Map<Integer, Signal> SIGNAL_IDS = new HashMap<>();
     public static final EnumProperty<SignalAngel> ANGEL =
             EnumProperty.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
@@ -85,8 +85,12 @@ public class Signal extends BasicBlock {
                 .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
                 .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
-        this.id = SIGNAL_IDS.size();
-        SIGNAL_IDS.add(this);
+        this.id = name.hashCode();
+        if (SIGNAL_IDS.containsKey(this.id)) {
+            OpenSignalsMain.exitMinecraftWithMessage("Hash [" + this.id + "] already exists for ["
+                    + name + "]! Need to choose an other name!");
+        }
+        SIGNAL_IDS.put(this.id, this);
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
@@ -432,11 +436,11 @@ public class Signal extends BasicBlock {
             if (sound.duration < 1)
                 return;
             if (sound.duration == 1) {
-                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
             } else if (world.getBlockTicks().hasScheduledTick(pos, this))
                 return;
             else if (sound.predicate.test(properties)) {
-                world.getBlockTicks().scheduleTick(pos, this, 1);
+                world.scheduleTick(pos, this, 1);
             }
         });
     }
