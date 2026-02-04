@@ -112,7 +112,7 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (SIGNAL_COUNTER) {
                 SIGNAL_COUNTER.put(info, list);
             }
-            sendToAll(info, states);
+            sendToAll(info, states, ChangedState.UPDATED);
             createToFile(info, states);
         });
     }
@@ -440,29 +440,29 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (SIGNAL_COUNTER) {
             SIGNAL_COUNTER.remove(info);
         }
-        sendRemoved(info);
+        sendRemoved(info, ChangedState.REMOVED_FROM_FILE);
         updateListeners(info, removedProperties, ChangedState.REMOVED_FROM_FILE);
         synchronized (ALL_LISTENERS) {
             ALL_LISTENERS.remove(info);
         }
     }
 
-    private static void sendRemoved(final SignalStateInfo info) {
+    private static void sendRemoved(final SignalStateInfo info, final ChangedState state) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putInt(info.signal.getID());
-        buffer.putBoolean(true);
+        buffer.putEnumValue(state);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
-            final Map<SEProperty, String> properties) {
+            final Map<SEProperty, String> properties, final ChangedState state) {
         if (properties.size() > 254)
             throw new IllegalStateException("Too many SEProperties!");
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
         buffer.putInt(stateInfo.signal.getID());
-        buffer.putBoolean(false);
+        buffer.putEnumValue(state);
         buffer.putMapWithCombinedValueConsumer(properties,
                 NetworkBufferWrappers.getSEPropertyConsumer(stateInfo.signal),
                 (buf, prop, value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
@@ -470,26 +470,27 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendTo(final SignalStateInfo info, final Map<SEProperty, String> properties,
-            final @Nullable PlayerEntity player) {
+            final @Nullable Player player, final ChangedState state) {
         if (player == null) {
-            sendToAll(info, properties);
+            sendToAll(info, properties, state);
         } else {
-            sendToPlayer(info, properties, player);
+            sendToPlayer(info, properties, player, state);
         }
     }
 
     private static void sendToPlayer(final SignalStateInfo stateInfo,
-            final Map<SEProperty, String> properties, final PlayerEntity player) {
+            final Map<SEProperty, String> properties, final Player player,
+            final ChangedState state) {
         if (properties == null || properties.isEmpty())
             return;
-        sendTo(player, packToByteBuffer(stateInfo, properties));
+        sendTo(player, packToByteBuffer(stateInfo, properties, state));
     }
 
     private static void sendToAll(final SignalStateInfo stateInfo,
-            final Map<SEProperty, String> properties) {
+            final Map<SEProperty, String> properties, final ChangedState state) {
         if (properties == null || properties.isEmpty())
             return;
-        final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
+        final ByteBuffer buffer = packToByteBuffer(stateInfo, properties, state);
         stateInfo.world.players().forEach(playerEntity -> sendTo(playerEntity, buffer));
     }
 
@@ -573,14 +574,14 @@ public final class SignalStateHandler implements INetworkSync {
                     synchronized (CURRENTLY_LOADED_STATES) {
                         sendProperties = CURRENTLY_LOADED_STATES.get(info.info);
                     }
-                    sendTo(info.info, sendProperties, player);
+                    sendTo(info.info, sendProperties, player, ChangedState.ADDED_TO_CACHE);
                     return;
                 }
                 final Map<SEProperty, String> properties = readAndSerialize(info.info);
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(info.info, properties);
                 }
-                sendTo(info.info, properties, player);
+                sendTo(info.info, properties, player, ChangedState.ADDED_TO_CACHE);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
                 final List<SignalStateListener> tasks;
                 synchronized (TASKS_WHEN_LOAD) {

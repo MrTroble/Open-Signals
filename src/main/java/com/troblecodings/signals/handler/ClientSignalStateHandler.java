@@ -13,6 +13,8 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.ChangedState;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -43,8 +45,9 @@ public class ClientSignalStateHandler implements INetworkSync {
         final BlockPos signalPos = buffer.getBlockPos();
         final StateInfo stateInfo = new StateInfo(level, signalPos);
         final int signalID = buffer.getInt();
-        final boolean remove = buffer.getBoolean();
-        if (remove) {
+        final ChangedState changedState = buffer.getEnumValue(ChangedState.class);
+        if (changedState.equals(ChangedState.REMOVED_FROM_CACHE)
+                || changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
             setRemoved(stateInfo);
             return;
         }
