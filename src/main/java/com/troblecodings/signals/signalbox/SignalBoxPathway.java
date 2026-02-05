@@ -189,7 +189,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     protected void setSignals(final SignalStateInfo lastSignal) {
         if (isExecutingSignalSet || tile == null)
             return;
-        final World world = tile.getLevel();
+        isExecutingSignalSet = true;
+        final Level world = tile.getLevel();
         final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal != null) {
@@ -201,11 +202,6 @@ public class SignalBoxPathway implements IChunkLoadable {
             final SignalStateInfo firstInfo = new SignalStateInfo(world, startSignal.pos, first);
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
             updatePreSignals();
-        }
-        final SignalBoxPathway next = getNextPathway();
-        if (next != null && (next.isEmptyOrBroken() || next.isBlocked)) {
-            updateSignalStates();
-            return;
         }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
                 data.getOtherSignals();
@@ -225,6 +221,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             }
         });
         updateSignalStates();
+        isExecutingSignalSet = false;
     }
 
     private void updatePreSignals() {
@@ -327,8 +324,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void resetOther() {
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.values().forEach((position) -> {
             final Signal current = SignalBoxHandler
                     .getSignal(new StateInfo(tile.getLevel(), tile.getBlockPos()), position.pos);
@@ -491,8 +488,8 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (trainNumberDisplays == null || number == null)
             return;
         trainNumberDisplays.forEach(ident -> {
-            final PathOptionEntry entry = grid.getNode(ident.point).getOption(ident.mode)
-                    .orElse(factory.getEntry());
+            final PathOptionEntry entry =
+                    grid.getNode(ident.point).getOption(ident.mode).orElse(factory.getEntry());
             if (number.equals(TrainNumber.DEFAULT)) {
                 entry.removeEntry(PathEntryType.TRAINNUMBER);
             } else {
