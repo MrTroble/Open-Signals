@@ -8,12 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -23,8 +24,10 @@ import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.debug.DebugNetworkHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.IPathEntry;
+import com.troblecodings.signals.signalbox.entrys.ModeIdentifierEntry;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.signalbox.entrys.PointEntry;
 
 import net.minecraft.world.level.block.Rotation;
 
@@ -67,8 +70,9 @@ public class SignalBoxNetworkTest {
         assertEquals(counter, grid.getCurrentCounter());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void testAddAndRemoveEntry() {
+    public <T> void testAddAndRemoveEntry() {
         final Map<ModeIdentifier, Map.Entry<PathOptionEntry, PathEntryType<?>>> entries =
                 new HashMap<>();
         for (int i = 0; i < 500; i++) {
@@ -78,8 +82,9 @@ public class SignalBoxNetworkTest {
                 modeIdent = new ModeIdentifier(getRandPoint(), mode);
             }
             final PathOptionEntry entry = new PathOptionEntry();
-            final PathEntryType<?> entryType = getRandEntryType();
-            final IPathEntry<?> iPathEntry = entryType.newValue();
+            final PathEntryType<T> entryType = (PathEntryType<T>) getRandEntryType();
+            final IPathEntry<T> iPathEntry = entryType.newValue();
+            iPathEntry.setValue(iPathEntry.getDefaultValue());
             entry.addEntry(entryType, iPathEntry);
             handler.sendEntryAdd(modeIdent, entryType, iPathEntry);
             entries.put(modeIdent, Maps.immutableEntry(entry, entryType));
@@ -162,12 +167,14 @@ public class SignalBoxNetworkTest {
                 Rotation.values()[RANDOM.nextInt(0, Rotation.values().length)]);
     }
 
-    private static final List<PathEntryType<?>> POSSIBLE_TYPES = ImmutableList.of(PathEntryType.ZS6,
-            PathEntryType.DELAY, PathEntryType.PATHWAY_COSTS, PathEntryType.SIGNAL_REPEATER,
-            PathEntryType.PRESIGNALS, PathEntryType.SIGNAL_REPEATER);
+    private static final List<PathEntryType<?>> PATHENTRY_TYPES =
+            Lists.newArrayList(PathEntryType.ALL_ENTRIES).stream()
+                    .filter(entry -> !(entry.getEntryClass().equals(ModeIdentifierEntry.class)
+                            || entry.getEntryClass().equals(PointEntry.class)))
+                    .collect(Collectors.toList());
 
     private PathEntryType<?> getRandEntryType() {
-        return POSSIBLE_TYPES.get(RANDOM.nextInt(0, POSSIBLE_TYPES.size()));
+        return PATHENTRY_TYPES.get(RANDOM.nextInt(0, PATHENTRY_TYPES.size()));
     }
 
 }

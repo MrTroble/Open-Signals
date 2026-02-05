@@ -89,11 +89,13 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
     @Override
     public void write(final NBTWrapper tag) {
-        pathEntrys.forEach((type, option) -> {
-            final NBTWrapper entry = new NBTWrapper();
-            option.write(entry);
-            tag.putWrapper(type.getName(), entry);
-        });
+        pathEntrys.entrySet().stream().filter(
+                entry -> !entry.getValue().getValue().equals(entry.getValue().getDefaultValue()))
+                .forEach(entry -> {
+                    final NBTWrapper entryWrapper = new NBTWrapper();
+                    entry.getValue().write(entryWrapper);
+                    tag.putWrapper(entry.getKey().getName(), entryWrapper);
+                });
     }
 
     @Override

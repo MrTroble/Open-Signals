@@ -35,6 +35,11 @@ public class ModeIdentifierEntry extends IPathEntry<ModeIdentifier> {
     }
 
     @Override
+    public ModeIdentifier getDefaultValue() {
+        return new ModeIdentifier(null, null);
+    }
+
+    @Override
     public void setValue(final ModeIdentifier value) {
         identifier = value;
     }
