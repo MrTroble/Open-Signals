@@ -451,7 +451,10 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private boolean isPowerd(final BlockPos pos) {
-        final BlockState state = tile.getLevel().getBlockState(pos);
+        final Level world = tile.getLevel();
+        if (world == null)
+            return false;
+        final BlockState state = world.getBlockState(pos);
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);

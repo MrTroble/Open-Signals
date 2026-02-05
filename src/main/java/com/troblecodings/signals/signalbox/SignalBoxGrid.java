@@ -150,27 +150,19 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2, final PathType type) {
-        try {
-            final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
-            if (!result.wasSuccesfull()) {
-                if (result.getMode().equals(PathwayRequestMode.PASS))
-                    return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
-                return result;
-            }
-            final PathwayData data = result.getPathwayData();
-            if (checkPathwayData(data))
-                return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
-            if (data.isEmpty())
+        final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2, type);
+        if (!result.wasSuccesfull()) {
+            if (result.getMode().equals(PathwayRequestMode.PASS))
                 return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
-            addPathway(data);
             return result;
-        } catch (final Exception e) {
-            OpenSignalsMain.getLogger().error("There was an issue with creating a pathway from "
-                    + p1 + " to " + p2 + "! Resetting!");
-            e.printStackTrace();
-            resetPathway(p1);
         }
-        return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+        final PathwayData data = result.getPathwayData();
+        if (checkPathwayData(data))
+            return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
+        if (data.isEmpty())
+            return PathwayRequestResult.getByMode(PathwayRequestMode.NO_PATH);
+        addPathway(data);
+        return result;
     }
 
     private boolean checkPathwayData(final PathwayData data) {
@@ -242,16 +234,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
 
     private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
         pathways.forEach(pathway -> {
-            try {
-                if (pathway.tryBlock(pos)) {
-                    updatePrevious(pathway);
-                }
-            } catch (final Exception e) {
-                OpenSignalsMain.getLogger().error(
-                        "There was an issue while trying to block " + pathway + "! Resetting!");
-                e.printStackTrace();
-                resetPathway(pathway);
-                tryNextPathways();
+            if (pathway.tryBlock(pos)) {
+                updatePrevious(pathway);
             }
 
         });
@@ -259,27 +243,20 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
 
     private void tryReset(final List<SignalBoxPathway> pathways, final BlockPos pos) {
         pathways.forEach(pathway -> {
-            try {
-                final Point first = pathway.getFirstPoint();
-                final Optional<Point> optPoint = pathway.tryReset(pos);
-                if (optPoint.isPresent()) {
-                    if (pathway.isEmptyOrBroken()) {
-                        resetPathway(pathway);
-                        pathway.checkReRequest();
-                    } else {
-                        pathway.compact(optPoint.get());
-                        this.startsToPath.remove(first);
-                        this.startsToPath.put(pathway.getFirstPoint(), pathway);
-                    }
+            final Point first = pathway.getFirstPoint();
+            final Optional<Point> optPoint = pathway.tryReset(pos);
+            if (optPoint.isPresent()) {
+                if (pathway.isEmptyOrBroken()) {
+                    resetPathway(pathway);
+                    pathway.checkReRequest();
+                } else {
+                    pathway.compact(optPoint.get());
+                    this.startsToPath.remove(first);
+                    this.startsToPath.put(pathway.getFirstPoint(), pathway);
                 }
-                if (pathway.checkResetOfProtectionWay(pos)) {
-                    pathway.removeProtectionWay();
-                }
-            } catch (final Exception e) {
-                OpenSignalsMain.getLogger().error(
-                        "There was an issue while trying to reset " + pathway + "! Resetting!");
-                e.printStackTrace();
-                resetPathway(pathway);
+            }
+            if (pathway.checkResetOfProtectionWay(pos)) {
+                pathway.removeProtectionWay();
             }
         });
         tryNextPathways();
