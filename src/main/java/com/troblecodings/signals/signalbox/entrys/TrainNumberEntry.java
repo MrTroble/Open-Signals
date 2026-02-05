@@ -35,6 +35,11 @@ public class TrainNumberEntry extends IPathEntry<TrainNumber> {
     }
 
     @Override
+    public TrainNumber getDefaultValue() {
+        return TrainNumber.DEFAULT;
+    }
+
+    @Override
     public void setValue(final TrainNumber value) {
         number = value;
     }

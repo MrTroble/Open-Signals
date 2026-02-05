@@ -36,6 +36,11 @@ public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
     }
 
     @Override
+    public Integer getDefaultValue() {
+        return 0;
+    }
+
+    @Override
     public void readNetwork(final ReadBuffer buffer) {
         this.value = buffer.getInt();
     }

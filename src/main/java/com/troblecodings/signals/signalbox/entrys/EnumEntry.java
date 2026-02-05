@@ -65,6 +65,11 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
     }
 
     @Override
+    public T getDefaultValue() {
+        return enumClass.getEnumConstants()[0];
+    }
+
+    @Override
     public void readNetwork(final ReadBuffer buffer) {
         this.enumValue = buffer.getEnumValue(enumClass);
 
