@@ -45,6 +45,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -159,8 +160,8 @@ public final class NameHandler implements INetworkSync {
             listener.update(info, name, ChangedState.UPDATED);
         } else {
             synchronized (TASKS_WHEN_LOAD) {
-                final List<NameStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
-                        _u -> new ArrayList<>());
+                final List<NameStateListener> list =
+                        TASKS_WHEN_LOAD.computeIfAbsent(info, _u -> new ArrayList<>());
                 if (!list.contains(listener)) {
                     list.add(listener);
                 }
@@ -258,6 +259,16 @@ public final class NameHandler implements INetworkSync {
         }
     }
 
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerLoggedInEvent event) {
+        final EntityPlayer player = event.player;
+        final Map<StateInfo, String> names;
+        synchronized (ALL_NAMES) {
+            names = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        names.forEach((info, map) -> sendTo(player, packToBuffer(info.pos, map)));
+    }
+
     private static void createToFile(final StateInfo info, final String name) {
         NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
@@ -327,13 +338,14 @@ public final class NameHandler implements INetworkSync {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
-                    final List<LoadHolder<?>> holders = LOAD_COUNTER.computeIfAbsent(info.info,
-                            _u -> new ArrayList<>());
+                    final List<LoadHolder<?>> holders =
+                            LOAD_COUNTER.computeIfAbsent(info.info, _u -> new ArrayList<>());
                     if (holders.size() > 0) {
                         isLoaded = true;
                     }
-                    if (!holders.contains(info.holder))
+                    if (!holders.contains(info.holder)) {
                         holders.add(info.holder);
+                    }
                 }
                 if (isLoaded) {
                     if (player == null)
@@ -383,8 +395,8 @@ public final class NameHandler implements INetworkSync {
         writeService.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
-                    final List<LoadHolder<?>> holders = LOAD_COUNTER.getOrDefault(info.info,
-                            new ArrayList<>());
+                    final List<LoadHolder<?>> holders =
+                            LOAD_COUNTER.getOrDefault(info.info, new ArrayList<>());
                     holders.remove(info.holder);
                     if (!holders.isEmpty())
                         return;
@@ -402,8 +414,8 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {
-        final PacketBuffer buffer = new PacketBuffer(
-                Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
+        final PacketBuffer buffer =
+                new PacketBuffer(Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
         if (player instanceof EntityPlayerMP) {
             final EntityPlayerMP server = (EntityPlayerMP) player;
             channel.sendTo(new FMLProxyPacket(buffer, CHANNELNAME), server);
