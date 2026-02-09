@@ -337,7 +337,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     public void writePathways(final NBTWrapper tag) {
         if (!startsToPath.isEmpty()) {
             tag.putList(PATHWAY_LIST, startsToPath.values().stream()
-                    .filter(SignalBoxPathway::isEmptyOrBroken).map(pathway -> {
+                    .filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
                         final NBTWrapper path = new NBTWrapper();
                         pathway.write(path);
                         return path;
