@@ -72,8 +72,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
-            SignalAngel.class);
+    public static final PropertyEnum<SignalAngel> ANGEL =
+            PropertyEnum.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -157,8 +157,8 @@ public class Signal extends BasicBlock {
     public IBlockState getStateForPlacement(final World world, final BlockPos pos,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
-        final int index = 15
-                - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
+        final int index =
+                15 - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
         return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
     }
 
@@ -200,6 +200,7 @@ public class Signal extends BasicBlock {
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
                 : tile.getProperties();
+        System.out.println("Loading [" + pos + "] with [" + properties + "]!");
         properties.forEach((property, value) -> {
             if (signalProperties.contains(property)) {
                 blockState.getAndUpdate(oldState -> oldState.withProperty(property, value));
@@ -502,13 +503,11 @@ public class Signal extends BasicBlock {
 
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            } else {
-                if (world.isUpdateScheduled(pos, this))
-                    return;
-                else {
-                    if (sound.predicate.test(properties)) {
-                        world.scheduleUpdate(pos, this, 1);
-                    }
+            } else if (world.isUpdateScheduled(pos, this))
+                return;
+            else {
+                if (sound.predicate.test(properties)) {
+                    world.scheduleUpdate(pos, this, 1);
                 }
             }
         });

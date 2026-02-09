@@ -23,7 +23,6 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChu
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
 
     public BasicBlockEntity() {
-        super();
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {
@@ -75,8 +74,9 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChu
     @Override
     public String getNameWrapper() {
         final StateInfo info = new StateInfo(world, pos);
-        final String customName = world.isRemote ? ClientNameHandler.getClientName(info)
-                : NameHandler.getName(info);
+        final String customName =
+                world.isRemote ? ClientNameHandler.getClientName(info) : NameHandler.getName(info);
+        System.out.println("Loaded [" + pos + "] with [" + customName + "]!");
         return customName;
     }
 
