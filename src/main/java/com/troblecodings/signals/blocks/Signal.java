@@ -200,7 +200,6 @@ public class Signal extends BasicBlock {
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
                 : tile.getProperties();
-        System.out.println("Loading [" + pos + "] with [" + properties + "]!");
         properties.forEach((property, value) -> {
             if (signalProperties.contains(property)) {
                 blockState.getAndUpdate(oldState -> oldState.withProperty(property, value));
@@ -505,10 +504,8 @@ public class Signal extends BasicBlock {
                 world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             } else if (world.isUpdateScheduled(pos, this))
                 return;
-            else {
-                if (sound.predicate.test(properties)) {
-                    world.scheduleUpdate(pos, this, 1);
-                }
+            else if (sound.predicate.test(properties)) {
+                world.scheduleUpdate(pos, this, 1);
             }
         });
     }

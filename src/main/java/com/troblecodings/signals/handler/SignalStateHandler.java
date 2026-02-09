@@ -47,7 +47,6 @@ import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -466,8 +465,6 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> properties, final EntityPlayer player) {
         if (properties == null || properties.isEmpty())
             return;
-        System.out.println(
-                "Sending [" + stateInfo.pos + "] to [" + player + "] with [" + properties + "]!");
         sendTo(player, packToByteBuffer(stateInfo, properties));
     }
 
@@ -477,25 +474,11 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         final List<EntityPlayer> players = ImmutableList.copyOf(stateInfo.world.playerEntities);
-        System.out.println(
-                "Sending [" + stateInfo.pos + "] to [" + players + "] with [" + properties + "]!");
         players.forEach(player -> sendTo(player, buffer));
     }
 
     @SubscribeEvent
-    public static void onPlayerJoin(final PlayerLoggedInEvent event) {
-        System.out.println("Called PlayerLoggedIn for [" + event.player + "]!");
-        final EntityPlayer player = event.player;
-        final Map<SignalStateInfo, Map<SEProperty, String>> properties;
-        synchronized (CURRENTLY_LOADED_STATES) {
-            properties = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
-        }
-        properties.forEach((info, map) -> sendTo(info, map, player));
-    }
-
-    @SubscribeEvent
     public static void onEntityJoinWorldEvent(final EntityJoinWorldEvent event) {
-        System.out.println("Called EntityJoinWorldEvent for [" + event.getEntity() + "]!");
         final Entity entity = event.getEntity();
         if (!(entity instanceof EntityPlayer))
             return;

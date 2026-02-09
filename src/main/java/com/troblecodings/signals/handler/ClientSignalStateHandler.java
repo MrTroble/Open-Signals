@@ -42,7 +42,6 @@ public class ClientSignalStateHandler implements INetworkSync {
         final int signalID = buffer.getInt();
         final boolean remove = buffer.getBoolean();
         if (remove) {
-            System.out.println("Removed [" + signalPos + "]!");
             setRemoved(stateInfo);
             return;
         }
@@ -50,7 +49,6 @@ public class ClientSignalStateHandler implements INetworkSync {
         final Map<SEProperty, String> newProperties =
                 buffer.getMapWithCombinedValueFunc(NetworkBufferWrappers.getSEPropertyFunc(signal),
                         (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
-        System.out.println("Updateing [" + signalPos + "] with [" + newProperties + "]!");
         final Map<SEProperty, String> properties;
         boolean contains;
         synchronized (CURRENTLY_LOADED_STATES) {

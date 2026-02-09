@@ -32,6 +32,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -40,12 +41,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -260,13 +261,15 @@ public final class NameHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void onPlayerJoin(final PlayerLoggedInEvent event) {
-        final EntityPlayer player = event.player;
+    public static void onEntityJoinWorldEvent(final EntityJoinWorldEvent event) {
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof EntityPlayer))
+            return;
         final Map<StateInfo, String> names;
         synchronized (ALL_NAMES) {
             names = ImmutableMap.copyOf(ALL_NAMES);
         }
-        names.forEach((info, map) -> sendTo(player, packToBuffer(info.pos, map)));
+        names.forEach((info, map) -> sendTo((EntityPlayer) entity, packToBuffer(info.pos, map)));
     }
 
     private static void createToFile(final StateInfo info, final String name) {
