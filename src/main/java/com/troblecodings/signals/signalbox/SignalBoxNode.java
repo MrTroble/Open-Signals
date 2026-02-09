@@ -260,8 +260,6 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
             entry.getValue().write(wrapper);
             if (manuellEnabledOutputs.contains(entry.getKey())) {
                 wrapper.putBoolean(ENABLED_OUTPUTS, true);
-            } else {
-                wrapper.putBoolean(ENABLED_OUTPUTS, false);
             }
             final SignalState state = signalStates.getOrDefault(entry.getKey(), SignalState.RED);
             if (!state.equals(SignalState.RED)) {
