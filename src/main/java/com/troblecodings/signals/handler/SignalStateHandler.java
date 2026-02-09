@@ -464,7 +464,8 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> properties, final EntityPlayer player) {
         if (properties == null || properties.isEmpty())
             return;
-        System.out.println("Sending [" + stateInfo.pos + "] with [" + properties + "]!");
+        System.out.println(
+                "Sending [" + stateInfo.pos + "] to [" + player + "] with [" + properties + "]!");
         sendTo(player, packToByteBuffer(stateInfo, properties));
     }
 
@@ -474,7 +475,8 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         final List<EntityPlayer> players = ImmutableList.copyOf(stateInfo.world.playerEntities);
-        System.out.println("Sending [" + stateInfo.pos + "] with [" + properties + "]!");
+        System.out.println(
+                "Sending [" + stateInfo.pos + "] to [" + players + "] with [" + properties + "]!");
         players.forEach(player -> sendTo(player, buffer));
     }
 

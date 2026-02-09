@@ -42,6 +42,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         final int signalID = buffer.getInt();
         final boolean remove = buffer.getBoolean();
         if (remove) {
+            System.out.println("Removed [" + signalPos + "]!");
             setRemoved(stateInfo);
             return;
         }

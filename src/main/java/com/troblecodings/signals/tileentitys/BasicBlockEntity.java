@@ -76,7 +76,6 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChu
         final StateInfo info = new StateInfo(world, pos);
         final String customName =
                 world.isRemote ? ClientNameHandler.getClientName(info) : NameHandler.getName(info);
-        System.out.println("Loaded [" + pos + "] with [" + customName + "]!");
         return customName;
     }
 
