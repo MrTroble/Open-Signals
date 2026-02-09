@@ -34,6 +34,7 @@ import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -41,6 +42,7 @@ import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
@@ -482,12 +484,26 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onPlayerJoin(final PlayerLoggedInEvent event) {
+        System.out.println("Called PlayerLoggedIn for [" + event.player + "]!");
         final EntityPlayer player = event.player;
         final Map<SignalStateInfo, Map<SEProperty, String>> properties;
         synchronized (CURRENTLY_LOADED_STATES) {
             properties = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
         properties.forEach((info, map) -> sendTo(info, map, player));
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoinWorldEvent(final EntityJoinWorldEvent event) {
+        System.out.println("Called EntityJoinWorldEvent for [" + event.getEntity() + "]!");
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof EntityPlayer))
+            return;
+        final Map<SignalStateInfo, Map<SEProperty, String>> properties;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            properties = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        properties.forEach((info, map) -> sendTo(info, map, (EntityPlayer) entity));
     }
 
     @SubscribeEvent
