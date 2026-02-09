@@ -23,7 +23,8 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 
 public class ClientSignalStateHandler implements INetworkSync {
 
-    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
+    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES =
+            new HashMap<>();
 
     public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -45,9 +46,10 @@ public class ClientSignalStateHandler implements INetworkSync {
             return;
         }
         final Signal signal = Signal.getSignalByID(signalID);
-        final Map<SEProperty, String> newProperties = buffer.getMapWithCombinedValueFunc(
-                NetworkBufferWrappers.getSEPropertyFunc(signal),
-                (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
+        final Map<SEProperty, String> newProperties =
+                buffer.getMapWithCombinedValueFunc(NetworkBufferWrappers.getSEPropertyFunc(signal),
+                        (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
+        System.out.println("Updateing [" + signalPos + "] with [" + newProperties + "]!");
         final Map<SEProperty, String> properties;
         boolean contains;
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -62,17 +64,17 @@ public class ClientSignalStateHandler implements INetworkSync {
             final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
             if (chunk == null)
                 return;
-            chunk.markDirty();
             final IBlockState state = level.getBlockState(signalPos);
             if (state == null)
                 return;
+            level.notifyBlockUpdate(signalPos, state, state, 3);
             mc.renderGlobal.notifyLightSet(signalPos);
             mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
-            level.notifyBlockUpdate(signalPos, state, state, 3);
             final TileEntity tile = level.getTileEntity(signalPos);
             if (tile != null && tile instanceof SignalTileEntity) {
                 ((SignalTileEntity) tile).updateAnimationStates(properties, !contains);
             }
+            chunk.markDirty();
         });
     }
 
