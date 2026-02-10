@@ -26,20 +26,21 @@ public class ClientNameHandler implements INetworkSync {
 
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
-        final Minecraft mc = Minecraft.getInstance();
-        final BlockPos pos = buffer.getBlockPos();
-        final boolean removed = buffer.getBoolean();
-        if (removed) {
-            setRemoved(pos);
-            return;
-        }
-        final String name = buffer.getString();
-        synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.put(new StateInfo(mc.level, pos), name);
-        }
-        final ClientWorld world = mc.level;
-        mc.submit(() -> {
-            final BlockState state = world.getBlockState(pos);
+        final Minecraft mc = Minecraft.getMinecraft();
+        mc.addScheduledTask(() -> {
+            final BlockPos pos = buffer.getBlockPos();
+            final boolean removed = buffer.getBoolean();
+            if (removed) {
+                setRemoved(pos);
+                return;
+            }
+            final String name = buffer.getString();
+            final WorldClient level = mc.world;
+            synchronized (CLIENT_NAMES) {
+                CLIENT_NAMES.put(new StateInfo(level, pos), name);
+            }
+            level.getChunkFromBlockCoords(pos).markDirty();
+            final IBlockState state = level.getBlockState(pos);
             if (state == null)
                 return;
             world.setBlocksDirty(pos, state, state);
