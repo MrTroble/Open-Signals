@@ -111,11 +111,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         final SignalBoxPathway pathway = endsToPath.get(p1);
         if (pathway == null)
             return false;
-        final boolean isReset = pathway.directResetOfProtectionWay();
-        if (isReset) {
-            pathway.removeProtectionWay();
-        }
-        return isReset;
+        return pathway.directResetOfProtectionWay();
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {
@@ -255,9 +251,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                     this.startsToPath.put(pathway.getFirstPoint(), pathway);
                 }
             }
-            if (pathway.checkResetOfProtectionWay(pos)) {
-                pathway.removeProtectionWay();
-            }
+            pathway.checkResetOfProtectionWay(pos);
         });
         tryNextPathways();
     }

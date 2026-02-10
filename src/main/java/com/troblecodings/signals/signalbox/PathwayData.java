@@ -228,8 +228,6 @@ public class PathwayData {
                     if (pw == null)
                         return;
                     pw.directResetOfProtectionWay();
-                    pw.removeProtectionWay();
-                    grid.updateToNet(pw);
                 }));
             }).start();
             return true;
@@ -249,10 +247,11 @@ public class PathwayData {
                     .updateRedstoneOutput(new StateInfo(pathway.tile.getLevel(), pos), false));
             option.removeEntry(PathEntryType.PATHUSAGE);
         });
+        removeProtectionWay();
         return true;
     }
 
-    protected void removeProtectionWay() {
+    private void removeProtectionWay() {
         this.protectionWayNodes = ImmutableList.of();
     }
 

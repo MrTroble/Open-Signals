@@ -120,22 +120,14 @@ public class SignalBoxPathway implements IChunkLoadable {
         });
     }
 
-    public boolean checkResetOfProtectionWay(final BlockPos position) {
+    public void checkResetOfProtectionWay(final BlockPos position) {
         if (!data.canResetProtectionWay(position))
-            return false;
-        return resetProtectionWay();
-    }
-
-    public boolean resetProtectionWay() {
-        return data.resetProtectionWay();
+            return;
+        data.resetProtectionWay();
     }
 
     public boolean directResetOfProtectionWay() {
         return data.directResetOfProtectionWay();
-    }
-
-    public void removeProtectionWay() {
-        data.removeProtectionWay();
     }
 
     public void setUpPathwayStatus() {
