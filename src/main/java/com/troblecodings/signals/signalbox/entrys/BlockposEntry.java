@@ -44,7 +44,7 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
 
     @Override
     public BlockPos getDefaultValue() {
-        return BlockPos.ZERO;
+        return BlockPos.ORIGIN;
     }
 
     @Override

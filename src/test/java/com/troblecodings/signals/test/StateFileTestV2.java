@@ -64,7 +64,7 @@ public class StateFileTestV2 {
     private static final Random RANDOM = new Random();
 
     public static BlockPos getRandomBlockPos() {
-        return new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(-64, 321), RANDOM.nextInt());
+        return new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(321), RANDOM.nextInt());
     }
 
     @Test

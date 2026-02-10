@@ -22,6 +22,7 @@ import com.troblecodings.signals.core.SignalProperties;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -72,8 +73,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final Map<Integer, Signal> SIGNAL_IDS = new HashMap<>();
-    public static final EnumProperty<SignalAngel> ANGEL =
-            EnumProperty.create("angel", SignalAngel.class);
+    public static final PropertyEnum<SignalAngel> ANGEL =
+            PropertyEnum.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -83,7 +84,7 @@ public class Signal extends BasicBlock {
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
 
-    public Signal(final SignalProperties prop) {
+    public Signal(final SignalProperties prop, final String name) {
         super(Material.ROCK);
         this.prop = prop;
         this.id = name.hashCode();
@@ -92,7 +93,7 @@ public class Signal extends BasicBlock {
                     + name + "]! Need to choose an other name!");
         }
         SIGNAL_IDS.put(this.id, this);
-        registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
+        this.setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
             final SEProperty property = signalProperties.get(i);
@@ -267,7 +268,7 @@ public class Signal extends BasicBlock {
         }, block -> block instanceof GhostBlock);
         if (!worldIn.isRemote) {
             final SignalStateInfo info = new SignalStateInfo(worldIn, pos, this);
-            SignalStateHandler.sendRemoved(info);
+            SignalStateHandler.sendRemoved(info, ChangedState.REMOVED_FROM_FILE);
             NameHandler.sendRemoved(new StateInfo(worldIn, pos));
             new Thread(() -> {
                 SignalStateHandler.setRemoved(new SignalStateInfo(worldIn, pos, this));
@@ -505,11 +506,11 @@ public class Signal extends BasicBlock {
                 return;
 
             if (sound.duration == 1) {
-                world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
-            } else if (world.getBlockTicks().hasScheduledTick(pos, this))
+                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            } else if (world.isUpdateScheduled(pos, this))
                 return;
             else if (sound.predicate.test(properties)) {
-                world.scheduleTick(pos, this, 1);
+                world.scheduleUpdate(pos, this, 1);
             }
         });
     }

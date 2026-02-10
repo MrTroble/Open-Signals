@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
@@ -44,7 +45,8 @@ public class ContainerPlacementtool extends ContainerBase {
         final int signalID = wrapper.getInteger(Placementtool.BLOCK_TYPE_ID);
         signal = tool.getObjFromID(signalID);
         final List<SEProperty> properties = signal.getProperties().stream()
-                .filter(property -> wrapper.contains(property.getName())).toList();
+                .filter(property -> wrapper.contains(property.getName()))
+                .collect(Collectors.toList());
         final WriteBuffer buffer = new WriteBuffer();
         final List<Byte> propertiesToSend = new ArrayList<>();
         for (int i = 0; i < properties.size(); i++) {
@@ -98,7 +100,7 @@ public class ContainerPlacementtool extends ContainerBase {
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         signalID = buffer.getInt();
-        final Placementtool tool = (Placementtool) info.player.getMainHandItem().getItem();
+        final Placementtool tool = (Placementtool) info.player.getHeldItemMainhand().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();

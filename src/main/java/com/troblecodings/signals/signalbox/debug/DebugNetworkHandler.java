@@ -1,5 +1,7 @@
 package com.troblecodings.signals.signalbox.debug;
 
+import java.nio.ByteBuffer;
+
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.ModeIdentifier;
@@ -15,7 +17,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class DebugNetworkHandler extends SignalBoxNetworkHandler {
 
@@ -37,8 +39,8 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
 
     @Override
     protected void sendBuffer(final WriteBuffer buffer) {
-        desirializeBuffer(new ReadBuffer(
-                Unpooled.copiedBuffer(buffer.getBuildedBuffer().position(0)).nioBuffer()));
+        desirializeBuffer(new ReadBuffer(Unpooled
+                .copiedBuffer((ByteBuffer) buffer.getBuildedBuffer().position(0)).nioBuffer()));
     }
 
     @Override
@@ -73,8 +75,9 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
             grid.setCounterFromNetwork(buffer.getInt());
         } else {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(new StateInfo(container.getTile().getLevel(),
-                    container.getTile().getBlockPos()), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(
+                    new StateInfo(container.getTile().getWorld(), container.getTile().getPos()),
+                    pos);
         }
     }
 

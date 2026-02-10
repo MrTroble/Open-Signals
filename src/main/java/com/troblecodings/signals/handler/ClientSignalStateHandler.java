@@ -71,7 +71,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
             final TileEntity tile = level.getTileEntity(signalPos);
             if (tile != null && tile instanceof SignalTileEntity) {
-                ((SignalTileEntity) tile).updateAnimationStates(properties, !contains);
+                ((SignalTileEntity) tile).updateAnimationState(newProperties, changedState);
             }
             chunk.markDirty();
         });

@@ -13,7 +13,6 @@ import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -21,8 +20,10 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -75,9 +76,13 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return handler;
     }
 
-    public void updateAnimationStates(final Map<SEProperty, String> properties,
-            final boolean firstLoad) {
-        handler.updateStates(properties, firstLoad);
+    public void updateAnimationState(final Map<SEProperty, String> properties,
+            final ChangedState state) {
+        final World world = Minecraft.getMinecraft().world;
+        final boolean loadFinilizedState = state.equals(ChangedState.ADDED_TO_CACHE)
+                || state.equals(ChangedState.ADDED_TO_FILE)
+                || (state.equals(ChangedState.UPDATED) && !world.isBlockLoaded(pos));
+        handler.updateStates(properties, loadFinilizedState);
     }
 
     @Override

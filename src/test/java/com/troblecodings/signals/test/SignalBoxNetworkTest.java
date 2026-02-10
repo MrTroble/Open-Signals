@@ -29,7 +29,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import com.troblecodings.signals.signalbox.entrys.PointEntry;
 
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.util.Rotation;
 
 public class SignalBoxNetworkTest {
 
@@ -64,7 +64,7 @@ public class SignalBoxNetworkTest {
 
     @Test
     public void testCounter() {
-        final int counter = RANDOM.nextInt(0, 1000);
+        final int counter = RANDOM.nextInt(1000);
         grid.setCounter(counter);
         handler.sendCounter();
         assertEquals(counter, grid.getCurrentCounter());
@@ -159,12 +159,12 @@ public class SignalBoxNetworkTest {
     }
 
     private Point getRandPoint() {
-        return new Point(RANDOM.nextInt(0, 101), RANDOM.nextInt(0, 101));
+        return new Point(RANDOM.nextInt(101), RANDOM.nextInt(101));
     }
 
     private ModeSet getRandModeSet() {
-        return new ModeSet(EnumGuiMode.values()[RANDOM.nextInt(0, EnumGuiMode.values().length)],
-                Rotation.values()[RANDOM.nextInt(0, Rotation.values().length)]);
+        return new ModeSet(EnumGuiMode.values()[RANDOM.nextInt(EnumGuiMode.values().length)],
+                Rotation.values()[RANDOM.nextInt(Rotation.values().length)]);
     }
 
     private static final List<PathEntryType<?>> PATHENTRY_TYPES =
@@ -174,7 +174,7 @@ public class SignalBoxNetworkTest {
                     .collect(Collectors.toList());
 
     private PathEntryType<?> getRandEntryType() {
-        return PATHENTRY_TYPES.get(RANDOM.nextInt(0, PATHENTRY_TYPES.size()));
+        return PATHENTRY_TYPES.get(RANDOM.nextInt(PATHENTRY_TYPES.size()));
     }
 
 }

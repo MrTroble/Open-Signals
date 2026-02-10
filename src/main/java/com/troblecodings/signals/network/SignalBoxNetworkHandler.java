@@ -24,7 +24,7 @@ import com.troblecodings.signals.signalbox.entrys.IPathEntry;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class SignalBoxNetworkHandler {
 
@@ -285,8 +285,9 @@ public class SignalBoxNetworkHandler {
             container.handleCounterUpdate();
         } else {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(new StateInfo(container.getTile().getLevel(),
-                    container.getTile().getBlockPos()), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(
+                    new StateInfo(container.getTile().getWorld(), container.getTile().getPos()),
+                    pos);
         }
     }
 

@@ -189,8 +189,8 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (isExecutingSignalSet || tile == null)
             return;
         isExecutingSignalSet = true;
-        final Level world = tile.getLevel();
-        final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
+        final World world = tile.getWorld();
+        final StateInfo identifier = new StateInfo(world, tile.getPos());
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal != null) {
             if (isBlocked)
@@ -231,8 +231,8 @@ public class SignalBoxPathway implements IChunkLoadable {
         final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
         if (first == null)
             return;
-        final SignalStateInfo firstInfo = new SignalStateInfo(tile.getWorld(), startSignal.pos,
-                first);
+        final SignalStateInfo firstInfo =
+                new SignalStateInfo(tile.getWorld(), startSignal.pos, first);
         data.getPreSignals().forEach(posIdent -> {
             final Signal current = SignalBoxHandler.getSignal(identifier, posIdent.pos);
             if (current == null)
@@ -303,7 +303,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     private void resetFirstSignal() {
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal != null) {
-            final StateInfo stateInfo = new StateInfo(tile.getLevel(), tile.getBlockPos());
+            final StateInfo stateInfo = new StateInfo(tile.getWorld(), tile.getPos());
             final Signal current = SignalBoxHandler.getSignal(stateInfo, startSignal.pos);
             if (current == null)
                 return;
@@ -453,10 +453,10 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private boolean isPowerd(final BlockPos pos) {
-        final Level world = tile.getLevel();
+        final World world = tile.getWorld();
         if (world == null)
             return false;
-        final BlockState state = world.getBlockState(pos);
+        final IBlockState state = world.getBlockState(pos);
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);
