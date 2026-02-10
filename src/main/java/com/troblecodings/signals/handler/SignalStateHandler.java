@@ -79,6 +79,12 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void onServerStop(final FMLServerStoppingEvent event) {
+        final Map<SignalStateInfo, Map<SEProperty, String>> maps;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        writeService.execute(() -> maps.entrySet().stream()
+                .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
         writeService.shutdown();
         try {
             writeService.awaitTermination(10, TimeUnit.MINUTES);
@@ -394,10 +400,9 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        writeService.execute(() -> {
-            maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-        });
+        writeService.execute(
+                () -> maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
+                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
     }
 
     @SubscribeEvent

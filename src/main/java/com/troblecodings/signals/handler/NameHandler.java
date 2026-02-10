@@ -70,6 +70,12 @@ public final class NameHandler implements INetworkSync {
 
     @EventHandler
     public static void onServerStop(final FMLServerStoppingEvent event) {
+        Map<StateInfo, String> map;
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        writeService.execute(() -> map.entrySet().stream()
+                .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
         writeService.shutdown();
         try {
             writeService.awaitTermination(10, TimeUnit.MINUTES);
@@ -245,10 +251,9 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        writeService.execute(() -> {
-            map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-        });
+        writeService.execute(
+                () -> map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
+                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
     }
 
     @SubscribeEvent
