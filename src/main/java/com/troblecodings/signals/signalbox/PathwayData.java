@@ -228,6 +228,7 @@ public class PathwayData {
                             if (pw == null)
                                 return;
                             pw.directResetOfProtectionWay();
+                            grid.tryNextPathways();
                         }));
             }).start();
             return true;

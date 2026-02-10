@@ -257,7 +257,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
 
     private boolean executingTryNextPWs = false;
 
-    private void tryNextPathways() {
+    protected void tryNextPathways() {
         if (executingTryNextPWs)
             return;
         executingTryNextPWs = true;
