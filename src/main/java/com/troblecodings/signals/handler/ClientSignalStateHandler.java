@@ -51,9 +51,9 @@ public class ClientSignalStateHandler implements INetworkSync {
         final Map<SEProperty, String> newProperties =
                 buffer.getMapWithCombinedValueFunc(NetworkBufferWrappers.getSEPropertyFunc(signal),
                         (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
+        final Map<SEProperty, String> properties;
         synchronized (CURRENTLY_LOADED_STATES) {
-            final Map<SEProperty, String> properties =
-                    CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
+            properties = CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
             properties.putAll(newProperties);
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
@@ -71,7 +71,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
             final TileEntity tile = level.getTileEntity(signalPos);
             if (tile != null && tile instanceof SignalTileEntity) {
-                ((SignalTileEntity) tile).updateAnimationState(newProperties, changedState);
+                ((SignalTileEntity) tile).updateAnimationState(properties, changedState);
             }
             chunk.markDirty();
         });

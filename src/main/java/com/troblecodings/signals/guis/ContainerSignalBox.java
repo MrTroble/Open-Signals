@@ -15,7 +15,6 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
@@ -75,13 +74,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
         this.tile = info.getTile(SignalBoxTileEntity.class);
+        this.grid = tile.getSignalBoxGrid();
+        initializeNetwork();
     }
 
     @Override
     public void sendAllDataToRemote() {
-        this.grid = tile.getSignalBoxGrid();
         initializeNetwork();
-        sendInitialisationPacket();
         network.sendAll();
     }
 
@@ -132,24 +131,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         loadPossibleSubsidiaires();
     }
 
-    private void sendInitialisationPacket() {
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putBlockPos(info.pos);
-        OpenSignalsMain.network.sendTo(getPlayer(), buffer);
-    }
-
     public SignalBoxNetworkHandler getNetwork() {
         return network;
     }
 
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
-        if (tile == null) {
-            final BlockPos pos = buffer.getBlockPos();
-            this.tile = (SignalBoxTileEntity) info.world.getTileEntity(pos);
+        if (grid == null) {
             this.grid = tile.getSignalBoxGrid();
             initializeNetwork();
-            return;
         }
         network.desirializeBuffer(buffer);
     }
@@ -289,9 +279,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     @Override
     public void onContainerClosed(final EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        grid.removeNetwork();
-        network.removeNetwork();
-        if (this.tile != null) {
+        if (this.grid != null) {
+            grid.removeNetwork();
+            network.removeNetwork();
             this.tile.remove(this);
         }
     }
