@@ -15,6 +15,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
@@ -76,6 +77,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         super(info);
         if (!info.world.isClientSide) {
             this.tile = info.getTile();
+            this.grid = tile.getSignalBoxGrid();
             tile.add(this);
         }
     }
@@ -83,6 +85,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     @Override
     public void sendAllDataToRemote() {
         initializeNetwork();
+        sendInitialisationPacket();
         network.sendAll();
     }
 
@@ -134,15 +137,24 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         loadPossibleSubsidiaires();
     }
 
+    private void sendInitialisationPacket() {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(info.pos);
+        OpenSignalsMain.network.sendTo(getPlayer(), buffer);
+    }
+
     public SignalBoxNetworkHandler getNetwork() {
         return network;
     }
 
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
-        if (grid == null) {
+        if (tile == null) {
+            final BlockPos pos = buffer.getBlockPos();
+            this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
             this.grid = tile.getSignalBoxGrid();
             initializeNetwork();
+            return;
         }
         network.desirializeBuffer(buffer);
     }
