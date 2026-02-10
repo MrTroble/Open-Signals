@@ -15,7 +15,7 @@ import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.enums.ChangedState;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;

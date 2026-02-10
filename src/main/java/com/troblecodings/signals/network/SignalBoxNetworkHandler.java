@@ -285,9 +285,8 @@ public class SignalBoxNetworkHandler {
             container.handleCounterUpdate();
         } else {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(
-                    new StateInfo(container.getTile().getWorld(), container.getTile().getPos()),
-                    pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(new StateInfo(container.getTile().getLevel(),
+                    container.getTile().getBlockPos()), pos);
         }
     }
 

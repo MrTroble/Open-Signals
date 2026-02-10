@@ -485,7 +485,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
             return;
         node.handleManuellEnabledOutputUpdate(mode, state);
-        SignalBoxHandler.updateRedstoneOutput(new StateInfo(tile.getWorld(), outputPos.get()),
+        SignalBoxHandler.updateRedstoneOutput(new StateInfo(tile.getLevel(), outputPos.get()),
                 state);
     }
 

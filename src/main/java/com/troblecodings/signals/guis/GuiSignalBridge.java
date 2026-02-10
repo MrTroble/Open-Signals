@@ -159,8 +159,9 @@ public class GuiSignalBridge extends GuiBase {
             final UIEntity blockEntity = createPreviewForBlock(block, 14, -2, 1.9f, 80, 60, true, 0,
                     0, true, SignalBridgeBuilder.EMPTY_WRAPPER);
             blockEntity.add(new UIClickable(e -> {
-                if (currentBlock != null)
+                if (currentBlock != null) {
                     removeUISelection(currentBlock);
+                }
                 if (currentBlock == block) {
                     currentBlock = null;
                     return;
@@ -214,18 +215,17 @@ public class GuiSignalBridge extends GuiBase {
                 row.add(tile);
                 final SignalBridgeBasicBlock savedBlock = container.builder.getBlockOnPoint(point);
                 if (savedBlock != null) {
-                    final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 0.7f,
-                            TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
-                            SignalBridgeRenderData.EMPTY_WRAPPER);
+                    final UIEntity blockEntity =
+                            createPreviewForBlock(savedBlock, 15, -1, 0.7f, TILE_WIDTH, TILE_WIDTH,
+                                    false, -9.5f, 1.5f, false, SignalBridgeBuilder.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
                 if (point.equals(container.builder.getStartPoint())) {
                     tile.add(new UIBorder(0xFF0000FF, 2));
                 }
                 tile.add(new UIClickable(e -> {
-                    if (currentBlock == null) {
+                    if (currentBlock == null)
                         return;
-                    }
                     final SignalBridgeBasicBlock block = container.builder.getBlockOnPoint(point);
                     final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 0.7f,
                             TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
@@ -407,9 +407,9 @@ public class GuiSignalBridge extends GuiBase {
         addButton.add(new UIToolTip(I18Wrapper.format("gui.signalbridge.plusbutton.desc")));
         list.add(addButton);
         container.allSignals.forEach((name, entry) -> {
-            final UIEntity blockEntity = createPreviewForBlock(entry.getKey(), 14, -3.5f, 1.9f, 80,
-                    100, true, 0, 0, true, name,
-                    new ModelInfoWrapper(entry.getKey(), renderData.getDataForName(name)), 100);
+            final UIEntity blockEntity =
+                    createPreviewForBlock(entry.getKey(), 14, -3.5f, 1.9f, 80, 100, true, 0, 0,
+                            true, name, new ModelInfoWrapper(renderData.getDataForName(name)), 100);
             blockEntity.add(new UIClickable(e -> {
                 addUISelection(name);
                 currentSignal = name;
@@ -553,8 +553,8 @@ public class GuiSignalBridge extends GuiBase {
             removeUISelection(name);
             disableRightEntity();
         }));
-        for (final Axis axis : EnumFacing.Axis.values()) {
-            for (final AxisDirection axisDirection : EnumFacing.AxisDirection.values()) {
+        for (final Axis axis : Direction.Axis.values()) {
+            for (final AxisDirection axisDirection : Direction.AxisDirection.values()) {
                 final String buttonName =
                         axis.getName() + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
                 final UIEntity button = GuiElements.createButton(buttonName, e -> {
@@ -705,10 +705,10 @@ public class GuiSignalBridge extends GuiBase {
         blockEntity.setHeight(height);
         blockEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         if (showName) {
-            final UILabel label = new UILabel(
-                    customName.isEmpty()
+            final UILabel label =
+                    new UILabel(customName.isEmpty()
                             ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "."
-                                    + block.delegate.name().getResourcePath())
+                                    + block.delegate.name().getPath())
                             : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());
@@ -932,9 +932,10 @@ public class GuiSignalBridge extends GuiBase {
     private void fillRenderPropertiesUp(final Signal signal,
             final Map<SEProperty, Integer> properties) {
         signal.getProperties().forEach(property -> {
-            if (!properties.containsKey(property))
+            if (!properties.containsKey(property)) {
                 properties.put(property,
                         property.getParent().getIDFromValue(property.getDefault()));
+            }
         });
     }
 }

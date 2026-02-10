@@ -9,8 +9,8 @@ import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -26,8 +26,8 @@ public class ClientNameHandler implements INetworkSync {
 
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
-        final Minecraft mc = Minecraft.getMinecraft();
-        mc.addScheduledTask(() -> {
+        final Minecraft mc = Minecraft.getInstance();
+        mc.submit(() -> {
             final BlockPos pos = buffer.getBlockPos();
             final boolean removed = buffer.getBoolean();
             if (removed) {
@@ -35,16 +35,15 @@ public class ClientNameHandler implements INetworkSync {
                 return;
             }
             final String name = buffer.getString();
-            final WorldClient level = mc.world;
+            final World level = mc.level;
             synchronized (CLIENT_NAMES) {
                 CLIENT_NAMES.put(new StateInfo(level, pos), name);
             }
-            level.getChunkFromBlockCoords(pos).markDirty();
-            final IBlockState state = level.getBlockState(pos);
+            final BlockState state = level.getBlockState(pos);
             if (state == null)
                 return;
-            world.setBlocksDirty(pos, state, state);
-            world.setBlockAndUpdate(pos, state);
+            level.setBlocksDirty(pos, state, state);
+            level.setBlockAndUpdate(pos, state);
         });
     }
 

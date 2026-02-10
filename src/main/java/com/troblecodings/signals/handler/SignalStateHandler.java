@@ -35,6 +35,7 @@ import com.troblecodings.signals.enums.ChangedState;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -45,6 +46,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -58,11 +60,14 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
-    private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
+    private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES =
+            new HashMap<>();
     private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
-    private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
-    private static final Map<SignalStateInfo, List<SignalStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
+    private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS =
+            new HashMap<>();
+    private static final Map<SignalStateInfo, List<SignalStateListener>> TASKS_WHEN_LOAD =
+            new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -137,8 +142,8 @@ public final class SignalStateHandler implements INetworkSync {
             listener.update(info, properties, ChangedState.UPDATED);
         } else {
             synchronized (TASKS_WHEN_LOAD) {
-                final List<SignalStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
-                        _u -> new ArrayList<>());
+                final List<SignalStateListener> list =
+                        TASKS_WHEN_LOAD.computeIfAbsent(info, _u -> new ArrayList<>());
                 if (!list.contains(listener)) {
                     list.add(listener);
                 }
@@ -150,10 +155,11 @@ public final class SignalStateHandler implements INetworkSync {
         if (!info.isValid() || info.isWorldNullOrClientSide())
             return;
         synchronized (ALL_LISTENERS) {
-            final List<SignalStateListener> listeners = ALL_LISTENERS.computeIfAbsent(info,
-                    _u -> new ArrayList<>());
-            if (!listeners.contains(listener))
+            final List<SignalStateListener> listeners =
+                    ALL_LISTENERS.computeIfAbsent(info, _u -> new ArrayList<>());
+            if (!listeners.contains(listener)) {
                 listeners.add(listener);
+            }
         }
     }
 
@@ -194,8 +200,8 @@ public final class SignalStateHandler implements INetworkSync {
         states.forEach((property, string) -> {
             if (property.equals(Signal.CUSTOMNAME))
                 return;
-            readData[signal.getIDFromProperty(
-                    property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
+            readData[signal.getIDFromProperty(property)] =
+                    (byte) (property.getParent().getIDFromValue(string) + 1);
         });
     }
 
@@ -228,8 +234,8 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             if (CURRENTLY_LOADED_STATES.containsKey(info)) {
                 contains.set(true);
-                final Map<SEProperty, String> oldStates = new HashMap<>(
-                        CURRENTLY_LOADED_STATES.get(info));
+                final Map<SEProperty, String> oldStates =
+                        new HashMap<>(CURRENTLY_LOADED_STATES.get(info));
                 states.entrySet().stream().filter(entry -> {
                     final String oldState = oldStates.get(entry.getKey());
                     return !entry.getValue().equals(oldState);
@@ -242,7 +248,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
         THREAD_SERVICE.execute(() -> {
-            sendToAll(info, changedProperties);
+            sendToAll(info, changedProperties, ChangedState.UPDATED);
             info.signal.getUpdate(info.world, info.pos);
             if (!contains.get()) {
                 createToFile(info, changedProperties);
@@ -261,11 +267,9 @@ public final class SignalStateHandler implements INetworkSync {
         }
         if (states != null)
             return states;
-        else {
-            if (info.world.isClientSide)
-                return new HashMap<>();
-            return readAndSerialize(info);
-        }
+        if (info.world.isClientSide)
+            return new HashMap<>();
+        return readAndSerialize(info);
     }
 
     private static void migrateWorldFilesToV2(final World world) {
@@ -337,11 +341,10 @@ public final class SignalStateHandler implements INetworkSync {
                 OpenSignalsMain.getLogger()
                         .warn("Position [" + stateInfo + "] not found on client!");
                 return map;
-            } else {
-                OpenSignalsMain.getLogger()
-                        .warn("Position [" + stateInfo + "] not found in file, recovering!");
-                pos = file.create(stateInfo.pos);
             }
+            OpenSignalsMain.getLogger()
+                    .warn("Position [" + stateInfo + "] not found in file, recovering!");
+            pos = file.create(stateInfo.pos);
         }
         ByteBuffer buffer;
         synchronized (file) {
@@ -452,7 +455,7 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.putBlockPos(info.pos);
         buffer.putInt(info.signal.getID());
         buffer.putEnumValue(state);
-        info.world.playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
+        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
@@ -470,7 +473,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendTo(final SignalStateInfo info, final Map<SEProperty, String> properties,
-            final @Nullable EntityPlayer player, final ChangedState state) {
+            final @Nullable PlayerEntity player, final ChangedState state) {
         if (player == null) {
             sendToAll(info, properties, state);
         } else {
@@ -479,7 +482,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendToPlayer(final SignalStateInfo stateInfo,
-            final Map<SEProperty, String> properties, final EntityPlayer player,
+            final Map<SEProperty, String> properties, final PlayerEntity player,
             final ChangedState state) {
         if (properties == null || properties.isEmpty())
             return;
@@ -491,20 +494,20 @@ public final class SignalStateHandler implements INetworkSync {
         if (properties == null || properties.isEmpty())
             return;
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties, state);
-        stateInfo.world.playerEntities.forEach(playerEntity -> sendTo(playerEntity, buffer));
+        stateInfo.world.players().forEach(playerEntity -> sendTo(playerEntity, buffer));
     }
 
     @SubscribeEvent
     public static void onEntityJoinWorldEvent(final EntityJoinWorldEvent event) {
         final Entity entity = event.getEntity();
-        if (!(entity instanceof EntityPlayer))
+        if (!(entity instanceof PlayerEntity))
             return;
         final Map<SignalStateInfo, Map<SEProperty, String>> properties;
         synchronized (CURRENTLY_LOADED_STATES) {
             properties = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
         properties.forEach(
-                (info, map) -> sendTo(info, map, (EntityPlayer) entity, ChangedState.UPDATED));
+                (info, map) -> sendTo(info, map, (PlayerEntity) entity, ChangedState.UPDATED));
     }
 
     @SubscribeEvent
@@ -549,7 +552,8 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        map.forEach((state, properties) -> sendToPlayer(state, properties, player));
+        map.forEach((state, properties) -> sendToPlayer(state, properties, player,
+                ChangedState.ADDED_TO_CACHE));
     }
 
     public static void loadSignal(final SignalStateLoadHoler info) {
@@ -573,8 +577,8 @@ public final class SignalStateHandler implements INetworkSync {
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
-                    final List<LoadHolder<?>> holders = SIGNAL_COUNTER.computeIfAbsent(info.info,
-                            _u -> new ArrayList<>());
+                    final List<LoadHolder<?>> holders =
+                            SIGNAL_COUNTER.computeIfAbsent(info.info, _u -> new ArrayList<>());
                     if (holders.size() > 0) {
                         isLoaded = true;
                     }
@@ -618,8 +622,8 @@ public final class SignalStateHandler implements INetworkSync {
         writeService.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
-                    final List<LoadHolder<?>> holders = SIGNAL_COUNTER.getOrDefault(info.info,
-                            new ArrayList<>());
+                    final List<LoadHolder<?>> holders =
+                            SIGNAL_COUNTER.getOrDefault(info.info, new ArrayList<>());
                     holders.remove(info.holder);
                     if (!holders.isEmpty())
                         return;

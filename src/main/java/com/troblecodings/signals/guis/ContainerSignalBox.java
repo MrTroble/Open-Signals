@@ -42,7 +42,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -153,7 +153,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             grid = tile.getSignalBoxGrid();
         }
         network.desirializeBuffer(buffer);
-        tile.markDirty();
+        tile.setChanged();
     }
 
     public void handlePathwayRequestResponse(final PathwayRequestMode result) {
@@ -246,7 +246,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             final boolean enable) {
         if (isClientSide())
             return;
-        final World world = tile.getWorld();
+        final World world = tile.getLevel();
         grid.getNodeChecked(ident.point).ifPresent((node) -> {
             node.getOption(ident.mode)
                     .ifPresent(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(pos -> {
@@ -276,12 +276,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     }
 
     public boolean isClientSide() {
-        return this.info.world.isRemote;
+        return this.info.world.isClientSide;
     }
 
     @Override
-    public void onContainerClosed(final EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
+    public void removed(final PlayerEntity playerIn) {
+        super.removed(playerIn);
         if (this.grid != null) {
             grid.removeNetwork();
             network.removeNetwork();

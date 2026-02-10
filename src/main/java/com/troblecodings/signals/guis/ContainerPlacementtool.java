@@ -99,7 +99,7 @@ public class ContainerPlacementtool extends ContainerBase {
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         signalID = buffer.getInt();
-        final Placementtool tool = (Placementtool) info.player.getHeldItemMainhand().getItem();
+        final Placementtool tool = (Placementtool) info.player.getMainHandItem().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();

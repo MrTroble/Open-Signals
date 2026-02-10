@@ -98,7 +98,7 @@ public class SignalAnimationHandler {
             final boolean loadToFinalState) {
         if (properties == null || properties.isEmpty())
             return;
-        final ModelInfoWrapper wrapper = new ModelInfoWrapper(tile.getBlockType(), properties);
+        final ModelInfoWrapper wrapper = new ModelInfoWrapper(properties);
         if (loadToFinalState) {
             updateToFinalizedAnimations(wrapper);
         } else {

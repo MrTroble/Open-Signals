@@ -57,26 +57,22 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final IBlockState state,
-            final EntityLivingBase placer, final ItemStack stack) {
-        SignalBoxHandler.relinkAllRedstoneIOs(new StateInfo(worldIn, pos));
-    }
-
-    @Override
-    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
-        if (!worldIn.isRemote) {
-            final SignalBoxTileEntity tile = (SignalBoxTileEntity) worldIn.getTileEntity(pos);
+    public void playerWillDestroy(final World world, final BlockPos pos, final BlockState state,
+            final PlayerEntity player) {
+        if (!world.isClientSide) {
+            final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(pos);
             tile.unlink();
             tile.getSignalBoxGrid().resetAllPathways();
-            SignalBoxHandler.removeSignalBox(new StateInfo(worldIn, pos));
-            SignalBoxHandler.onPosRemove(new StateInfo(worldIn, pos));
+            SignalBoxHandler.removeSignalBox(new StateInfo(world, pos));
+            SignalBoxHandler.onPosRemove(new StateInfo(world, pos));
         }
         super.playerWillDestroy(world, pos, state, player);
     }
-    
+
     @Override
     public void onPlace(final BlockState state, final World world, final BlockPos pos,
             final BlockState state2, final boolean bool) {
         SignalBoxHandler.relinkAllRedstoneIOs(new StateInfo(world, pos));
     }
+
 }
