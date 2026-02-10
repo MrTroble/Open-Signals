@@ -20,10 +20,8 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -76,13 +74,11 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return handler;
     }
 
+    @SideOnly(Side.CLIENT)
     public void updateAnimationState(final Map<SEProperty, String> properties,
             final ChangedState state) {
-        final World world = Minecraft.getMinecraft().world;
-        final boolean loadFinilizedState = state.equals(ChangedState.ADDED_TO_CACHE)
-                || state.equals(ChangedState.ADDED_TO_FILE)
-                || (state.equals(ChangedState.UPDATED) && !world.isBlockLoaded(pos));
-        handler.updateStates(properties, loadFinilizedState);
+        handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
+                || state.equals(ChangedState.ADDED_TO_FILE));
     }
 
     @Override

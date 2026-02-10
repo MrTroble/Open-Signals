@@ -22,9 +22,6 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChu
     public static final String POS_TAG = "posTag";
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
 
-    public BasicBlockEntity() {
-    }
-
     public void saveWrapper(final NBTWrapper wrapper) {
     }
 
