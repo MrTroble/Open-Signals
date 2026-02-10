@@ -214,9 +214,9 @@ public class GuiSignalBridge extends GuiBase {
                 row.add(tile);
                 final SignalBridgeBasicBlock savedBlock = container.builder.getBlockOnPoint(point);
                 if (savedBlock != null) {
-                    final UIEntity blockEntity =
-                            createPreviewForBlock(savedBlock, 15, -1, 0.7f, TILE_WIDTH, TILE_WIDTH,
-                                    false, -9.5f, 1.5f, false, SignalBridgeBuilder.EMPTY_WRAPPER);
+                    final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 0.7f,
+                            TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
+                            SignalBridgeRenderData.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
                 if (point.equals(container.builder.getStartPoint())) {
@@ -407,9 +407,9 @@ public class GuiSignalBridge extends GuiBase {
         addButton.add(new UIToolTip(I18Wrapper.format("gui.signalbridge.plusbutton.desc")));
         list.add(addButton);
         container.allSignals.forEach((name, entry) -> {
-            final UIEntity blockEntity =
-                    createPreviewForBlock(entry.getKey(), 14, -3.5f, 1.9f, 80, 100, true, 0, 0,
-                            true, name, new ModelInfoWrapper(renderData.getDataForName(name)), 100);
+            final UIEntity blockEntity = createPreviewForBlock(entry.getKey(), 14, -3.5f, 1.9f, 80,
+                    100, true, 0, 0, true, name,
+                    new ModelInfoWrapper(entry.getKey(), renderData.getDataForName(name)), 100);
             blockEntity.add(new UIClickable(e -> {
                 addUISelection(name);
                 currentSignal = name;
@@ -553,8 +553,8 @@ public class GuiSignalBridge extends GuiBase {
             removeUISelection(name);
             disableRightEntity();
         }));
-        for (final Axis axis : Direction.Axis.values()) {
-            for (final AxisDirection axisDirection : Direction.AxisDirection.values()) {
+        for (final Axis axis : EnumFacing.Axis.values()) {
+            for (final AxisDirection axisDirection : EnumFacing.AxisDirection.values()) {
                 final String buttonName =
                         axis.getName() + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
                 final UIEntity button = GuiElements.createButton(buttonName, e -> {
@@ -705,10 +705,10 @@ public class GuiSignalBridge extends GuiBase {
         blockEntity.setHeight(height);
         blockEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         if (showName) {
-            final UILabel label =
-                    new UILabel(customName.isEmpty()
+            final UILabel label = new UILabel(
+                    customName.isEmpty()
                             ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "."
-                                    + block.delegate.name().getPath())
+                                    + block.delegate.name().getResourcePath())
                             : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());
@@ -724,9 +724,8 @@ public class GuiSignalBridge extends GuiBase {
         preview.add(new UIScale(previewScale, previewScale, previewScale));
 
         if (enableRotation) {
-            preview.add(new UIDrag(
-                    (x, y) -> renderer.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0)),
-                    1));
+            preview.add(new UIDrag((x, y) -> renderer
+                    .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * 0.1f, 0)), 1));
         }
 
         preview.add(new UIScissor());

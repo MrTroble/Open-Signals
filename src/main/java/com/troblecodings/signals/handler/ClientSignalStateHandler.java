@@ -63,14 +63,19 @@ public class ClientSignalStateHandler implements INetworkSync {
         }
         if (level == null)
             return;
-        final long startTime = Calendar.getInstance().getTimeInMillis();
-        SERVICE.execute(() -> {
-            TileEntity entity;
-            while ((entity = level.getBlockEntity(signalPos)) == null) {
-                final long currentTime = Calendar.getInstance().getTimeInMillis();
-                if (currentTime - startTime >= 5000)
-                    return;
-                continue;
+        mc.addScheduledTask(() -> {
+            final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
+            if (chunk == null)
+                return;
+            final IBlockState state = level.getBlockState(signalPos);
+            if (state == null)
+                return;
+            level.notifyBlockUpdate(signalPos, state, state, 3);
+            mc.renderGlobal.notifyLightSet(signalPos);
+            mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
+            final TileEntity tile = level.getTileEntity(signalPos);
+            if (tile != null && tile instanceof SignalTileEntity) {
+                ((SignalTileEntity) tile).updateAnimationState(newProperties, changedState);
             }
             final BlockState state = entity.getBlockState();
             mc.level.setBlocksDirty(signalPos, state, state);

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.signals.handler.NameHandlerFileV2;
 import com.troblecodings.signals.handler.SignalStatePosV2;
 
@@ -97,7 +98,7 @@ public class NameFileTestV2 {
             testString = "test_" + String.valueOf(i);
             final BlockPos firstcreate = StateFileTestV2.getRandomBlockPos();
             final SignalStatePosV2 pos = file.createState(firstcreate, testString);
-            listOfPos.add(Map.entry(firstcreate, pos));
+            listOfPos.add(Maps.immutableEntry(firstcreate, pos));
             allNames.put(firstcreate, testString);
         }
         for (int i = 0; i < listOfPos.size(); i++) {

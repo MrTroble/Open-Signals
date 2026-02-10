@@ -447,12 +447,12 @@ public final class SignalStateHandler implements INetworkSync {
         }
     }
 
-    private static void sendRemoved(final SignalStateInfo info, final ChangedState state) {
+    public static void sendRemoved(final SignalStateInfo info, final ChangedState state) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putInt(info.signal.getID());
         buffer.putEnumValue(state);
-        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
+        info.world.playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
@@ -470,7 +470,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendTo(final SignalStateInfo info, final Map<SEProperty, String> properties,
-            final @Nullable Player player, final ChangedState state) {
+            final @Nullable EntityPlayer player, final ChangedState state) {
         if (player == null) {
             sendToAll(info, properties, state);
         } else {
@@ -479,7 +479,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendToPlayer(final SignalStateInfo stateInfo,
-            final Map<SEProperty, String> properties, final Player player,
+            final Map<SEProperty, String> properties, final EntityPlayer player,
             final ChangedState state) {
         if (properties == null || properties.isEmpty())
             return;
@@ -491,7 +491,20 @@ public final class SignalStateHandler implements INetworkSync {
         if (properties == null || properties.isEmpty())
             return;
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties, state);
-        stateInfo.world.players().forEach(playerEntity -> sendTo(playerEntity, buffer));
+        stateInfo.world.playerEntities.forEach(playerEntity -> sendTo(playerEntity, buffer));
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoinWorldEvent(final EntityJoinWorldEvent event) {
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof EntityPlayer))
+            return;
+        final Map<SignalStateInfo, Map<SEProperty, String>> properties;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            properties = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        properties.forEach(
+                (info, map) -> sendTo(info, map, (EntityPlayer) entity, ChangedState.UPDATED));
     }
 
     @SubscribeEvent

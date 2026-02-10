@@ -112,8 +112,10 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             }
 
             if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(blockPW.getValue());
+                final SignalBoxPathway otherPathway =
+                        otherGrid.get().getPathwayByLastPoint(blockPW.getValue());
+                if (!(otherPathway instanceof InterSignalBoxPathway))
+                    return;
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
                 blockPW = null;
             }
@@ -127,8 +129,10 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             }
 
             if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(resetPW.getValue());
+                final SignalBoxPathway otherPathway =
+                        otherGrid.get().getPathwayByLastPoint(resetPW.getValue());
+                if (!(otherPathway instanceof InterSignalBoxPathway))
+                    return;
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
                 resetPW = null;
             }
@@ -141,12 +145,12 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             final MainSignalIdentifier otherLastSignal = pathwayToBlock.data.getEndSignal();
             if (otherLastSignal != null) {
-                final Signal nextSignal = SignalBoxHandler
-                        .getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
-                                pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
+                final Signal nextSignal = SignalBoxHandler.getSignal(
+                        new StateInfo(pathwayToBlock.tile.getWorld(), pathwayToBlock.tile.getPos()),
+                        otherLastSignal.pos);
                 if (nextSignal != null) {
-                    lastSignalInfo = new SignalStateInfo(tile.getLevel(), otherLastSignal.pos,
-                            nextSignal);
+                    lastSignalInfo =
+                            new SignalStateInfo(tile.getWorld(), otherLastSignal.pos, nextSignal);
                 }
             }
         }
@@ -203,8 +207,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                 signalIdent.updateSignalState(SignalState.GREEN);
             });
         }
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff()) {
                 position.updateSignalState(SignalState.OFF);
@@ -238,10 +242,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     }
 
     public void setOtherPathwayToBlock(final InterSignalBoxPathway pathway) {
+        if (!(pathway instanceof InterSignalBoxPathway))
+            return;
         this.pathwayToBlock = pathway;
     }
 
     public void setOtherPathwayToReset(final InterSignalBoxPathway pathway) {
+        if (!(pathway instanceof InterSignalBoxPathway))
+            return;
         this.pathwayToReset = pathway;
     }
 
