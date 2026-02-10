@@ -37,29 +37,30 @@ public class ClientSignalStateHandler implements INetworkSync {
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getMinecraft();
-        final World level = mc.world;
-        final BlockPos signalPos = buffer.getBlockPos();
-        final StateInfo stateInfo = new StateInfo(level, signalPos);
-        final int signalID = buffer.getInt();
-        final ChangedState changedState = buffer.getEnumValue(ChangedState.class);
-        if (changedState.equals(ChangedState.REMOVED_FROM_CACHE)
-                || changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
-            setRemoved(stateInfo);
-            return;
-        }
-        final Signal signal = Signal.getSignalByID(signalID);
-        final Map<SEProperty, String> newProperties =
-                buffer.getMapWithCombinedValueFunc(NetworkBufferWrappers.getSEPropertyFunc(signal),
-                        (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
-        final Map<SEProperty, String> properties;
-        synchronized (CURRENTLY_LOADED_STATES) {
-            properties = CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
-            properties.putAll(newProperties);
-            CURRENTLY_LOADED_STATES.put(stateInfo, properties);
-        }
-        if (level == null)
-            return;
         mc.addScheduledTask(() -> {
+            final World level = mc.world;
+            final BlockPos signalPos = buffer.getBlockPos();
+            final StateInfo stateInfo = new StateInfo(level, signalPos);
+            final int signalID = buffer.getInt();
+            final ChangedState changedState = buffer.getEnumValue(ChangedState.class);
+            if (changedState.equals(ChangedState.REMOVED_FROM_CACHE)
+                    || changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
+                setRemoved(stateInfo);
+                return;
+            }
+            final Signal signal = Signal.getSignalByID(signalID);
+            final Map<SEProperty, String> newProperties = buffer.getMapWithCombinedValueFunc(
+                    NetworkBufferWrappers.getSEPropertyFunc(signal),
+                    (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
+            final Map<SEProperty, String> properties;
+            synchronized (CURRENTLY_LOADED_STATES) {
+                properties =
+                        CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
+                properties.putAll(newProperties);
+                CURRENTLY_LOADED_STATES.put(stateInfo, properties);
+            }
+            if (level == null)
+                return;
             final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
             if (chunk == null)
                 return;
