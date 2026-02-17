@@ -347,8 +347,8 @@ public class SignalBoxNetworkHandler {
         final PathwayRequestResult request = grid.requestWay(p1, p2, type);
         if (!request.wasSuccesfull()) {
             final SignalBoxNode endNode = grid.getNode(p2);
-            if (request.canBeAddedToSaver(type) && type.equals(PathType.NORMAL)
-                    && !endNode.containsOutConnection() && grid.addNextPathway(p1, p2, type)) {
+            if (request.canBeAddedToSaver(type) && !endNode.containsOutConnection()
+                    && grid.addNextPathway(p1, p2, type)) {
                 sendAddSavedPathway(p1, p2, type, request);
                 return;
             }
