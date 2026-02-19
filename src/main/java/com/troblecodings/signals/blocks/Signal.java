@@ -243,6 +243,7 @@ public class Signal extends BasicBlock {
         nextConsumer = _u -> {
         };
         properties.add(CUSTOMNAME);
+        System.out.println("Registerd [" + properties + "] for [" + this + "]!");
         this.signalProperties = ImmutableList.copyOf(properties);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL

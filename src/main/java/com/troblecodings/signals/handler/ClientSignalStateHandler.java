@@ -52,6 +52,8 @@ public class ClientSignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> newProperties = buffer.getMapWithCombinedValueFunc(
                     NetworkBufferWrappers.getSEPropertyFunc(signal),
                     (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
+            System.out.println("Recived Properties for [" + signal + "] on [" + signalPos
+                    + "] Properties=" + newProperties);
             final Map<SEProperty, String> properties;
             synchronized (CURRENTLY_LOADED_STATES) {
                 properties =

@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.troblecodings.core.interfaces.BlockModelDataWrapper;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 
 import net.minecraft.block.Block;
@@ -26,7 +25,6 @@ public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     public ModelInfoWrapper(final Block block, final Map<SEProperty, String> properties) {
         this(block);
-        OpenSignalsMain.getLogger().error("[" + block + "] with=" + properties);
         properties.forEach((property, value) -> state =
                 ((IExtendedBlockState) state).withProperty(property, value));
     }
