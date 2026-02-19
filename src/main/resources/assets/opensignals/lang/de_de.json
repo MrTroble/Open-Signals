@@ -176,6 +176,7 @@
     "error.no_path": "Kein Fahrstraße möglich",
     "error.no_intersignalbox_selected": "Kein Stellwerk verbunden",
     "error.input_blocking": "aktiver Input blockiert",
+	"error.subsidiary_enabled": "Eingeschaltetes ZS Signal",
     "error.pass": "Erfolg",
     
     "__SignalboxLinkingPage": "",

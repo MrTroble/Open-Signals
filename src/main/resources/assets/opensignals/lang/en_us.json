@@ -176,6 +176,7 @@
 	"error.no_path": "No path available",
 	"error.no_intersignalbox_selected": "No signalbox connected",
 	"error.input_blocking": "active Input is blocking",
+	"error.subsidiary_enabled": "Activated Subsidiary",
 	"error.pass": "Pass",
 
 	"__SignalboxLinkingPage": "",
