@@ -211,6 +211,7 @@ public class Signal extends BasicBlock {
             } else {
                 OpenSignalsMain.getLogger().error("Tried to set invalid SEProperty [" + property
                         + "] on [" + this + "]. Rejected!");
+                OpenSignalsMain.getLogger().error("Properties on [" + pos + "]=" + properties);
             }
         });
         return blockState.get();
