@@ -376,6 +376,8 @@ public final class SignalStateHandler implements INetworkSync {
                 }
             });
         }
+        System.out.println("Loaded [" + stateInfo.pos + "] for  [" + stateInfo.signal + "] with ["
+                + map + "]!");
         return map;
     }
 
