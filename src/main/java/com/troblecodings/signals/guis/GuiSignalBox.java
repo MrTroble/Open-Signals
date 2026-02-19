@@ -517,6 +517,7 @@ public class GuiSignalBox extends GuiBase {
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
                 network.sendResetAllPathways();
+                resetAllSubsidiarySignals();
                 resetColors();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
                 this.lastTile = null;
@@ -684,6 +685,19 @@ public class GuiSignalBox extends GuiBase {
                                 .getColor());
             });
         });
+    }
+
+    private void resetAllSubsidiarySignals() {
+        final SubsidiaryState dummy = SubsidiaryState.ALL_STATES.get(0);
+        container.enabledSubsidiaryTypes.forEach((point, states) -> {
+            final SignalBoxNode node = container.grid.getNode(point);
+            states.keySet().forEach(mode -> {
+                node.updateState(mode, SignalState.RED);
+                network.sendSubsidiary(new ModeIdentifier(point, mode), dummy, false);
+            });
+            updateSignalState(node);
+        });
+        container.enabledSubsidiaryTypes.clear();
     }
 
 }
