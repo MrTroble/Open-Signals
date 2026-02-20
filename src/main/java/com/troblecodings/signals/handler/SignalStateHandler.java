@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -376,11 +377,6 @@ public final class SignalStateHandler implements INetworkSync {
                 }
             });
         }
-        System.out.println("Loaded [" + stateInfo.pos + "] for  [" + stateInfo.signal + "] with ["
-                + map + "]!");
-        for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-            System.out.println("     " + e.toString());
-        }
         return map;
     }
 
@@ -556,6 +552,11 @@ public final class SignalStateHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (signals == null || signals.isEmpty())
             return;
+        System.out.println("Loading "
+                + signals.stream().map(loader -> loader.info).collect(Collectors.toList()));
+        for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+            System.out.println("     " + e.toString());
+        }
         THREAD_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 boolean isLoaded = false;
