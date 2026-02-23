@@ -173,7 +173,8 @@ public class PathwayData {
         final MainSignalIdentifier signalIdent = endSignal.get();
         final PathOptionEntry option = grid.getNode(signalIdent.getPoint())
                 .getOption(signalIdent.getModeSet()).orElse(null);
-        if ((option == null) || grid.startsToPath.containsKey(lastPoint))
+        final SignalBoxPathway next = grid.getPathwayByStartPoint(lastPoint);
+        if ((option == null) || next != null && !next.isBlocked)
             return true;
         final Point protectionWayEnd =
                 option.getEntry(PathEntryType.PROTECTIONWAY_END).orElse(lastPoint);
