@@ -61,7 +61,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     private final Map<BlockPos, LinkType> posForType = new HashMap<>();
     private SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
-    private EntityPlayer player;
+    private PlayerEntity player;
 
     protected Consumer<SignalBoxNode> updateSignalState = (node) -> {
     };
