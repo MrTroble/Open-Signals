@@ -579,11 +579,8 @@ public final class SignalStateHandler implements INetworkSync {
                     }
                 }
                 if (isLoaded) {
-                    Map<SEProperty, String> sendProperties;
-                    synchronized (CURRENTLY_LOADED_STATES) {
-                        sendProperties = CURRENTLY_LOADED_STATES.get(info.info);
-                    }
-                    sendTo(info.info, sendProperties, player, ChangedState.ADDED_TO_CACHE);
+                    runTaskWhenSignalLoaded(info.info, (stateInfo, props, _u) -> sendTo(stateInfo,
+                            props, player, ChangedState.ADDED_TO_CACHE));
                     return;
                 }
                 final Map<SEProperty, String> properties = readAndSerialize(info.info);
