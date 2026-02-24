@@ -480,7 +480,8 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> properties, final ChangedState state) {
         if (properties == null || properties.isEmpty())
             return;
-        System.out.println("Sending [" + stateInfo + "] with " + properties + " to all!");
+        System.out.println("Sending [" + stateInfo + "] with " + properties + " to "
+                + stateInfo.world.playerEntities);
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties, state);
         stateInfo.world.playerEntities.forEach(playerEntity -> sendTo(playerEntity, buffer));
     }
@@ -512,6 +513,7 @@ public final class SignalStateHandler implements INetworkSync {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
                 final SignalStateInfo info =
                         new SignalStateInfo(world, pos, signalTile.getSignal());
+                System.out.println("Loading " + info + " for " + player);
                 states.add(new SignalStateLoadHoler(info, new LoadHolder<>(player)));
             }
         });
