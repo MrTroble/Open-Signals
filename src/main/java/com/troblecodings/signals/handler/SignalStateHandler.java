@@ -471,7 +471,8 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> properties, final EntityPlayer player,
             final ChangedState state) {
         if (properties == null || properties.isEmpty()) {
-            System.out.println("Returning Sending for " + player + " because properties is empty");
+            System.out.println("Returning Sending of " + stateInfo + "  for " + player
+                    + " because properties is empty");
             return;
         }
 
@@ -482,8 +483,8 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties, final ChangedState state) {
         if (properties == null || properties.isEmpty()) {
-            System.out.println("Returning Sending for " + stateInfo.world.playerEntities
-                    + " because properties is empty");
+            System.out.println("Returning Sending of " + stateInfo + "for "
+                    + stateInfo.world.playerEntities + " because properties is empty");
             return;
         }
 
