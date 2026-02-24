@@ -470,26 +470,15 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToPlayer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties, final EntityPlayer player,
             final ChangedState state) {
-        if (properties == null || properties.isEmpty()) {
-            System.out.println("Returning Sending of " + stateInfo + "  for " + player
-                    + " because properties is empty");
+        if (properties == null || properties.isEmpty())
             return;
-        }
-
-        System.out.println("Sending [" + stateInfo + "] with " + properties + " to " + player);
         sendTo(player, packToByteBuffer(stateInfo, properties, state));
     }
 
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties, final ChangedState state) {
-        if (properties == null || properties.isEmpty()) {
-            System.out.println("Returning Sending of " + stateInfo + "for "
-                    + stateInfo.world.playerEntities + " because properties is empty");
+        if (properties == null || properties.isEmpty())
             return;
-        }
-
-        System.out.println("Sending [" + stateInfo + "] with " + properties + " to "
-                + stateInfo.world.playerEntities);
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties, state);
         stateInfo.world.playerEntities.forEach(playerEntity -> sendTo(playerEntity, buffer));
     }
@@ -521,7 +510,6 @@ public final class SignalStateHandler implements INetworkSync {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
                 final SignalStateInfo info =
                         new SignalStateInfo(world, pos, signalTile.getSignal());
-                System.out.println("Loading " + info + " for " + player);
                 states.add(new SignalStateLoadHoler(info, new LoadHolder<>(player)));
             }
         });
@@ -561,10 +549,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void loadSignals(final List<SignalStateLoadHoler> signals,
             final @Nullable EntityPlayer player) {
-        if (signals == null || signals.isEmpty()) {
-            System.out.println("Returning load of list for " + player + "because empty!");
+        if (signals == null || signals.isEmpty())
             return;
-        }
         THREAD_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 boolean isLoaded = false;
