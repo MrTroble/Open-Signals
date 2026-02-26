@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.ModeIdentifier;
@@ -51,6 +52,8 @@ public class PathwayData {
     private static final String PATH_TYPE = "pathType";
     private static final String LIST_OF_PROTECTIONWAY_NODES = "listOfProtectionWayNodes";
     private static final String IS_INTERSIGNALBOX_PATHWAY = "isInterSignalBoxPathway";
+    private static final boolean CAN_INPUT_BLOCK_SHUNTING_PATH =
+            ConfigHandler.GENERAL.canInputBlockShuntingPath.get();
 
     protected SignalBoxGrid grid = null;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
@@ -161,7 +164,9 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED))
+            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED)
+                    || (CAN_INPUT_BLOCK_SHUNTING_PATH
+                            && SignalBoxUtil.isPathBlocked(grid, current, path)))
                 return false;
         }
         return true;
