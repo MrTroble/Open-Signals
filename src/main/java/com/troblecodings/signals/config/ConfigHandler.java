@@ -26,8 +26,12 @@ public final class ConfigHandler {
     public static int lightEmission = 1;
 
     @Name("canAddRSPathToSaver")
-    @Comment("ShuntingPaths can be added to PathwaySaver.")
+    @Comment("ShuntingPaths can be added to PathwaySaver. Default: false")
     public static boolean canAddRSPathToSaver = false;
+
+    @Name("canInputBlockShuntingPath")
+    @Comment("Choose wether a blocking input can prevent setting a shunting path. Default: false")
+    public static boolean canInputBlockShuntingPath = false;
 
     @Name("Signalbox background color")
     @Comment("Change the background color of the signalbox gui. Default: -7631989")
