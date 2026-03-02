@@ -62,6 +62,7 @@ public class ContainerSignalController extends ContainerBase
         linkedPos = controllerEntity.getLinkedPosition();
         if (linkedPos == null)
             return;
+        controllerEntity.validateData();
         currentSignal = controllerEntity.getLinkedSignal();
         final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
