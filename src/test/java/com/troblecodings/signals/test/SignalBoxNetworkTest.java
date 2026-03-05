@@ -43,6 +43,12 @@ public class SignalBoxNetworkTest {
         SignalBoxFactory.setUpFactoryForTests();
     }
 
+    @BeforeEach
+    public void initializeNewGridAndNetwork() {
+        grid = new SignalBoxGrid(null);
+        handler = new DebugNetworkHandler(grid);
+    }
+
     @Test
     public void testAddAndRemoveMode() {
         final Map<Point, ModeSet> modes = new HashMap<>();
@@ -150,12 +156,6 @@ public class SignalBoxNetworkTest {
             handler.sendManuellOutputRemove(ident.point, ident.mode);
             assertTrue(!grid.getNode(ident.point).containsManuellOutput(ident.mode));
         });
-    }
-
-    @BeforeEach
-    public void initializeNewGridAndNetwork() {
-        grid = new SignalBoxGrid(null);
-        handler = new DebugNetworkHandler(grid);
     }
 
     private Point getRandPoint() {
