@@ -53,7 +53,6 @@ public class ContainerSignalController extends ContainerBase
     }
 
     private void sendProperitesToClient() {
-        // TODO redo the SignalController
         if (info.pos == null)
             return;
         controllerEntity = (SignalControllerTileEntity) info.world.getBlockEntity(info.pos);
@@ -96,7 +95,7 @@ public class ContainerSignalController extends ContainerBase
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
         buffer.putInt(getSignal().getID());
-        buffer.putByte((byte) currentMode.ordinal());
+        buffer.putEnumValue(currentMode);
         buffer.putMapWithCombinedValueConsumer(propertiesToSend,
                 NetworkBufferWrappers.getSEPropertyConsumer(getSignal()),
                 (buf, prop, value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
@@ -125,7 +124,7 @@ public class ContainerSignalController extends ContainerBase
         linkedPos = buffer.getBlockPos();
         final int signalID = buffer.getInt();
         this.currentSignal = Signal.SIGNAL_IDS.get(signalID);
-        currentMode = EnumMode.values()[buffer.getByteToUnsignedInt()];
+        currentMode = buffer.getEnumValue(EnumMode.class);
         this.properties.clear();
         this.properties.putAll(buffer.getMapWithCombinedValueFunc(
                 NetworkBufferWrappers.getSEPropertyFunc(currentSignal),
@@ -159,54 +158,50 @@ public class ContainerSignalController extends ContainerBase
         final SignalControllerNetwork mode = buffer.getEnumValue(SignalControllerNetwork.class);
         switch (mode) {
             case SEND_MODE: {
-                currentMode = EnumMode.of(buffer);
+                currentMode = buffer.getEnumValue(EnumMode.class);
                 controllerEntity.setLastMode(currentMode);
                 break;
             }
             case SEND_RS_PROFILE: {
+                if (buffer.getBoolean()) {
+                    controllerEntity.removeProfile(buffer.getByte());
+                }
                 currentRSProfile = buffer.getByteToUnsignedInt();
                 break;
             }
             case SEND_PROPERTY: {
                 final SEProperty property = propertiesList.get(buffer.getByteToUnsignedInt());
-                final String value = property.getObjFromID(buffer.getByteToUnsignedInt());
+                final int valueID = buffer.getByteToUnsignedInt();
+                final String value = property.getObjFromID(valueID);
                 if (currentMode.equals(EnumMode.MANUELL)) {
                     SignalStateHandler.setState(
                             new SignalStateInfo(info.world, linkedPos, getSignal()), property,
                             value);
                 } else if (currentMode.equals(EnumMode.SINGLE)) {
+                    if (valueID == -1) {
+                        controllerEntity.removePropertyFromProfile((byte) currentRSProfile,
+                                property);
+                        break;
+                    }
                     controllerEntity.updateRedstoneProfile((byte) currentRSProfile, property,
                             value);
                 }
                 break;
             }
-            case REMOVE_PROPERTY: {
-                if (currentMode.equals(EnumMode.SINGLE)) {
-                    final SEProperty property = propertiesList.get(buffer.getByteToUnsignedInt());
-                    controllerEntity.removePropertyFromProfile((byte) currentRSProfile, property);
-                }
-                break;
-            }
-            case REMOVE_PROFILE: {
-                final EnumState state = EnumState.of(buffer);
-                final Direction direction = deserializeDirection(buffer);
-                controllerEntity.removeProfileFromDirection(direction, state);
-                break;
-            }
             case SET_PROFILE: {
-                final EnumState state = EnumState.of(buffer);
-                final Direction direction = deserializeDirection(buffer);
+                final EnumState state = buffer.getEnumValue(EnumState.class);
+                final Direction direction = buffer.getEnumValue(Direction.class);
                 final int profile = buffer.getByteToUnsignedInt();
-                controllerEntity.updateEnabledStates(direction, state, profile);
+                if (profile == -1) {
+                    controllerEntity.removeProfileFromDirection(direction, state);
+                } else {
+                    controllerEntity.updateEnabledStates(direction, state, profile);
+                }
                 break;
             }
             case SET_RS_INPUT_PROFILE: {
                 final int profile = buffer.getByteToUnsignedInt();
                 controllerEntity.setProfileRSInput((byte) profile);
-                break;
-            }
-            case REMOVE_RS_INPUT_PROFILE: {
-                controllerEntity.setProfileRSInput((byte) -1);
                 break;
             }
             case UNLINK_INPUT_POS: {
@@ -219,18 +214,73 @@ public class ContainerSignalController extends ContainerBase
                 controllerEntity.setLinkedRSInput(null);
                 break;
             }
-            case SEND_RS_PROFILE_REMOVE: {
-                controllerEntity.removeProfile(buffer.getByte());
-                break;
-            }
             default:
                 break;
         }
         controllerEntity.setChanged();
     }
 
-    private static Direction deserializeDirection(final ReadBuffer buffer) {
-        return Direction.values()[buffer.getByteToUnsignedInt()];
+    protected void sendAndSetProfile(final Direction facing, final int profile,
+            final EnumState state) {
+        final Map<EnumState, Integer> map =
+                enabledRSStates.computeIfAbsent(facing, _u -> new HashMap<>());
+        if (profile == -1) {
+            map.remove(state);
+        } else {
+            map.put(state, profile);
+        }
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.SET_PROFILE);
+        buffer.putEnumValue(facing);
+        buffer.putEnumValue(state);
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendCurrentMode() {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.SEND_MODE);
+        buffer.putEnumValue(currentMode);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendRSProfileRemove(final int profileToRemove, final int newProfile) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.SEND_RS_PROFILE);
+        buffer.putBoolean(true);
+        buffer.putByte((byte) profileToRemove);
+        buffer.putByte((byte) newProfile);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendRSProfile(final int profile) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.SEND_RS_PROFILE);
+        buffer.putBoolean(false);
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendPropertyToServer(final SEProperty property, final int value) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.SEND_PROPERTY);
+        buffer.putByte((byte) currentSignal.getIDFromProperty(property));
+        buffer.putByte((byte) value);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendRSInputProfileToServer(final int profile) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.SET_RS_INPUT_PROFILE);
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void unlinkInputPos() {
+        linkedRSInput = null;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalControllerNetwork.UNLINK_INPUT_POS);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     public Map<SEProperty, String> getProperties() {

@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
-import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -37,7 +36,6 @@ import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
-import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
@@ -51,7 +49,6 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -65,8 +62,6 @@ public class GuiSignalController extends GuiBase {
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();
     private boolean loaded = false;
-    private final Player player;
-    private EnumMode currentMode;
     private int currentProfile = -1;
     private final PreviewSideBar previewSidebar = new PreviewSideBar(-8);
     private final PreviewSideBar previewRedstone = new PreviewSideBar(-8);
@@ -76,14 +71,13 @@ public class GuiSignalController extends GuiBase {
     public GuiSignalController(final GuiInfo info) {
         super(info);
         this.controller = (ContainerSignalController) info.base;
-        this.player = info.player;
         initInternal();
     }
 
     private void initMode(final EnumMode mode) {
         lowerEntity.clear();
-        this.currentMode = mode;
-        sendCurrentMode();
+        controller.currentMode = mode;
+        controller.sendCurrentMode();
         switch (mode) {
             case MANUELL:
                 addManuellMode();
@@ -127,7 +121,7 @@ public class GuiSignalController extends GuiBase {
             if (!onlyUpdatePreview) {
                 final UIEntity entity =
                         GuiElements.createEnumElement(new DisableIntegerable<>(property), e -> {
-                            sendPropertyToServer(property, e);
+                            controller.sendPropertyToServer(property, e);
                             previewRedstone.addToRenderNormal(property, e);
                             if (e == -1) {
                                 properties.remove(property);
@@ -223,8 +217,9 @@ public class GuiSignalController extends GuiBase {
         entity.add(new UIButton("x"));
         entity.add(new UIClickable(e -> {
             controller.allRSStates.remove(currentProfile);
-            sendRSProfileRemove(currentProfile);
+            final int profileToRemove = currentProfile;
             initMode(EnumMode.SINGLE);
+            controller.sendRSProfileRemove(profileToRemove, currentProfile);
         }));
         entity.add(new UIToolTip(I18Wrapper.format("gui.controller.remove_profile")));
         return entity;
@@ -236,7 +231,7 @@ public class GuiSignalController extends GuiBase {
             if (newProfileID == -1)
                 return;
 
-            sendRSProfile(newProfileID);
+            controller.sendRSProfile(newProfileID);
             controller.allRSStates.put(newProfileID, new HashMap<>());
             addProfilesToList(list, propertyEntity);
             final int profileToLoad = currentProfile == -1 ? newProfileID : currentProfile;
@@ -414,7 +409,7 @@ public class GuiSignalController extends GuiBase {
                                                 + ": "
                                                 + I18Wrapper.format("property.disabled.name"),
                                         _u -> {
-                                            sendAndSetProfile(face, -1, state);
+                                            controller.sendAndSetProfile(face, -1, state);
                                             mainButton.setText("");
                                             pop();
                                         }));
@@ -422,7 +417,7 @@ public class GuiSignalController extends GuiBase {
                     final UIEntity button = GuiElements.createButton(I18Wrapper.format(
                             "gui.controller." + face.getName() + "." + state.getNameWrapper())
                             + " : " + String.valueOf(i), _u2 -> {
-                                sendAndSetProfile(face, i, state);
+                                controller.sendAndSetProfile(face, i, state);
                                 mainButton.setText(i != -1 ? String.valueOf(i) : "");
                                 pop();
                             });
@@ -473,7 +468,7 @@ public class GuiSignalController extends GuiBase {
                 SizeIntegerables.of("profile", 30, in -> String.valueOf(in)));
         leftSide.add(GuiElements.createEnumElement(profile, e -> {
             updateProfileProperties(new UIEntity(), e, true);
-            sendRSInputProfileToServer(e);
+            controller.sendRSInputProfileToServer(e);
         }, controller.linkedRSInputProfile));
         updateProfileProperties(new UIEntity(), controller.linkedRSInputProfile, true);
 
@@ -513,7 +508,7 @@ public class GuiSignalController extends GuiBase {
 
         final UIEntity unlinkButton =
                 GuiElements.createButton(I18Wrapper.format("gui.controller.unlink"), e -> {
-                    unlinkInputPos();
+                    controller.unlinkInputPos();
                     label.setText(I18Wrapper.format("gui.controller.not_linked"));
                 });
         unlinkButton.add(new UIToolTip(I18Wrapper.format("gui.controller.unlink.desc")));
@@ -598,7 +593,7 @@ public class GuiSignalController extends GuiBase {
             list.add(GuiElements.createEnumElement(enumarable, property, e -> {
                 previewSidebar.addToRenderNormal(property, e);
                 if (loaded) {
-                    sendPropertyToServer(property, e);
+                    controller.sendPropertyToServer(property, e);
                     previewSidebar.update(controller.getSignal());
                 }
             }, index));
@@ -619,90 +614,6 @@ public class GuiSignalController extends GuiBase {
         previewSidebar.setDisable(false);
         previewRedstone.setDisable(false);
         return super.pop();
-    }
-
-    private void sendAndSetProfile(final Direction facing, final int profile,
-            final EnumState state) {
-        if (!loaded)
-            return;
-        final Map<EnumState, Integer> map =
-                controller.enabledRSStates.computeIfAbsent(facing, _u -> new HashMap<>());
-        if (profile == -1) {
-            map.remove(state);
-        } else {
-            map.put(state, profile);
-        }
-        final WriteBuffer buffer = new WriteBuffer();
-        if (profile == -1) {
-            buffer.putEnumValue(SignalControllerNetwork.REMOVE_PROFILE);
-        } else {
-            buffer.putEnumValue(SignalControllerNetwork.SET_PROFILE);
-        }
-        buffer.putByte((byte) state.ordinal());
-        buffer.putByte((byte) facing.ordinal());
-        buffer.putByte((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    private void sendCurrentMode() {
-        if (!loaded)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalControllerNetwork.SEND_MODE);
-        buffer.putByte((byte) currentMode.ordinal());
-        OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    private void sendRSProfileRemove(final int profile) {
-        if (!loaded)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalControllerNetwork.SEND_RS_PROFILE_REMOVE);
-        buffer.putByte((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    private void sendRSProfile(final int profile) {
-        if (!loaded)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalControllerNetwork.SEND_RS_PROFILE);
-        buffer.putByte((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    private void sendPropertyToServer(final SEProperty property, final int value) {
-        if (!loaded)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        if (value == -1) {
-            buffer.putEnumValue(SignalControllerNetwork.REMOVE_PROPERTY);
-        } else {
-            buffer.putEnumValue(SignalControllerNetwork.SEND_PROPERTY);
-        }
-        buffer.putByte((byte) controller.getSignal().getIDFromProperty(property));
-        buffer.putByte((byte) value);
-        OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    private void sendRSInputProfileToServer(final int profile) {
-        if (!loaded)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        if (profile == -1) {
-            buffer.putEnumValue(SignalControllerNetwork.REMOVE_RS_INPUT_PROFILE);
-        } else {
-            buffer.putEnumValue(SignalControllerNetwork.SET_RS_INPUT_PROFILE);
-        }
-        buffer.putByte((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    private void unlinkInputPos() {
-        controller.linkedRSInput = null;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalControllerNetwork.UNLINK_INPUT_POS);
-        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     @Override
