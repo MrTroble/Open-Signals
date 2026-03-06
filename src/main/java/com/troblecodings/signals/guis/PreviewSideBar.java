@@ -86,10 +86,14 @@ public class PreviewSideBar {
         properties.clear();
     }
 
+    public void setDisable(final boolean disable) {
+        blockRender.setDisable(disable);
+    }
+
     private void buildRenderListForAnimations(final Signal signal, final ModelInfoWrapper wrapper) {
         animationInfos.clear();
-        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = SignalAnimationConfigParser.ALL_ANIMATIONS
-                .get(signal);
+        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map =
+                SignalAnimationConfigParser.ALL_ANIMATIONS.get(signal);
         map.forEach((entry, list) -> {
             for (final SignalAnimation animation : list) {
                 final Predicate<ModelInfoWrapper> predicate = animation.getPredicate();

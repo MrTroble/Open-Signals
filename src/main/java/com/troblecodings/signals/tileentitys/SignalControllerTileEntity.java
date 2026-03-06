@@ -41,7 +41,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     private BlockPos linkedSignalPosition = null;
     private Signal linkedSignal = null;
-    private int lastProfile = 0;
     private EnumMode lastState;
     private BlockPos linkedRSInput = null;
     private Byte profileRSInput = -1;
@@ -62,7 +61,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String PROFILE = "profile";
     private static final String PROPERITES = "properties";
     private static final String ALLSTATES = "allstates";
-    private static final String LAST_PROFILE = "lastprofile";
     private static final String ENUM_MODE = "enummode";
     private static final String LINKED_RS_INPUT = "linkedrsinput";
     private static final String RS_INPUT_PROFILE = "rsinputprofile";
@@ -82,14 +80,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return lastState;
     }
 
-    public int getProfile() {
-        return lastProfile;
-    }
-
-    public void setProfile(final int profile) {
-        lastProfile = profile;
-    }
-
     public void removePropertyFromProfile(final Byte profile, final SEProperty property) {
         final Map<SEProperty, String> properties = allStates.get(profile);
         if (properties != null) {
@@ -107,6 +97,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void updateRedstoneProfile(final Byte profile, final SEProperty property,
             final String value) {
         allStates.computeIfAbsent(profile, _u -> new HashMap<>()).put(property, value);
+    }
+
+    public void removeProfile(final Byte profile) {
+        allStates.remove(profile);
     }
 
     public void updateEnabledStates(final Direction direction, final EnumState state,
@@ -144,7 +138,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             return;
         wrapper.putBlockPos(BLOCK_POS_ID, linkedSignalPosition);
         wrapper.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
-        wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null) {
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
         }
@@ -183,7 +176,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         linkedSignal = Signal.SIGNALS.get(wrapper.getString(SIGNAL_NAME));
         if (linkedSignalPosition == null || linkedSignal == null)
             return;
-        lastProfile = wrapper.getInteger(LAST_PROFILE);
         lastState = EnumMode.values()[wrapper.getInteger(ENUM_MODE)];
         for (final Direction direction : Direction.values()) {
             if (!wrapper.contains(direction.getName())) {
@@ -199,13 +191,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             });
             enabledStates.put(direction, map);
             if (comp.contains(RS_BOOLEAN)) {
-                currentStates[direction.ordinal()] = comp.getWrapper(RS_BOOLEAN)
-                        .getBoolean(RS_BOOLEAN);
+                currentStates[direction.ordinal()] =
+                        comp.getWrapper(RS_BOOLEAN).getBoolean(RS_BOOLEAN);
             }
         }
         final List<NBTWrapper> list = wrapper.getList(ALLSTATES);
-        final List<SEProperty> properites = linkedSignal == null ? new ArrayList<>()
-                : linkedSignal.getProperties();
+        final List<SEProperty> properites =
+                linkedSignal == null ? new ArrayList<>() : linkedSignal.getProperties();
         list.forEach(compund -> {
             final int profile = compund.getInteger(PROFILE);
             final NBTWrapper comp = compund.getWrapper(PROPERITES);
@@ -221,9 +213,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (wrapper.contains(LINKED_RS_INPUT)) {
             linkedRSInput = wrapper.getBlockPos(LINKED_RS_INPUT);
         }
-        profileRSInput = (byte) (wrapper.contains(RS_INPUT_PROFILE)
-                ? wrapper.getInteger(RS_INPUT_PROFILE)
-                : -1);
+        profileRSInput =
+                (byte) (wrapper.contains(RS_INPUT_PROFILE) ? wrapper.getInteger(RS_INPUT_PROFILE)
+                        : -1);
 
     }
 
@@ -231,10 +223,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void onLoad() {
         if (!level.isClientSide) {
             if (linkedSignalPosition != null && linkedSignal != null) {
-                final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
-                        linkedSignal);
-                final LoadHolder<StateInfo> holder = new LoadHolder<>(
-                        new StateInfo(level, worldPosition));
+                final SignalStateInfo info =
+                        new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
+                final LoadHolder<StateInfo> holder =
+                        new LoadHolder<>(new StateInfo(level, worldPosition));
                 SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
                 SignalStateHandler.addListener(info, listener);
                 NameHandler.loadName(new StateLoadHolder(info.toStateInfo(), holder));
@@ -243,11 +235,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     public void unloadSignal() {
-        if (linkedSignalPosition != null & linkedSignal != null) {
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
-                    linkedSignal);
-            final LoadHolder<StateInfo> holder = new LoadHolder<>(
-                    new StateInfo(level, worldPosition));
+        if (linkedSignalPosition != null && linkedSignal != null) {
+            final SignalStateInfo info =
+                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
+            final LoadHolder<StateInfo> holder =
+                    new LoadHolder<>(new StateInfo(level, worldPosition));
             SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, holder));
             NameHandler.unloadName(new StateLoadHolder(info.toStateInfo(), holder));
         }
@@ -278,7 +270,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             onLoad();
             setChanged();
             return true;
-        } else if (block instanceof RedstoneInput) {
+        }
+        if (block instanceof RedstoneInput) {
             linkedRSInput = pos;
             loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) level, pos,
                     (tile, _u) -> tile.linkController(getBlockPos()));
@@ -322,8 +315,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (profile == null || !allStates.containsKey(profile)) {
                 continue;
             }
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
-                    linkedSignal);
+            final SignalStateInfo info =
+                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
             SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, _u1,
                     _u2) -> SignalStateHandler.setStates(info, allStates.get(profile)));
         }
@@ -334,8 +327,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             return;
         final Map<SEProperty, String> properties = allStates.get(profileRSInput);
         if (properties != null) {
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
-                    linkedSignal);
+            final SignalStateInfo info =
+                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
             SignalStateHandler.runTaskWhenSignalLoaded(info,
                     (stateInfo, _u1, _u2) -> SignalStateHandler.setStates(info, properties));
         }

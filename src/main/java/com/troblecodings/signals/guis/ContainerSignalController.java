@@ -33,7 +33,6 @@ public class ContainerSignalController extends ContainerBase
 
     protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
     protected final Map<Direction, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
-    protected int lastProfile;
     protected EnumMode currentMode = EnumMode.MANUELL;
     protected BlockPos linkedRSInput = null;
     protected int linkedRSInputProfile = -1;
@@ -55,14 +54,12 @@ public class ContainerSignalController extends ContainerBase
 
     private void sendProperitesToClient() {
         // TODO redo the SignalController
-        if (info.pos == null) {
+        if (info.pos == null)
             return;
-        }
         controllerEntity = (SignalControllerTileEntity) info.world.getBlockEntity(info.pos);
         linkedPos = controllerEntity.getLinkedPosition();
-        if (linkedPos == null) {
+        if (linkedPos == null)
             return;
-        }
         currentSignal = controllerEntity.getLinkedSignal();
         final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
@@ -78,8 +75,8 @@ public class ContainerSignalController extends ContainerBase
                 propertiesToSend.put(property, value);
             }
         });
-        final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>(
-                controllerEntity.getAllStates());
+        final Map<Byte, Map<SEProperty, String>> allStates =
+                new HashMap<>(controllerEntity.getAllStates());
         final Map<Byte, Map<SEProperty, String>> allStatesToSend = new HashMap<>();
         allStates.forEach((profile, props) -> {
             final Map<SEProperty, String> propsForProfile = new HashMap<>();
@@ -92,8 +89,8 @@ public class ContainerSignalController extends ContainerBase
             });
             allStatesToSend.put(profile, propsForProfile);
         });
-        final Map<Direction, Map<EnumState, Byte>> enabledStates = controllerEntity
-                .getEnabledStates();
+        final Map<Direction, Map<EnumState, Byte>> enabledStates =
+                controllerEntity.getEnabledStates();
         currentMode = controllerEntity.getLastMode();
 
         final WriteBuffer buffer = new WriteBuffer();
@@ -103,7 +100,6 @@ public class ContainerSignalController extends ContainerBase
         buffer.putMapWithCombinedValueConsumer(propertiesToSend,
                 NetworkBufferWrappers.getSEPropertyConsumer(getSignal()),
                 (buf, prop, value) -> buf.putByte((byte) prop.getParent().getIDFromValue(value)));
-        buffer.putByte((byte) controllerEntity.getProfile());
         buffer.putMap(allStatesToSend, WriteBuffer.BYTE_CONSUMER,
                 (buf, props) -> buf.putMapWithCombinedValueConsumer(props,
                         NetworkBufferWrappers.getSEPropertyConsumer(getSignal()),
@@ -114,11 +110,13 @@ public class ContainerSignalController extends ContainerBase
                 WriteBuffer.getEnumConsumer(), WriteBuffer.BYTE_CONSUMER));
         final BlockPos linkedRSInput = controllerEntity.getLinkedRSInput();
         buffer.putBoolean(linkedRSInput != null);
-        if (linkedRSInput != null)
+        if (linkedRSInput != null) {
             buffer.putBlockPos(linkedRSInput);
+        }
         buffer.putBoolean(controllerEntity.getProfileRSInput() != -1);
-        if (controllerEntity.getProfileRSInput() != -1)
+        if (controllerEntity.getProfileRSInput() != -1) {
             buffer.putByte(controllerEntity.getProfileRSInput());
+        }
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -133,7 +131,6 @@ public class ContainerSignalController extends ContainerBase
                 NetworkBufferWrappers.getSEPropertyFunc(currentSignal),
                 (buf, prop) -> prop.getObjFromID(buffer.getByteToUnsignedInt())));
         propertiesList = currentSignal.getProperties();
-        lastProfile = buffer.getByteToUnsignedInt();
         allRSStates.clear();
         allRSStates.putAll(buffer.getMap(ReadBuffer.BYTE_TO_INT_FUNCTION,
                 (buf) -> buf.getMapWithCombinedValueFunc(
@@ -144,11 +141,13 @@ public class ContainerSignalController extends ContainerBase
                 buf -> buf.getMap(ReadBuffer.getEnumFunction(EnumState.class),
                         ReadBuffer.BYTE_TO_INT_FUNCTION)));
         final boolean isInputConnected = buffer.getBoolean();
-        if (isInputConnected)
+        if (isInputConnected) {
             linkedRSInput = buffer.getBlockPos();
+        }
         final boolean isProfileInputenabled = buffer.getBoolean();
-        if (isProfileInputenabled)
+        if (isProfileInputenabled) {
             linkedRSInputProfile = buffer.getByteToUnsignedInt();
+        }
         update();
     }
 
@@ -212,11 +211,16 @@ public class ContainerSignalController extends ContainerBase
             }
             case UNLINK_INPUT_POS: {
                 final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
-                if (info.pos == null || linkedInput == null)
+                if (info.pos == null || linkedInput == null) {
                     break;
+                }
                 loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) info.world,
                         linkedInput, (tile, _u) -> tile.unlinkController(info.pos));
                 controllerEntity.setLinkedRSInput(null);
+                break;
+            }
+            case SEND_RS_PROFILE_REMOVE: {
+                controllerEntity.removeProfile(buffer.getByte());
                 break;
             }
             default:
