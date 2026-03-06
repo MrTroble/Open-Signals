@@ -62,9 +62,10 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.gui.Font;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Rotation;
 
 public class GuiSignalBox extends GuiBase {
 
@@ -73,7 +74,7 @@ public class GuiSignalBox extends GuiBase {
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
     public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
-            ConfigHandler.signalboxTrainnumberBackgroundColor;
+            ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
 
     public static final ResourceLocation REDSTONE_OFF =
             new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
@@ -128,7 +129,9 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void checkForSubsidiary(final SignalBoxNode node, final ModeSet mode) {
-        final SubsidiaryState state = node.getSubsidiaryState(mode);
+        final Map<ModeSet, SubsidiaryState> subsidiary =
+                container.enabledSubsidiaryTypes.getOrDefault(node.getPoint(), new HashMap<>());
+        final SubsidiaryState state = subsidiary.get(mode);
         if (state != null) {
             node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
         }
@@ -141,19 +144,21 @@ public class GuiSignalBox extends GuiBase {
         return;
     }
 
-    private void updateTrainNumbers(final SignalBoxNode node) {
-        node.iterator().forEachRemaining(modeSet -> {
-            if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
-                return;
-            node.getOption(modeSet).ifPresent(option -> {
-                final TrainNumber number =
-                        option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
-                final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
-                if (number.trainNumber.isEmpty()) {
-                    rendering.removeTrainNumber(modeIdent);
-                } else {
-                    rendering.putTrainNumber(modeIdent, number.trainNumber);
-                }
+    private void updateTrainNumbers(final List<SignalBoxNode> nodes) {
+        nodes.forEach(node -> {
+            node.iterator().forEachRemaining(modeSet -> {
+                if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
+                    return;
+                node.getOption(modeSet).ifPresent(option -> {
+                    final TrainNumber number =
+                            option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+                    final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
+                    if (number.trainNumber.isEmpty()) {
+                        rendering.removeTrainNumber(modeIdent);
+                    } else {
+                        rendering.putTrainNumber(modeIdent, number.trainNumber);
+                    }
+                });
             });
         });
     }
@@ -379,6 +384,18 @@ public class GuiSignalBox extends GuiBase {
             dropDown.addElements(list);
         });
         lowerEntity.add(GuiElements.createPageSelect(box));
+
+        final UIEntity bottomRow = new UIEntity();
+        bottomRow.setHeight(20);
+        bottomRow.setInheritWidth(true);
+        bottomRow.add(new UIBox(UIBox.HBOX, 0));
+        lowerEntity.add(bottomRow);
+
+        bottomRow.add(GuiElements.createSpacerV(20));
+        final String text = I18Wrapper.format("gui.signalbox.return");
+        final Font font = Minecraft.getInstance().font;
+        bottomRow.add(GuiElements.createButton(text, font.width(text) + 10,
+                e -> initializeFieldUsage(mainButton)));
         lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
 
