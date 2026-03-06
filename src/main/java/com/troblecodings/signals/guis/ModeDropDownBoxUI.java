@@ -132,7 +132,7 @@ public class ModeDropDownBoxUI {
 
                 parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
                         I18Wrapper.format("property.pathway_costs.name"),
-                        SignalBoxUtil.getDefaultCosts(modeSet)));
+                        SignalBoxUtil.getDefaultCosts(modeSet), 120));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
@@ -170,6 +170,8 @@ public class ModeDropDownBoxUI {
                         }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
             case HP: {
+                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
+                        PathEntryType.SIGNAL, mode, rotation);
                 final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
                         .orElseGet(() -> new ArrayList<>());
                 final UIEntity preSignalEntity = GuiElements
@@ -282,11 +284,13 @@ public class ModeDropDownBoxUI {
                         PathEntryType.PROTECTIONWAY_RESET, mode, rotation, ".protectionway_reset");
 
                 parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.DELAY,
-                        I18Wrapper.format("property.reset_protectionway_delay.name"), 0));
+                        I18Wrapper.format("property.reset_protectionway_delay.name"), 0, 120));
             }
             case RS: {
-                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
-                        PathEntryType.SIGNAL, mode, rotation);
+                if (mode.equals(EnumGuiMode.RS)) {
+                    gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
+                            PathEntryType.SIGNAL, mode, rotation);
+                }
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
                         e -> {
                             final boolean state = e == 1 ? true : false;
@@ -558,7 +562,8 @@ public class ModeDropDownBoxUI {
     }
 
     private UIEntity getTextFieldEntityforType(final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<Integer> type, final String labelName, final int defaultValue) {
+            final PathEntryType<Integer> type, final String labelName, final int defaultValue,
+            final int max) {
         final UIEntity hentity = new UIEntity();
         hentity.setInheritWidth(true);
         hentity.setHeight(20);
@@ -581,7 +586,7 @@ public class ModeDropDownBoxUI {
                 return true;
             try {
                 final int i = Integer.valueOf(str);
-                if (i < 0 || i > 120)
+                if (i < 0 || i > max)
                     return false;
             } catch (final Exception e) {
                 return false;
