@@ -366,9 +366,7 @@ public class PathwayData {
             startSignal = Optional.of(firstPos);
             final PathOptionEntry entry =
                     grid.getNode(firstPos.getPoint()).getOption(firstPos.getModeSet()).orElse(null);
-            final List<PosIdentifier> posIdents =
-                    entry.getEntry(PathEntryType.PRESIGNALS).orElse(new ArrayList<>());
-            posIdents.removeIf(ident -> !grid.getNode(ident.getPoint()).has(ident.getModeSet()));
+            final List<PosIdentifier> posIdents = getPreSignalData(entry, grid);
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
                 final PathOptionEntry vpEntry =
                         grid.getNode(ident.getPoint()).getOption(ident.getModeSet())
@@ -385,6 +383,18 @@ public class PathwayData {
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
         this.zs6State = zs6State.get();
         this.delay = delayAtomic.get();
+    }
+
+    private List<PosIdentifier> getPreSignalData(final PathOptionEntry signalOption,
+            final SignalBoxGrid grid) {
+        final List<PosIdentifier> idents =
+                signalOption.getEntry(PathEntryType.PRESIGNALS).orElse(new ArrayList<>());
+        if (idents.removeIf(ident -> !grid.getNodeChecked(ident.getPoint())
+                .orElseGet(() -> new SignalBoxNode()).getOption(ident.getModeSet())
+                .orElseGet(() -> new PathOptionEntry()).containsEntry(PathEntryType.SIGNAL))) {
+            signalOption.setEntry(PathEntryType.PRESIGNALS, idents);
+        }
+        return idents;
     }
 
     private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
