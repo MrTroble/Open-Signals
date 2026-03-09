@@ -15,10 +15,12 @@ import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
+import com.troblecodings.guilib.ecs.entitys.UICheckBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
+import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
@@ -40,7 +42,11 @@ import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Rotation;
 
 public class ModeDropDownBoxUI {
@@ -112,20 +118,8 @@ public class ModeDropDownBoxUI {
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
 
-                final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
-                final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-                    final int speed = id > 0 ? id : 127;
-                    final Optional<Integer> opt = option.getEntry(PathEntryType.SPEED);
-                    if (speed == 127 && opt.isPresent()) {
-                        gui.removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
-                        option.removeEntry(PathEntryType.SPEED);
-                    } else if ((opt.isPresent() && opt.get() != speed)
-                            || (!opt.isPresent() && speed != 127)) {
-                        gui.sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
-                        option.setEntry(PathEntryType.SPEED, speed);
-                    }
-                }, option.getEntry(PathEntryType.SPEED).filter(n -> n < 16).orElse(127));
-                parent.add(speedSelection);
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.SPEED,
+                        I18Wrapper.format("property.speed.name"), 0, 20));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.OUTPUT,
                         PathEntryType.OUTPUT, mode, rotation);
@@ -133,6 +127,9 @@ public class ModeDropDownBoxUI {
                 parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
                         I18Wrapper.format("property.pathway_costs.name"),
                         SignalBoxUtil.getDefaultCosts(modeSet), 120));
+
+                parent.add(getCheckBoxEntityforType(mode, rotation, PathEntryType.ZS6,
+                        I18Wrapper.format("property.zs6_state.name"), TCBoolean.FALSE));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
@@ -149,12 +146,6 @@ public class ModeDropDownBoxUI {
                     }
                 }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
                 parent.add(zs2Entity);
-                Optional<TCBoolean> opt = option.getEntry(PathEntryType.ZS6);
-                parent.add(GuiElements.createBoolElement(BoolIntegerables.of("zs6_state"), e -> {
-                    final boolean state = e == 1 ? true : false;
-                    gui.sendZS6Entry(state, node, mode, rotation, PathEntryType.ZS6);
-                    option.setEntry(PathEntryType.ZS6, TCBoolean.valueOf(state));
-                }, opt.isPresent() && opt.get().booleanValue() ? 1 : 0));
             }
                 break;
             case VP:
@@ -612,6 +603,47 @@ public class ModeDropDownBoxUI {
         textInputEntity.add(input);
 
         hentity.add(textInputEntity);
+        return hentity;
+    }
+
+    private UIEntity getCheckBoxEntityforType(final EnumGuiMode mode, final Rotation rotation,
+            final PathEntryType<TCBoolean> type, final String labelName,
+            final TCBoolean defaultValue) {
+        final SoundManager handler = Minecraft.getInstance().getSoundManager();
+
+        final UIEntity hentity = new UIEntity();
+        hentity.setInheritWidth(true);
+        hentity.setHeight(20);
+        hentity.add(new UIBox(UIBox.HBOX, 0));
+
+        final UIEntity labelEntity = new UIEntity();
+        labelEntity.setInheritWidth(true);
+        labelEntity.setHeight(20);
+        labelEntity.add(new UILabel(labelName));
+        hentity.add(labelEntity);
+
+        final UIEntity checkBoxEntity = new UIEntity();
+        checkBoxEntity.setInheritWidth(true);
+        checkBoxEntity.setHeight(20);
+        checkBoxEntity.setScale(1.3f);
+
+        final UICheckBox checkBox = new UICheckBox("");
+        checkBox.setChecked((option.getEntry(type).orElseGet(() -> defaultValue)).booleanValue());
+        final UIClickable clickable = new UIClickable(e -> {
+            checkBox.setChecked(!checkBox.isChecked());
+            handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            if (checkBox.isChecked() != defaultValue.booleanValue()) {
+                option.setEntry(type, TCBoolean.valueOf(checkBox.isChecked()));
+                gui.sendZS6Entry(checkBox.isChecked(), node, mode, rotation, type);
+            } else {
+                option.removeEntry(type);
+                gui.removeEntryFromServer(node, mode, rotation, type);
+            }
+        });
+        checkBoxEntity.add(checkBox);
+        checkBoxEntity.add(clickable);
+
+        hentity.add(checkBoxEntity);
         return hentity;
     }
 
