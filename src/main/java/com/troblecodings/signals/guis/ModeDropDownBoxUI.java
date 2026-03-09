@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.TCBoolean;
-import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -118,18 +117,17 @@ public class ModeDropDownBoxUI {
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
 
-                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.SPEED,
-                        I18Wrapper.format("property.speed.name"), 0, 20));
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.SPEED, "speed",
+                        0, 20));
+
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
+                        "pathway_costs", SignalBoxUtil.getDefaultCosts(modeSet), 120));
+
+                parent.add(getCheckBoxEntityforType(mode, rotation, PathEntryType.ZS6, "zs6_state",
+                        TCBoolean.FALSE));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.OUTPUT,
                         PathEntryType.OUTPUT, mode, rotation);
-
-                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
-                        I18Wrapper.format("property.pathway_costs.name"),
-                        SignalBoxUtil.getDefaultCosts(modeSet), 120));
-
-                parent.add(getCheckBoxEntityforType(mode, rotation, PathEntryType.ZS6,
-                        I18Wrapper.format("property.zs6_state.name"), TCBoolean.FALSE));
 
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
@@ -149,16 +147,9 @@ public class ModeDropDownBoxUI {
             case VP:
                 gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
                         PathEntryType.SIGNAL, mode, rotation);
-                final Optional<Boolean> opt = option.getEntry(PathEntryType.SIGNAL_REPEATER);
-                parent.add(
-                        GuiElements.createBoolElement(BoolIntegerables.of("signal_repeater"), e -> {
-                            final boolean state = e == 1 ? true : false;
-                            if (state) {
-                                option.setEntry(PathEntryType.SIGNAL_REPEATER, state);
-                            } else {
-                                option.removeEntry(PathEntryType.SIGNAL_REPEATER);
-                            }
-                        }, opt.isPresent() && opt.get() ? 1 : 0));
+
+                parent.add(getCheckBoxEntityforType(mode, rotation, PathEntryType.SIGNAL_REPEATER,
+                        "signal_repeater", false));
                 break;
             case HP: {
                 gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
@@ -267,34 +258,20 @@ public class ModeDropDownBoxUI {
                         PathEntryType.PROTECTIONWAY_RESET, mode, rotation, ".protectionway_reset");
 
                 parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.DELAY,
-                        I18Wrapper.format("property.reset_protectionway_delay.name"), 0, 120));
+                        "reset_protectionway_delay", 0, 120));
             }
             case RS: {
                 if (mode.equals(EnumGuiMode.RS)) {
                     gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
                             PathEntryType.SIGNAL, mode, rotation);
                 }
-                parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
-                        e -> {
-                            final boolean state = e == 1 ? true : false;
-                            if (state) {
-                                option.setEntry(PathEntryType.CAN_BE_OVERSTPEPPED, state);
-                            } else {
-                                option.removeEntry(PathEntryType.CAN_BE_OVERSTPEPPED);
-                            }
-                        },
-                        option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false) ? 1 : 0));
+                parent.add(getCheckBoxEntityforType(mode, rotation,
+                        PathEntryType.CAN_BE_OVERSTPEPPED, "can_be_overstepped", false));
                 break;
             }
             case BUE: {
-                parent.add(GuiElements.createEnumElement(
-                        new SizeIntegerables<>("delay", 60, get -> String.valueOf(get)), i -> {
-                            if (i == 0) {
-                                option.removeEntry(PathEntryType.DELAY);
-                            } else {
-                                option.setEntry(PathEntryType.DELAY, i);
-                            }
-                        }, option.getEntry(PathEntryType.DELAY).orElse(0)));
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.DELAY, "delay",
+                        0, 120));
                 break;
             }
             case OUT_CONNECTION: {
@@ -539,18 +516,20 @@ public class ModeDropDownBoxUI {
     }
 
     private UIEntity getTextFieldEntityforType(final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<Integer> type, final String labelName, final int defaultValue,
+            final PathEntryType<Integer> type, final String name, final int defaultValue,
             final int max) {
         final UIEntity hentity = new UIEntity();
         hentity.setInheritWidth(true);
-        hentity.setHeight(20);
+        hentity.setHeight(21);
         hentity.add(new UIBox(UIBox.HBOX, 0));
 
         final UIEntity labelEntity = new UIEntity();
         labelEntity.setInheritWidth(true);
         labelEntity.setHeight(20);
-        labelEntity.add(new UILabel(labelName));
+        labelEntity.add(new UILabel(I18Wrapper.format("property." + name + ".name")));
         hentity.add(labelEntity);
+
+        hentity.add(new UIToolTip(I18Wrapper.format("property." + name + ".desc")));
 
         final UIEntity textInputEntity = new UIEntity();
         textInputEntity.setInheritWidth(true);
@@ -591,25 +570,17 @@ public class ModeDropDownBoxUI {
     }
 
     private UIEntity getCheckBoxEntityforType(final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<TCBoolean> type, final String labelName,
-            final TCBoolean defaultValue) {
+            final PathEntryType<TCBoolean> type, final String name, final TCBoolean defaultValue) {
         final SoundManager handler = Minecraft.getInstance().getSoundManager();
 
         final UIEntity hentity = new UIEntity();
         hentity.setInheritWidth(true);
-        hentity.setHeight(20);
+        hentity.setHeight(22);
         hentity.add(new UIBox(UIBox.HBOX, 0));
 
-        final UIEntity labelEntity = new UIEntity();
-        labelEntity.setInheritWidth(true);
-        labelEntity.setHeight(20);
-        labelEntity.add(new UILabel(labelName));
-        hentity.add(labelEntity);
-
-        final UIEntity checkBoxEntity = new UIEntity();
-        checkBoxEntity.setInheritWidth(true);
-        checkBoxEntity.setHeight(20);
-        checkBoxEntity.setScale(1.3f);
+        hentity.add(getBoolLabelEntity(name));
+        hentity.add(new UIToolTip(I18Wrapper.format("property." + name + ".desc")));
+        final UIEntity checkBoxEntity = getBoolCheckBoxEntity();
 
         final UICheckBox checkBox = new UICheckBox("");
         checkBox.setChecked((option.getEntry(type).orElseGet(() -> defaultValue)).booleanValue());
@@ -629,6 +600,55 @@ public class ModeDropDownBoxUI {
 
         hentity.add(checkBoxEntity);
         return hentity;
+    }
+
+    private UIEntity getCheckBoxEntityforType(final EnumGuiMode mode, final Rotation rotation,
+            final PathEntryType<Boolean> type, final String name, final boolean defaultValue) {
+        final SoundManager handler = Minecraft.getInstance().getSoundManager();
+
+        final UIEntity hentity = new UIEntity();
+        hentity.setInheritWidth(true);
+        hentity.setHeight(22);
+        hentity.add(new UIBox(UIBox.HBOX, 0));
+
+        hentity.add(getBoolLabelEntity(name));
+        hentity.add(new UIToolTip(I18Wrapper.format("property." + name + ".desc")));
+        final UIEntity checkBoxEntity = getBoolCheckBoxEntity();
+
+        final UICheckBox checkBox = new UICheckBox("");
+        checkBox.setChecked((option.getEntry(type).orElseGet(() -> defaultValue)));
+        final UIClickable clickable = new UIClickable(e -> {
+            checkBox.setChecked(!checkBox.isChecked());
+            handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            if (checkBox.isChecked() != defaultValue) {
+                option.setEntry(type, checkBox.isChecked());
+                gui.sendBoolEntry(checkBox.isChecked(), node.getPoint(), modeSet, type);
+            } else {
+                option.removeEntry(type);
+                gui.removeEntryFromServer(node, mode, rotation, type);
+            }
+        });
+        checkBoxEntity.add(checkBox);
+        checkBoxEntity.add(clickable);
+
+        hentity.add(checkBoxEntity);
+        return hentity;
+    }
+
+    private static UIEntity getBoolLabelEntity(final String name) {
+        final UIEntity labelEntity = new UIEntity();
+        labelEntity.setInheritWidth(true);
+        labelEntity.setHeight(20);
+        labelEntity.add(new UILabel(I18Wrapper.format("property." + name + ".name")));
+        return labelEntity;
+    }
+
+    private static UIEntity getBoolCheckBoxEntity() {
+        final UIEntity checkBoxEntity = new UIEntity();
+        checkBoxEntity.setInheritWidth(true);
+        checkBoxEntity.setHeight(20);
+        checkBoxEntity.setScale(1.3f);
+        return checkBoxEntity;
     }
 
 }

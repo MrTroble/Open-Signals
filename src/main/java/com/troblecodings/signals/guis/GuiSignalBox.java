@@ -347,7 +347,7 @@ public class GuiSignalBox extends GuiBase {
         reset();
         final UIEntity list = new UIEntity();
         list.setInherits(true);
-        final UIBox box = new UIBox(UIBox.VBOX, 2);
+        final UIBox box = new UIBox(UIBox.VBOX, 1);
         list.add(box);
         lowerEntity.add(new UIBox(UIBox.VBOX, 3));
         lowerEntity.add(list);
