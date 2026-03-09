@@ -62,6 +62,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     protected final Map<Map.Entry<Point, Point>, PathType> nextPathways = new HashMap<>();
     protected final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
     protected SignalBoxGrid grid;
+    protected String signalBoxUIProfile;
     private final Map<BlockPos, LinkType> posForType = new HashMap<>();
     private SignalBoxTileEntity tile;
     private Consumer<String> infoUpdates;

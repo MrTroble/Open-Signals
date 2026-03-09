@@ -16,6 +16,8 @@ import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 
 public class GuiTrainNumber extends GuiBase {
 
+    private static final int SELECTION_COLOR = 0x2900FF00;
+
     private final ContainerTrainNumber container;
 
     public GuiTrainNumber(final GuiInfo info) {
@@ -69,20 +71,23 @@ public class GuiTrainNumber extends GuiBase {
                 GuiElements.createButton(I18Wrapper.format("gui.trainnumber.setpoint"),
                         e -> push(GuiElements.createScreen(screen -> {
                             final BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(
-                                    container.grid, false, (rendering, point, mouseKey) -> {
+                                    container.grid, UISignalBoxProfile.DEFAULT,
+                                    UISignalBoxProfile.DEFAULT.getOperationModeSettings()
+                                            .getUIBorderSettings(),
+                                    (rendering, point, mouseKey) -> {
                                         if (mouseKey != MouseEvent.LEFT_MOUSE)
                                             return;
                                         container.grid.getNodeChecked(point).ifPresent(node -> {
                                             if (node.isEmpty())
                                                 return;
-                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
-                                                    point, SelectionType.FIRST);
+                                            rendering.addSelection(SELECTION_COLOR, point,
+                                                    SelectionType.FIRST);
                                             container.selectedPoint = point;
                                             container.sendNewPoint();
                                         });
                                     });
                             if (container.selectedPoint != null) {
-                                entitys.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                entitys.rendering.addSelection(SELECTION_COLOR,
                                         container.selectedPoint, SelectionType.FIRST);
                             }
                             screen.add(entitys.entity);

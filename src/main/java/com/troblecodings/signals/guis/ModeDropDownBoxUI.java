@@ -31,6 +31,7 @@ import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.guis.UISignalBoxProfile.OperationModeSettings;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -50,6 +51,7 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ModeDropDownBoxUI {
 
+    private final OperationModeSettings settings;
     private ModeSet modeSet = null;
     private final Runnable update;
     private PathOptionEntry option = null;
@@ -64,6 +66,7 @@ public class ModeDropDownBoxUI {
         this.option = option;
         this.gui = gui;
         this.node = node;
+        this.settings = gui.profile.getOperationModeSettings();
     }
 
     public UIEntity getTop() {
@@ -166,51 +169,61 @@ public class ModeDropDownBoxUI {
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
 
-                            final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
-                                    grid, false, (rendering, point, mouseKey) -> {
-                                        final SignalBoxNode node = grid.getNodeChecked(point)
-                                                .orElseGet(() -> new SignalBoxNode());
-                                        if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
-                                            return;
-                                        final AtomicReference<PosIdentifier> vp =
-                                                new AtomicReference<>();
-                                        node.getModes().forEach((nodeMode, entry) -> {
-                                            if (!(nodeMode.mode.equals(EnumGuiMode.VP)
-                                                    || nodeMode.mode.equals(EnumGuiMode.ZS3)))
-                                                return;
-                                            final BlockPos linkedSignal = entry
-                                                    .getEntry(PathEntryType.SIGNAL).orElse(null);
-                                            if (linkedSignal == null)
-                                                return;
-                                            vp.set(new PosIdentifier(point, nodeMode,
-                                                    linkedSignal));
-                                        });
-                                        final PosIdentifier ident = vp.get();
-                                        if (ident == null)
-                                            return;
-                                        if (preSignalsList.contains(ident)) {
-                                            preSignalsList.remove(ident);
-                                            rendering.removeColoredPoint(
-                                                    GuiSignalBox.SELECTION_COLOR, point);
-                                        } else {
-                                            preSignalsList.add(ident);
-                                            rendering.addColoredPoint(GuiSignalBox.SELECTION_COLOR,
-                                                    point);
-                                        }
-                                        if (preSignalsList.isEmpty()) {
-                                            option.removeEntry(PathEntryType.PRESIGNALS);
-                                            gui.removeEntryFromServer(this.node, mode, rotation,
-                                                    PathEntryType.PRESIGNALS);
-                                        } else {
-                                            option.setEntry(PathEntryType.PRESIGNALS,
-                                                    preSignalsList);
-                                            gui.sendPosIdentList(preSignalsList, this.node, mode,
-                                                    rotation, PathEntryType.PRESIGNALS);
-                                        }
-                                    });
+                            final BoxEntity boxEntity =
+                                    UISignalBoxRendering.createSignalBoxEntity(grid, gui.profile,
+                                            gui.profile.getOperationModeSettings()
+                                                    .getUIBorderSettings(),
+                                            (rendering, point, mouseKey) -> {
+                                                final SignalBoxNode node =
+                                                        grid.getNodeChecked(point).orElseGet(
+                                                                () -> new SignalBoxNode());
+                                                if (mouseKey != MouseEvent.LEFT_MOUSE
+                                                        || node.isEmpty())
+                                                    return;
+                                                final AtomicReference<PosIdentifier> vp =
+                                                        new AtomicReference<>();
+                                                node.getModes().forEach((nodeMode, entry) -> {
+                                                    if (!(nodeMode.mode.equals(EnumGuiMode.VP)
+                                                            || nodeMode.mode
+                                                                    .equals(EnumGuiMode.ZS3)))
+                                                        return;
+                                                    final BlockPos linkedSignal =
+                                                            entry.getEntry(PathEntryType.SIGNAL)
+                                                                    .orElse(null);
+                                                    if (linkedSignal == null)
+                                                        return;
+                                                    vp.set(new PosIdentifier(point, nodeMode,
+                                                            linkedSignal));
+                                                });
+                                                final PosIdentifier ident = vp.get();
+                                                if (ident == null)
+                                                    return;
+                                                if (preSignalsList.contains(ident)) {
+                                                    preSignalsList.remove(ident);
+                                                    rendering.removeColoredPoint(
+                                                            settings.getUserSelectionColor(),
+                                                            point);
+                                                } else {
+                                                    preSignalsList.add(ident);
+                                                    rendering.addColoredPoint(
+                                                            settings.getUserSelectionColor(),
+                                                            point);
+                                                }
+                                                if (preSignalsList.isEmpty()) {
+                                                    option.removeEntry(PathEntryType.PRESIGNALS);
+                                                    gui.removeEntryFromServer(this.node, mode,
+                                                            rotation, PathEntryType.PRESIGNALS);
+                                                } else {
+                                                    option.setEntry(PathEntryType.PRESIGNALS,
+                                                            preSignalsList);
+                                                    gui.sendPosIdentList(preSignalsList, this.node,
+                                                            mode, rotation,
+                                                            PathEntryType.PRESIGNALS);
+                                                }
+                                            });
                             preSignalsList.forEach(ident -> {
-                                boxEntity.rendering.addColoredPoint(GuiSignalBox.SELECTION_COLOR,
-                                        ident.getPoint());
+                                boxEntity.rendering.addColoredPoint(
+                                        settings.getUserSelectionColor(), ident.getPoint());
                             });
                             screen.add(boxEntity.entity);
 
@@ -232,7 +245,9 @@ public class ModeDropDownBoxUI {
                                     e1 -> gui.pop()));
 
                             final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
-                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                    gui.container.grid, gui.profile,
+                                    gui.profile.getOperationModeSettings().getUIBorderSettings(),
+                                    (rendering, point, mouseKey) -> {
                                         final SignalBoxNode node = grid.getNodeChecked(point)
                                                 .orElse(new SignalBoxNode());
                                         if (mouseKey != MouseEvent.LEFT_MOUSE || node.isEmpty())
@@ -246,7 +261,7 @@ public class ModeDropDownBoxUI {
                                                     PathEntryType.PROTECTIONWAY_END);
                                             option.removeEntry(PathEntryType.PROTECTIONWAY_END);
                                         } else {
-                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                            rendering.addSelection(settings.getUserSelectionColor(),
                                                     point, SelectionType.FIRST);
                                             gui.sendPointEntry(point, this.node, mode, rotation,
                                                     PathEntryType.PROTECTIONWAY_END);
@@ -255,7 +270,7 @@ public class ModeDropDownBoxUI {
                                     });
 
                             if (!selcetedPoint.equals(new Point(-1, -1))) {
-                                boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                boxEntity.rendering.addSelection(settings.getUserSelectionColor(),
                                         selcetedPoint, SelectionType.FIRST);
                             }
 
@@ -331,7 +346,9 @@ public class ModeDropDownBoxUI {
                                     e1 -> gui.pop()));
 
                             final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
-                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                    gui.container.grid, gui.profile,
+                                    gui.profile.getOperationModeSettings().getUIBorderSettings(),
+                                    (rendering, point, mouseKey) -> {
                                         final SignalBoxNode node = grid.getNodeChecked(point)
                                                 .orElse(new SignalBoxNode());
                                         if (mouseKey != MouseEvent.LEFT_MOUSE || !node.isValidEnd())
@@ -344,7 +361,7 @@ public class ModeDropDownBoxUI {
                                                     PathEntryType.POINT);
                                             option.removeEntry(PathEntryType.POINT);
                                         } else {
-                                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                            rendering.addSelection(settings.getUserSelectionColor(),
                                                     point, SelectionType.FIRST);
                                             gui.sendPointEntry(point, this.node, mode, rotation,
                                                     PathEntryType.POINT);
@@ -353,7 +370,7 @@ public class ModeDropDownBoxUI {
                                     });
 
                             if (!selcetedPoint.equals(new Point(-1, -1))) {
-                                boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                                boxEntity.rendering.addSelection(settings.getUserSelectionColor(),
                                         selcetedPoint, SelectionType.FIRST);
                             }
 
@@ -381,7 +398,9 @@ public class ModeDropDownBoxUI {
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
                             final BoxEntity entity = UISignalBoxRendering.createSignalBoxEntity(
-                                    gui.container.grid, false, (rendering, point, mouseKey) -> {
+                                    gui.container.grid, gui.profile,
+                                    gui.profile.getOperationModeSettings().getUIBorderSettings(),
+                                    (rendering, point, mouseKey) -> {
                                         if (mouseKey != MouseEvent.LEFT_MOUSE)
                                             return;
                                         final SignalBoxNode node = gui.container.grid
@@ -429,7 +448,7 @@ public class ModeDropDownBoxUI {
                                                             })));
                                         }
                                     });
-                            entity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                            entity.rendering.addSelection(settings.getUserSelectionColor(),
                                     identifier.point, SelectionType.FIRST);
                             screen.add(entity.entity);
                             gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
@@ -454,7 +473,7 @@ public class ModeDropDownBoxUI {
                     final UIEntity entity = new UIEntity();
                     entity.setInherits(true);
                     entity.add(new UIBox(UIBox.VBOX, 5));
-                    entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    entity.add(new UIColor(gui.profile.getBackgroundColor()));
                     entity.add(GuiElements.createSpacerV(30));
                     entity.add(GuiElements.createLabel(I18Wrapper.format("info.key.removeother")));
                     entity.add(GuiElements.createSpacerV(30));
@@ -467,7 +486,7 @@ public class ModeDropDownBoxUI {
                         disconnectFromEachOther(thisIdent, otherIdent, gui.container.grid, gui);
                         connectToEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
                                 gui.container.grid, gui);
-                        rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
+                        rendering.addSelection(settings.getUserSelectionColor(), node.getPoint(),
                                 SelectionType.FIRST);
                         gui.pop();
                         if (wereMultipleEntries) {
@@ -500,7 +519,7 @@ public class ModeDropDownBoxUI {
                                     gui.container.grid, gui)));
             connectToEachOther(new ModeIdentifier(node.getPoint(), mode), thisIdent,
                     gui.container.grid, gui);
-            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, node.getPoint(),
+            rendering.addSelection(settings.getUserSelectionColor(), node.getPoint(),
                     SelectionType.FIRST);
         }
     }

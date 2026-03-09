@@ -15,6 +15,7 @@ import com.troblecodings.signals.guis.GuiSignalBridge;
 import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.GuiTrainNumber;
 import com.troblecodings.signals.guis.NamableGui;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
@@ -44,6 +45,8 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(PathwayRequester.class, GuiPathwayRequester::new);
         OpenSignalsMain.handler.addGui(TrainNumberBlock.class, GuiTrainNumber::new);
         OpenSignalsMain.handler.addGui(SignalBridgeBasicBlock.class, GuiSignalBridge::new);
+
+        UISignalBoxProfile.loadSignalBoxUIProfiles();
     }
 
     @SuppressWarnings("unchecked")
