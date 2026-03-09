@@ -363,6 +363,7 @@ public class SidePanel {
             if (guiModes.contains(EnumGuiMode.HP)) {
                 final UIEntity entity =
                         GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
+                            gui.setAutoPoint(node.getPoint(), (byte) e);
                             node.setAutoPoint(e == 1 ? true : false);
                         }, node.isAutoPoint() ? 1 : 0);
                 entity.setScale(0.95f);
@@ -502,7 +503,7 @@ public class SidePanel {
                                         final UIEntity info = new UIEntity();
                                         info.setInherits(true);
                                         info.add(new UIBox(UIBox.VBOX, 5));
-                                        info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                                        info.add(new UIColor(gui.profile.getBackgroundColor()));
                                         info.add(new UIClickable(_u -> gui.pop(), 1));
                                         info.add(statusEntity);
                                         final UIEntity textureEntity = new UIEntity();
@@ -611,8 +612,7 @@ public class SidePanel {
                             lowerEntity.add(GuiElements.createSpacerH(7));
                             final UIEntity save =
                                     GuiElements.createButton(I18Wrapper.format("btn.save"), e1 -> {
-                                        gui.network.updateTrainNumber(node.getPoint(),
-                                                new TrainNumber(input.getText()));
+                                        gui.sendTrainNumber(node.getPoint(), input.getText());
                                         input.setText("");
                                         gui.pop();
                                     });
@@ -753,7 +753,7 @@ public class SidePanel {
                     info.setInherits(true);
                     info.add(new UIBox(UIBox.VBOX, 5));
                     info.add(new UIClickable(_u -> gui.pop(), 1));
-                    info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    info.add(new UIColor(gui.profile.getBackgroundColor()));
                     info.add(statusEntity);
                     final UIEntity textureEntity = new UIEntity();
                     textureEntity.setHeight(40);
@@ -845,7 +845,7 @@ public class SidePanel {
                             gui.pop();
                             setShowHelpPage(false);
                             addColorToTile(entry.getKey(), entry.getValue(),
-                                    GuiSignalBox.SELECTION_COLOR);
+                                    gui.profile.getOperationModeSettings().getUserSelectionColor());
                             // TODO Maby other color?
                         }));
                 layout.add(GuiElements.createButton("x", 20, _u -> {

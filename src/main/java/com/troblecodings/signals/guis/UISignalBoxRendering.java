@@ -28,9 +28,9 @@ import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
-import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -47,7 +47,6 @@ public class UISignalBoxRendering extends UIComponent {
     public static final int TILE_WIDTH = 10;
     public static final int HALF_TILE = UISignalBoxRendering.TILE_WIDTH / 2;
     public static final int TILE_COUNT = 100;
-    public static final int GRID_COLOR = 0xFF5B5B5B;
     private static final float[] ALL_LINES = getLines();
 
     private static float[] getLines() {
@@ -71,19 +70,22 @@ public class UISignalBoxRendering extends UIComponent {
         return lines;
     }
 
-    private boolean showLines = false;
     private Map<Point, Map<ModeSet, ModeRenderInfo>> gridRender;
     private Map<Point, String> nodeLabeling;
-    private final FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+    private final UISignalBoxProfile profile;
+    private final UIBorderSettings settings;
+    private final Font font = Minecraft.getInstance().font;
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
     private final Map<ModeIdentifier, String> trainNumbers = new HashMap<>();
     private final Set<ColorPoint> additionalPoints = new HashSet<>();
 
-    public UISignalBoxRendering(final SignalBoxGrid grid, final boolean showLines,
-            final SignalBoxConsumer consumer, final UIEntity gridParent) {
-        this.showLines = showLines;
+    public UISignalBoxRendering(final SignalBoxGrid grid, final UISignalBoxProfile profile,
+            final UIBorderSettings settings, final SignalBoxConsumer consumer,
+            final UIEntity gridParent) {
+        this.settings = settings;
+        this.profile = profile;
         this.consumer = consumer;
         this.gridParent = gridParent;
         gridRender = Maps.newHashMap();
@@ -93,8 +95,8 @@ public class UISignalBoxRendering extends UIComponent {
     }
 
     private void addNode(final SignalBoxNode node) {
-        final Map<ModeSet, ModeRenderInfo> modesets = gridRender.computeIfAbsent(node.getPoint(),
-                k -> Maps.newHashMap());
+        final Map<ModeSet, ModeRenderInfo> modesets =
+                gridRender.computeIfAbsent(node.getPoint(), k -> Maps.newHashMap());
         node.forEach(modeSet -> modesets.put(modeSet,
                 new ModeRenderInfo(modeSet.mode, node.getState(modeSet))));
         gridRender.put(node.getPoint(), modesets);
@@ -198,8 +200,9 @@ public class UISignalBoxRendering extends UIComponent {
 
     @Override
     public void draw(final DrawInfo info) {
-        if (showLines)
-            info.lines(GRID_COLOR, 0.5f, ALL_LINES);
+        if (settings.isShowLines()) {
+            info.lines(settings.getLineColor(), settings.getLineWidth(), ALL_LINES);
+        }
         gridRender.forEach((point, modelist) -> {
             info.push();
             info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 0);
@@ -213,7 +216,12 @@ public class UISignalBoxRendering extends UIComponent {
         for (final ColorPoint c : additionalPoints) {
             renderColorPoint(info, c);
         }
-        final int signalBoxTrainNumberColor = ConfigHandler.signalboxTrainNumberColor;
+        final int signalBoxTrainNumberColor =
+                profile.getOperationModeSettings().getTrainNumberColor();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO);
         trainNumbers.forEach((point, number) -> renderText(info, point.point, point.mode.rotation,
                 number, (int) 6.5f, (4 * TILE_WIDTH - font.getStringWidth(number)) / 2,
                 signalBoxTrainNumberColor, 0.5f));
@@ -271,18 +279,19 @@ public class UISignalBoxRendering extends UIComponent {
     }
 
     public static BoxEntity createSignalBoxEntity(final SignalBoxGrid sigGrid,
-            final boolean showLines, final SignalBoxConsumer consumer) {
+            final UISignalBoxProfile profile, final UIBorderSettings settings,
+            final SignalBoxConsumer consumer) {
         final UIEntity grid = new UIEntity();
         grid.setInherits(true);
-        grid.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        grid.add(new UIColor(profile.getBackgroundColor()));
         grid.add(new UIBorder(0xFF000000, 4));
         grid.add(new UIScissor());
 
         final UIEntity entity = new UIEntity();
         entity.setWidth(TILE_WIDTH * TILE_COUNT);
         entity.setHeight(entity.getHeight());
-        final UISignalBoxRendering rendering = new UISignalBoxRendering(sigGrid, showLines,
-                consumer, grid);
+        final UISignalBoxRendering rendering =
+                new UISignalBoxRendering(sigGrid, profile, settings, consumer, grid);
         entity.add(rendering);
 
         grid.add(new UIScroll(s -> {

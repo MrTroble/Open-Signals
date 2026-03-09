@@ -30,6 +30,9 @@ import net.minecraft.world.World;
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
     private final SignalBoxGrid grid;
+    private String signalBoxUIProfile;
+
+    private static final String SIGNALBOX_UI_PROFILE = "signalBoxUIProfile";
 
     public SignalBoxTileEntity() {
         grid = SignalBoxFactory.getFactory().getGrid();
@@ -48,6 +51,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid.writePathways(wrapper);
         SignalBoxHandler.writeTileNBT(new StateInfo(world, pos), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
+        wrapper.putString(SIGNALBOX_UI_PROFILE, signalBoxUIProfile);
     }
 
     private NBTWrapper copy = null;
@@ -61,6 +65,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (world != null) {
             onLoad();
         }
+        signalBoxUIProfile = wrapper.getString(SIGNALBOX_UI_PROFILE);
     }
 
     @Override
@@ -130,6 +135,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     public SignalBoxGrid getSignalBoxGrid() {
         return grid;
+    }
+
+    public String getSignalBoxUIProfile() {
+        return signalBoxUIProfile;
+    }
+
+    public void setSignalBoxUIProfile(final String signalBoxUIProfile) {
+        this.signalBoxUIProfile = signalBoxUIProfile;
     }
 
     @Override

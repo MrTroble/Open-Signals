@@ -16,6 +16,8 @@ import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 
 public class GuiTrainNumber extends GuiBase {
 
+    private static final int SELECTION_COLOR = 0x2900FF00;
+
     private final ContainerTrainNumber container;
 
     public GuiTrainNumber(final GuiInfo info) {
@@ -64,27 +66,30 @@ public class GuiTrainNumber extends GuiBase {
         inputEntity.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.info.change")));
         inner.add(inputEntity);
 
-        final UIEntity changeButton = GuiElements.createButton(
-                I18Wrapper.format("gui.trainnumber.setpoint"),
-                e -> push(GuiElements.createScreen(screen -> {
-                    final BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(
-                            container.grid, false, (rendering, point, mouseKey) -> {
-                                if (mouseKey != MouseEvent.LEFT_MOUSE)
-                                    return;
-                                container.grid.getNodeChecked(point).ifPresent(node -> {
-                                    if (node.isEmpty())
-                                        return;
-                                    rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
-                                            SelectionType.FIRST);
-                                    container.selectedPoint = point;
-                                    container.sendNewPoint();
-                                });
-                            });
-                    if (container.selectedPoint != null) {
-                        entitys.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
-                                container.selectedPoint, SelectionType.FIRST);
-                    }
-                    screen.add(entitys.entity);
+        final UIEntity changeButton =
+                GuiElements.createButton(I18Wrapper.format("gui.trainnumber.setpoint"),
+                        e -> push(GuiElements.createScreen(screen -> {
+                            final BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(
+                                    container.grid, UISignalBoxProfile.DEFAULT,
+                                    UISignalBoxProfile.DEFAULT.getOperationModeSettings()
+                                            .getUIBorderSettings(),
+                                    (rendering, point, mouseKey) -> {
+                                        if (mouseKey != MouseEvent.LEFT_MOUSE)
+                                            return;
+                                        container.grid.getNodeChecked(point).ifPresent(node -> {
+                                            if (node.isEmpty())
+                                                return;
+                                            rendering.addSelection(SELECTION_COLOR, point,
+                                                    SelectionType.FIRST);
+                                            container.selectedPoint = point;
+                                            container.sendNewPoint();
+                                        });
+                                    });
+                            if (container.selectedPoint != null) {
+                                entitys.rendering.addSelection(SELECTION_COLOR,
+                                        container.selectedPoint, SelectionType.FIRST);
+                            }
+                            screen.add(entitys.entity);
 
                     final UIEntity lowerEntity = new UIEntity();
                     lowerEntity.add(new UIBox(UIBox.HBOX, 5));

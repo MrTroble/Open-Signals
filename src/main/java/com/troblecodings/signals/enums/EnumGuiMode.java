@@ -10,7 +10,6 @@ import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.guis.UISignalBoxIcons;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
@@ -25,7 +24,7 @@ public enum EnumGuiMode {
             0.9f, 0.2f, 0.9f, 0.8f
     }, PathwayModeType.END, 0), PLATFORM(new float[] {
             0, 0.15f, 1, 0.15f
-    }, PathwayModeType.NONE, 0, SignalBoxUtil.FREE_COLOR, 3), BUE(new float[] {
+    }, PathwayModeType.NONE, 0, ConfigHandler.CLIENT.signalboxFreeColor.get(), 3), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
     }), HP(0, true, PathwayModeType.START_END, 2), VP(1, true, PathwayModeType.NONE, 1),
     RS(2, true, PathwayModeType.START_END, (state) -> state.equals(SignalState.RED) ? 1 : 3),
@@ -82,7 +81,7 @@ public enum EnumGuiMode {
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth) {
-        this(array, type, depth, SignalBoxUtil.FREE_COLOR, 2);
+        this(array, type, depth, ConfigHandler.CLIENT.signalboxFreeColor.get(), 2);
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth,

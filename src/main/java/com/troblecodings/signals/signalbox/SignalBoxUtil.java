@@ -27,12 +27,6 @@ import net.minecraft.world.World;
 
 public final class SignalBoxUtil {
 
-    public static final int FREE_COLOR = ConfigHandler.signalboxFreeColor;
-    public static final int SELECTED_COLOR = ConfigHandler.signalboxSelectColor;
-    public static final int USED_COLOR = ConfigHandler.signalboxUsedColor;
-    public static final int PREPARED_COLOR = ConfigHandler.signalboxPreparedColor;
-    public static final int SHUNTING_COLOR = ConfigHandler.signalboxShuntingColor;
-
     private static List<Point> debugPointList = new ArrayList<>();
 
     private SignalBoxUtil() {
@@ -245,7 +239,7 @@ public final class SignalBoxUtil {
             final SignalBoxNode previous) {
         final Point delta = lastNode.getPoint().delta(previous.getPoint());
         final Rotation rotation =
-                SignalBoxUtil.getRotationFromDelta(delta).add(Rotation.CLOCKWISE_180);
+                SignalBoxUtil.getRotationFromDelta(delta).getRotated(Rotation.CLOCKWISE_180);
         for (final EnumGuiMode mode : type.getModes()) {
             if (!mode.getModeType().isValidEnd()) {
                 continue;
