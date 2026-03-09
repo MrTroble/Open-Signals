@@ -347,7 +347,7 @@ public class GuiSignalBox extends GuiBase {
         reset();
         final UIEntity list = new UIEntity();
         list.setInherits(true);
-        final UIBox box = new UIBox(UIBox.VBOX, 1);
+        final UIBox box = new UIBox(UIBox.VBOX, 2);
         list.add(box);
         lowerEntity.add(new UIBox(UIBox.VBOX, 3));
         lowerEntity.add(list);
@@ -394,7 +394,7 @@ public class GuiSignalBox extends GuiBase {
         bottomRow.add(GuiElements.createSpacerV(20));
         final String text = I18Wrapper.format("gui.signalbox.return");
         final Font font = Minecraft.getInstance().font;
-        bottomRow.add(GuiElements.createButton(text, font.width(text) + 10,
+        bottomRow.add(GuiElements.createButton(text, font.width(text) + 8,
                 e -> initializeFieldUsage(mainButton)));
         lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
