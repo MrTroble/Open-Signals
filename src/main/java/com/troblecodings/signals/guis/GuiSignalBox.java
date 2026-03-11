@@ -409,8 +409,7 @@ public class GuiSignalBox extends GuiBase {
         disableBottomEntity();
         page = SignalBoxPage.LINKING;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
-        lowerEntity.setInheritHeight(true);
-        lowerEntity.setInheritWidth(true);
+        lowerEntity.setInherits(true);
 
         final IIntegerable<String> uiProfiles =
                 SizeIntegerables.of("ui_profiles", UISignalBoxProfile.UI_PROFILES.size(),
@@ -606,8 +605,7 @@ public class GuiSignalBox extends GuiBase {
         final UIEntity titel = new UIEntity();
         titel.add(new UIScale(1.2f, 1.2f, 1));
         titel.add(titlelabel);
-        titel.setInheritHeight(true);
-        titel.setInheritWidth(true);
+        titel.setInherits(true);
 
         final UIEntity header = new UIEntity();
         header.setInheritWidth(true);
@@ -627,15 +625,13 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.setHeight(0);
 
         final UIEntity middlePart = new UIEntity();
-        middlePart.setInheritHeight(true);
-        middlePart.setInheritWidth(true);
+        middlePart.setInherits(true);
         middlePart.add(new UIBox(UIBox.VBOX, 4));
         middlePart.add(header);
         middlePart.add(lowerEntity);
         middlePart.add(bottomEntity);
 
-        lowerEntity.setInheritHeight(true);
-        lowerEntity.setInheritWidth(true);
+        lowerEntity.setInherits(true);
         initializeFieldTemplate(this::tileNormal,
                 profile.getOperationModeSettings().getUIBorderSettings());
 
