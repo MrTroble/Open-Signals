@@ -61,13 +61,15 @@ public class UISignalBoxProfile {
                 && Objects.equals(textureSettings, other.textureSettings);
     }
 
+    @Override
+    public String toString() {
+        return "UISignalBoxProfile [" + name + "]";
+    }
+
     public static void loadSignalBoxUIProfiles() {
         UI_PROFILES.add(DEFAULT);
-        OpenSignalsMain.contentPacks.getFiles("signalbox").forEach(entry -> {
-            final UISignalBoxProfile profile =
-                    GSON.fromJson(entry.getValue(), UISignalBoxProfile.class);
-            UI_PROFILES.add(profile);
-        });
+        OpenSignalsMain.contentPacks.getFiles("signalbox").forEach(entry -> UI_PROFILES
+                .add(GSON.fromJson(entry.getValue(), UISignalBoxProfile.class)));
     }
 
     private static UISignalBoxProfile getDefaultProfile() {

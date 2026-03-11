@@ -35,8 +35,7 @@ public class NamableGui extends GuiBase {
         this.entity.add(new UIBox(UIBox.HBOX, 5));
 
         final UIEntity inner = new UIEntity();
-        inner.setInheritHeight(true);
-        inner.setInheritWidth(true);
+        inner.setInherits(true);
         inner.add(new UIBox(UIBox.VBOX, 2));
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(inner);
@@ -71,9 +70,8 @@ public class NamableGui extends GuiBase {
         apply.setWidth(60);
         hbox.add(apply);
         inner.add(hbox);
-        if (!(container.tile instanceof RedstoneIOTileEntity)) {
+        if (!(container.tile instanceof RedstoneIOTileEntity))
             return;
-        }
         inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
