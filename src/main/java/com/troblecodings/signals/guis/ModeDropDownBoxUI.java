@@ -120,15 +120,6 @@ public class ModeDropDownBoxUI {
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
 
-                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.SPEED, "speed",
-                        0, 20));
-
-                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
-                        "pathway_costs", SignalBoxUtil.getDefaultCosts(modeSet), 120));
-
-                parent.add(getCheckBoxEntityforType(mode, rotation, PathEntryType.ZS6, "zs6_state",
-                        TCBoolean.FALSE));
-
                 gui.selectLink(parent, node, option, entrySet, LinkType.OUTPUT,
                         PathEntryType.OUTPUT, mode, rotation);
 
@@ -147,6 +138,15 @@ public class ModeDropDownBoxUI {
                     }
                 }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
                 parent.add(zs2Entity);
+
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.SPEED, "speed",
+                        0, 20));
+
+                parent.add(getTextFieldEntityforType(mode, rotation, PathEntryType.PATHWAY_COSTS,
+                        "pathway_costs", SignalBoxUtil.getDefaultCosts(modeSet), 120));
+
+                parent.add(getCheckBoxEntityforType(mode, rotation, PathEntryType.ZS6, "zs6_state",
+                        TCBoolean.FALSE));
             }
                 break;
             case VP:
