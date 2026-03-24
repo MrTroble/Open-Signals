@@ -10,6 +10,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
+import com.troblecodings.guilib.ecs.entitys.input.UIKeyUpdate;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
@@ -60,6 +61,7 @@ public class NamableGui extends GuiBase {
         final UITextInput input = new UITextInput(container.tile.getNameWrapper());
         textfield.add(input);
         textfield.add(new UIToolTip(I18Wrapper.format("property.customname.desc")));
+        textfield.add(new UIKeyUpdate(_u -> this.updateText(input.getText())));
 
         hbox.add(textfield);
         final UIEntity apply = GuiElements.createButton(I18Wrapper.format("btn.apply"),
