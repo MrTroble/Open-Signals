@@ -21,8 +21,9 @@ public class RedstoneInput extends RedstoneIO {
             if (!state.getValue(RedstoneIO.POWER)) {
                 worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, true));
                 final BlockEntity entity = worldIn.getBlockEntity(pos);
-                if (entity instanceof RedstoneIOTileEntity)
-                    ((RedstoneIOTileEntity) entity).sendToAll();
+                if (entity instanceof RedstoneIOTileEntity) {
+                    ((RedstoneIOTileEntity) entity).sendInputChanged();
+                }
             }
         } else {
             worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, false));

@@ -2,6 +2,7 @@ package com.troblecodings.signals.guis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -18,28 +19,33 @@ import net.minecraft.core.BlockPos;
 
 public class NamableContainer extends ContainerBase {
 
+    private static final Byte MODE_NAME = 0;
+    private static final Byte MODE_DELAY = 1;
+    private static final Byte MODE_DELAY_UNIT = 2;
+
     protected BasicBlockEntity tile;
     protected BlockPos pos;
+    protected int resetDelay = 0;
+    protected TimeUnit resetTimeUnit = TimeUnit.SECONDS;
     protected final List<BlockPos> linkedPos = new ArrayList<>();
     protected final List<BlockPos> linkedController = new ArrayList<>();
 
     public NamableContainer(final GuiInfo info) {
         super(info);
-        if (info.pos != null)
+        if (info.pos != null) {
             this.tile = info.getTile();
+        }
     }
 
     private void sendSignalPos() {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
-        final List<BlockPos> linkedPos = tile.getLinkedPos();
-        buffer.putByte((byte) linkedPos.size());
-        linkedPos.forEach(pos -> buffer.putBlockPos(pos));
+        buffer.putList(tile.getLinkedPos(), WriteBuffer.BLOCKPOS_CONSUMER);
         if (tile instanceof RedstoneIOTileEntity) {
-            final List<BlockPos> linkedController = ((RedstoneIOTileEntity) tile)
-                    .getLinkedController();
-            buffer.putByte((byte) linkedController.size());
-            linkedController.forEach(pos -> buffer.putBlockPos(pos));
+            buffer.putList(((RedstoneIOTileEntity) tile).getLinkedController(),
+                    WriteBuffer.BLOCKPOS_CONSUMER);
+            buffer.putInt(((RedstoneIOTileEntity) tile).getResetDelay());
+            buffer.putEnumValue(((RedstoneIOTileEntity) tile).getTimeUnit());
         }
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
@@ -54,26 +60,59 @@ public class NamableContainer extends ContainerBase {
         linkedPos.clear();
         linkedController.clear();
         pos = buffer.getBlockPos();
-        final int size = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < size; i++)
-            linkedPos.add(buffer.getBlockPos());
         tile = (BasicBlockEntity) info.world.getBlockEntity(pos);
+        linkedPos.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
         if (tile instanceof RedstoneIOTileEntity) {
-            final int controllerLinkSize = buffer.getByteToUnsignedInt();
-            for (int i = 0; i < controllerLinkSize; i++)
-                linkedController.add(buffer.getBlockPos());
+            linkedController.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
+            resetDelay = buffer.getInt();
+            resetTimeUnit = buffer.getEnumValue(TimeUnit.class);
         }
         update();
     }
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        final StateInfo info = new StateInfo(this.info.world, this.info.pos);
-        final String name = buffer.getString();
-        if (tile instanceof SignalTileEntity) {
-            NameHandler.setNameForSignal(info, name);
-        } else {
-            NameHandler.setNameForNonSignal(info, name);
+        final byte mode = buffer.getByte();
+        if (mode == MODE_NAME) {
+            final StateInfo info = new StateInfo(this.info.world, this.info.pos);
+            final String name = buffer.getString();
+            if (tile instanceof SignalTileEntity) {
+                NameHandler.setNameForSignal(info, name);
+            } else {
+                NameHandler.setNameForNonSignal(info, name);
+            }
         }
+        if (!(tile instanceof RedstoneIOTileEntity))
+            return;
+        if (mode == MODE_DELAY) {
+            ((RedstoneIOTileEntity) tile).setResetDelay(buffer.getInt());
+        } else if (mode == MODE_DELAY_UNIT) {
+            ((RedstoneIOTileEntity) tile).setTimeUnit(buffer.getEnumValue(TimeUnit.class));
+        }
+
+    }
+
+    protected void sendNameToServer(final String name) {
+        final WriteBuffer buffer = getBuffer(MODE_NAME);
+        buffer.putString(name);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendDelayTimeToServer(final int delay) {
+        final WriteBuffer buffer = getBuffer(MODE_DELAY);
+        buffer.putInt(delay);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendDelayTimeUnitToServer(final TimeUnit unit) {
+        final WriteBuffer buffer = getBuffer(MODE_DELAY_UNIT);
+        buffer.putEnumValue(unit);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private static WriteBuffer getBuffer(final byte mode) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte(mode);
+        return buffer;
     }
 }

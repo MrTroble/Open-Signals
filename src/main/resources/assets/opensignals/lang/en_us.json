@@ -355,6 +355,17 @@
 	"gui.return": "Return",
 	"gui.keyprompt": "Hold [LSHIFT] for more info!%nHold [CTRL] to hide.",
 	"gui.notconnected": "Not connected",
+	
+	"__NameableUI":"",
+	"gui.namable.reset_delay": "reset delay",
+	"property.timeunit.name": "time unit",
+	"property.value.NANOSECONDS": "nanoseconds",
+	"property.value.MICROSECONDS": "microseconds",
+	"property.value.MILLISECONDS": "milliseconds",
+	"property.value.SECONDS": "seconds",
+	"property.value.MINUTES": "minutes",
+	"property.value.HOURS": "hours",
+	"property.value.DAYS": "days",
 
 	"__SignalPropertyNames": "",
 	"property.sh_high.name": "Change signal height",

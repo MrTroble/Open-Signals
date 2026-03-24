@@ -2,6 +2,11 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
@@ -26,7 +31,11 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         super(info);
     }
 
+    private int resetDelay = 0;
+    private TimeUnit timeUnit = TimeUnit.SECONDS;
+
     private final List<BlockPos> linkedSignalController = new ArrayList<>();
+    private final ScheduledExecutorService resetExecutor = Executors.newScheduledThreadPool(1);
 
     public static final String NAME_NBT = "name";
     public static final String LINKED_LIST = "linkedList";
@@ -58,22 +67,77 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 .forEach(linkedSignalController::add);
     }
 
-    public void sendToAll() {
-        if (level.isClientSide)
+    private ScheduledFuture<?> resetTask;
+    private final Consumer<RedstoneUpdatePacket> updateSignalBoxes = (packet) -> linkedPositions
+            .forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, pos,
+                    (tile, _u) -> tile.getSignalBoxGrid().updateInput(packet)));
+
+    /**
+     * Is used for the normal SignalBoxInput. Calling Blocking and Resetting in one
+     * without the reset delay.
+     */
+    public void sendInputChanged() {
+        final RedstoneUpdatePacket packet = getRedstoneUpdatePacket();
+        if (packet == null)
             return;
-        final boolean power = this.level.getBlockState(this.worldPosition)
-                .getValue(RedstoneIO.POWER);
-        final RedstoneUpdatePacket update = new RedstoneUpdatePacket(level, worldPosition, power,
-                (RedstoneInput) this.getBlockState().getBlock());
-        linkedPositions
-                .forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level,
-                        pos, (tile, _u) -> tile.getSignalBoxGrid().updateInput(update)));
+        updateSignalBoxes.accept(packet);
         linkedSignalController.forEach(pos -> loadChunkAndGetTile(SignalControllerTileEntity.class,
                 (ServerLevel) level, pos, (tile, _u) -> tile.updateFromRSInput()));
     }
 
+    public void sendInputOn() {
+        if (resetTask != null) {
+            resetTask.cancel(false);
+            resetTask = null;
+        }
+        sendInputChanged();
+    }
+
+    public void sendInputOff() {
+        final RedstoneUpdatePacket packet = getRedstoneUpdatePacket();
+        if (packet == null)
+            return;
+        if (resetDelay <= 0) {
+            updateSignalBoxes.accept(packet);
+        } else {
+            if (resetTask != null) {
+                if (!resetTask.cancel(false))
+                    return;
+            }
+            resetTask = resetExecutor.schedule(() -> {
+                updateSignalBoxes.accept(packet);
+                resetTask = null;
+            }, resetDelay, timeUnit);
+        }
+    }
+
+    private RedstoneUpdatePacket getRedstoneUpdatePacket() {
+        if (level.isClientSide)
+            return null;
+        final boolean power =
+                this.level.getBlockState(this.worldPosition).getValue(RedstoneIO.POWER);
+        return new RedstoneUpdatePacket(level, worldPosition, power,
+                (RedstoneInput) this.getBlockState().getBlock());
+    }
+
     public List<BlockPos> getLinkedController() {
         return ImmutableList.copyOf(linkedSignalController);
+    }
+
+    public int getResetDelay() {
+        return resetDelay;
+    }
+
+    public void setResetDelay(final int resetDelay) {
+        this.resetDelay = resetDelay;
+    }
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(final TimeUnit timeUnit) {
+        this.timeUnit = timeUnit;
     }
 
     @Override
@@ -81,8 +145,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         super.onLoad();
         if (level == null || level.isClientSide)
             return;
-        final LinkingUpdates update = SignalBoxHandler
-                .getPosUpdates(new StateInfo(level, worldPosition));
+        final LinkingUpdates update =
+                SignalBoxHandler.getPosUpdates(new StateInfo(level, worldPosition));
         if (update == null)
             return;
         update.getPosToRemove().forEach(pos -> unlink(pos));
@@ -98,29 +162,33 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public void link(final BlockPos pos) {
         if (level.isClientSide)
             return;
-        if (!linkedPositions.contains(pos))
+        if (!linkedPositions.contains(pos)) {
             linkedPositions.add(pos);
+        }
     }
 
     public void unlink(final BlockPos pos) {
         if (level.isClientSide)
             return;
-        if (linkedPositions.contains(pos))
+        if (linkedPositions.contains(pos)) {
             linkedPositions.remove(pos);
+        }
     }
 
     public void linkController(final BlockPos pos) {
         if (level.isClientSide)
             return;
-        if (!linkedSignalController.contains(pos))
+        if (!linkedSignalController.contains(pos)) {
             linkedSignalController.add(pos);
+        }
     }
 
     public void unlinkController(final BlockPos pos) {
         if (level.isClientSide)
             return;
-        if (linkedSignalController.contains(pos))
+        if (linkedSignalController.contains(pos)) {
             linkedSignalController.remove(pos);
+        }
     }
 
     @Override
