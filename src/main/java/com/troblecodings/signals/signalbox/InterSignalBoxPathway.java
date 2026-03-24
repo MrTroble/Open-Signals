@@ -1,6 +1,7 @@
 package com.troblecodings.signals.signalbox;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.Maps;
@@ -114,8 +115,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (otherGrid.get() != null) {
                 final SignalBoxPathway otherPathway =
                         otherGrid.get().getPathwayByLastPoint(blockPW.getValue());
-                if (!(otherPathway instanceof InterSignalBoxPathway))
-                    return;
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
                 blockPW = null;
             }
@@ -131,8 +130,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (otherGrid.get() != null) {
                 final SignalBoxPathway otherPathway =
                         otherGrid.get().getPathwayByLastPoint(resetPW.getValue());
-                if (!(otherPathway instanceof InterSignalBoxPathway))
-                    return;
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
                 resetPW = null;
             }
@@ -145,16 +142,28 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             final MainSignalIdentifier otherLastSignal = pathwayToBlock.data.getEndSignal();
             if (otherLastSignal != null) {
-                final Signal nextSignal = SignalBoxHandler.getSignal(
-                        new StateInfo(pathwayToBlock.tile.getWorld(), pathwayToBlock.tile.getPos()),
-                        otherLastSignal.pos);
+                final Signal nextSignal =
+                        SignalBoxHandler.getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
+                                pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
                 if (nextSignal != null) {
                     lastSignalInfo =
-                            new SignalStateInfo(tile.getWorld(), otherLastSignal.pos, nextSignal);
+                            new SignalStateInfo(tile.getLevel(), otherLastSignal.pos, nextSignal);
                 }
             }
         }
         return super.getLastSignalInfo();
+    }
+
+    @Override
+    public void resetAllSignals() {
+        super.resetAllSignals();
+        if (pathwayToReset != null) {
+            pathwayToReset.loadTileAndExecute(otherTile -> {
+                final SignalBoxGrid otherGrid = otherTile.getSignalBoxGrid();
+                Optional.of(otherGrid.getPathwayByLastPoint(pathwayToReset.getLastPoint()))
+                        .ifPresent(pw -> pw.resetAllSignals());
+            });
+        }
     }
 
     @Override
