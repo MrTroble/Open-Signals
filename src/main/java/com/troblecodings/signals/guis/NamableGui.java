@@ -1,8 +1,9 @@
 package com.troblecodings.signals.guis;
 
+import java.util.concurrent.TimeUnit;
+
 import com.troblecodings.core.I18Wrapper;
-import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.guilib.ecs.ContainerBase;
+import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -10,24 +11,21 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.entity.player.EntityPlayer;
-
 public class NamableGui extends GuiBase {
 
     private UILabel labelComp;
     private final NamableContainer container;
-    private final EntityPlayer player;
 
     public NamableGui(final GuiInfo info) {
         super(info);
         this.container = (NamableContainer) info.base;
-        this.player = info.player;
     }
 
     private void initOwn() {
@@ -71,10 +69,12 @@ public class NamableGui extends GuiBase {
         inner.add(hbox);
         if (!(container.tile instanceof RedstoneIOTileEntity))
             return;
+
+        addResetInfoEntity(inner);
+
         inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
-        list.setInheritHeight(true);
-        list.setInheritWidth(true);
+        list.setInherits(true);
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
         this.container.linkedPos.forEach(pos -> list.add(GuiElements.createLabel(
@@ -88,13 +88,59 @@ public class NamableGui extends GuiBase {
         inner.add(GuiElements.createPageSelect(layout));
     }
 
+    private void addResetInfoEntity(final UIEntity inner) {
+        if (!(container.tile.getBlockState().getBlock() instanceof CombinedRedstoneInput))
+            return;
+
+        final UIEntity hentity = new UIEntity();
+        hentity.setHeight(20);
+        hentity.setInheritWidth(true);
+        hentity.add(new UIBox(UIBox.HBOX, 5));
+
+        inner.add(hentity);
+        inner.add(GuiElements.createSpacerV(10));
+
+        final UITextInput resetInput = new UITextInput(String.valueOf(container.resetDelay));
+        resetInput.setValidator(input -> {
+            if (input.isEmpty())
+                return true;
+            try {
+                Integer.valueOf(input);
+            } catch (final NumberFormatException e) {
+                return false;
+            }
+            return true;
+        });
+        resetInput.setOnTextUpdate(input -> container
+                .sendDelayTimeToServer(input.isEmpty() ? 0 : Integer.valueOf(input)));
+
+        final UIEntity resetInputEntity = new UIEntity();
+        resetInputEntity.setInherits(true);
+        resetInputEntity.add(resetInput);
+
+        final UIEntity labelEntity =
+                GuiElements.createLabel(I18Wrapper.format("gui.namable.reset_delay"), 1f);
+        labelEntity.setInheritWidth(false);
+        labelEntity.setWidth(100);
+        labelEntity.setY(2);
+
+        hentity.add(labelEntity);
+        hentity.add(resetInputEntity);
+
+        final UIEntity timeUnitSelection =
+                GuiElements.createEnumElement(new EnumIntegerable<>(TimeUnit.class),
+                        i -> container.sendDelayTimeUnitToServer(TimeUnit.values()[i]),
+                        container.resetTimeUnit.ordinal());
+        timeUnitSelection.setInheritWidth(false);
+        timeUnitSelection.setWidth(130);
+        hentity.add(timeUnitSelection);
+    }
+
     private void updateText(final String input) {
         if (input.isEmpty() || input
                 .equals(ClientNameHandler.getClientName(new StateInfo(mc.world, container.pos))))
             return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putString(input);
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        container.sendNameToServer(input);
         labelComp.setText(input);
     }
 
