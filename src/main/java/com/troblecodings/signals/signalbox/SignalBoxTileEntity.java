@@ -12,6 +12,7 @@ import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -32,7 +33,7 @@ import net.minecraft.world.level.block.Block;
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
     private final SignalBoxGrid grid;
-    private String signalBoxUIProfile;
+    private String signalBoxUIProfile = UISignalBoxProfile.DEFAULT.getName();
 
     private static final String SIGNALBOX_UI_PROFILE = "signalBoxUIProfile";
 
