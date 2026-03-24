@@ -40,6 +40,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public static final String NAME_NBT = "name";
     public static final String LINKED_LIST = "linkedList";
     public static final String LINKED_SIGNAL_CONTROLLER = "linkedSignalContrller";
+    public static final String RESET_DELAY = "resetDelay";
+    public static final String RESET_DELAY_UNIT = "ResetDelayUnit";
 
     @Override
     public String getNameWrapper() {
@@ -55,6 +57,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper).toList());
         wrapper.putList(LINKED_SIGNAL_CONTROLLER,
                 linkedSignalController.stream().map(NBTWrapper::getBlockPosWrapper).toList());
+        wrapper.putInteger(RESET_DELAY, resetDelay);
+        wrapper.putString(RESET_DELAY_UNIT, timeUnit.name());
     }
 
     @Override
@@ -65,6 +69,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 .forEach(linkedPositions::add);
         wrapper.getList(LINKED_SIGNAL_CONTROLLER).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedSignalController::add);
+        resetDelay = wrapper.getInteger(RESET_DELAY);
+        timeUnit = TimeUnit.valueOf(wrapper.getString(RESET_DELAY_UNIT));
     }
 
     private ScheduledFuture<?> resetTask;
