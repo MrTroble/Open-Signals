@@ -3,6 +3,7 @@ package com.troblecodings.signals.signalbox;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.Maps;
@@ -70,8 +71,9 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             } else {
                 final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
                 otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, otherPos)));
-                if (otherGrid.get() == null)
+                if (otherGrid.get() == null) {
                     loadTileAndExecute(otherPos, tile -> otherGrid.set(tile.getSignalBoxGrid()));
+                }
 
                 final SignalBoxPathway otherPathway = otherGrid.get().getPathwayByLastPoint(end);
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
@@ -88,8 +90,9 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             } else {
                 final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
                 otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, otherPos)));
-                if (otherGrid.get() == null)
+                if (otherGrid.get() == null) {
                     loadTileAndExecute(otherPos, tile -> otherGrid.set(tile.getSignalBoxGrid()));
+                }
 
                 final SignalBoxPathway otherPathway = otherGrid.get().getPathwayByLastPoint(end);
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
@@ -106,13 +109,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (blockPW != null) {
             final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
             otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, blockPW.getKey())));
-            if (otherGrid.get() == null)
+            if (otherGrid.get() == null) {
                 loadTileAndExecute(blockPW.getKey(),
                         tile -> otherGrid.set(tile.getSignalBoxGrid()));
+            }
 
             if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(blockPW.getValue());
+                final SignalBoxPathway otherPathway =
+                        otherGrid.get().getPathwayByLastPoint(blockPW.getValue());
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
                 blockPW = null;
             }
@@ -120,13 +124,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (resetPW != null) {
             final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
             otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, resetPW.getKey())));
-            if (otherGrid.get() == null)
+            if (otherGrid.get() == null) {
                 loadTileAndExecute(resetPW.getKey(),
                         tile -> otherGrid.set(tile.getSignalBoxGrid()));
+            }
 
             if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(resetPW.getValue());
+                final SignalBoxPathway otherPathway =
+                        otherGrid.get().getPathwayByLastPoint(resetPW.getValue());
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
                 resetPW = null;
             }
@@ -139,15 +144,28 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             final MainSignalIdentifier otherLastSignal = pathwayToBlock.data.getEndSignal();
             if (otherLastSignal != null) {
-                final Signal nextSignal = SignalBoxHandler
-                        .getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
+                final Signal nextSignal =
+                        SignalBoxHandler.getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
                                 pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
-                if (nextSignal != null)
-                    lastSignalInfo = new SignalStateInfo(tile.getLevel(), otherLastSignal.pos,
-                            nextSignal);
+                if (nextSignal != null) {
+                    lastSignalInfo =
+                            new SignalStateInfo(tile.getLevel(), otherLastSignal.pos, nextSignal);
+                }
             }
         }
         return super.getLastSignalInfo();
+    }
+
+    @Override
+    public void resetAllSignals() {
+        super.resetAllSignals();
+        if (pathwayToReset != null) {
+            pathwayToReset.loadTileAndExecute(otherTile -> {
+                final SignalBoxGrid otherGrid = otherTile.getSignalBoxGrid();
+                Optional.of(otherGrid.getPathwayByLastPoint(pathwayToReset.getLastPoint()))
+                        .ifPresent(pw -> pw.resetAllSignals());
+            });
+        }
     }
 
     @Override
@@ -204,8 +222,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                 nodes.add(signalIdent.node);
             });
         }
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff()) {
                 position.updateSignalState(SignalState.OFF);
@@ -215,13 +233,15 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             final SignalBoxPathway next = getNextPathway();
             SignalState toSet = SignalState.RED;
             if (lastSignal != null && next != null && !next.isEmptyOrBroken()) {
-                if (!next.isExecutingSignalSet)
+                if (!next.isExecutingSignalSet) {
                     toSet = SignalState.GREEN;
+                }
             } else if (pathwayToBlock != null) {
                 final SignalBoxPathway otherNext = pathwayToBlock.getNextPathway();
                 if (otherNext != null && !otherNext.isEmptyOrBroken()) {
-                    if (!otherNext.isExecutingSignalSet)
+                    if (!otherNext.isExecutingSignalSet) {
                         toSet = SignalState.GREEN;
+                    }
                 } else {
                     toSet = SignalState.RED;
                 }
