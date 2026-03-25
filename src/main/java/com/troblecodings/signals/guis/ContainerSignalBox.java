@@ -20,7 +20,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
@@ -367,7 +366,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             }
             case SEND_POSIDENT_LIST: {
                 deserializeEntry(buffer, buffer
-                        .getList(ReadBuffer.getINetworkSaveableFunction(PosIdentifier.class)));
+                        .getList(ReadBuffer.getINetworkSaveableFunction(ModeIdentifier.class)));
                 break;
             }
             case SEND_CONNECTED_TRAINNUMBERS: {

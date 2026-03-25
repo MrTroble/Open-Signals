@@ -36,7 +36,6 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -881,9 +880,9 @@ public class GuiSignalBox extends GuiBase {
         container.grid.resetAllSignals();
     }
 
-    protected void sendPosIdentList(final List<PosIdentifier> list, final SignalBoxNode node,
+    protected void sendModeIdentList(final List<ModeIdentifier> list, final SignalBoxNode node,
             final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<List<PosIdentifier>> entry) {
+            final PathEntryType<List<ModeIdentifier>> entry) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
