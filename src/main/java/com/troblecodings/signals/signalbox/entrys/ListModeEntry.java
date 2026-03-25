@@ -7,15 +7,16 @@ import java.util.stream.Collectors;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.ModeIdentifier;
 
-public class ListBlockPosEntry extends IPathEntry<List<PosIdentifier>> {
+public class ListModeEntry extends IPathEntry<List<ModeIdentifier>> {
 
-    private List<PosIdentifier> list = new ArrayList<>();
+    private List<ModeIdentifier> list = new ArrayList<>();
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        list.addAll(buffer.getList(ReadBuffer.getINetworkSaveableFunction(PosIdentifier.class)));
+        list.clear();
+        list.addAll(buffer.getList(ReadBuffer.getINetworkSaveableFunction(ModeIdentifier.class)));
     }
 
     @Override
@@ -35,29 +36,24 @@ public class ListBlockPosEntry extends IPathEntry<List<PosIdentifier>> {
     @Override
     public void read(final NBTWrapper tag) {
         list.clear();
-        tag.getList(getName()).stream().map(posTag -> PosIdentifier.of(posTag)).forEach(list::add);
+        tag.getList(getName()).stream().map(posTag -> ModeIdentifier.of(posTag)).forEach(list::add);
     }
 
     @Override
-    public List<PosIdentifier> getValue() {
+    public List<ModeIdentifier> getValue() {
         return new ArrayList<>(list);
     }
 
     @Override
-    public void setValue(final List<PosIdentifier> value) {
+    public void setValue(final List<ModeIdentifier> value) {
         this.list = new ArrayList<>(value);
     }
 
-    @Override
-    public List<PosIdentifier> getDefaultValue() {
-        return new ArrayList<>();
-    }
-
-    public void add(final PosIdentifier pos) {
+    public void add(final ModeIdentifier pos) {
         list.add(pos);
     }
 
-    public void remove(final PosIdentifier pos) {
+    public void remove(final ModeIdentifier pos) {
         list.remove(pos);
     }
 

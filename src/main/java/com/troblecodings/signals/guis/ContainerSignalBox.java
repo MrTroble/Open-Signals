@@ -151,8 +151,174 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         if (grid == null) {
             grid = tile.getSignalBoxGrid();
         }
-        network.desirializeBuffer(buffer);
-        tile.markDirty();
+        final SignalBoxNetwork mode = buffer.getEnumValue(SignalBoxNetwork.class);
+        switch (mode) {
+            case SEND_INT_ENTRY: {
+                deserializeEntry(buffer, buffer.getByteToUnsignedInt());
+                break;
+            }
+            case REMOVE_ENTRY: {
+                final Point point = Point.of(buffer);
+                final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
+                final Rotation rotation = deserializeRotation(buffer);
+                final PathEntryType<?> entryType =
+                        PathEntryType.ALL_ENTRIES.get(buffer.getByteToUnsignedInt());
+                final ModeSet modeSet = new ModeSet(guiMode, rotation);
+                grid.getNode(point).getOption(modeSet)
+                        .ifPresent(entry -> entry.removeEntry(entryType));
+                break;
+            }
+            case SEND_POS_ENTRY: {
+                deserializeEntry(buffer, buffer.getBlockPos());
+                break;
+            }
+            case SEND_ZS2_ENTRY: {
+                deserializeEntry(buffer, buffer.getByte());
+                break;
+            }
+            case SEND_ZS6_ENTRY: {
+                deserializeEntry(buffer, buffer.getTcBoolean());
+                break;
+            }
+            case REMOVE_POS: {
+                final BlockPos pos = buffer.getBlockPos();
+                SignalBoxHandler.unlinkPosFromSignalBox(
+                        new StateInfo(tile.getLevel(), tile.getBlockPos()), pos);
+                break;
+            }
+            case RESET_PW: {
+                final Point point = Point.of(buffer);
+                final SignalBoxPathway pw = grid.getPathwayByStartPoint(point);
+                final boolean isShuntingPath = pw != null ? pw.isShuntingPath() : false;
+                if (grid.resetPathway(point) && !isShuntingPath) {
+                    grid.count();
+                    final WriteBuffer sucess = new WriteBuffer();
+                    sucess.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
+                    sucess.putInt(grid.getCurrentCounter());
+                    OpenSignalsMain.network.sendTo(info.player, sucess);
+                }
+                break;
+            }
+            case REQUEST_PW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                final PathType type = buffer.getEnumValue(PathType.class);
+                final PathwayRequestResult request = grid.requestWay(start, end, type);
+                if (!request.wasSuccesfull()) {
+                    final SignalBoxNode endNode = grid.getNode(end);
+                    if (request.canBeAddedToSaver(type) && !endNode.containsOutConnection()
+                            && grid.addNextPathway(start, end, type)) {
+                        final WriteBuffer sucess = new WriteBuffer();
+                        sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
+                        sucess.putEnumValue(request.getMode());
+                        start.writeNetwork(sucess);
+                        end.writeNetwork(sucess);
+                        sucess.putEnumValue(type);
+                        OpenSignalsMain.network.sendTo(info.player, sucess);
+                        break;
+                    }
+                    final WriteBuffer error = new WriteBuffer();
+                    error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
+                    error.putEnumValue(request.getMode());
+                    OpenSignalsMain.network.sendTo(info.player, error);
+                }
+                break;
+            }
+            case RESET_ALL_PW: {
+                grid.resetAllPathways();
+                break;
+            }
+            case SEND_CHANGED_MODES: {
+                grid.readUpdateNetwork(buffer, true);
+                break;
+            }
+            case REQUEST_SUBSIDIARY: {
+                final SubsidiaryState entry = SubsidiaryState.of(buffer);
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                final boolean enable = buffer.getBoolean();
+                updateServerSubsidiary(point, modeSet, entry, enable);
+                break;
+            }
+            case UPDATE_RS_OUTPUT: {
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                final boolean state = buffer.getBoolean();
+                final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
+                if (pos != null) {
+                    SignalBoxHandler.updateRedstoneOutput(new StateInfo(info.world, pos), state);
+                    final WriteBuffer sucess = new WriteBuffer();
+                    sucess.putEnumValue(SignalBoxNetwork.OUTPUT_UPDATE);
+                    point.writeNetwork(sucess);
+                    modeSet.writeNetwork(sucess);
+                    sucess.putBoolean(state);
+                    OpenSignalsMain.network.sendTo(info.player, sucess);
+                }
+                break;
+            }
+            case SET_AUTO_POINT: {
+                final Point point = Point.of(buffer);
+                final boolean state = buffer.getBoolean();
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                node.setAutoPoint(state);
+                grid.updatePathwayToAutomatic(point);
+                break;
+            }
+            case SEND_NAME: {
+                final Point point = Point.of(buffer);
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                node.setCustomText(buffer.getString());
+                break;
+            }
+            case SEND_BOOL_ENTRY: {
+                deserializeEntry(buffer, buffer.getBoolean());
+                break;
+            }
+            case REMOVE_SAVEDPW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                grid.removeNextPathway(start, end);
+                break;
+            }
+            case SEND_POINT_ENTRY: {
+                deserializeEntry(buffer, Point.of(buffer));
+                break;
+            }
+            case SEND_COUNTER: {
+                grid.setCounter(buffer.getInt());
+                break;
+            }
+            case SEND_TRAIN_NUMBER: {
+                final Point point = Point.of(buffer);
+                final TrainNumber number = TrainNumber.of(buffer);
+                grid.updateTrainNumber(point, number);
+                break;
+            }
+            case RESET_ALL_SIGNALS: {
+                grid.resetAllSignals();
+                break;
+            }
+            case SEND_POSIDENT_LIST: {
+                deserializeEntry(buffer, buffer
+                        .getList(ReadBuffer.getINetworkSaveableFunction(ModeIdentifier.class)));
+                break;
+            }
+            case SEND_CONNECTED_TRAINNUMBERS: {
+                deserializeEntry(buffer, ModeIdentifier.of(buffer));
+                break;
+            }
+            case SET_SIGNAL_STATE: {
+                final Point point = Point.of(buffer);
+                final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
+                final Rotation rotation = deserializeRotation(buffer);
+                final SignalState state = buffer.getEnumValue(SignalState.class);
+                grid.getNodeChecked(point)
+                        .ifPresent(node -> node.updateState(new ModeSet(guiMode, rotation), state));
+            }
+            default:
+                break;
+        }
+        tile.setChanged();
     }
 
     public void handlePathwayRequestResponse(final PathwayRequestMode result) {

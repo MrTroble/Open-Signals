@@ -27,7 +27,6 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
@@ -157,8 +156,8 @@ public class ModeDropDownBoxUI {
             case HP: {
                 gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
                         PathEntryType.SIGNAL, mode, rotation);
-                final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
-                        .orElseGet(() -> new ArrayList<>());
+                final List<ModeIdentifier> preSignalsList = option
+                        .getEntry(PathEntryType.PRESIGNALS).orElseGet(() -> new ArrayList<>());
                 final UIEntity preSignalEntity = GuiElements
                         .createButton(I18Wrapper.format("property.presignals.name"), e -> {
                             final UIEntity screen = new UIEntity();
@@ -178,22 +177,16 @@ public class ModeDropDownBoxUI {
                                                 if (mouseKey != MouseEvent.LEFT_MOUSE
                                                         || node.isEmpty())
                                                     return;
-                                                final AtomicReference<PosIdentifier> vp =
+                                                final AtomicReference<ModeIdentifier> vp =
                                                         new AtomicReference<>();
                                                 node.getModes().forEach((nodeMode, entry) -> {
                                                     if (!(nodeMode.mode.equals(EnumGuiMode.VP)
                                                             || nodeMode.mode
                                                                     .equals(EnumGuiMode.ZS3)))
                                                         return;
-                                                    final BlockPos linkedSignal =
-                                                            entry.getEntry(PathEntryType.SIGNAL)
-                                                                    .orElse(null);
-                                                    if (linkedSignal == null)
-                                                        return;
-                                                    vp.set(new PosIdentifier(point, nodeMode,
-                                                            linkedSignal));
+                                                    vp.set(new ModeIdentifier(point, nodeMode));
                                                 });
-                                                final PosIdentifier ident = vp.get();
+                                                final ModeIdentifier ident = vp.get();
                                                 if (ident == null)
                                                     return;
                                                 if (preSignalsList.contains(ident)) {
@@ -214,14 +207,14 @@ public class ModeDropDownBoxUI {
                                                 } else {
                                                     option.setEntry(PathEntryType.PRESIGNALS,
                                                             preSignalsList);
-                                                    gui.sendPosIdentList(preSignalsList, this.node,
+                                                    gui.sendModeIdentList(preSignalsList, this.node,
                                                             mode, rotation,
                                                             PathEntryType.PRESIGNALS);
                                                 }
                                             });
                             preSignalsList.forEach(ident -> {
                                 boxEntity.rendering.addColoredPoint(
-                                        settings.getUserSelectionColor(), ident.getPoint());
+                                        settings.getUserSelectionColor(), ident.point);
                             });
                             screen.add(boxEntity.entity);
 
