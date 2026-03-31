@@ -43,6 +43,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -144,14 +145,14 @@ public class Signal extends BasicBlock {
     @Override
     public VoxelShape getShape(final BlockState state, final IBlockReader source,
             final BlockPos pos, final ISelectionContext context) {
-        final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
-        if (te == null)
+        final TileEntity te = source.getBlockEntity(pos);
+        if (te == null || (!te instanceof SignalTileEntity))
             return VoxelShapes.block();
         final World world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
-                : te.getProperties();
+                : ((SignalTileEntity) te).getProperties();
         return VoxelShapes
                 .create(VoxelShapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
