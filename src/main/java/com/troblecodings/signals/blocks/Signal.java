@@ -197,14 +197,14 @@ public class Signal extends BasicBlock {
             final BlockPos pos) {
         final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>(
                 (IExtendedBlockState) super.getExtendedState(state, acess, pos));
-        final SignalTileEntity tile = (SignalTileEntity) acess.getTileEntity(pos);
-        if (tile == null)
+        final TileEntity tile = acess.getTileEntity(pos);
+        if (tile == null || !(tile instanceof SignalTileEntity))
             return blockState.get();
         final World world = tile.getWorld();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
-                : tile.getProperties();
+                : ((SignalTileEntity) tile).getProperties();
         properties.forEach((property, value) -> {
             if (signalProperties.contains(property)) {
                 blockState.getAndUpdate(oldState -> oldState.withProperty(property, value));
