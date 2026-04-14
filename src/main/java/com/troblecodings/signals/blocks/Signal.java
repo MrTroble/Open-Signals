@@ -3,6 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,11 +82,11 @@ public class Signal extends BasicBlock {
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
-    private static MessageDigest DIGEST;
+    private static MessageDigest digest;
 
     static {
         try {
-            DIGEST = MessageDigest.getInstance("MD5");
+            digest = MessageDigest.getInstance("MD5");
         } catch (final NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -101,7 +102,7 @@ public class Signal extends BasicBlock {
         this.prop = prop;
         this.id = getIDFromName(name);
         if (SIGNAL_IDS.containsKey(this.id)) {
-            OpenSignalsMain.exitMinecraftWithMessage("With high propability the name [" + name
+            OpenSignalsMain.exitMinecraftWithMessage("With high propability the signal [" + name
                     + "] is already registerd! Already existing signal: [" + SIGNAL_IDS.get(this.id)
                     + "] Please change your signal name!");
         }
@@ -116,12 +117,14 @@ public class Signal extends BasicBlock {
     }
 
     private static int getIDFromName(final String name) {
-        final byte[] array = DIGEST.digest(name.getBytes());
-        DIGEST.reset();
+        final byte[] array = digest.digest(name.getBytes());
+        digest.reset();
         int returnID = 0;
         for (int i = 0; i < array.length / 4; i += 4) {
-            returnID ^= array[i] << 24 | array[i + 1] << 16 | array[i + 2] << 8 | array[i + 3];
+            returnID ^= (array[i] << 24 | array[i + 1] << 16 | array[i + 2] << 8 | array[i + 3])
+                    + 0x9e3779b9 + (returnID << 6) + (returnID >> 2);
         }
+        System.out.println("ID=" + returnID + ",NAME=" + name + ",BYTES=" + Arrays.toString(array));
         return returnID;
     }
 
