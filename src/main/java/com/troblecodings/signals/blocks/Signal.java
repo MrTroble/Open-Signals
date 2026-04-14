@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +81,16 @@ public class Signal extends BasicBlock {
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
+    private static MessageDigest DIGEST;
+
+    static {
+        try {
+            DIGEST = MessageDigest.getInstance("MD5");
+        } catch (final NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected final SignalProperties prop;
     private final int id;
     private List<SEProperty> signalProperties;
@@ -87,10 +99,11 @@ public class Signal extends BasicBlock {
     public Signal(final SignalProperties prop, final String name) {
         super(Material.ROCK);
         this.prop = prop;
-        this.id = name.hashCode();
+        this.id = getIDFromName(name);
         if (SIGNAL_IDS.containsKey(this.id)) {
-            OpenSignalsMain.exitMinecraftWithMessage("Hash [" + this.id + "] already exists for ["
-                    + name + "]! Need to choose an other name!");
+            OpenSignalsMain.exitMinecraftWithMessage("With high propability the name [" + name
+                    + "] is already registerd! Already existing signal: [" + SIGNAL_IDS.get(this.id)
+                    + "] Please change your signal name!");
         }
         SIGNAL_IDS.put(this.id, this);
         this.setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
@@ -100,6 +113,16 @@ public class Signal extends BasicBlock {
             signalPropertiesToInt.put(property, i);
         }
         setLightLevel(ConfigHandler.lightEmission / 15.0f);
+    }
+
+    private static int getIDFromName(final String name) {
+        final byte[] array = DIGEST.digest(name.getBytes());
+        DIGEST.reset();
+        int returnID = 0;
+        for (int i = 0; i < array.length / 4; i += 4) {
+            returnID ^= array[i] << 24 | array[i + 1] << 16 | array[i + 2] << 8 | array[i + 3];
+        }
+        return returnID;
     }
 
     public static Signal getSignalByID(final int id) {
