@@ -35,6 +35,8 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
+import com.troblecodings.signals.enums.SignalBoxIcons;
+import com.troblecodings.signals.enums.SignalBoxIcons.SignalBoxSymbols;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 
@@ -45,7 +47,6 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -237,7 +238,7 @@ public class GuiSignalController extends GuiBase {
             if (currentProfile == -1) {
                 currentProfile = newProfileID;
             }
-        }, "gui.controller.add");
+        }, "gui.controller.add_profile");
         final UIButton addButton = new UIButton("+");
         addButtonEntity.add(addButton);
         return addButtonEntity;
@@ -356,22 +357,24 @@ public class GuiSignalController extends GuiBase {
         entity.add(label);
         entity.add(new UIToolTip(I18Wrapper.format("gui.controller.mode.desc")));
 
-        final UIEntity redstoneOn = getTexturedIcon(GuiSignalBox.REDSTONE_ON);
+        final UIEntity redstoneOn =
+                getTexturedIcon(SignalBoxIcons.SYMBOLS, SignalBoxSymbols.REDSTONE_ON.ordinal());
         entity.add(redstoneOn);
 
-        final UIEntity redstoneOff = getTexturedIcon(GuiSignalBox.REDSTONE_OFF);
+        final UIEntity redstoneOff =
+                getTexturedIcon(SignalBoxIcons.SYMBOLS, SignalBoxSymbols.REDSTONE_OFF.ordinal());
         redstoneOff.add(new UIBorder(0xFF000000, 1));
 
         entity.add(redstoneOff);
         return entity;
     }
 
-    private UIEntity getTexturedIcon(final ResourceLocation loc) {
+    private UIEntity getTexturedIcon(final SignalBoxIcons icons, final int id) {
         final UIEntity icon = new UIEntity();
         icon.setHeight(20);
         icon.setWidth(20);
         icon.add(new UIColor(0x6F000000));
-        icon.add(new UITexture(loc));
+        icon.add(new UITexture(icons.getResourceLocation(), icons.getX(id), 0, icons.getMX(id), 1));
         icon.add(new UIBorder(0xFF000000, 1));
         return icon;
     }

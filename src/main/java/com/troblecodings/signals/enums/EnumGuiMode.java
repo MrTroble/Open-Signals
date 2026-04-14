@@ -7,7 +7,7 @@ import java.util.function.Function;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.config.ConfigHandler;
-import com.troblecodings.signals.guis.UISignalBoxIcons;
+import com.troblecodings.signals.enums.SignalBoxIcons.SignalBoxSigns;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 
@@ -18,25 +18,36 @@ public enum EnumGuiMode {
 
     STRAIGHT(new float[] {
             0, 0.5f, 1, 0.5f
-    }), CORNER(new float[] {
+    }), //
+    CORNER(new float[] {
             0, 0.5f, 0.5f, 1
-    }), END(new float[] {
+    }), //
+    END(new float[] {
             0.9f, 0.2f, 0.9f, 0.8f
-    }, PathwayModeType.END, 0), PLATFORM(new float[] {
+    }, PathwayModeType.END, 0), //
+    PLATFORM(new float[] {
             0, 0.15f, 1, 0.15f
-    }, PathwayModeType.NONE, 0, ConfigHandler.CLIENT.signalboxFreeColor.get(), 3), BUE(new float[] {
+    }, PathwayModeType.NONE, 0, ConfigHandler.CLIENT.signalboxFreeColor.get(), 3), //
+    BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
-    }), HP(0, true, PathwayModeType.START_END, 2), VP(1, true, PathwayModeType.NONE, 1),
-    RS(2, true, PathwayModeType.START_END, (state) -> state.equals(SignalState.RED) ? 1 : 3),
-    RA10(3, PathwayModeType.END, 1), SH2(4, PathwayModeType.NONE, 3),
-    IN_CONNECTION(UISignalBoxIcons.INCOMING_ICON, PathwayModeType.START, 1),
-    OUT_CONNECTION(UISignalBoxIcons.OUTGOING_ICON, PathwayModeType.END, 1),
-    ARROW(UISignalBoxIcons.ARROW_ICON, PathwayModeType.END, 1),
-    NE1(UISignalBoxIcons.NE1_ICON, PathwayModeType.START_END, 1),
-    NE5(UISignalBoxIcons.NE5_ICON, PathwayModeType.START_END, 1),
-    ZS3(UISignalBoxIcons.ZS3_ICON, PathwayModeType.NONE, 1), TRAIN_NUMBER(new float[] {
+    }), //
+    HP(SignalBoxIcons.SIGNALS, 0, true, PathwayModeType.START_END, 2),
+    VP(SignalBoxIcons.SIGNALS, 1, true, PathwayModeType.NONE, 1),
+    RS(SignalBoxIcons.SIGNALS, 2, PathwayModeType.START_END,
+            (state) -> state.equals(SignalState.RED) ? 1 : 3),
+    RA10(SignalBoxIcons.SIGNS, SignalBoxSigns.RA10.ordinal(), PathwayModeType.END, 1),
+    SH2(SignalBoxIcons.SIGNS, SignalBoxSigns.SH2.ordinal(), PathwayModeType.NONE, 3),
+    IN_CONNECTION(SignalBoxIcons.SIGNS, SignalBoxSigns.ARROW_IN.ordinal(), PathwayModeType.START,
+            1),
+    OUT_CONNECTION(SignalBoxIcons.SIGNS, SignalBoxSigns.ARROW_OUT.ordinal(), PathwayModeType.END,
+            1),
+    ARROW(SignalBoxIcons.SIGNS, SignalBoxSigns.ARROW.ordinal(), PathwayModeType.END, 1),
+    NE1(SignalBoxIcons.SIGNS, SignalBoxSigns.NE1.ordinal(), PathwayModeType.START_END, 1),
+    NE5(SignalBoxIcons.SIGNS, SignalBoxSigns.NE5.ordinal(), PathwayModeType.START_END, 1),
+    ZS3(SignalBoxIcons.SIGNS, SignalBoxSigns.ZS3.ordinal(), PathwayModeType.NONE, 1),
+    TRAIN_NUMBER(new float[] {
             0, 0.5f, 2, 0.5f
-    }, PathwayModeType.NONE, 2, ConfigHandler.signalboxTrainnumberBackgroundColor, 6),
+    }, PathwayModeType.NONE, 2, ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get(), 6), //
     CROSSING(new float[] {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
     });
@@ -50,29 +61,30 @@ public enum EnumGuiMode {
     private int defaultColor;
     private final PathwayModeType type;
 
-    private EnumGuiMode(final int id, final PathwayModeType type, final int depth) {
-        this((_u) -> ((info, c) -> info.drawTexture(UISignalBoxIcons.ICON,
-                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, id * 0.2, 0,
-                id * 0.2 + 0.2, 0.5)), type, (_u) -> depth);
+    private EnumGuiMode(final SignalBoxIcons icon, final int id, final PathwayModeType type,
+            final int depth) {
+        this((_u) -> ((info, c) -> info.drawTexture(icon.getResourceLocation(),
+                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, icon.getX(id), 0,
+                icon.getMX(id), 1)), type, (_u) -> depth);
     }
 
-    private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type,
+    private EnumGuiMode(final SignalBoxIcons icon, final int id, final PathwayModeType type,
             final Function<SignalState, Integer> depthFunc) {
         this((state) -> {
             final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> info.drawTexture(UISignalBoxIcons.SIGNALS,
+            return (info, c) -> info.drawTexture(icon.getResourceLocation(),
                     UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
-                    (id + factor) * 0.0666667f, 0.0f, (id + factor) * 0.066667f + 0.06f, 1.0f);
+                    icon.getX(id + factor), 0, icon.getMX(id + factor), 1);
         }, type, depthFunc);
     }
 
-    private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type,
-            final int depth) {
+    private EnumGuiMode(final SignalBoxIcons icon, final int id, final boolean unused,
+            final PathwayModeType type, final int depth) {
         this((state) -> {
             final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> info.drawTexture(UISignalBoxIcons.SIGNALS,
+            return (info, c) -> info.drawTexture(icon.getResourceLocation(),
                     UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
-                    (id + factor) * 0.0666667f, 0.0f, (id + factor) * 0.066667f + 0.06f, 1.0f);
+                    icon.getX(id + factor), 0, icon.getMX(id + factor), 1);
         }, type, (_u) -> depth);
     }
 

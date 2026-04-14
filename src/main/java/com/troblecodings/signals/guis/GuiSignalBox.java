@@ -45,6 +45,8 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.ShowTypes;
+import com.troblecodings.signals.enums.SignalBoxIcons;
+import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
@@ -67,15 +69,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
 
 public class GuiSignalBox extends GuiBase {
-
-    public static final ResourceLocation REDSTONE_OFF =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
@@ -475,15 +468,17 @@ public class GuiSignalBox extends GuiBase {
             layout.add(new UIBox(UIBox.HBOX, 2));
 
             final int id = t.ordinal();
-            final UIEntity icon = new UIEntity();
+            final SignalBoxIcons symbols = SignalBoxIcons.SYMBOLS;
             final UITexture texture = t.equals(LinkType.SIGNALBOX)
                     ? new UITexture(new ResourceLocation(OpenSignalsMain.MODID,
                             "textures/blocks/signalbox.png"))
-                    : new UITexture(UISignalBoxIcons.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
+                    : new UITexture(symbols.getResourceLocation(), symbols.getX(id), 0,
+                            symbols.getMX(id), 1);
+            final UIEntity icon = new UIEntity();
             icon.add(texture);
             icon.setHeight(20);
             icon.setWidth(20);
-            icon.add(new UIToolTip(I18Wrapper.format("type." + t.name())));
+            icon.add(new UIToolTip(I18Wrapper.format("property.value." + t.name())));
             layout.add(icon);
 
             UIEntity btn = GuiElements.createButton(name, e -> {
