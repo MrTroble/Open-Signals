@@ -88,6 +88,7 @@
     "block.opensignals.semaphoresignalbridge": "HV Form-Brückensignal",
     "block.opensignals.zs32": "Zs3/Zs2",
     "block.opensignals.postconnectable": "Verbindungsfähiger Mast",
+    "block.opensignals.monitor": "Monitor",
 
     "__LinkingToolChatMessages": "",
     "lt.linkedpos": "§2Verlinkt mit: {%d, %d, %d§2}§r",

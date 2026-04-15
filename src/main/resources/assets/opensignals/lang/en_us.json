@@ -88,6 +88,7 @@
 	"block.opensignals.semaphoresignalbridge": "HV Semaphore bridge signal",
 	"block.opensignals.zs32": "Zs3/Zs2",
 	"block.opensignals.postconnectable": "Connectable Pole",
+	"block.opensignals.monitor": "Monitor",
 
 	"__LinkingToolChatMessages": "",
 	"lt.linkedpos": "§2Linked with: {%d, %d, %d§2}§r",
