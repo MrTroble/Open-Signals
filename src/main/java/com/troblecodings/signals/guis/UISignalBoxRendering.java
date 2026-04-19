@@ -33,6 +33,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.guis.UISignalBoxProfile.TextureSettings;
 import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -99,8 +100,8 @@ public class UISignalBoxRendering extends UIComponent {
     private void addNode(final SignalBoxNode node) {
         final Map<ModeSet, ModeRenderInfo> modesets =
                 gridRender.computeIfAbsent(node.getPoint(), k -> Maps.newHashMap());
-        node.forEach(modeSet -> modesets.put(modeSet,
-                new ModeRenderInfo(modeSet.mode, node.getState(modeSet))));
+        node.forEach(modeSet -> modesets.put(modeSet, new ModeRenderInfo(modeSet.mode,
+                node.getState(modeSet), profile.getTextureSettings())));
         gridRender.put(node.getPoint(), modesets);
         nodeLabeling.put(node.getPoint(), node.getCustomText());
     }
@@ -122,7 +123,7 @@ public class UISignalBoxRendering extends UIComponent {
 
     public void addMode(final Point point, final ModeSet modeSet) {
         gridRender.computeIfAbsent(point, k -> Maps.newHashMap()).put(modeSet,
-                new ModeRenderInfo(modeSet.mode, SignalState.RED));
+                new ModeRenderInfo(modeSet.mode, SignalState.RED, profile.getTextureSettings()));
     }
 
     public boolean has(final Point point, final ModeSet modeSet) {
@@ -326,7 +327,8 @@ public class UISignalBoxRendering extends UIComponent {
 
     public void updateSignalState(final Point point, final ModeSet set, final SignalState state) {
         gridRender.computeIfPresent(point, (p, map) -> {
-            map.computeIfPresent(set, (u, m) -> new ModeRenderInfo(m, state));
+            map.computeIfPresent(set,
+                    (u, m) -> new ModeRenderInfo(m, state, profile.getTextureSettings()));
             return map;
         });
     }
@@ -338,19 +340,21 @@ public class UISignalBoxRendering extends UIComponent {
         private final EnumGuiMode mode;
         public final Consumer<DrawInfo> component;
 
-        public ModeRenderInfo(final EnumGuiMode mode, final SignalState state) {
+        public ModeRenderInfo(final EnumGuiMode mode, final SignalState state,
+                final TextureSettings textureSet) {
             this.color = mode.getDefaultColor();
             this.state = state;
-            final BiConsumer<DrawInfo, Integer> component = mode.consumer.apply(state);
+            final BiConsumer<DrawInfo, Integer> component = mode.consumer.apply(state, textureSet);
             this.mode = mode;
             this.component = (info) -> component.accept(info, color);
         }
 
-        public ModeRenderInfo(final ModeRenderInfo old, final SignalState state) {
+        public ModeRenderInfo(final ModeRenderInfo old, final SignalState state,
+                final TextureSettings textureSet) {
             this.mode = old.mode;
             this.color = old.color;
             this.state = state;
-            final BiConsumer<DrawInfo, Integer> component = mode.consumer.apply(state);
+            final BiConsumer<DrawInfo, Integer> component = mode.consumer.apply(state, textureSet);
             this.component = (info) -> component.accept(info, color);
         }
 

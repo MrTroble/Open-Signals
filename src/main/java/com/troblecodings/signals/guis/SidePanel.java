@@ -190,7 +190,8 @@ public class SidePanel {
         info.translate(UISignalBoxRendering.HALF_TILE, UISignalBoxRendering.HALF_TILE, 0);
         info.rotate(0, 0, rotation * UIRotate.PERPENDICULAR_ANGLE);
         info.translate(-UISignalBoxRendering.HALF_TILE, -UISignalBoxRendering.HALF_TILE, 0);
-        modes.consumer.apply(SignalState.RED).accept(info, modes.getDefaultColor());
+        modes.consumer.apply(SignalState.RED, UISignalBoxProfile.DEFAULT.getTextureSettings())
+                .accept(info, modes.getDefaultColor());
         info.pop();
     }
 

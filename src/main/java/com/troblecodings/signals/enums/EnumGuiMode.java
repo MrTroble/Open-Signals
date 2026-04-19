@@ -2,12 +2,14 @@ package com.troblecodings.signals.enums;
 
 import java.util.Arrays;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.enums.SignalBoxIcons.SignalBoxSigns;
+import com.troblecodings.signals.guis.UISignalBoxProfile.TextureSettings;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 
@@ -56,23 +58,25 @@ public enum EnumGuiMode {
      * Naming
      */
 
-    public final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer;
+    public final BiFunction<SignalState, TextureSettings, BiConsumer<DrawInfo, Integer>> consumer;
     public final Function<SignalState, Integer> depthFunc;
     private int defaultColor;
     private final PathwayModeType type;
 
     private EnumGuiMode(final SignalBoxIcons icon, final int id, final PathwayModeType type,
             final int depth) {
-        this((_u) -> ((info, c) -> info.drawTexture(icon.getResourceLocation(),
-                UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, icon.getX(id), 0,
-                icon.getMX(id), 1)), type, (_u) -> depth);
+        this((_u,
+                set) -> ((info, c) -> info.drawTexture(getLocFromProfileAndIcon(icon, set),
+                        UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
+                        icon.getX(id), 0, icon.getMX(id), 1)),
+                type, (_u) -> depth);
     }
 
     private EnumGuiMode(final SignalBoxIcons icon, final int id, final PathwayModeType type,
             final Function<SignalState, Integer> depthFunc) {
-        this((state) -> {
+        this((state, set) -> {
             final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> info.drawTexture(icon.getResourceLocation(),
+            return (info, c) -> info.drawTexture(getLocFromProfileAndIcon(icon, set),
                     UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
                     icon.getX(id + factor), 0, icon.getMX(id + factor), 1);
         }, type, depthFunc);
@@ -80,9 +84,9 @@ public enum EnumGuiMode {
 
     private EnumGuiMode(final SignalBoxIcons icon, final int id, final boolean unused,
             final PathwayModeType type, final int depth) {
-        this((state) -> {
+        this((state, set) -> {
             final int factor = state.ordinal() < 3 ? (state.ordinal() * 3) : (6 + state.ordinal());
-            return (info, c) -> info.drawTexture(icon.getResourceLocation(),
+            return (info, c) -> info.drawTexture(getLocFromProfileAndIcon(icon, set),
                     UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH,
                     icon.getX(id + factor), 0, icon.getMX(id + factor), 1);
         }, type, (_u) -> depth);
@@ -98,7 +102,7 @@ public enum EnumGuiMode {
 
     private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth,
             final int color, final int width) {
-        this((_u) -> {
+        this((_u, _u2) -> {
             float[] currentArray = Arrays.copyOf(array, array.length);
             for (int i = 0; i < array.length; i++) {
                 currentArray[i] *= UISignalBoxRendering.TILE_WIDTH;
@@ -110,13 +114,14 @@ public enum EnumGuiMode {
 
     private EnumGuiMode(final ResourceLocation location, final PathwayModeType type,
             final int depth) {
-        this.consumer = (state) -> ((info, color) -> info.drawTexture(location,
+        this.consumer = (state, set) -> ((info, color) -> info.drawTexture(location,
                 UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, 0, 0, 1, 1));
         this.type = type;
         this.depthFunc = (_u) -> depth;
     }
 
-    private EnumGuiMode(final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer,
+    private EnumGuiMode(
+            final BiFunction<SignalState, TextureSettings, BiConsumer<DrawInfo, Integer>> consumer,
             final PathwayModeType type, final Function<SignalState, Integer> depthFunc) {
         this.consumer = consumer;
         this.type = type;
@@ -139,5 +144,14 @@ public enum EnumGuiMode {
         if (!(this.equals(STRAIGHT) || this.equals(BUE)))
             return rot;
         return Rotation.values()[rot.ordinal() % 2];
+    }
+
+    private static ResourceLocation getLocFromProfileAndIcon(final SignalBoxIcons icon,
+            final TextureSettings set) {
+        if (icon.equals(SignalBoxIcons.SIGNALS))
+            return set.getSignalsLoc();
+        if (icon.equals(SignalBoxIcons.SIGNS))
+            return set.getSignsLoc();
+        return icon.getResourceLocation();
     }
 }
