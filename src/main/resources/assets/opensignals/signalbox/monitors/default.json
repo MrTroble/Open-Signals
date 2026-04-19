@@ -1,0 +1,9 @@
+{
+    "monitors": [
+        {
+            "name": "monitor",
+            "maxX": 5,
+            "maxY": 5
+        }
+    ]
+}
