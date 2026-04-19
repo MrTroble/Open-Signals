@@ -9,7 +9,6 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.GhostBlock;
-import com.troblecodings.signals.blocks.Monitor;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.PostConnectable;
@@ -19,6 +18,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.TrainNumberBlock;
+import com.troblecodings.signals.contentpacks.MonitorBlockParser;
 import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
 import com.troblecodings.signals.core.SignalLoader;
 
@@ -47,7 +47,6 @@ public final class OSBlocks {
     public static final PathwayRequester PATHWAY_REQUESTER = new PathwayRequester();
     public static final TrainNumberBlock TRAIN_NUMBER_BLOCK = new TrainNumberBlock();
     public static final PostConnectable POST_CONNECTABLE = new PostConnectable();
-    public static final Monitor MONITOR = new Monitor();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
@@ -72,6 +71,7 @@ public final class OSBlocks {
         SignalLoader.loadAllSignals();
         BasicBlock.prepare();
         SignalBridgeBlockParser.loadSignalBridgeBlocks();
+        MonitorBlockParser.loadMonitorBlocks();
     }
 
     public static void loadBlock(final BasicBlock block, final String pName) {

@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.enums.SignalBoxIcons;
 
 import net.minecraft.resources.ResourceLocation;
 
@@ -68,7 +69,7 @@ public class UISignalBoxProfile {
 
     public static void loadSignalBoxUIProfiles() {
         UI_PROFILES.add(DEFAULT);
-        OpenSignalsMain.contentPacks.getFiles("signalbox").forEach(entry -> UI_PROFILES
+        OpenSignalsMain.contentPacks.getFiles("signalbox/profiles").forEach(entry -> UI_PROFILES
                 .add(GSON.fromJson(entry.getValue(), UISignalBoxProfile.class)));
     }
 
@@ -154,8 +155,8 @@ public class UISignalBoxProfile {
 
     public static class TextureSettings {
 
-        private String signsTexturePath = "gui/textures/symbols.png";
-        private String signalsTexturePath = "gui/textures/signals.png";
+        private String signsTexturePath = SignalBoxIcons.SIGNS.getResourceLocation().getPath();
+        private String signalsTexturePath = SignalBoxIcons.SIGNALS.getResourceLocation().getPath();
 
         private transient ResourceLocation signsLoc;
         private transient ResourceLocation signalsLoc;
