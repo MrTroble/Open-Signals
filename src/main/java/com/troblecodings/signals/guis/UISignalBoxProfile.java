@@ -153,21 +153,29 @@ public class UISignalBoxProfile {
     }
 
     public static class TextureSettings {
-        // TODO Integrate in system
 
-        private String iconsTexturePath = "gui/textures/symbols.png";
+        private String signsTexturePath = "gui/textures/symbols.png";
         private String signalsTexturePath = "gui/textures/signals.png";
 
-        private transient final ResourceLocation iconsLoc =
-                new ResourceLocation(OpenSignalsMain.MODID, iconsTexturePath);
-        private transient final ResourceLocation signalsLoc =
-                new ResourceLocation(OpenSignalsMain.MODID, signalsTexturePath);
+        private transient ResourceLocation signsLoc;
+        private transient ResourceLocation signalsLoc;
 
-        public ResourceLocation getIconsLoc() {
-            return iconsLoc;
+        private void generateLocs() {
+            signsLoc = new ResourceLocation(OpenSignalsMain.MODID, signsTexturePath);
+            signalsLoc = new ResourceLocation(OpenSignalsMain.MODID, signalsTexturePath);
+        }
+
+        public ResourceLocation getSignsLoc() {
+            if (signsLoc == null) {
+                generateLocs();
+            }
+            return signsLoc;
         }
 
         public ResourceLocation getSignalsLoc() {
+            if (signalsLoc == null) {
+                generateLocs();
+            }
             return signalsLoc;
         }
 
