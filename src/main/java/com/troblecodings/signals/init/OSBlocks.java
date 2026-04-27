@@ -69,9 +69,9 @@ public final class OSBlocks {
         }
         OSItems.init();
         SignalLoader.loadAllSignals();
-        BasicBlock.prepare();
         SignalBridgeBlockParser.loadSignalBridgeBlocks();
         MonitorBlockParser.loadMonitorBlocks();
+        BasicBlock.prepare();
     }
 
     public static void loadBlock(final BasicBlock block, final String pName) {

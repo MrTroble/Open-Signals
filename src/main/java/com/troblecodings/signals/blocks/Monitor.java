@@ -35,16 +35,20 @@ public class Monitor extends BasicBlock {
     public static final BooleanProperty DOWN = BooleanProperty.create("down");
 
     private final MonitorBlockProperties prop;
-    private final int id;
+    private final MonitorTEBlock teMonitor;
+    private int id = -1;
 
-    public Monitor(final MonitorBlockProperties prop) {
+    public Monitor(final MonitorBlockProperties prop, final MonitorTEBlock teMonitor) {
         super(Properties.of(Material.STONE));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH)
                 .setValue(LEFT, Boolean.valueOf(false)).setValue(RIGHT, Boolean.valueOf(false))
                 .setValue(UP, Boolean.valueOf(false)).setValue(DOWN, Boolean.valueOf(false)));
+        this.prop = prop;
+        this.teMonitor = teMonitor;
+        if (this instanceof MonitorTEBlock)
+            return;
         this.id = MONITORS.size();
         MONITORS.add(this);
-        this.prop = prop;
     }
 
     @Override
@@ -144,15 +148,12 @@ public class Monitor extends BasicBlock {
         final BlockState lowerState = getter.getBlockState(lowerPos);
         final Block lowerBlock = lowerState.getBlock();
         if (lowerBlock instanceof Monitor)
-            return Shapes.create(lowerBlock.getShape(lowerState, getter, lowerPos, context)
-                    .move(0, -1, 0).bounds().expandTowards(0, 1, 0));
+            return lowerBlock.getShape(lowerState, getter, lowerPos, context).move(0, -1, 0);
         final BlockPos leftPos = pos.west();
         final BlockState leftState = getter.getBlockState(leftPos);
         final Block leftBlock = leftState.getBlock();
         if (leftBlock instanceof Monitor)
-            return Shapes.create(leftBlock.getShape(leftState, getter, leftPos, context)
-                    .move(-1, 0, 0).bounds().expandTowards(1, 0, 0));
-        // TODO Maby get size from TE for correct shape?
+            return leftBlock.getShape(leftState, getter, leftPos, context).move(-1, 0, 0);
         return Shapes.block();
     }
 
@@ -165,6 +166,10 @@ public class Monitor extends BasicBlock {
     @Override
     public boolean shouldHaveItem() {
         return false;
+    }
+
+    public MonitorTEBlock getTileEntityMonitorBlock() {
+        return teMonitor;
     }
 
     public MonitorBlockProperties getMonitorProperties() {

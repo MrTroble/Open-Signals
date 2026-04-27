@@ -28,6 +28,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -44,6 +45,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     private static final String START_POINT = "startPoint";
     private static final String END_POINT = "endPoint";
     private static final String PATH_TYPE = "pathType";
+    private static final String SIGNALBOX_UI_PROFILE = "signalBoxUIProfile";
 
     private static final int MAX_COUNTS = 9999;
 
@@ -53,6 +55,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
     protected SignalBoxTileEntity tile;
+    protected UISignalBoxProfile uiProfile = UISignalBoxProfile.DEFAULT;
     private int counter;
 
     public SignalBoxGrid() {
@@ -351,6 +354,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                     return nodeTag;
                 })::iterator);
         tag.putInteger(SUBSIDIARY_COUNTER, counter);
+        tag.putString(SIGNALBOX_UI_PROFILE, uiProfile.getName());
     }
 
     public void writePathways(final NBTWrapper tag) {
@@ -394,6 +398,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             });
         });
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
+        uiProfile = UISignalBoxProfile.NAME_FOR_PROFILE
+                .getOrDefault(tag.getString(SIGNALBOX_UI_PROFILE), UISignalBoxProfile.DEFAULT);
     }
 
     public void readPathways(final NBTWrapper tag) {
@@ -521,8 +527,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             return null;
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
-        final EnumPathUsage usage = entry.getEntry(PathEntryType.PATHUSAGE)
-                .orElse(EnumPathUsage.FREE);
+        final EnumPathUsage usage =
+                entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
         if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
             return null;
         if (state) {
@@ -535,6 +541,10 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
 
     public List<Point> getAllPoints() {
         return ImmutableList.copyOf(modeGrid.keySet());
+    }
+
+    public UISignalBoxProfile getUIProfile() {
+        return uiProfile;
     }
 
     public void sendDebugPointUpdates(final List<Point> points) {

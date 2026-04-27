@@ -1,7 +1,9 @@
 package com.troblecodings.signals.guis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import com.google.gson.Gson;
@@ -14,14 +16,26 @@ import net.minecraft.resources.ResourceLocation;
 public class UISignalBoxProfile {
 
     public static final UISignalBoxProfile DEFAULT = getDefaultProfile();
+    public static final Map<String, UISignalBoxProfile> NAME_FOR_PROFILE = new HashMap<>();
     public static final List<UISignalBoxProfile> UI_PROFILES = new ArrayList<>();
     private static final Gson GSON = new Gson();
 
+    private int id;
     private String name;
     private int backgroundColor = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     private EditorModeSettings editorSettings = new EditorModeSettings();
     private OperationModeSettings operationSettings = new OperationModeSettings();
     private TextureSettings textureSettings = new TextureSettings();
+
+    public void initializeData() {
+        this.id = UI_PROFILES.size();
+        UI_PROFILES.add(this);
+        NAME_FOR_PROFILE.put(name, this);
+    }
+
+    public int getID() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -68,9 +82,9 @@ public class UISignalBoxProfile {
     }
 
     public static void loadSignalBoxUIProfiles() {
-        UI_PROFILES.add(DEFAULT);
-        OpenSignalsMain.contentPacks.getFiles("signalbox/profiles").forEach(entry -> UI_PROFILES
-                .add(GSON.fromJson(entry.getValue(), UISignalBoxProfile.class)));
+        DEFAULT.initializeData();
+        OpenSignalsMain.contentPacks.getFiles("signalbox/profiles").forEach(entry -> GSON
+                .fromJson(entry.getValue(), UISignalBoxProfile.class).initializeData());
     }
 
     private static UISignalBoxProfile getDefaultProfile() {

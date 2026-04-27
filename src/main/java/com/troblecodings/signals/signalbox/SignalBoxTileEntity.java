@@ -35,8 +35,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     private final SignalBoxGrid grid;
     private String signalBoxUIProfile = UISignalBoxProfile.DEFAULT.getName();
 
-    private static final String SIGNALBOX_UI_PROFILE = "signalBoxUIProfile";
-
     public SignalBoxTileEntity(final TileEntityInfo info) {
         super(info);
         grid = SignalBoxFactory.getFactory().getGrid();
@@ -55,7 +53,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid.writePathways(wrapper);
         SignalBoxHandler.writeTileNBT(new StateInfo(level, worldPosition), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
-        wrapper.putString(SIGNALBOX_UI_PROFILE, signalBoxUIProfile);
     }
 
     private NBTWrapper copy = null;
@@ -69,7 +66,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (level != null) {
             onLoad();
         }
-        signalBoxUIProfile = wrapper.getString(SIGNALBOX_UI_PROFILE);
     }
 
     @Override
