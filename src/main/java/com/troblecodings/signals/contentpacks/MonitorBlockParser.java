@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Monitor;
+import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.core.MonitorBlockProperties;
 import com.troblecodings.signals.init.OSBlocks;
 
@@ -20,8 +21,10 @@ public class MonitorBlockParser {
             final MonitorBlockParser monitors =
                     GSON.fromJson(entry.getValue(), MonitorBlockParser.class);
             for (final MonitorBlockProperties props : monitors.monitors) {
-                final Monitor monitor = new Monitor(props);
+                final MonitorTEBlock monitorTE = new MonitorTEBlock(props);
+                final Monitor monitor = new Monitor(props, monitorTE);
                 OSBlocks.loadBlock(monitor, props.getName());
+                OSBlocks.loadBlock(monitorTE, props.getName() + ".tile");
             }
         });
     }

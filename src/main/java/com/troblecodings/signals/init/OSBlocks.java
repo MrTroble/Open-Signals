@@ -72,6 +72,7 @@ public final class OSBlocks {
         SignalLoader.loadAllSignals();
         SignalBridgeBlockParser.loadSignalBridgeBlocks();
         MonitorBlockParser.loadMonitorBlocks();
+        BasicBlock.prepare();
     }
 
     @SuppressWarnings("deprecation")

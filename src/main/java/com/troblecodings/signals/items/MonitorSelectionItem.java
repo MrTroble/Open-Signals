@@ -9,6 +9,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Monitor;
 import com.troblecodings.signals.guis.ContainerMonitorSelection;
 import com.troblecodings.signals.init.OSTabs;
+import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,6 +49,9 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
         final List<BlockPos> allMonitorPos = getMonitorPos(context.getClickedPos().above(),
                 context.getHorizontalDirection().getOpposite(), sizeX, sizeY);
 
+        if (allMonitorPos.isEmpty())
+            return InteractionResult.CONSUME;
+
         for (final BlockPos pos : allMonitorPos) {
             if (!worldIn.isEmptyBlock(pos)) {
                 if (!worldIn.isClientSide) {
@@ -55,8 +59,15 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
                 }
             }
         }
+        final BlockPlaceContext placeContext = new BlockPlaceContext(context);
+        final BlockPos firstPos = allMonitorPos.remove(0);
+        worldIn.setBlock(firstPos,
+                monitor.getTileEntityMonitorBlock().getStateForPlacement(placeContext), 3);
+        final MonitorTileEntity tile = (MonitorTileEntity) worldIn.getBlockEntity(firstPos);
+        tile.loadFromItem(sizeX, sizeY);
+
         for (final BlockPos pos : allMonitorPos) {
-            worldIn.setBlock(pos, monitor.getStateForPlacement(new BlockPlaceContext(context)), 3);
+            worldIn.setBlock(pos, monitor.getStateForPlacement(placeContext), 3);
         }
         return InteractionResult.SUCCESS;
     }

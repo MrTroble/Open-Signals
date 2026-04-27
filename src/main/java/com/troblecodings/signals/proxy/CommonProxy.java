@@ -7,6 +7,7 @@ import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Monitor;
+import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
@@ -18,6 +19,7 @@ import com.troblecodings.signals.contentpacks.OneSignalNonPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
+import com.troblecodings.signals.guis.ContainerMonitor;
 import com.troblecodings.signals.guis.ContainerMonitorSelection;
 import com.troblecodings.signals.guis.ContainerPathwayRequester;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
@@ -58,6 +60,7 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(TrainNumberBlock.class, ContainerTrainNumber::new);
         OpenSignalsMain.handler.addServer(SignalBridgeBasicBlock.class, ContainerSignalBridge::new);
         OpenSignalsMain.handler.addServer(Monitor.class, ContainerMonitorSelection::new);
+        OpenSignalsMain.handler.addServer(MonitorTEBlock.class, ContainerMonitor::new);
     }
 
     public void init(final FMLInitializationEvent event) {

@@ -2,13 +2,13 @@ package com.troblecodings.signals.guis;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.TriConsumer;
 import org.lwjgl.opengl.GL11;
@@ -84,24 +84,23 @@ public class UISignalBoxRendering extends UIComponent {
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final UISignalBoxProfile profile,
             final UIBorderSettings settings, final SignalBoxConsumer consumer,
-            final UIEntity gridParent) {
+            final UIEntity gridParent, final Map<Point, SignalBoxNode> nodes) {
         this.settings = settings;
         this.profile = profile;
         this.consumer = consumer;
         this.gridParent = gridParent;
         gridRender = Maps.newHashMap();
         nodeLabeling = Maps.newHashMap();
-        final List<SignalBoxNode> nodes = grid.getNodes();
         nodes.forEach(this::addNode);
     }
 
-    private void addNode(final SignalBoxNode node) {
+    private void addNode(final Point point, final SignalBoxNode node) {
         final Map<ModeSet, ModeRenderInfo> modesets =
-                gridRender.computeIfAbsent(node.getPoint(), k -> Maps.newHashMap());
+                gridRender.computeIfAbsent(point, k -> Maps.newHashMap());
         node.forEach(modeSet -> modesets.put(modeSet, new ModeRenderInfo(modeSet.mode,
                 node.getState(modeSet), profile.getTextureSettings())));
-        gridRender.put(node.getPoint(), modesets);
-        nodeLabeling.put(node.getPoint(), node.getCustomText());
+        gridRender.put(point, modesets);
+        nodeLabeling.put(point, node.getCustomText());
     }
 
     public void updateNodeLabeling(final Point point, final String labeling) {
@@ -182,6 +181,10 @@ public class UISignalBoxRendering extends UIComponent {
 
     public void removeColoredPoint(final int c, final Point point) {
         additionalPoints.remove(new ColorPoint(point, c));
+    }
+
+    public void clearColoredPoints() {
+        additionalPoints.clear();
     }
 
     @Override
@@ -282,6 +285,13 @@ public class UISignalBoxRendering extends UIComponent {
     public static BoxEntity createSignalBoxEntity(final SignalBoxGrid sigGrid,
             final UISignalBoxProfile profile, final UIBorderSettings settings,
             final SignalBoxConsumer consumer) {
+        return createSignalBoxEntity(sigGrid, profile, settings, consumer, sigGrid.getNodes()
+                .stream().collect(Collectors.toMap(node -> node.getPoint(), node -> node)));
+    }
+
+    public static BoxEntity createSignalBoxEntity(final SignalBoxGrid sigGrid,
+            final UISignalBoxProfile profile, final UIBorderSettings settings,
+            final SignalBoxConsumer consumer, final Map<Point, SignalBoxNode> nodes) {
         final UIEntity grid = new UIEntity();
         grid.setInherits(true);
         grid.add(new UIColor(profile.getBackgroundColor()));
@@ -292,7 +302,7 @@ public class UISignalBoxRendering extends UIComponent {
         entity.setWidth(TILE_WIDTH * TILE_COUNT);
         entity.setHeight(entity.getHeight());
         final UISignalBoxRendering rendering =
-                new UISignalBoxRendering(sigGrid, profile, settings, consumer, grid);
+                new UISignalBoxRendering(sigGrid, profile, settings, consumer, grid, nodes);
         entity.add(rendering);
 
         grid.add(new UIScroll(s -> {
