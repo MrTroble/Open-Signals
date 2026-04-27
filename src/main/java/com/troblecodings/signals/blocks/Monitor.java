@@ -8,6 +8,7 @@ import com.troblecodings.signals.core.MonitorBlockProperties;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -53,7 +54,7 @@ public class Monitor extends BasicBlock {
 
     @Override
     public BlockState getStateForPlacement(final BlockPlaceContext ctx) {
-        Direction direction = ctx.getHorizontalDirection().getOpposite();
+        final Direction direction = ctx.getHorizontalDirection().getOpposite();
         BlockState state = defaultBlockState();
         switch (direction) {
             case EAST:
@@ -144,17 +145,37 @@ public class Monitor extends BasicBlock {
     @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
             final CollisionContext context) {
-        final BlockPos lowerPos = pos.below();
-        final BlockState lowerState = getter.getBlockState(lowerPos);
-        final Block lowerBlock = lowerState.getBlock();
-        if (lowerBlock instanceof Monitor)
-            return lowerBlock.getShape(lowerState, getter, lowerPos, context).move(0, -1, 0);
-        final BlockPos leftPos = pos.west();
-        final BlockState leftState = getter.getBlockState(leftPos);
-        final Block leftBlock = leftState.getBlock();
-        if (leftBlock instanceof Monitor)
-            return leftBlock.getShape(leftState, getter, leftPos, context).move(-1, 0, 0);
+        final BlockPos downPos = pos.below();
+        final BlockState downState = getter.getBlockState(downPos);
+        final Block downBlock = downState.getBlock();
+        if (downBlock instanceof Monitor)
+            return downBlock.getShape(downState, getter, downPos, context).move(0, -1, 0);
+
+        final BlockPos nextPos = getLeftPos(state, pos);
+        final Vec3i relative = nextPos.subtract(pos);
+        final BlockState nextState = getter.getBlockState(nextPos);
+        final Block nextBlock = nextState.getBlock();
+        if (!relative.equals(BlockPos.ZERO) && nextBlock instanceof Monitor)
+            return nextBlock.getShape(nextState, getter, nextPos, context).move(relative.getX(),
+                    relative.getY(), relative.getZ());
         return Shapes.block();
+    }
+
+    private static BlockPos getLeftPos(final BlockState state, final BlockPos pos) {
+        if (!(state.getBlock() instanceof Monitor) || !state.getValue(LEFT))
+            return pos;
+        Direction dir = state.getValue(FACING);
+        switch (dir) {
+            case EAST:
+                return pos.south();
+            case SOUTH:
+                return pos.west();
+            case WEST:
+                return pos.north();
+            case NORTH:
+            default:
+                return pos.east();
+        }
     }
 
     @Override

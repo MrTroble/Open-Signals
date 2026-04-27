@@ -3,7 +3,8 @@
         {
             "name": "monitor",
             "maxX": 5,
-            "maxY": 5
+            "maxY": 5,
+            "insets": 12
         }
     ]
 }
