@@ -2,7 +2,6 @@ package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
@@ -17,6 +16,7 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -31,6 +31,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class MonitorTEBlock extends Monitor {
 
     public static final TileEntitySupplierWrapper SUPPLIER = MonitorTileEntity::new;
+    public static final float STEPS_PER_BLOCK = 100;
 
     public MonitorTEBlock(final MonitorBlockProperties prop) {
         super(prop, null);
@@ -42,8 +43,10 @@ public class MonitorTEBlock extends Monitor {
         final MonitorTileEntity tile = (MonitorTileEntity) getter.getBlockEntity(pos);
         if (tile == null)
             return Shapes.block();
-        return Shapes.create(Shapes.block().bounds().expandTowards(tile.getMonitorSizeX() - 1,
-                tile.getMonitorSizeY() - 1, 0));
+        final Direction direction = state.getValue(FACING).getCounterClockWise();
+        return Shapes.create(Shapes.block().bounds().expandTowards(
+                direction.getStepX() * (tile.getMonitorSizeX() - 1), tile.getMonitorSizeY() - 1,
+                direction.getStepZ() * (tile.getMonitorSizeX() - 1)));
     }
 
     public void render(final RenderAnimationInfo info, final MonitorTileEntity tile,
@@ -52,18 +55,38 @@ public class MonitorTEBlock extends Monitor {
         final float monitorSizeY = tile.getMonitorSizeY();
         final float renderSizeX = tile.getRenderEnd().getX() - tile.getRenderStart().getX() + 1f;
         final float renderSizeY = tile.getRenderEnd().getY() - tile.getRenderStart().getY() + 1f;
+
         final DrawInfo drawInfo = new DrawInfo(info.stack);
         drawInfo.push();
-        RenderSystem.depthMask(true);
         drawInfo.alphaOn();
         drawInfo.blendOn();
         drawInfo.depthOff();
         drawInfo.applyColor();
 
-        final float stepsPerBlock = 100;
+        final float insets = getMonitorProperties().getInsets();
+        final float colorInsets = insets / STEPS_PER_BLOCK;
 
-        final float insets = 12;
-        final float colorInsets = insets / stepsPerBlock;
+        final BlockState state = tile.getBlockState();
+        final Direction direction = state.getValue(FACING);
+        switch (direction) {
+            case DOWN:
+            case UP:
+            case NORTH:
+                break;
+            case EAST:
+                drawInfo.translate(0, 0, -0.5f);
+                drawInfo.rotate(0, UIRotate.PERPENDICULAR_ANGLE, 0);
+                break;
+            case SOUTH:
+                drawInfo.translate(0.5f, 0, 0.5f);
+                drawInfo.rotate(0, 2 * UIRotate.PERPENDICULAR_ANGLE, 0);
+                drawInfo.translate(-0.5f, 0, -0.5f);
+                break;
+            case WEST:
+                drawInfo.rotate(0, 3 * UIRotate.PERPENDICULAR_ANGLE, 0);
+                break;
+        }
+
         drawInfo.push();
         drawInfo.depthOn();
         drawInfo.translate(-monitorSizeX + 1, 0, -0.001f);
@@ -77,16 +100,17 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.translate(1, 1.05f * monitorSizeY, 0);
         drawInfo.rotate(0, 0, 2 * UIRotate.PERPENDICULAR_ANGLE);
 
-        drawInfo.scale(1 / stepsPerBlock, 1 / stepsPerBlock, 1 / stepsPerBlock);
+        drawInfo.scale(1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK);
         drawInfo.translate(insets, insets, -0.35f);
 
-        final float maxSizeX = monitorSizeX * stepsPerBlock - 2 * insets;
-        final float maxSizeY = monitorSizeY * stepsPerBlock - 2 * insets;
+        final float maxSizeX = monitorSizeX * STEPS_PER_BLOCK - 2 * insets;
+        final float maxSizeY = monitorSizeY * STEPS_PER_BLOCK - 2 * insets;
         drawInfo.scale(maxSizeX / (renderSizeX * UISignalBoxRendering.TILE_WIDTH),
                 maxSizeY / (renderSizeY * UISignalBoxRendering.TILE_WIDTH), 1);
 
         drawInfo.scale(1, 1, -0.1f);
         rendering.draw(drawInfo);
+
         drawInfo.blendOff();
         drawInfo.depthOff();
         drawInfo.alphaOff();
