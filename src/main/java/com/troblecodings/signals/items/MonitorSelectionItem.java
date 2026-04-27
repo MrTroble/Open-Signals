@@ -57,6 +57,7 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
                 if (!worldIn.isClientSide) {
                     translateMessageWrapper(player, "pt.blockinway");
                 }
+                return InteractionResult.FAIL;
             }
         }
         final BlockPlaceContext placeContext = new BlockPlaceContext(context);
