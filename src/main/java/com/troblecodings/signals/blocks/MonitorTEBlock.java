@@ -66,27 +66,7 @@ public class MonitorTEBlock extends Monitor {
         final float insets = getMonitorProperties().getInsets();
         final float colorInsets = insets / STEPS_PER_BLOCK;
 
-        final BlockState state = tile.getBlockState();
-        final Direction direction = state.getValue(FACING);
-        switch (direction) {
-            case DOWN:
-            case UP:
-            case NORTH:
-                break;
-            case EAST:
-                drawInfo.translate(0, 0, -0.5f);
-                drawInfo.rotate(0, UIRotate.PERPENDICULAR_ANGLE, 0);
-                break;
-            case SOUTH:
-                drawInfo.translate(0.5f, 0, 0.5f);
-                drawInfo.rotate(0, 2 * UIRotate.PERPENDICULAR_ANGLE, 0);
-                drawInfo.translate(-0.5f, 0, -0.5f);
-                break;
-            case WEST:
-                drawInfo.rotate(0, 3 * UIRotate.PERPENDICULAR_ANGLE, 0);
-                break;
-        }
-
+        rotate(drawInfo, tile);
         drawInfo.push();
         drawInfo.depthOn();
         drawInfo.translate(-monitorSizeX + 1, 0, -0.001f);
@@ -115,6 +95,30 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.depthOff();
         drawInfo.alphaOff();
         drawInfo.pop();
+    }
+
+    private static void rotate(final DrawInfo info, final MonitorTileEntity tile) {
+        final BlockState state = tile.getBlockState();
+        final Direction direction = state.getValue(FACING);
+        if (direction.equals(Direction.DOWN) || direction.equals(Direction.UP)
+                || direction.equals(Direction.NORTH))
+            return;
+
+        info.translate(0.5f, 0, 0.5f);
+        switch (direction) {
+            case EAST:
+                info.rotate(0, 3 * UIRotate.PERPENDICULAR_ANGLE, 0);
+                break;
+            case SOUTH:
+                info.rotate(0, 2 * UIRotate.PERPENDICULAR_ANGLE, 0);
+                break;
+            case WEST:
+                info.rotate(0, UIRotate.PERPENDICULAR_ANGLE, 0);
+                break;
+            default:
+                break;
+        }
+        info.translate(-0.5f, 0, -0.5f);
     }
 
     @Override
