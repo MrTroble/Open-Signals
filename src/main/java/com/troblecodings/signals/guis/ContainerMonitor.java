@@ -18,7 +18,7 @@ public class ContainerMonitor extends ContainerBase {
     protected SignalBoxGrid grid = new SignalBoxGrid();
     protected MonitorTileEntity tile;
     protected int monitorSizeX, monitorSizeY;
-    protected Point renderStart, renderEnd;
+    protected Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
 
     public ContainerMonitor(final GuiInfo info) {
         super(info);

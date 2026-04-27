@@ -22,7 +22,9 @@ public class GuiMonitor extends GuiBase {
 
     private final ContainerMonitor container;
     private final List<Point> selectedPoints = new ArrayList<>();
+    private UILabel ratioInfo;
     private BoxEntity box;
+    private float monitorRatio = 0;
 
     public GuiMonitor(final GuiInfo info) {
         super(info);
@@ -57,17 +59,38 @@ public class GuiMonitor extends GuiBase {
         boxEntity.add(mouseUpdate);
 
         upperEntity.add(GuiElements.createLabel(I18Wrapper.format("tile.monitor.name")));
-        upperEntity.add(GuiElements.createButton("new_section", 100, e -> {
+        upperEntity.add(GuiElements.createButton("new_section", 70, e -> {
             box.rendering.clearColoredPoints();
             selectedPoints.clear();
-            container.renderStart = null;
+            container.renderStart = new Point(-1, -1);
+            container.renderEnd = new Point(-1, -1);
+            ratioInfo.setText("Current Ratio:   :  ");
             mouseUpdate.enable();
         }));
+
+        final UIEntity ratioEntity = new UIEntity();
+        ratioEntity.setHeight(40);
+        ratioEntity.setWidth(100);
+        ratioEntity.add(new UIBox(UIBox.VBOX, 2));
+
+        ratioEntity.add(GuiElements.createLabel(
+                "Monitor Ratio: " + container.monitorSizeX + " : " + container.monitorSizeY));
+
+        final UIEntity currentRatio = GuiElements.createLabel(
+                "Current Ratio: " + (container.renderEnd.getX() - container.renderStart.getX())
+                        + " : " + (container.renderEnd.getY() - container.renderStart.getY()));
+        ratioInfo = currentRatio.findRecursive(UILabel.class).stream().findFirst()
+                .orElse(new UILabel(""));
+        ratioEntity.add(currentRatio);
+
+        upperEntity.add(ratioEntity);
+
         list.add(boxEntity);
     }
 
     private UIMouseUpdate getUserSelectionGrid(final BoxEntity box,
             final UISignalBoxProfile uiProfile) {
+        // TODO Maby possibility for max value?
         final int maxTileX = 10;
         final int maxTileY = 10;
         final int color = uiProfile.getOperationModeSettings().getUserSelectionColor();
@@ -75,15 +98,15 @@ public class GuiMonitor extends GuiBase {
             if (selectedPoints.contains(p))
                 return;
             final Point start = getStartPoint(p);
-            if (p.getX() < start.getX() || p.getY() < start.getY()
-                    || p.getX() >= start.getX() + maxTileX || p.getY() >= start.getY() + maxTileY)
+            final Point end = getEndPoint(p, container.renderEnd);
+            if (p.getX() < start.getX() || p.getY() < start.getY())
                 return;
 
             selectedPoints.add(p);
             box.rendering.addColoredPoint(color, p);
-            if (start.getX() != p.getX() && start.getY() != p.getY()) {
-                for (int i = start.getX(); i <= p.getX(); i++) {
-                    for (int j = start.getY(); j <= p.getY(); j++) {
+            if (start.getX() != p.getX() || start.getY() != p.getY()) {
+                for (int i = start.getX(); i <= end.getX(); i++) {
+                    for (int j = start.getY(); j <= end.getY(); j++) {
                         final Point newPoint = new Point(i, j);
                         if (!selectedPoints.contains(newPoint)) {
                             selectedPoints.add(newPoint);
@@ -92,15 +115,29 @@ public class GuiMonitor extends GuiBase {
                     }
                 }
             }
-            container.renderEnd = p;
+            updateRatioInfo(start, end);
+            container.renderEnd = end;
         }, () -> container.sendNewPointsToServer(), box.rendering);
     }
 
+    private void updateRatioInfo(final Point start, final Point end) {
+        final int distX = end.getX() - start.getX() + 1;
+        final int distY = end.getY() - start.getY() + 1;
+        final boolean isInRatio = ((float) distX / (float) distY) == monitorRatio;
+        ratioInfo.setText("Current Ratio: " + distX + " : " + distY);
+        ratioInfo.setTextColor(isInRatio ? 0xFF00FF00 : 0xFFFF0000);
+    }
+
     private Point getStartPoint(final Point defaultPoint) {
-        if (container.renderStart == null) {
+        if (container.renderStart == null || container.renderStart.equals(new Point(-1, -1))) {
             container.renderStart = defaultPoint;
         }
         return container.renderStart;
+    }
+
+    private Point getEndPoint(final Point currentSelect, final Point currentEnd) {
+        return new Point(Math.max(currentSelect.getX(), currentEnd.getX()),
+                Math.max(currentSelect.getY(), currentEnd.getY()));
     }
 
     private void addRenderSelection() {
@@ -119,6 +156,8 @@ public class GuiMonitor extends GuiBase {
                 box.rendering.addColoredPoint(color, new Point(i, j));
             }
         }
+        monitorRatio = (float) container.monitorSizeX / (float) container.monitorSizeY;
+        updateRatioInfo(renderStart, renderEnd);
     }
 
     @Override
