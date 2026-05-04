@@ -3,7 +3,6 @@ package com.troblecodings.signals.blocks;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,15 +116,14 @@ public class Signal extends BasicBlock {
     }
 
     private static int getIDFromName(final String name) {
-        final byte[] array = digest.digest(name.getBytes());
-        digest.reset();
-        int returnID = 0;
-        for (int i = 0; i < array.length / 4; i += 4) {
-            returnID ^= (array[i] << 24 | array[i + 1] << 16 | array[i + 2] << 8 | array[i + 3])
-                    + 0x9e3779b9 + (returnID << 6) + (returnID >> 2);
-        }
-        System.out.println("ID=" + returnID + ",NAME=" + name + ",BYTES=" + Arrays.toString(array));
-        return returnID;
+        /*
+         * final byte[] array = digest.digest(name.getBytes()); digest.reset(); int
+         * returnID = 0; for (int i = 0; i < array.length / 4; i += 4) { returnID ^=
+         * (array[i] << 24 | array[i + 1] << 16 | array[i + 2] << 8 | array[i + 3]) +
+         * 0x9e3779b9 + (returnID << 6) + (returnID >> 2); }
+         */
+        // TODO Fix the Hashing
+        return name.hashCode();
     }
 
     public static Signal getSignalByID(final int id) {
