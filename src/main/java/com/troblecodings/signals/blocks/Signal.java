@@ -146,7 +146,7 @@ public class Signal extends BasicBlock {
     public VoxelShape getShape(final BlockState state, final IBlockReader source,
             final BlockPos pos, final ISelectionContext context) {
         final TileEntity te = source.getBlockEntity(pos);
-        if (te == null || (!te instanceof SignalTileEntity))
+        if (te == null || !(te instanceof SignalTileEntity))
             return VoxelShapes.block();
         final World world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
