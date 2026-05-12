@@ -21,6 +21,7 @@ public class DebugOptionEntry extends PathOptionEntry {
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
         final Optional<T> entry = super.getEntry(type);
         if (entry.filter(n -> n.equals(EnumPathUsage.SELECTED)).isPresent()) {
+            return entry;
         }
         return entry;
     }
