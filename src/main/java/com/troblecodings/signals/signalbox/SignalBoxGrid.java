@@ -28,6 +28,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.guis.ContainerSignalBox;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;

@@ -366,10 +366,10 @@ public class PathwayData {
                     grid.getNode(firstPos.getPoint()).getOption(firstPos.getModeSet()).orElse(null);
             final List<ModeIdentifier> posIdents = getPreSignalData(entry, grid);
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
-                final PathOptionEntry vpEntry =
-                        grid.getNode(ident.getPoint()).getOption(ident.getModeSet())
-                                .orElse(SignalBoxFactory.getFactory().getEntry());
-                return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
+                final PathOptionEntry vpEntry = grid.getNode(ident.point).getOption(ident.mode)
+                        .orElse(new PathOptionEntry());
+                return new OtherSignalIdentifier(ident.point, ident.mode,
+                        vpEntry.getEntry(PathEntryType.SIGNAL).orElseGet(() -> null),
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
                         EnumGuiMode.VP, grid);
             }).filter(ident -> ident.pos != null).collect(Collectors.toList()));
@@ -388,7 +388,7 @@ public class PathwayData {
         final List<ModeIdentifier> idents =
                 signalOption.getEntry(PathEntryType.PRESIGNALS).orElseGet(() -> new ArrayList<>());
         if (idents.removeIf(ident -> !grid.getNodeChecked(ident.point)
-                .orElseGet(() -> new SignalBoxNode()).has(ident.mode))) {
+                .orElseGet(() -> new SignalBoxNode(grid.getNetwork())).has(ident.mode))) {
             signalOption.setEntry(PathEntryType.PRESIGNALS, idents);
         }
         return idents;

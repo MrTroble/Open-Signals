@@ -45,12 +45,12 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 
 public class SidePanel {
 
@@ -160,7 +160,7 @@ public class SidePanel {
         emergencyEntity.setWidth(20);
         emergencyEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
                 icons.getMX(iconId), 1));
-        emergencyEntity.add(new UIClickable(e -> gui.resetAllSignals()));
+        emergencyEntity.add(new UIClickable(e -> gui.network.sendResetAllSignals()));
         emergencyEntity.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
         list.add(emergencyEntity);
 
@@ -591,8 +591,12 @@ public class SidePanel {
                                                         }
                                                         gui.rendering.setColor(node.getPoint(),
                                                                 mode,
-                                                                !turnOff ? GuiSignalBox.OUTPUT_COLOR
-                                                                        : SignalBoxUtil.FREE_COLOR);
+                                                                !turnOff ? gui.profile
+                                                                        .getOperationModeSettings()
+                                                                        .getOutputColor()
+                                                                        : gui.profile
+                                                                                .getOperationModeSettings()
+                                                                                .getFreeColor());
                                                     }));
                                         }
                                         gui.pop();

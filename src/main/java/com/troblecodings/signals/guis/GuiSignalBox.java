@@ -44,6 +44,7 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.ShowTypes;
+import com.troblecodings.signals.enums.SignalBoxIcons;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
@@ -129,8 +130,8 @@ public class GuiSignalBox extends GuiBase {
             if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
                 return;
             node.getOption(modeSet).ifPresent(option -> {
-                final TrainNumber number = option.getEntry(PathEntryType.TRAINNUMBER)
-                        .orElse(TrainNumber.DEFAULT);
+                final TrainNumber number =
+                        option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
                 final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
                 if (number.trainNumber.isEmpty()) {
                     rendering.removeTrainNumber(modeIdent);
@@ -625,6 +626,11 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.setWidth(middlePart.getWidth() - 4);
     }
 
+    private void updateUIProfile(final int profileID) {
+        this.profile = UISignalBoxProfile.UI_PROFILES.get(profileID);
+        // TODO Sent to Server
+    }
+
     private void disableBottomEntity() {
         bottomEntity.clear();
         bottomEntity.setHeight(0);
@@ -699,7 +705,7 @@ public class GuiSignalBox extends GuiBase {
             node.getOption(ident.getMode()).ifPresent(poe -> {
                 rendering.setColor(node.getPoint(), ident.getMode(),
                         poe.getEntry(PathEntryType.PATHUSAGE).orElseGet(() -> EnumPathUsage.FREE)
-                                .getColor());
+                                .getColor(profile.getOperationModeSettings()));
             });
         });
     }
