@@ -15,6 +15,7 @@ import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -101,13 +102,20 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     @OnlyIn(Dist.CLIENT)
     @Override
     public void requestModelDataUpdate() {
-        final Map<SEProperty, String> newProperties = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> newProperties =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
         final boolean wasEmpty = properties.isEmpty();
         handler.updateStates(newProperties, wasEmpty);
         this.properties.clear();
         this.properties.putAll(newProperties);
         super.requestModelDataUpdate();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void updateAnimationState(final Map<SEProperty, String> properties,
+            final ChangedState state) {
+        handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
+                || state.equals(ChangedState.ADDED_TO_FILE));
     }
 
     @Override

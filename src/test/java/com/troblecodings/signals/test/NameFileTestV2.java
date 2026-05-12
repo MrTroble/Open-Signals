@@ -17,13 +17,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.handler.NameHandlerFile;
-import com.troblecodings.signals.handler.SignalStateFile;
-import com.troblecodings.signals.handler.SignalStatePos;
+import com.troblecodings.signals.handler.NameHandlerFileV2;
+import com.troblecodings.signals.handler.SignalStatePosV2;
 
 import net.minecraft.core.BlockPos;
 
-public class NameFileTest {
+public class NameFileTestV2 {
 
     private static Path path = null;
 
@@ -56,10 +55,10 @@ public class NameFileTest {
 
     @Test
     public void testWriteAndRead() {
-        final BlockPos pos = GIRSyncEntryTests.randomBlockPos();
+        final BlockPos pos = StateFileTestV2.getRandomBlockPos();
         final String name = "wdasdfdgsddfwadsdf";
-        final NameHandlerFile file = new NameHandlerFile(path);
-        final SignalStatePos statePos = file.createState(pos, name);
+        final NameHandlerFileV2 file = new NameHandlerFileV2(path);
+        final SignalStatePosV2 statePos = file.createState(pos, name);
 
         final String nameInFile = file.getString(statePos);
         assertEquals(name, nameInFile);
@@ -69,7 +68,7 @@ public class NameFileTest {
         file.deleteIndex(pos);
 
         assertNull(file.find(pos));
-        final SignalStatePos statePos2 = file.createState(pos, name);
+        final SignalStatePosV2 statePos2 = file.createState(pos, name);
         final String nameInFile2 = file.getString(statePos2);
         assertEquals(name, nameInFile2);
 
@@ -78,31 +77,31 @@ public class NameFileTest {
 
     @Test
     public void testException() {
-        final NameHandlerFile file = new NameHandlerFile(path);
+        final NameHandlerFileV2 file = new NameHandlerFileV2(path);
         String str = "";
         for (int i = 0; i < 129; i++) {
             str += "A";
         }
         final String s = str;
         assertThrowsExactly(IllegalArgumentException.class,
-                () -> file.createState(GIRSyncEntryTests.randomBlockPos(), s));
+                () -> file.createState(StateFileTestV2.getRandomBlockPos(), s));
     }
 
     @Test
     public void moreThanPossible() {
-        final NameHandlerFile file = new NameHandlerFile(path);
+        final NameHandlerFileV2 file = new NameHandlerFileV2(path);
         final Map<BlockPos, String> allNames = new HashMap<>();
-        final List<Map.Entry<BlockPos, SignalStatePos>> listOfPos = new ArrayList<>();
+        final List<Map.Entry<BlockPos, SignalStatePosV2>> listOfPos = new ArrayList<>();
         String testString = "";
-        for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 10; i++) {
+        for (int i = 0; i < 5000; i++) {
             testString = "test_" + String.valueOf(i);
-            final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
-            final SignalStatePos pos = file.createState(firstcreate, testString);
+            final BlockPos firstcreate = StateFileTestV2.getRandomBlockPos();
+            final SignalStatePosV2 pos = file.createState(firstcreate, testString);
             listOfPos.add(Map.entry(firstcreate, pos));
             allNames.put(firstcreate, testString);
         }
-        for (int i = 0; i < listOfPos.size() / 1000; i++) {
-            final Map.Entry<BlockPos, SignalStatePos> entry = listOfPos.get(i);
+        for (int i = 0; i < listOfPos.size(); i++) {
+            final Map.Entry<BlockPos, SignalStatePosV2> entry = listOfPos.get(i);
             assertEquals(entry.getValue(), file.find(entry.getKey()));
             assertEquals(allNames.get(entry.getKey()), file.getString(entry.getValue()));
         }

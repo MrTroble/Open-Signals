@@ -27,18 +27,21 @@ public class ClientNameHandler implements INetworkSync {
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getInstance();
-        final BlockPos pos = buffer.getBlockPos();
-        final boolean removed = buffer.getBoolean();
-        if (removed) {
-            setRemoved(pos);
-            return;
-        }
-        final String name = buffer.getString();
-        synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.put(new StateInfo(mc.level, pos), name);
-        }
-        final ClientLevel world = mc.level;
         mc.doRunTask(() -> {
+            final BlockPos pos = buffer.getBlockPos();
+            final ClientLevel world = mc.level;
+            final StateInfo info = new StateInfo(world, pos);
+            final boolean removed = buffer.getBoolean();
+            if (removed) {
+                setRemoved(info);
+                return;
+            }
+            final String name = buffer.getString();
+            synchronized (CLIENT_NAMES) {
+                CLIENT_NAMES.put(info, name);
+            }
+            if (world == null)
+                return;
             final BlockState state = world.getBlockState(pos);
             if (state == null)
                 return;
@@ -47,10 +50,9 @@ public class ClientNameHandler implements INetworkSync {
         });
     }
 
-    private static void setRemoved(final BlockPos pos) {
-        final Minecraft mc = Minecraft.getInstance();
+    private static void setRemoved(final StateInfo info) {
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.remove(new StateInfo(mc.level, pos));
+            CLIENT_NAMES.remove(info);
         }
     }
 

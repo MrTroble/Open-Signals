@@ -13,9 +13,11 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
+import com.troblecodings.signals.network.PathOptionEntryNetwork;
 
 public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
+    private PathOptionEntryNetwork network = new PathOptionEntryNetwork();
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -31,17 +33,38 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
             pathEntrys.remove(type);
             return;
         }
-        final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
-                pType -> pType.newValue());
+        final IPathEntry<T> pathEntry =
+                (IPathEntry<T>) pathEntrys.computeIfAbsent(type, pType -> pType.newValue());
+        final T oldValue = pathEntry.getValue();
         pathEntry.setValue(value);
+        if (!value.equals(oldValue)) {
+            network.sendEntryAdd(type, pathEntry);
+        }
+    }
+
+    public void addEntry(final PathEntryType<?> entryType, final IPathEntry<?> entry) {
+        if (entry == null) {
+            pathEntrys.remove(entryType);
+            return;
+        }
+        pathEntrys.put(entryType, entry);
+    }
+
+    public void removeEntryNoNetwork(final PathEntryType<?> type) {
+        pathEntrys.remove(type);
     }
 
     public void removeEntry(final PathEntryType<?> type) {
         pathEntrys.remove(type);
+        network.sendEntryRemove(type);
     }
 
     public boolean containsEntry(final PathEntryType<?> type) {
         return pathEntrys.containsKey(type);
+    }
+
+    public void setUpNetwork(final PathOptionEntryNetwork network) {
+        this.network = network;
     }
 
     @Override
@@ -66,17 +89,19 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
     @Override
     public void write(final NBTWrapper tag) {
-        pathEntrys.forEach((type, option) -> {
-            final NBTWrapper entry = new NBTWrapper();
-            option.write(entry);
-            tag.putWrapper(type.getName(), entry);
-        });
+        pathEntrys.entrySet().stream().filter(
+                entry -> !entry.getValue().getDefaultValue().equals(entry.getValue().getValue()))
+                .forEach(entry -> {
+                    final NBTWrapper entryWrapper = new NBTWrapper();
+                    entry.getValue().write(entryWrapper);
+                    tag.putWrapper(entry.getKey().getName(), entryWrapper);
+                });
     }
 
     @Override
     public void read(final NBTWrapper tag) {
-        final List<PathEntryType<?>> tagSet = tag.keySet().stream().map(PathEntryType::getType)
-                .collect(Collectors.toList());
+        final List<PathEntryType<?>> tagSet =
+                tag.keySet().stream().map(PathEntryType::getType).collect(Collectors.toList());
         tagSet.forEach(entry -> {
             if (entry != null) {
                 if (tag.contains(entry.getName())) {
@@ -94,8 +119,8 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
     public void readNetwork(final ReadBuffer buffer) {
         pathEntrys.putAll(buffer.getMapWithCombinedValueFunc(
                 NetworkBufferWrappers.PATHENTRYTYPE_FUNCTION, (buf, type) -> {
-                    final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type,
-                            _u -> type.newValue());
+                    final IPathEntry<?> entry =
+                            pathEntrys.computeIfAbsent(type, _u -> type.newValue());
                     entry.readNetwork(buffer);
                     return entry;
                 }));

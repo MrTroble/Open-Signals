@@ -18,8 +18,8 @@
                 {
                     "predicate": "with(SH_MECH.SH1) && hasandisnot(sh_high)",
                     "mode": "ROTATION",
-                    "rotationAxis": "Z",
                     "animationSpeed": 2,
+                    "rotationAxis": "Z",
                     "rotation": -45
                 },
                 {

@@ -223,6 +223,15 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void onLoad() {
         if (!level.isClientSide) {
             if (linkedSignalPosition != null && linkedSignal != null) {
+                final Block thisBlock = level.getBlockState(this.getLinkedPosition()).getBlock();
+                if (!thisBlock.equals(linkedSignal)) {
+                    OpenSignalsMain.getLogger()
+                            .error("Unlinked wrong signal data for [" + getBlockPos()
+                                    + "]! Linked Pos=" + getLinkedPos() + ", Saved block="
+                                    + linkedSignal + ", Real block=" + thisBlock);
+                    unlink();
+                    return;
+                }
                 final SignalStateInfo info =
                         new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
                 final LoadHolder<StateInfo> holder =

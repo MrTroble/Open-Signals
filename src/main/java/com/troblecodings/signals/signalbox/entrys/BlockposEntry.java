@@ -43,6 +43,11 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
     }
 
     @Override
+    public BlockPos getDefaultValue() {
+        return BlockPos.ZERO;
+    }
+
+    @Override
     public void readNetwork(final ReadBuffer buffer) {
         this.position = buffer.getBlockPos();
     }

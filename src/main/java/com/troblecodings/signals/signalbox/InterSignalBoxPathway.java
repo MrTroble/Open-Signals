@@ -1,7 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -148,8 +146,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                         SignalBoxHandler.getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
                                 pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
                 if (nextSignal != null) {
-                    lastSignalInfo =
-                            new SignalStateInfo(tile.getLevel(), otherLastSignal.pos, nextSignal);
+                    lastSignalInfo = new SignalStateInfo(tile.getLevel(), otherLastSignal.pos,
+                            nextSignal);
                 }
             }
         }
@@ -201,7 +199,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                         .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                 pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
                 pathwayToBlock.updateTrainNumber(trainNumber);
-                otherGrid.updateToNet(pathwayToBlock);
             });
         }
         return result;
@@ -209,17 +206,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void updateSignalStates() {
-        final List<SignalBoxNode> nodes = new ArrayList<>();
         final MainSignalIdentifier startSignal = data.getStartSignal();
         final MainSignalIdentifier lastSignal = data.getEndSignal();
         if (startSignal != null) {
             if (isBlocked)
                 return;
             startSignal.updateSignalState(SignalState.GREEN);
-            nodes.add(startSignal.node);
             data.getPreSignals().forEach(signalIdent -> {
                 signalIdent.updateSignalState(SignalState.GREEN);
-                nodes.add(signalIdent.node);
             });
         }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
@@ -227,7 +221,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff()) {
                 position.updateSignalState(SignalState.OFF);
-                nodes.add(position.node);
                 return;
             }
             final SignalBoxPathway next = getNextPathway();
@@ -254,9 +247,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                 toSet = SignalState.OFF;
             }
             position.updateSignalState(toSet);
-            nodes.add(position.node);
         });
-        updateSignalsOnClient(nodes);
     }
 
     public void setOtherPathwayToBlock(final InterSignalBoxPathway pathway) {

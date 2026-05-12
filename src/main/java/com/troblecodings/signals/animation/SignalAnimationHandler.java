@@ -40,7 +40,8 @@ public class SignalAnimationHandler {
         this.tile = tile;
     }
 
-    private final Map<BakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel = new HashMap<>();
+    private final Map<BakedModel, Entry<ModelTranslation, List<SignalAnimation>>> animationPerModel =
+            new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
         final BlockState state = tile.getBlockState();
@@ -52,8 +53,8 @@ public class SignalAnimationHandler {
         }
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final ModelBlockRenderer renderer = info.dispatcher.getModelRenderer();
-        final VertexConsumer vertex = info.source
-                .getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
+        final VertexConsumer vertex =
+                info.source.getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
         final IModelData data = tile.getModelData();
 
         final float tick = currentTick - this.lastWorldTick;
@@ -91,11 +92,12 @@ public class SignalAnimationHandler {
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 
-    public void updateStates(final Map<SEProperty, String> properties, final boolean firstLoad) {
+    public void updateStates(final Map<SEProperty, String> properties,
+            final boolean loadToFinalState) {
         if (properties == null || properties.isEmpty())
             return;
         final ModelInfoWrapper wrapper = new ModelInfoWrapper(properties);
-        if (firstLoad) {
+        if (loadToFinalState) {
             updateToFinalizedAnimations(wrapper);
         } else {
             updateAnimations(wrapper);
@@ -146,8 +148,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final BakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                    Quaternion.ONE);
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, Quaternion.ONE);
             translation.setModelTranslation(entry.getValue().copy());
             animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
                     .map(animation -> animation.copy()).collect(Collectors.toList())));

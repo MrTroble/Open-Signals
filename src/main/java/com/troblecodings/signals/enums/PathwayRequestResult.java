@@ -9,12 +9,14 @@ import com.troblecodings.signals.signalbox.PathwayData;
 
 public class PathwayRequestResult {
 
-    private static final Map<PathwayRequestMode, PathwayRequestResult> MODE_TO_RESULT = new HashMap<>();
+    private static final Map<PathwayRequestMode, PathwayRequestResult> MODE_TO_RESULT =
+            new HashMap<>();
 
     static {
         for (final PathwayRequestMode mode : PathwayRequestMode.values()) {
-            if (mode == PathwayRequestMode.PASS)
+            if (mode == PathwayRequestMode.PASS) {
                 continue;
+            }
             MODE_TO_RESULT.put(mode, new PathwayRequestResult(mode));
         }
     }
@@ -74,9 +76,7 @@ public class PathwayRequestResult {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final PathwayRequestResult other = (PathwayRequestResult) obj;
         return Objects.equals(data, other.data) && mode == other.mode;
@@ -87,7 +87,8 @@ public class PathwayRequestResult {
         NO_EQUAL_PATH_TYPE("no_equal_path_type"), NOT_IN_GRID("not_in_grid"),
         ALREADY_USED("already_used"), OVERSTEPPING("overstepping"),
         INPUT_BLOCKING("input_blocking"), NO_PATH("no_path"),
-        NO_INTERSIGNALBOX_SELECTED("no_intersignalbox_selected"), PASS("pass");
+        NO_INTERSIGNALBOX_SELECTED("no_intersignalbox_selected"),
+        SUBISIDIARY_ENABLED("subsidiary_enabled"), PASS("pass");
 
         private final String name;
 

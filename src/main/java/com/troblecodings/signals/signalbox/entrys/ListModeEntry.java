@@ -49,7 +49,12 @@ public class ListModeEntry extends IPathEntry<List<ModeIdentifier>> {
         this.list = new ArrayList<>(value);
     }
 
-    public void add(final ModeIdentifier pos) {
+    @Override
+    public List<PosIdentifier> getDefaultValue() {
+        return new ArrayList<>();
+    }
+
+    public void add(final PosIdentifier pos) {
         list.add(pos);
     }
 

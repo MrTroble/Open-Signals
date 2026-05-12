@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.ModeIdentifier;
@@ -50,6 +51,8 @@ public class PathwayData {
     private static final String PATH_TYPE = "pathType";
     private static final String LIST_OF_PROTECTIONWAY_NODES = "listOfProtectionWayNodes";
     private static final String IS_INTERSIGNALBOX_PATHWAY = "isInterSignalBoxPathway";
+    private static final boolean CAN_INPUT_BLOCK_SHUNTING_PATH =
+            ConfigHandler.GENERAL.canInputBlockShuntingPath.get();
 
     protected SignalBoxGrid grid = null;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
@@ -160,7 +163,9 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED))
+            if (current.isUsedInDirection(oldPos, EnumPathUsage.PROTECTED)
+                    || (CAN_INPUT_BLOCK_SHUNTING_PATH
+                            && SignalBoxUtil.isPathBlocked(grid, current, path)))
                 return false;
         }
         return true;
@@ -172,7 +177,8 @@ public class PathwayData {
         final MainSignalIdentifier signalIdent = endSignal.get();
         final PathOptionEntry option = grid.getNode(signalIdent.getPoint())
                 .getOption(signalIdent.getModeSet()).orElse(null);
-        if ((option == null) || grid.startsToPath.containsKey(lastPoint))
+        final SignalBoxPathway next = grid.getPathwayByStartPoint(lastPoint);
+        if ((option == null) || next != null && !next.isBlocked)
             return true;
         final Point protectionWayEnd =
                 option.getEntry(PathEntryType.PROTECTIONWAY_END).orElse(lastPoint);
@@ -227,8 +233,7 @@ public class PathwayData {
                     if (pw == null)
                         return;
                     pw.directResetOfProtectionWay();
-                    pw.removeProtectionWay();
-                    grid.updateToNet(pw);
+                    grid.tryNextPathways();
                 }));
             }).start();
             return true;
@@ -248,10 +253,11 @@ public class PathwayData {
                     .updateRedstoneOutput(new StateInfo(pathway.tile.getLevel(), pos), false));
             option.removeEntry(PathEntryType.PATHUSAGE);
         });
+        removeProtectionWay();
         return true;
     }
 
-    protected void removeProtectionWay() {
+    private void removeProtectionWay() {
         this.protectionWayNodes = ImmutableList.of();
     }
 
@@ -289,7 +295,7 @@ public class PathwayData {
                         .ifPresent(value -> zs6State.set(value.booleanValue()));
                 optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER).ifPresent(ident -> {
                     final Optional<PathOptionEntry> entry = grid.getNodeChecked(ident.point)
-                            .orElse(new SignalBoxNode()).getOption(ident.mode);
+                            .orElse(new SignalBoxNode(grid.getNetwork())).getOption(ident.mode);
                     if (entry.isPresent()) {
                         trainNumberDisplays.add(ident);
                     } else {
@@ -360,10 +366,10 @@ public class PathwayData {
                     grid.getNode(firstPos.getPoint()).getOption(firstPos.getModeSet()).orElse(null);
             final List<ModeIdentifier> posIdents = getPreSignalData(entry, grid);
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
-                final PathOptionEntry vpEntry = grid.getNode(ident.point).getOption(ident.mode)
-                        .orElse(new PathOptionEntry());
-                return new OtherSignalIdentifier(ident.point, ident.mode,
-                        vpEntry.getEntry(PathEntryType.SIGNAL).orElseGet(() -> null),
+                final PathOptionEntry vpEntry =
+                        grid.getNode(ident.getPoint()).getOption(ident.getModeSet())
+                                .orElse(SignalBoxFactory.getFactory().getEntry());
+                return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
                         EnumGuiMode.VP, grid);
             }).filter(ident -> ident.pos != null).collect(Collectors.toList()));

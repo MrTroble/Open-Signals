@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.18.2 - 3.8.2]
+* feat: added config option to block shunting path with active redstone input
+* feat/fix: pathway can't be set with active subsidiary
+* fix: signal name not loaded in signalbox
+* fix: semaphore signal animation
+* fix: issue with wrong signal data in SignalController
+* fix: client signal property (network) loading
+* fix: mast_lamps glowing lamps and ks signal mast model
+* fix: hl subsidiary config
+* fix: minor fixes
+* ref/fix: client-server signalsystem mismatch
+* ref: new signalbox networking system
+* ref: client animation update trigger
+
 ## [1.18.2 - 3.8.1]
 * fix: issues with loading NBT data of signal box
 * fix: issues with setting pathway with a overlap nearby

@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,31 +70,57 @@ public class Signal extends BasicBlock {
     };
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
-    public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
+    public static final Map<Integer, Signal> SIGNAL_IDS = new HashMap<>();
     public static final EnumProperty<SignalAngel> ANGEL =
             EnumProperty.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
+    private static MessageDigest digest;
+
+    static {
+        try {
+            digest = MessageDigest.getInstance("MD5");
+        } catch (final NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected final SignalProperties prop;
     private final int id;
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
 
-    public Signal(final SignalProperties prop) {
+    public Signal(final SignalProperties prop, final String name) {
         super(Properties.of(Material.STONE).noOcclusion()
                 .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
                 .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
-        this.id = SIGNAL_IDS.size();
-        SIGNAL_IDS.add(this);
+        this.id = getIDFromName(name);
+        if (SIGNAL_IDS.containsKey(this.id)) {
+            OpenSignalsMain.exitMinecraftWithMessage("With high propability the signal [" + name
+                    + "] is already registerd! Already existing signal: [" + SIGNAL_IDS.get(this.id)
+                    + "] Please change your signal name!");
+        }
+        SIGNAL_IDS.put(this.id, this);
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+
+    private static int getIDFromName(final String name) {
+        /*
+         * final byte[] array = digest.digest(name.getBytes()); digest.reset(); int
+         * returnID = 0; for (int i = 0; i < array.length / 4; i += 4) { returnID ^=
+         * (array[i] << 24 | array[i + 1] << 16 | array[i + 2] << 8 | array[i + 3]) +
+         * 0x9e3779b9 + (returnID << 6) + (returnID >> 2); }
+         */
+        // TODO Fix the Hashing
+        return name.hashCode();
     }
 
     public static Signal getSignalByID(final int id) {
@@ -434,14 +462,10 @@ public class Signal extends BasicBlock {
 
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
-            } else {
-                if (world.getBlockTicks().hasScheduledTick(pos, this))
-                    return;
-                else {
-                    if (sound.predicate.test(properties)) {
-                        world.scheduleTick(pos, this, 1);
-                    }
-                }
+            } else if (world.getBlockTicks().hasScheduledTick(pos, this))
+                return;
+            else if (sound.predicate.test(properties)) {
+                world.scheduleTick(pos, this, 1);
             }
         });
     }

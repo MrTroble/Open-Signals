@@ -37,26 +37,29 @@ public class ContainerPlacementtool extends ContainerBase {
     }
 
     private void sendItemProperties(final Player player) {
-        // TODO Redo networking
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
         final int signalID = wrapper.getInteger(Placementtool.BLOCK_TYPE_ID);
         signal = tool.getObjFromID(signalID);
-        final List<SEProperty> properites = signal.getProperties();
+        final List<SEProperty> properties = signal.getProperties().stream()
+                .filter(property -> wrapper.contains(property.getName())).toList();
+        final WriteBuffer buffer = new WriteBuffer();
         final List<Byte> propertiesToSend = new ArrayList<>();
-        for (int i = 0; i < properites.size(); i++) {
-            final SEProperty property = properites.get(i);
+        for (int i = 0; i < properties.size(); i++) {
+            final SEProperty property = properties.get(i);
             if (wrapper.contains(property.getName())) {
                 propertiesToSend.add((byte) i);
                 final String value = wrapper.getString(property.getName());
                 propertiesToSend.add((byte) property.getParent().getIDFromValue(value));
             }
         }
-        final WriteBuffer buffer = new WriteBuffer();
         buffer.putInt(signalID);
-        buffer.putByte((byte) propertiesToSend.size());
-        propertiesToSend.forEach(buffer::putByte);
+        buffer.putList(properties, (buf, prop) -> {
+            buffer.putByte((byte) signal.getIDFromProperty(prop));
+            final String value = wrapper.getString(prop.getName());
+            buffer.putByte((byte) prop.getParent().getIDFromValue(value));
+        });
         final String signalName = wrapper.getString(SIGNAL_NAME);
         buffer.putString(signalName);
         OpenSignalsMain.network.sendTo(player, buffer);
@@ -94,16 +97,16 @@ public class ContainerPlacementtool extends ContainerBase {
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         signalID = buffer.getInt();
-        final int size = buffer.getByteToUnsignedInt();
         final Placementtool tool = (Placementtool) info.player.getMainHandItem().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();
-        for (int i = 0; i < size / 2; i++) {
-            final SEProperty property = signalProperties.get(buffer.getByteToUnsignedInt());
-            final int value = buffer.getByteToUnsignedInt();
-            properties.put(property, value);
-        }
+        buffer.getList(buf -> {
+            final SEProperty prop = signalProperties.get(buf.getByteToUnsignedInt());
+            final int value = buf.getByteToUnsignedInt();
+            properties.put(prop, value);
+            return prop;
+        });
         signalName = buffer.getString();
         signalProperties.forEach(property -> {
             if (!properties.containsKey(property)) {

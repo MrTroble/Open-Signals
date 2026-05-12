@@ -62,8 +62,6 @@ public class GuiSignalBridge extends GuiBase {
     private static final UIBorder SELECTED_BORDER = new UIBorder(0xFF00FF00, 1);
     private static final int TILE_WIDTH = 13;
     private static final int TILE_COUNT = 15;
-    private static final int BACKGROUD_COLOR = 0xFF8B8B8B;
-    private static final int GRID_COLOR = 0xFF5B5B5B;
     private static final UIToolTip COLLISION_TOOLTIP =
             new UIToolTip(I18Wrapper.format("gui.signalbridge.collision"), true);
 
@@ -82,7 +80,7 @@ public class GuiSignalBridge extends GuiBase {
     private boolean loaded = false;
 
     static {
-        Signal.SIGNAL_IDS.stream().filter(signal -> signal.isForSignalBridge())
+        Signal.SIGNAL_IDS.values().stream().filter(signal -> signal.isForSignalBridge())
                 .forEach(SIGNALS_FOR_BRIDGE::add);
     }
 
