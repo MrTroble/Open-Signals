@@ -117,11 +117,12 @@ public class SignalAnimationHandler {
         translation.setUpNewTranslation(animation.getModelTranslation());
     }
 
-    public void updateStates(final Map<SEProperty, String> properties, final boolean firstLoad) {
+    public void updateStates(final Map<SEProperty, String> properties,
+            final boolean loadToFinalState) {
         if (properties == null || properties.isEmpty())
             return;
         final ModelInfoWrapper wrapper = new ModelInfoWrapper(tile.getBlockType(), properties);
-        if (firstLoad) {
+        if (loadToFinalState) {
             updateToFinalizedAnimations(wrapper);
         } else {
             updateAnimations(wrapper);
@@ -169,8 +170,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final IBakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                    QuaternionWrapper.ONE);
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, QuaternionWrapper.ONE);
             translation.setModelTranslation(entry.getValue().copy());
             final BufferBuilder buffer = getBufferFromModel(model, entry.getValue().copy());
             animationPerModel.put(Maps.immutableEntry(model, buffer),

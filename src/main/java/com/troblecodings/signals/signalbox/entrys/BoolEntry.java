@@ -59,6 +59,11 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     }
 
     @Override
+    public Boolean getDefaultValue() {
+        return false;
+    }
+
+    @Override
     public void readNetwork(final ReadBuffer buffer) {
         value = buffer.getBoolean();
     }

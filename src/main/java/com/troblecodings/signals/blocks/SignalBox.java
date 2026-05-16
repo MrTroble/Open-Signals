@@ -70,7 +70,9 @@ public class SignalBox extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         if (!worldIn.isRemote) {
-            ((SignalBoxTileEntity) worldIn.getTileEntity(pos)).unlink();
+            final SignalBoxTileEntity tile = (SignalBoxTileEntity) worldIn.getTileEntity(pos);
+            tile.unlink();
+            tile.getSignalBoxGrid().resetAllPathways();
             SignalBoxHandler.removeSignalBox(new StateInfo(worldIn, pos));
             SignalBoxHandler.onPosRemove(new StateInfo(worldIn, pos));
         }

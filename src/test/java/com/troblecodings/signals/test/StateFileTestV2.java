@@ -63,7 +63,7 @@ public class StateFileTestV2 {
 
     private static final Random RANDOM = new Random();
 
-    private static BlockPos getRandomBlockPos() {
+    public static BlockPos getRandomBlockPos() {
         return new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(321), RANDOM.nextInt());
     }
 
@@ -123,7 +123,7 @@ public class StateFileTestV2 {
             file.write(statePos, buffer);
             listOfPos.add(Maps.immutableEntry(firstcreate, statePos));
         }
-        for (int i = 0; i < listOfPos.size() / 1000; i++) {
+        for (int i = 0; i < listOfPos.size(); i++) {
             final Map.Entry<BlockPos, SignalStatePosV2> entry = listOfPos.get(i);
             final SignalStatePosV2 findPos = file.find(entry.getKey());
             assertEquals(buffer, file.read(findPos));

@@ -61,6 +61,11 @@ public class TCBoolEntry extends IPathEntry<TCBoolean>
     }
 
     @Override
+    public TCBoolean getDefaultValue() {
+        return TCBoolean.FALSE;
+    }
+
+    @Override
     public void readNetwork(final ReadBuffer buffer) {
         value = buffer.getBoolean();
     }

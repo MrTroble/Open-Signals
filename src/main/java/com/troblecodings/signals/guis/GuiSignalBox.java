@@ -13,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.troblecodings.core.I18Wrapper;
-import com.troblecodings.core.TCBoolean;
-import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
@@ -38,7 +36,6 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -49,16 +46,15 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.ShowTypes;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SignalBoxConsumer;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientRenderUpdate;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
-import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
@@ -91,13 +87,11 @@ public class GuiSignalBox extends GuiBase {
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
+    protected final SignalBoxNetworkHandler network;
     private SignalBoxPage page = SignalBoxPage.OPERATION;
     private SignalBoxNode lastTile = null;
     private UIEntity mainButton;
-    private final GuiInfo info;
-    private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
     private UIEntity splitter = new UIEntity();
-    private boolean allPacketsRecived = false;
     private SidePanel helpPage;
     protected UISignalBoxRendering rendering;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
@@ -106,19 +100,27 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
-        container.setInfoConsumer(this::infoUpdate);
-        container.setColorUpdater(this::applyColorChanges);
-        container.setConuterUpdater(this::updateCounter);
-        container.setTrainNumberUpdater(this::updateTrainNumbers);
+        this.network = container.getNetwork();
+        container.infoUpdates = this::infoUpdate;
+        container.counterUpdater = this::updateCounter;
+        container.nodeUpdate = this::updateNode;
         container.updateSignalState = this::updateSignalState;
-        this.info = info;
     }
 
     public SignalBoxPage getPage() {
         return page;
     }
 
-    private void updateSignalState(final SignalBoxNode node) {
+    private void updateNode(final SignalBoxNode node, final PathEntryType<?> type) {
+        if (type.equals(PathEntryType.PATHUSAGE)) {
+            updateColor(node);
+        }
+        if (type.equals(PathEntryType.TRAINNUMBER)) {
+            updateTrainNumbers(node);
+        }
+    }
+
+    protected void updateSignalState(final SignalBoxNode node) {
         node.forEach((mode) -> {
             checkForSubsidiary(node, mode);
             rendering.updateSignalState(node.getPoint(), mode, node.getState(mode));
@@ -126,36 +128,32 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void checkForSubsidiary(final SignalBoxNode node, final ModeSet mode) {
-        final Map<ModeSet, SubsidiaryState> subsidiary =
-                container.enabledSubsidiaryTypes.getOrDefault(node.getPoint(), new HashMap<>());
-        final SubsidiaryState state = subsidiary.get(mode);
+        final SubsidiaryState state = node.getSubsidiaryState(mode);
         if (state != null) {
             node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
         }
     }
 
-    public void infoUpdate(final String errorString) {
+    protected void infoUpdate(final String errorString) {
         final UIToolTip tooltip = new UIToolTip(errorString, true);
         lowerEntity.add(tooltip);
         executor.schedule(() -> lowerEntity.remove(tooltip), 3, TimeUnit.SECONDS);
         return;
     }
 
-    private void updateTrainNumbers(final List<SignalBoxNode> nodes) {
-        nodes.forEach(node -> {
-            node.iterator().forEachRemaining(modeSet -> {
-                if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
-                    return;
-                node.getOption(modeSet).ifPresent(option -> {
-                    final TrainNumber number =
-                            option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
-                    final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
-                    if (number.trainNumber.isEmpty()) {
-                        rendering.removeTrainNumber(modeIdent);
-                    } else {
-                        rendering.putTrainNumber(modeIdent, number.trainNumber);
-                    }
-                });
+    private void updateTrainNumbers(final SignalBoxNode node) {
+        node.iterator().forEachRemaining(modeSet -> {
+            if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
+                return;
+            node.getOption(modeSet).ifPresent(option -> {
+                final TrainNumber number =
+                        option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+                final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
+                if (number.trainNumber.isEmpty()) {
+                    rendering.removeTrainNumber(modeIdent);
+                } else {
+                    rendering.putTrainNumber(modeIdent, number.trainNumber);
+                }
             });
         });
     }
@@ -188,13 +186,11 @@ public class GuiSignalBox extends GuiBase {
                     if (!option.getEntry(entryType).isPresent())
                         return;
                     option.removeEntry(entryType);
-                    removeEntryFromServer(node, mode, rotation, entryType);
                 } else {
                     final Optional<BlockPos> pathEntry = option.getEntry(entryType);
                     if (pathEntry.isPresent() && pathEntry.get().equals(setPos))
                         return;
                     option.setEntry(entryType, setPos);
-                    sendPosEntryToServer(setPos, node, mode, rotation, entryType);
                 }
             }, option.getEntry(entryType).map(entry -> positions.indexOf(entry)).orElse(-1));
             parent.add(blockSelect);
@@ -212,12 +208,12 @@ public class GuiSignalBox extends GuiBase {
 
     protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
         final SubsidiaryState state = holder.entry;
-        sendSubsidiaryRequest(state, holder.point, holder.modeSet, false);
-        container.updateClientSubsidiary(holder.point, holder.modeSet, state, false);
+        network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state, false);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
 
         container.grid.getNodeChecked(holder.point).ifPresent(node -> {
+            container.updateClientSubsidiary(node, holder.modeSet, state, false);
             node.removeSubsidiaryState(holder.modeSet);
             node.updateState(holder.modeSet, SignalState.RED);
             rendering.updateSignalState(holder.point, holder.modeSet, SignalState.RED);
@@ -239,7 +235,6 @@ public class GuiSignalBox extends GuiBase {
         } else {
             rendering.addMode(point, modeSet);
         }
-        this.changedModes.put(point, container.grid.getNode(point));
     }
 
     private void tileNormal(final UISignalBoxRendering rendering, final Point tile,
@@ -280,11 +275,18 @@ public class GuiSignalBox extends GuiBase {
 
     private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
         final List<PathType> possibleTypes = start.getPossibleTypes(end);
+        for (final ModeSet mode : start.getModes().keySet()) {
+            if (start.getSubsidiaryState(mode) != null) {
+                infoUpdate(I18Wrapper
+                        .format("error." + PathwayRequestMode.SUBISIDIARY_ENABLED.getName()));
+                return;
+            }
+        }
         if (possibleTypes.isEmpty()) {
             infoUpdate(
                     I18Wrapper.format("error." + PathwayRequestMode.NO_EQUAL_PATH_TYPE.getName()));
         } else if (possibleTypes.size() == 1) {
-            sendPWRequest(lastTile.getPoint(), end.getPoint(), possibleTypes.get(0));
+            network.sendRequestPathway(start.getPoint(), end.getPoint(), possibleTypes.get(0));
         } else if (possibleTypes.size() > 1) {
             push(GuiElements.createScreen(entity -> {
                 entity.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> pop()));
@@ -294,7 +296,7 @@ public class GuiSignalBox extends GuiBase {
                 entity.add(GuiElements.createSpacerV(10));
                 possibleTypes
                         .forEach(type -> entity.add(GuiElements.createButton(type.name(), e -> {
-                            sendPWRequest(start.getPoint(), end.getPoint(), type);
+                            network.sendRequestPathway(start.getPoint(), end.getPoint(), type);
                             pop();
                         })));
             }));
@@ -368,7 +370,7 @@ public class GuiSignalBox extends GuiBase {
 
         namingInput.setOnTextUpdate(str -> {
             node.setCustomText(str);
-            sendName(node.getPoint(), str);
+            network.sendNodeLabel(node.getPoint(), str);
             rendering.updateNodeLabeling(node.getPoint(), str);
         });
 
@@ -469,7 +471,7 @@ public class GuiSignalBox extends GuiBase {
             btn.add(new UIToolTip(I18Wrapper.format("sb.highlight")));
             layout.add(btn);
             layout.add(GuiElements.createButton("x", 20, e -> {
-                removeBlockPos(p);
+                network.sendRemovePos(p);
                 list.remove(layout);
             }));
             list.add(layout);
@@ -491,7 +493,6 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
-        sendModeChanges();
         page = SignalBoxPage.OPERATION;
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
@@ -528,7 +529,9 @@ public class GuiSignalBox extends GuiBase {
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
-                resetAllPathways();
+                network.sendResetAllPathways();
+                resetAllSubsidiarySignals();
+                resetColors();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
                 this.lastTile = null;
 
@@ -563,10 +566,10 @@ public class GuiSignalBox extends GuiBase {
 
         final List<SignalBoxNode> nodes = container.grid.getNodes();
         buildColors(nodes);
-        updateTrainNumbers(nodes);
+        nodes.forEach(this::updateTrainNumbers);
     }
 
-    public void updateCounter() {
+    protected void updateCounter() {
         helpPage.updateCounterButton();
     }
 
@@ -626,304 +629,20 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.getParent().update();
     }
 
-    private void sendPWRequest(final Point start, final Point end, final PathType type) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REQUEST_PW);
-        start.writeNetwork(buffer);
-        end.writeNetwork(buffer);
-        buffer.putEnumValue(type);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void resetPathwayOnServer(final SignalBoxNode node) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.RESET_PW);
-        node.getPoint().writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void sendPosEntryToServer(final BlockPos pos, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<BlockPos> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_POS_ENTRY);
-        buffer.putBlockPos(pos);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendIntEntryToServer(final int speed, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Integer> entry) {
-        if (speed == 127 || !allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_INT_ENTRY);
-        buffer.putByte((byte) speed);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendZS2Entry(final byte value, final SignalBoxNode node, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<Byte> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_ZS2_ENTRY);
-        buffer.putByte(value);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendZS6Entry(final boolean value, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<TCBoolean> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_ZS6_ENTRY);
-        buffer.putBoolean(value);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendPointEntry(final Point point, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Point> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_POINT_ENTRY);
-        point.writeNetwork(buffer);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void removeEntryFromServer(final SignalBoxNode node, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<?> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REMOVE_ENTRY);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void resetAllPathways() {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_PW);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-        resetColors(container.grid.getNodes());
-        rendering.clearTrainNumbers();
-    }
-
-    private void sendModeChanges() {
-        if (changedModes.isEmpty() || !allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_CHANGED_MODES);
-        buffer.putINetworkSaveableMap(changedModes);
-        container.grid.putAllNodes(changedModes);
-        changedModes.clear();
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void removeBlockPos(final BlockPos pos) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REMOVE_POS);
-        buffer.putBlockPos(pos);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendSubsidiaryRequest(final SubsidiaryState entry, final Point point,
-            final ModeSet mode, final boolean enable) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REQUEST_SUBSIDIARY);
-        entry.writeNetwork(buffer);
-        point.writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        buffer.putBoolean(enable);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void changeRedstoneOutput(final Point point, final ModeSet mode,
-            final boolean state) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.UPDATE_RS_OUTPUT);
-        point.writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        buffer.putBoolean(state);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-        rendering.setColor(point, mode, state ? OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR);
-    }
-
-    protected void setAutoPoint(final Point point, final byte state) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SET_AUTO_POINT);
-        point.writeNetwork(buffer);
-        buffer.putBoolean(state == 1);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void sendName(final Point point, final String name) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_NAME);
-        point.writeNetwork(buffer);
-        buffer.putString(name);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendBoolEntry(final boolean state, final Point point, final ModeSet mode,
-            final PathEntryType<Boolean> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_BOOL_ENTRY);
-        buffer.putBoolean(state);
-        point.writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void removeNextPathwayFromServer(final Point start, final Point end) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
-        start.writeNetwork(buffer);
-        end.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendCurrentCounterToServer() {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
-        buffer.putInt(container.grid.getCurrentCounter());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendTrainNumber(final Point point, final String number) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
-        point.writeNetwork(buffer);
-        buffer.putString(number);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void deleteTrainNumber(final Point point) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
-        point.writeNetwork(buffer);
-        buffer.putString(TrainNumber.DEFAULT.trainNumber);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void resetAllSignals() {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_SIGNALS);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-        container.grid.resetAllSignals();
-    }
-
-    protected void sendPosIdentList(final List<PosIdentifier> list, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<List<PosIdentifier>> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_POSIDENT_LIST);
-        buffer.putISaveableList(list);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendConnetedTrainNumbers(final ModeIdentifier ident, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_CONNECTED_TRAINNUMBERS);
-        ident.writeNetwork(buffer);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) PathEntryType.CONNECTED_TRAINNUMBER.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void updateSignalStateOnServer(final Point point, final ModeSet mode,
-            final SignalState state) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SET_SIGNAL_STATE);
-        point.writeNetwork(buffer);
-        buffer.putByte((byte) mode.mode.ordinal());
-        buffer.putByte((byte) mode.rotation.ordinal());
-        buffer.putEnumValue(state);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
     private void reset() {
         lowerEntity.clear();
     }
 
     @Override
     public void updateFromContainer() {
-        if (!allPacketsRecived) {
-            updateEnabledSubsidiaries();
-            initializeBasicUI();
-            enabledSubsidiaries.values()
-                    .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
-            allPacketsRecived = true;
-        }
+        updateAllEnabledSubsidiaries();
+        initializeBasicUI();
+        enabledSubsidiaries.values()
+                .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
     }
 
-    private void updateEnabledSubsidiaries() {
+    private void updateAllEnabledSubsidiaries() {
+        enabledSubsidiaries.clear();
         container.enabledSubsidiaryTypes.forEach((point, map) -> map.forEach((modeSet, state) -> {
             final SignalBoxNode node = container.grid.getNode(point);
             if (node == null)
@@ -947,8 +666,8 @@ public class GuiSignalBox extends GuiBase {
         });
     }
 
-    private void resetColors(final List<SignalBoxNode> nodes) {
-        nodes.forEach(node -> {
+    private void resetColors() {
+        container.grid.getNodes().forEach(node -> {
             node.forEach(mode -> {
                 final EnumGuiMode guiMode = mode.mode;
                 final PathOptionEntry entry = node.getOption(mode).get();
@@ -971,18 +690,28 @@ public class GuiSignalBox extends GuiBase {
         });
     }
 
-    private void applyColorChanges(final List<SignalBoxNode> listOfNodes) {
-        for (int i = listOfNodes.size() - 2; i > 0; i--) {
-            final Point oldPos = listOfNodes.get(i - 1).getPoint();
-            final Point newPos = listOfNodes.get(i + 1).getPoint();
-            final Path path = new Path(oldPos, newPos);
-            final SignalBoxNode current = listOfNodes.get(i);
-            final ModeSet modeSet = current.getMode(path);
-            current.getOption(modeSet)
-                    .ifPresent(poe -> rendering.setColor(current.getPoint(), modeSet,
-                            poe.getEntry(PathEntryType.PATHUSAGE)
-                                    .orElseGet(() -> EnumPathUsage.FREE).getColor()));
-        }
+    private void updateColor(final SignalBoxNode node) {
+        node.toPathIdentifier().forEach(ident -> {
+            node.getOption(ident.getMode()).ifPresent(poe -> {
+                rendering.setColor(node.getPoint(), ident.getMode(),
+                        poe.getEntry(PathEntryType.PATHUSAGE).orElseGet(() -> EnumPathUsage.FREE)
+                                .getColor());
+            });
+        });
+    }
+
+    private void resetAllSubsidiarySignals() {
+        final SubsidiaryState dummy = SubsidiaryState.ALL_STATES.get(0);
+        container.enabledSubsidiaryTypes.forEach((point, states) -> {
+            final SignalBoxNode node = container.grid.getNode(point);
+            states.keySet().forEach(mode -> {
+                node.updateState(mode, SignalState.RED);
+                network.sendSubsidiary(new ModeIdentifier(point, mode), dummy, false);
+            });
+            updateSignalState(node);
+        });
+        enabledSubsidiaries.clear();
+        container.enabledSubsidiaryTypes.clear();
     }
 
     @Override

@@ -25,8 +25,8 @@ public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     public ModelInfoWrapper(final Block block, final Map<SEProperty, String> properties) {
         this(block);
-        properties.forEach((property,
-                value) -> state = ((IExtendedBlockState) state).withProperty(property, value));
+        properties.forEach((property, value) -> state =
+                ((IExtendedBlockState) state).withProperty(property, value));
     }
 
     @Override
@@ -40,8 +40,8 @@ public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     @SuppressWarnings("unchecked")
     public <T> T getData(final IUnlistedProperty<T> prop) {
-        final Optional<T> opt = (Optional<T>) ((IExtendedBlockState) state).getUnlistedProperties()
-                .get(prop);
+        final Optional<T> opt =
+                (Optional<T>) ((IExtendedBlockState) state).getUnlistedProperties().get(prop);
         if (opt.isPresent())
             return opt.get();
         return null;

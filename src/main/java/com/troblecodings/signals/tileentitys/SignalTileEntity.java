@@ -13,6 +13,7 @@ import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -73,9 +74,11 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return handler;
     }
 
-    public void updateAnimationStates(final Map<SEProperty, String> properties,
-            final boolean firstLoad) {
-        handler.updateStates(properties, firstLoad);
+    @SideOnly(Side.CLIENT)
+    public void updateAnimationState(final Map<SEProperty, String> properties,
+            final ChangedState state) {
+        handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
+                || state.equals(ChangedState.ADDED_TO_FILE));
     }
 
     @Override

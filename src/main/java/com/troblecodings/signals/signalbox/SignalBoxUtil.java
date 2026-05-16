@@ -286,6 +286,8 @@ public final class SignalBoxUtil {
     }
 
     private static boolean isPowerd(final SignalBoxTileEntity tile, final BlockPos pos) {
+        if (tile == null)
+            return false;
         final World world = tile.getWorld();
         if (world == null) {
             OpenSignalsMain.getLogger()
