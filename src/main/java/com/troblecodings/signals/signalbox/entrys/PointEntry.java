@@ -36,6 +36,11 @@ public class PointEntry extends IPathEntry<Point> {
     }
 
     @Override
+    public Point getDefaultValue() {
+        return new Point(-1, -1);
+    }
+
+    @Override
     public void setValue(final Point value) {
         this.point = value;
     }

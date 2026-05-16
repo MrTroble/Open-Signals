@@ -37,6 +37,8 @@ public abstract class IPathEntry<T> implements INetworkSaveable, ISaveable {
      */
     public abstract void setValue(T value);
 
+    public abstract T getDefaultValue();
+
     @Override
     public int hashCode() {
         return Objects.hash(name, this.getValue());

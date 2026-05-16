@@ -13,12 +13,13 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.ChangedState;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -39,40 +40,44 @@ public class ClientSignalStateHandler implements INetworkSync {
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getInstance();
-        final ClientWorld level = mc.level;
-        final BlockPos signalPos = buffer.getBlockPos();
-        final StateInfo stateInfo = new StateInfo(level, signalPos);
-        final int signalID = buffer.getInt();
-        final boolean remove = buffer.getBoolean();
-        if (remove) {
-            setRemoved(stateInfo);
-            return;
-        }
-        final Signal signal = Signal.getSignalByID(signalID);
-        final Map<SEProperty, String> newProperties =
-                buffer.getMapWithCombinedValueFunc(NetworkBufferWrappers.getSEPropertyFunc(signal),
-                        (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
-        synchronized (CURRENTLY_LOADED_STATES) {
-            final Map<SEProperty, String> properties =
-                    CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
-            properties.putAll(newProperties);
-            CURRENTLY_LOADED_STATES.put(stateInfo, properties);
-        }
-        if (level == null)
-            return;
-        final long startTime = Calendar.getInstance().getTimeInMillis();
-        SERVICE.execute(() -> {
-            TileEntity entity;
-            while ((entity = level.getBlockEntity(signalPos)) == null) {
-                final long currentTime = Calendar.getInstance().getTimeInMillis();
-                if (currentTime - startTime >= 5000)
-                    return;
-                continue;
+        mc.submit(() -> {
+            final World level = mc.level;
+            final BlockPos signalPos = buffer.getBlockPos();
+            final StateInfo stateInfo = new StateInfo(level, signalPos);
+            final int signalID = buffer.getInt();
+            final ChangedState changedState = buffer.getEnumValue(ChangedState.class);
+            if (changedState.equals(ChangedState.REMOVED_FROM_CACHE)
+                    || changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
+                setRemoved(stateInfo);
+                return;
             }
-            final BlockState state = entity.getBlockState();
-            mc.level.setBlocksDirty(signalPos, state, state);
-            entity.requestModelDataUpdate();
-            mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
+            final Signal signal = Signal.getSignalByID(signalID);
+            final Map<SEProperty, String> newProperties = buffer.getMapWithCombinedValueFunc(
+                    NetworkBufferWrappers.getSEPropertyFunc(signal),
+                    (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
+            final Map<SEProperty, String> properties;
+            synchronized (CURRENTLY_LOADED_STATES) {
+                properties =
+                        CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
+                properties.putAll(newProperties);
+                CURRENTLY_LOADED_STATES.put(stateInfo, properties);
+            }
+            if (level == null)
+                return;
+            final long startTime = Calendar.getInstance().getTimeInMillis();
+            SERVICE.execute(() -> {
+                TileEntity entity;
+                while ((entity = level.getBlockEntity(signalPos)) == null) {
+                    final long currentTime = Calendar.getInstance().getTimeInMillis();
+                    if (currentTime - startTime >= 5000)
+                        return;
+                    continue;
+                }
+                final BlockState state = entity.getBlockState();
+                mc.level.setBlocksDirty(signalPos, state, state);
+                entity.requestModelDataUpdate();
+                mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
+            });
         });
     }
 

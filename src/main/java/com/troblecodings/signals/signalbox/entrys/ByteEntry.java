@@ -34,6 +34,11 @@ public class ByteEntry extends IPathEntry<Byte> {
     }
 
     @Override
+    public Byte getDefaultValue() {
+        return 0;
+    }
+
+    @Override
     public void setValue(final Byte value) {
         this.value = value;
     }

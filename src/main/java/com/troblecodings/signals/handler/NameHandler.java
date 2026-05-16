@@ -42,6 +42,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -166,8 +167,8 @@ public final class NameHandler implements INetworkSync {
             listener.update(info, name, ChangedState.UPDATED);
         } else {
             synchronized (TASKS_WHEN_LOAD) {
-                final List<NameStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
-                        _u -> new ArrayList<>());
+                final List<NameStateListener> list =
+                        TASKS_WHEN_LOAD.computeIfAbsent(info, _u -> new ArrayList<>());
                 if (!list.contains(listener)) {
                     list.add(listener);
                 }
@@ -253,10 +254,11 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        if (writeService != null)
+        if (writeService != null) {
             writeService.execute(() -> map.entrySet().stream()
                     .filter(entry -> entry.getKey().world.equals(world))
                     .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
+        }
     }
 
     @SubscribeEvent
@@ -266,6 +268,16 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             ALL_LEVEL_FILES.remove(unload.getWorld());
         }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
+        final PlayerEntity player = event.getPlayer();
+        Map<StateInfo, String> map;
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        map.forEach((state, name) -> sendTo(player, packToBuffer(state.pos, name)));
     }
 
     private static void createToFile(final StateInfo info, final String name) {
@@ -341,13 +353,14 @@ public final class NameHandler implements INetworkSync {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
-                    final List<LoadHolder<?>> holders = LOAD_COUNTER.computeIfAbsent(info.info,
-                            _u -> new ArrayList<>());
+                    final List<LoadHolder<?>> holders =
+                            LOAD_COUNTER.computeIfAbsent(info.info, _u -> new ArrayList<>());
                     if (holders.size() > 0) {
                         isLoaded = true;
                     }
-                    if (!holders.contains(info.holder))
+                    if (!holders.contains(info.holder)) {
                         holders.add(info.holder);
+                    }
                 }
                 if (isLoaded) {
                     if (player == null)
@@ -395,8 +408,8 @@ public final class NameHandler implements INetworkSync {
         writeService.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
-                    final List<LoadHolder<?>> holders = LOAD_COUNTER.getOrDefault(info.info,
-                            new ArrayList<>());
+                    final List<LoadHolder<?>> holders =
+                            LOAD_COUNTER.getOrDefault(info.info, new ArrayList<>());
                     holders.remove(info.holder);
                     if (!holders.isEmpty())
                         return;

@@ -7,6 +7,7 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
@@ -33,14 +34,17 @@ public final class NetworkBufferWrappers {
     public static final Function<ReadBuffer, PathEntryType<?>> PATHENTRYTYPE_FUNCTION = buf -> PathEntryType.ALL_ENTRIES
             .get(buf.getByteToUnsignedInt());
 
-    public static Function<ReadBuffer, SignalBoxNode> getSignalBoxNodeFunc() {
+    public static Function<ReadBuffer, SignalBoxNode> getSignalBoxNodeFunc(
+            final SignalBoxNetworkHandler network) {
         return buffer -> getSignalBoxNodeFunc(
-                ReadBuffer.getINetworkSaveableFunction(Point.class).apply(buffer)).apply(buffer);
+                ReadBuffer.getINetworkSaveableFunction(Point.class).apply(buffer), network)
+                        .apply(buffer);
     }
 
-    public static Function<ReadBuffer, SignalBoxNode> getSignalBoxNodeFunc(final Point point) {
+    public static Function<ReadBuffer, SignalBoxNode> getSignalBoxNodeFunc(final Point point,
+            final SignalBoxNetworkHandler network) {
         return buffer -> {
-            final SignalBoxNode node = new SignalBoxNode(point);
+            final SignalBoxNode node = new SignalBoxNode(point, network);
             node.readNetwork(buffer);
             return node;
         };

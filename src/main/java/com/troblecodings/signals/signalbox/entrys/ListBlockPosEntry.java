@@ -49,6 +49,11 @@ public class ListBlockPosEntry extends IPathEntry<List<PosIdentifier>> {
         this.list = new ArrayList<>(value);
     }
 
+    @Override
+    public List<PosIdentifier> getDefaultValue() {
+        return new ArrayList<>();
+    }
+
     public void add(final PosIdentifier pos) {
         list.add(pos);
     }

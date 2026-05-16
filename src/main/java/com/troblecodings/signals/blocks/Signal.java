@@ -43,6 +43,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -68,7 +69,7 @@ public class Signal extends BasicBlock {
     };
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
-    public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
+    public static final Map<Integer, Signal> SIGNAL_IDS = new HashMap<>();
     public static final EnumProperty<SignalAngel> ANGEL =
             EnumProperty.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
@@ -80,13 +81,17 @@ public class Signal extends BasicBlock {
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
 
-    public Signal(final SignalProperties prop) {
+    public Signal(final SignalProperties prop, final String name) {
         super(Properties.of(Material.STONE).noOcclusion()
                 .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
                 .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
-        this.id = SIGNAL_IDS.size();
-        SIGNAL_IDS.add(this);
+        this.id = name.hashCode();
+        if (SIGNAL_IDS.containsKey(this.id)) {
+            OpenSignalsMain.exitMinecraftWithMessage("Hash [" + this.id + "] already exists for ["
+                    + name + "]! Need to choose an other name!");
+        }
+        SIGNAL_IDS.put(this.id, this);
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
@@ -140,14 +145,14 @@ public class Signal extends BasicBlock {
     @Override
     public VoxelShape getShape(final BlockState state, final IBlockReader source,
             final BlockPos pos, final ISelectionContext context) {
-        final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
-        if (te == null)
+        final TileEntity te = source.getBlockEntity(pos);
+        if (te == null || !(te instanceof SignalTileEntity))
             return VoxelShapes.block();
         final World world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
-                : te.getProperties();
+                : ((SignalTileEntity) te).getProperties();
         return VoxelShapes
                 .create(VoxelShapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
