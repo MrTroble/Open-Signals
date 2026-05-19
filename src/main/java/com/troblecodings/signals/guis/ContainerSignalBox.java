@@ -29,6 +29,8 @@ import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler.SignalBoxNetworkListener;
+import com.troblecodings.signals.network.SignalBoxNetworkReader;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -47,7 +49,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
-public class ContainerSignalBox extends ContainerBase implements UIClientSync, IChunkLoadable {
+public class ContainerSignalBox extends ContainerBase
+        implements UIClientSync, IChunkLoadable, SignalBoxNetworkReader {
 
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryState>> enabledSubsidiaryTypes =
@@ -58,8 +61,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     protected SignalBoxTileEntity tile;
 
     private final Map<BlockPos, LinkType> posForType = new HashMap<>();
-    private SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
     private Player player;
+    private SignalBoxNetworkHandler network;
+    private SignalBoxNetworkListener listener;
 
     protected Consumer<SignalBoxNode> updateSignalState = (node) -> {
     };
@@ -83,11 +87,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     @Override
     public void sendAllDataToRemote() {
         this.grid = tile.getSignalBoxGrid();
+        this.network = grid.getNetwork();
         initializeNetwork();
         sendInitialisationPacket();
-        network.sendAll();
+        network.sendAll(this);
     }
 
+    @Override
     public void addAdditionalInitialisationData(final WriteBuffer buffer) {
         final StateInfo identifier = new StateInfo(info.world, tile.getBlockPos());
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
@@ -115,6 +121,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 (b, list) -> b.putISaveableList(list));
     }
 
+    @Override
     public void readAdditionalInitialisationData(final ReadBuffer buffer) {
         posForType.clear();
         nextPathways.clear();
@@ -132,8 +139,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 enabledSubsidiaryTypes.put(node.getPoint(), subsidiares);
             }
         });
-        update();
         loadPossibleSubsidiaires();
+        update();
     }
 
     private void sendInitialisationPacket() {
@@ -152,6 +159,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             final BlockPos pos = buffer.getBlockPos();
             this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
             this.grid = tile.getSignalBoxGrid();
+            this.network = grid.getNetwork();
             initializeNetwork();
             return;
         }
@@ -167,12 +175,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         tile.setChanged();
     }
 
+    @Override
     public void handlePathwayRequestResponse(final PathwayRequestMode result) {
         if (!isClientSide())
             return;
         infoUpdates.accept(I18Wrapper.format("error." + result.getName()));
     }
 
+    @Override
     public void handleAddSavedPathway(final Point p1, final Point p2, final PathType type,
             final PathwayRequestMode result) {
         if (!isClientSide())
@@ -182,22 +192,27 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 + I18Wrapper.format("info.pathwaysaver"));
     }
 
+    @Override
     public void handleRemoveSavedPathway(final Point p1, final Point p2) {
         nextPathways.remove(Maps.immutableEntry(p1, p2));
     }
 
+    @Override
     public void handleDebugPoints(final List<Point> debugPoints) {
         this.debugPoints.accept(debugPoints);
     }
 
+    @Override
     public void handleCounterUpdate() {
         counterUpdater.run();
     }
 
+    @Override
     public void handleNodeUpdate(final SignalBoxNode node, final PathEntryType<?> type) {
         nodeUpdate.accept(node, type);
     }
 
+    @Override
     public void handleSignalStateUpdate(final SignalBoxNode node) {
         updateSignalState.accept(node);
     }
@@ -205,8 +220,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private void initializeNetwork() {
         if (grid == null)
             return;
-        grid.setUpNetwork(this);
-        this.network.setUpNetwork(this);
+        listener = new SignalBoxNetworkListener(getStateInfo(),
+                b -> OpenSignalsMain.network.sendTo(getPlayer(), b));
+        network.addListener(listener, false);
+        network.setUpNetworkReader(this);
     }
 
     private void loadPossibleSubsidiaires() {
@@ -253,6 +270,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         }
     }
 
+    @Override
     public void updateServerSubsidiary(final ModeIdentifier ident, final SubsidiaryState state,
             final boolean enable) {
         if (isClientSide())
@@ -282,10 +300,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         return this.tile;
     }
 
+    @Override
     public SignalBoxGrid getGrid() {
         return this.grid;
     }
 
+    @Override
     public boolean isClientSide() {
         return this.info.world.isClientSide;
     }
@@ -293,8 +313,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     @Override
     public void removed(final Player playerIn) {
         super.removed(playerIn);
-        grid.removeNetwork();
-        network.removeNetwork();
+        network.removeListener(listener);
+        network.removeNetworkReader();
         if (this.tile != null) {
             this.tile.remove(this);
         }
@@ -318,5 +338,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             this.tile.add(this);
         }
         return true;
+    }
+
+    @Override
+    public StateInfo getStateInfo() {
+        return new StateInfo(info.world, tile.getBlockPos());
     }
 }

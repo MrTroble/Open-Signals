@@ -20,8 +20,10 @@ import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.GuiTrainNumber;
 import com.troblecodings.signals.guis.NamableGui;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
+import com.troblecodings.signals.handler.ClientMonitorNetworkHandler;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.items.Placementtool;
@@ -43,6 +45,7 @@ public class ClientProxy extends CommonProxy {
         super.initModEvent(event);
         SignalStateHandler.registerToNetworkChannel(new ClientSignalStateHandler());
         NameHandler.registerToNetworkChannel(new ClientNameHandler());
+        MonitorNetworkHandler.registerToNetworkChannel(new ClientMonitorNetworkHandler());
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
         OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
         OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);

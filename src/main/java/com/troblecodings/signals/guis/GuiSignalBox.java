@@ -645,6 +645,7 @@ public class GuiSignalBox extends GuiBase {
     public void updateFromContainer() {
         updateAllEnabledSubsidiaries();
         initializeBasicUI();
+        System.out.println("Calling UI");
         enabledSubsidiaries.values()
                 .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
     }

@@ -1,11 +1,12 @@
 package com.troblecodings.signals.network;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -13,7 +14,6 @@ import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
-import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -55,40 +55,52 @@ public class SignalBoxNetworkHandler {
     protected static final SignalBoxNetworkMode DEBUG_POINTS =
             new SignalBoxNetworkMode((b, n) -> n.readDebugPoints(b));
 
-    protected ContainerSignalBox container = null;
+    protected SignalBoxNetworkReader reader;
+    protected final SignalBoxGrid grid;
+    protected final List<SignalBoxNetworkListener> listeners = new ArrayList<>();
 
-    public void setUpNetwork(final ContainerSignalBox container) {
-        this.container = container;
+    public SignalBoxNetworkHandler(final SignalBoxGrid grid) {
+        this(null, grid);
     }
 
-    public void removeNetwork() {
-        this.container = null;
+    public SignalBoxNetworkHandler(final SignalBoxNetworkReader reader, final SignalBoxGrid grid) {
+        this.reader = reader;
+        this.grid = grid;
     }
 
-    protected boolean containerConnected() {
-        return container != null;
+    public void addListener(final SignalBoxNetworkListener listener, final boolean sendInitPacket) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+            if (!sendInitPacket)
+                return;
+            final WriteBuffer buffer = new WriteBuffer();
+            getGrid().writeNetwork(buffer);
+            listener.consumer.accept(buffer);
+        }
     }
 
-    public ContainerSignalBox getContainer() {
-        return container;
+    public void removeListener(final SignalBoxNetworkListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void setUpNetworkReader(final SignalBoxNetworkReader reader) {
+        this.reader = reader;
+    }
+
+    public void removeNetworkReader() {
+        this.reader = null;
     }
 
     public void sendModeAdd(final ModeIdentifier ident) {
-        if (!containerConnected())
-            return;
         sendBuffer(getEntryBuffer(ident, EntryNetworkMode.MODE_ADD));
     }
 
     public void sendModeRemove(final ModeIdentifier ident) {
-        if (!containerConnected())
-            return;
         sendBuffer(getEntryBuffer(ident, EntryNetworkMode.MODE_REMOVE));
     }
 
     public void sendEntryAdd(final ModeIdentifier ident, final PathEntryType<?> entryType,
             final IPathEntry<?> entry) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getEntryBuffer(ident, EntryNetworkMode.ENTRY_ADD);
         buffer.putInt(entryType.getID());
         entry.writeNetwork(buffer);
@@ -96,49 +108,37 @@ public class SignalBoxNetworkHandler {
     }
 
     public void sendEntryRemove(final ModeIdentifier ident, final PathEntryType<?> type) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getEntryBuffer(ident, EntryNetworkMode.ENTRY_REMOVE);
         buffer.putInt(type.getID());
         sendBuffer(buffer);
     }
 
-    public void sendAll() {
-        if (!containerConnected())
-            return;
+    public void sendAll(final SignalBoxNetworkReader reader) {
         final WriteBuffer buffer = getGridBuffer(GridNetworkMode.SEND_ALL);
         getGrid().writeNetwork(buffer);
-        container.addAdditionalInitialisationData(buffer);
+        reader.addAdditionalInitialisationData(buffer);
         sendBuffer(buffer);
     }
 
     public void sendCounter() {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getGridBuffer(GridNetworkMode.COUNTER);
         buffer.putInt(getGrid().getCurrentCounter());
         sendBuffer(buffer);
     }
 
     public void sendNodeLabel(final Point point, final String label) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getNodeBuffer(point, NodeNetworkMode.LABEL);
         buffer.putString(label);
         sendBuffer(buffer);
     }
 
     public void sendAutoPoint(final Point point, final boolean autoPoint) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getNodeBuffer(point, NodeNetworkMode.AUTO_POINT);
         buffer.putBoolean(autoPoint);
         sendBuffer(buffer);
     }
 
     public void sendRequestPathway(final Point p1, final Point p2, final PathType type) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getPathwayBuffer(PathwayNetworkMode.REQUEST);
         p1.writeNetwork(buffer);
         p2.writeNetwork(buffer);
@@ -147,37 +147,27 @@ public class SignalBoxNetworkHandler {
     }
 
     public void sendResetPathway(final Point p1) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getPathwayBuffer(PathwayNetworkMode.RESET);
         p1.writeNetwork(buffer);
         sendBuffer(buffer);
     }
 
     public void sendRequestResponse(final PathwayRequestResult result) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getPathwayBuffer(PathwayNetworkMode.RESPONSE);
         buffer.putEnumValue(result.getMode());
         sendBuffer(buffer);
     }
 
     public void sendResetAllPathways() {
-        if (!containerConnected())
-            return;
         sendBuffer(getPathwayBuffer(PathwayNetworkMode.RESET_ALL_PATHWAYS));
     }
 
     public void sendResetAllSignals() {
-        if (!containerConnected())
-            return;
         sendBuffer(getPathwayBuffer(PathwayNetworkMode.RESET_ALL_SIGNALS));
     }
 
     public void sendAddSavedPathway(final Point start, final Point end, final PathType type,
             final PathwayRequestResult result) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getSavedPathwayBuffer(start, end);
         buffer.putByte(ADD);
         buffer.putEnumValue(type);
@@ -186,16 +176,12 @@ public class SignalBoxNetworkHandler {
     }
 
     public void sendRemoveSavedPathway(final Point start, final Point end) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getSavedPathwayBuffer(start, end);
         buffer.putByte(REMOVE);
         sendBuffer(buffer);
     }
 
     public void sendRemovePos(final BlockPos pos) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getGridBuffer(GridNetworkMode.REMOVE_POS);
         buffer.putBlockPos(pos);
         sendBuffer(buffer);
@@ -203,8 +189,6 @@ public class SignalBoxNetworkHandler {
 
     public void sendSubsidiary(final ModeIdentifier ident, final SubsidiaryState entry,
             final boolean enable) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = SUBSIDIARY.getBuffer();
         ident.writeNetwork(buffer);
         entry.writeNetwork(buffer);
@@ -228,8 +212,6 @@ public class SignalBoxNetworkHandler {
     }
 
     public void updateTrainNumber(final Point point, final TrainNumber number) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = TRAINNUMBER.getBuffer();
         point.writeNetwork(buffer);
         number.writeNetwork(buffer);
@@ -237,16 +219,12 @@ public class SignalBoxNetworkHandler {
     }
 
     public void sendDebugPoints(final List<Point> points) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = DEBUG_POINTS.getBuffer();
         buffer.putISaveableList(points);
         sendBuffer(buffer);
     }
 
     public void sendUpdateSignalStates(final SignalBoxNode node) {
-        if (!containerConnected())
-            return;
         final WriteBuffer buffer = getNodeBuffer(node.getPoint(), NodeNetworkMode.SIGNAL_STATE);
         node.writeSignalStates(buffer);
         sendBuffer(buffer);
@@ -265,13 +243,13 @@ public class SignalBoxNetworkHandler {
         final PathOptionEntry optionEntry = node.getOrCreateOption(ident.mode);
         if (mode.equals(EntryNetworkMode.ENTRY_REMOVE)) {
             optionEntry.removeEntryNoNetwork(entryType);
-            container.handleNodeUpdate(node, entryType);
+            reader.handleNodeUpdate(node, entryType);
             return;
         }
         final IPathEntry<?> entry = entryType.newValue();
         entry.readNetwork(buffer);
         optionEntry.addEntry(entryType, entry);
-        container.handleNodeUpdate(node, entryType);
+        reader.handleNodeUpdate(node, entryType);
     }
 
     protected void readForGrid(final ReadBuffer buffer) {
@@ -279,14 +257,13 @@ public class SignalBoxNetworkHandler {
         final GridNetworkMode mode = buffer.getEnumValue(GridNetworkMode.class);
         if (mode.equals(GridNetworkMode.SEND_ALL)) {
             grid.readNetwork(buffer);
-            container.readAdditionalInitialisationData(buffer);
+            reader.readAdditionalInitialisationData(buffer);
         } else if (mode.equals(GridNetworkMode.COUNTER)) {
             grid.setCounterFromNetwork(buffer.getInt());
-            container.handleCounterUpdate();
+            reader.handleCounterUpdate();
         } else {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(new StateInfo(container.getTile().getLevel(),
-                    container.getTile().getBlockPos()), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(reader.getStateInfo(), pos);
         }
     }
 
@@ -308,14 +285,14 @@ public class SignalBoxNetworkHandler {
         }
         if (mode.equals(NodeNetworkMode.SIGNAL_STATE)) {
             node.readSignalStates(buffer);
-            container.handleSignalStateUpdate(node);
+            reader.handleSignalStateUpdate(node);
         }
     }
 
     protected void handleManuellOutput(final SignalBoxNode node, final ModeSet mode,
             final NodeNetworkMode network) {
         final boolean state = network.equals(NodeNetworkMode.MANUELL_OUTPUT_ADD) ? true : false;
-        if (container.isClientSide()) {
+        if (reader.isClientSide()) {
             node.handleManuellEnabledOutputUpdate(mode, state);
         } else {
             getGrid().updateManuellRSOutput(node.getPoint(), mode, state);
@@ -326,7 +303,7 @@ public class SignalBoxNetworkHandler {
         final SignalBoxGrid grid = getGrid();
         final PathwayNetworkMode mode = buffer.getEnumValue(PathwayNetworkMode.class);
         if (mode.equals(PathwayNetworkMode.RESPONSE)) {
-            container.handlePathwayRequestResponse(buffer.getEnumValue(PathwayRequestMode.class));
+            reader.handlePathwayRequestResponse(buffer.getEnumValue(PathwayRequestMode.class));
             return;
         }
         if (mode.equals(PathwayNetworkMode.RESET_ALL_PATHWAYS)) {
@@ -371,19 +348,19 @@ public class SignalBoxNetworkHandler {
         final byte state = buffer.getByte();
         if (state == REMOVE) {
             getGrid().removeNextPathway(p1, p2);
-            container.handleRemoveSavedPathway(p1, p2);
+            reader.handleRemoveSavedPathway(p1, p2);
             return;
         }
         final PathType type = buffer.getEnumValue(PathType.class);
         final PathwayRequestMode result = buffer.getEnumValue(PathwayRequestMode.class);
-        container.handleAddSavedPathway(p1, p2, type, result);
+        reader.handleAddSavedPathway(p1, p2, type, result);
     }
 
     protected void readSubsidiary(final ReadBuffer buffer) {
         final ModeIdentifier ident = ModeIdentifier.of(buffer);
         final SubsidiaryState entry = SubsidiaryState.of(buffer);
         final boolean state = buffer.getBoolean();
-        container.updateServerSubsidiary(ident, entry, state);
+        reader.updateServerSubsidiary(ident, entry, state);
     }
 
     protected void readUpdateTrainNumber(final ReadBuffer buffer) {
@@ -393,7 +370,7 @@ public class SignalBoxNetworkHandler {
     }
 
     protected void readDebugPoints(final ReadBuffer buffer) {
-        container.handleDebugPoints(
+        reader.handleDebugPoints(
                 buffer.getList(ReadBuffer.getINetworkSaveableFunction(Point.class)));
     }
 
@@ -431,23 +408,23 @@ public class SignalBoxNetworkHandler {
     }
 
     protected SignalBoxGrid getGrid() {
-        return container.getGrid();
+        return grid;
     }
 
     public void desirializeBuffer(final ReadBuffer buffer) {
+        if (reader == null)
+            return;
         final SignalBoxNetworkMode mode = SignalBoxNetworkMode.getModeFromBuffer(buffer);
         mode.executeRead(buffer, this);
     }
 
     protected void sendBuffer(final WriteBuffer buffer) {
-        if (!containerConnected())
-            return;
-        OpenSignalsMain.network.sendTo(container.getPlayer(), buffer);
+        listeners.forEach(listener -> listener.consumer.accept(buffer));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(container);
+        return Objects.hash(listeners, reader);
     }
 
     @Override
@@ -457,7 +434,7 @@ public class SignalBoxNetworkHandler {
         if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         SignalBoxNetworkHandler other = (SignalBoxNetworkHandler) obj;
-        return Objects.equals(container, other.container);
+        return Objects.equals(listeners, other.listeners) && Objects.equals(reader, other.reader);
     }
 
     protected static enum PathwayNetworkMode {
@@ -474,5 +451,33 @@ public class SignalBoxNetworkHandler {
 
     protected static enum EntryNetworkMode {
         MODE_ADD, MODE_REMOVE, ENTRY_ADD, ENTRY_REMOVE;
+    }
+
+    public static class SignalBoxNetworkListener {
+
+        private final StateInfo info;
+        private final Consumer<WriteBuffer> consumer;
+
+        public SignalBoxNetworkListener(final StateInfo info,
+                final Consumer<WriteBuffer> consumer) {
+            this.info = info;
+            this.consumer = consumer;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(consumer, info);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if ((obj == null) || (getClass() != obj.getClass()))
+                return false;
+            SignalBoxNetworkListener other = (SignalBoxNetworkListener) obj;
+            return Objects.equals(consumer, other.consumer) && Objects.equals(info, other.info);
+        }
+
     }
 }

@@ -28,6 +28,7 @@ import com.troblecodings.signals.guis.ContainerSignalBridge;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.ContainerTrainNumber;
 import com.troblecodings.signals.guis.NamableContainer;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSItems;
@@ -43,6 +44,7 @@ public class CommonProxy {
     public void initModEvent(final FMLConstructModEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
+        MonitorNetworkHandler.init();
         OSSounds.init();
 
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,

@@ -3,7 +3,6 @@ package com.troblecodings.signals.signalbox.debug;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -19,20 +18,8 @@ import net.minecraft.core.BlockPos;
 
 public class DebugNetworkHandler extends SignalBoxNetworkHandler {
 
-    private final SignalBoxGrid grid;
-
     public DebugNetworkHandler(final SignalBoxGrid grid) {
-        this.grid = grid;
-    }
-
-    @Override
-    protected boolean containerConnected() {
-        return true;
-    }
-
-    @Override
-    protected SignalBoxGrid getGrid() {
-        return grid;
+        super(grid);
     }
 
     @Override
@@ -73,8 +60,7 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
             grid.setCounterFromNetwork(buffer.getInt());
         } else {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(new StateInfo(container.getTile().getLevel(),
-                    container.getTile().getBlockPos()), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(reader.getStateInfo(), pos);
         }
     }
 

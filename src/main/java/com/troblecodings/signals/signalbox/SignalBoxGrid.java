@@ -27,7 +27,6 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
-import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
@@ -59,7 +58,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     protected SignalBoxTileEntity tile;
     protected UISignalBoxProfile uiProfile = UISignalBoxProfile.DEFAULT;
     private int counter;
-    private final SignalBoxNetworkHandler network = new SignalBoxNetworkHandler();
+    private final SignalBoxNetworkHandler network = new SignalBoxNetworkHandler(this);
 
     public SignalBoxGrid() {
         this(SignalBoxFactory.getFactory());
@@ -134,14 +133,6 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             node.remove(mode);
         }
         node.post();
-    }
-
-    public void setUpNetwork(final ContainerSignalBox container) {
-        network.setUpNetwork(container);
-    }
-
-    public void removeNetwork() {
-        network.removeNetwork();
     }
 
     public SignalBoxNetworkHandler getNetwork() {
