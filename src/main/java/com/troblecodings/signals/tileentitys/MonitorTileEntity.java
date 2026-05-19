@@ -4,27 +4,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.RenderAnimationInfo;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
+import com.troblecodings.signals.network.SignalBoxNetworkHandler;
+import com.troblecodings.signals.network.SignalBoxNetworkReader;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 
-public class MonitorTileEntity extends SyncableTileEntity implements ILinkableTile {
+public class MonitorTileEntity extends SyncableTileEntity
+        implements ILinkableTile, SignalBoxNetworkReader {
 
     public static final String LINKED_SIGNAL_BOX = "linkedSignalBox";
     public static final String MONITOR_SIZE_X = "monitorSizeX";
@@ -32,6 +36,7 @@ public class MonitorTileEntity extends SyncableTileEntity implements ILinkableTi
     public static final String RENDER_START_POINT = "renderStartPoint";
     public static final String RENDER_END_POINT = "renderEndPoint";
 
+    private SignalBoxNetworkHandler network;
     private SignalBoxGrid grid = new SignalBoxGrid();
     private BlockPos linkedSignalBox = BlockPos.ZERO;
     private int monitorSizeX, monitorSizeY;
@@ -98,7 +103,7 @@ public class MonitorTileEntity extends SyncableTileEntity implements ILinkableTi
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
-            loadGrid();
+            MonitorNetworkHandler.registerMonitorToBox(getStateInfo());
             return true;
         }
         return false;
@@ -106,29 +111,40 @@ public class MonitorTileEntity extends SyncableTileEntity implements ILinkableTi
 
     @Override
     public void onLoad() {
-        if (level.isClientSide)
+        if (level.isClientSide || linkedSignalBox == null)
             return;
-        loadGrid();
+        MonitorNetworkHandler.onMonitorLoad(this, getStateInfo());
     }
 
-    private void loadGrid() {
-        loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, linkedSignalBox,
-                (tile, chunk) -> {
-                    grid = tile.getSignalBoxGrid();
-                });
+    @Override
+    public void onChunkUnloaded() {
+        // MonitorNetworkHandler.unregisterMonitorFromBox(getStateInfo());
     }
 
-    public void loadRenderPoints(final Point start, final Point end, final SignalBoxGrid grid) {
+    public void loadBoxUpdate(final ReadBuffer buffer) {
+        if (network == null) {
+            network = new SignalBoxNetworkHandler(this, grid);
+        }
+        network.desirializeBuffer(buffer);
+        updateRendering();
+    }
+
+    public void loadRenderPoints(final ReadBuffer buffer) {
+        renderStart = buffer.getINetworkSaveable(Point.class);
+        renderEnd = buffer.getINetworkSaveable(Point.class);
+        updateRendering();
+    }
+
+    private void updateRendering() {
         final Map<Point, SignalBoxNode> nodes = new HashMap<>();
         for (final SignalBoxNode node : grid.getNodes()) {
             final Point p = node.getPoint();
-            if (start.getX() <= p.getX() && p.getX() <= end.getX() && start.getY() <= p.getY()
-                    && p.getY() <= end.getY()) {
-                nodes.put(new Point(p.getX() - start.getX(), p.getY() - start.getY()), node);
+            if (renderStart.getX() <= p.getX() && p.getX() <= renderEnd.getX()
+                    && renderStart.getY() <= p.getY() && p.getY() <= renderEnd.getY()) {
+                nodes.put(new Point(p.getX() - renderStart.getX(), p.getY() - renderStart.getY()),
+                        node);
             }
         }
-        this.renderStart = start;
-        this.renderEnd = end;
         rendering = UISignalBoxRendering.createSignalBoxEntity(grid, grid.getUIProfile(),
                 grid.getUIProfile().getOperationModeSettings().getUIBorderSettings(),
                 (_u1, _u2, _u3) -> {
@@ -145,6 +161,7 @@ public class MonitorTileEntity extends SyncableTileEntity implements ILinkableTi
         this.monitorSizeY = monitorSizeY;
     }
 
+    @Override
     public SignalBoxGrid getGrid() {
         return grid;
     }
@@ -171,6 +188,16 @@ public class MonitorTileEntity extends SyncableTileEntity implements ILinkableTi
 
     public UISignalBoxProfile getProfile() {
         return grid.getUIProfile();
+    }
+
+    @Override
+    public StateInfo getStateInfo() {
+        return new StateInfo(level, linkedSignalBox);
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return level != null ? level.isClientSide : false;
     }
 
 }

@@ -68,7 +68,7 @@ public class ContainerMonitor extends ContainerBase {
             return;
         final BlockEntity tile = info.world.getBlockEntity(pos);
         if (tile != null) {
-            ((MonitorTileEntity) tile).loadRenderPoints(renderStart, renderEnd, grid);
+            ((MonitorTileEntity) tile).setRenderPoints(renderStart, renderEnd);
         }
         final WriteBuffer buffer = new WriteBuffer();
         renderStart.writeNetwork(buffer);
