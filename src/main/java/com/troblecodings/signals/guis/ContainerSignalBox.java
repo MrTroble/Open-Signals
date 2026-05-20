@@ -26,6 +26,7 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
@@ -59,10 +60,10 @@ public class ContainerSignalBox extends ContainerBase
     protected final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
     protected SignalBoxGrid grid;
     protected SignalBoxTileEntity tile;
+    protected SignalBoxNetworkHandler network;
 
     private final Map<BlockPos, LinkType> posForType = new HashMap<>();
     private Player player;
-    private SignalBoxNetworkHandler network;
     private SignalBoxNetworkListener listener;
 
     protected Consumer<SignalBoxNode> updateSignalState = (node) -> {
@@ -171,6 +172,8 @@ public class ContainerSignalBox extends ContainerBase
         if (grid == null) {
             grid = tile.getSignalBoxGrid();
         }
+        MonitorNetworkHandler.checkForClientUpdates(getStateInfo(), network,
+                new WriteBuffer(buffer.getCopiedBuffer().array()));
         network.desirializeBuffer(buffer);
         tile.setChanged();
     }
@@ -222,7 +225,7 @@ public class ContainerSignalBox extends ContainerBase
             return;
         listener = new SignalBoxNetworkListener(getStateInfo(),
                 b -> OpenSignalsMain.network.sendTo(getPlayer(), b));
-        network.addListener(listener, false);
+        network.addListener(listener);
         network.setUpNetworkReader(this);
     }
 

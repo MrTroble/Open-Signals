@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.ModeIdentifier;
@@ -31,28 +32,28 @@ public class SignalBoxNetworkHandler {
     private static final byte REMOVE = 0;
     private static final byte ADD = 1;
 
-    protected static final SignalBoxNetworkMode GRID =
+    public static final SignalBoxNetworkMode GRID =
             new SignalBoxNetworkMode((b, n) -> n.readForGrid(b));
 
-    protected static final SignalBoxNetworkMode ENTRY =
+    public static final SignalBoxNetworkMode ENTRY =
             new SignalBoxNetworkMode((b, n) -> n.readEntry(b));
 
-    protected static final SignalBoxNetworkMode NODE_SPECIAL_ENTRIES =
+    public static final SignalBoxNetworkMode NODE_SPECIAL_ENTRIES =
             new SignalBoxNetworkMode((b, n) -> n.readNodeSpecialEntries(b));
 
-    protected static final SignalBoxNetworkMode PATHWAY =
+    public static final SignalBoxNetworkMode PATHWAY =
             new SignalBoxNetworkMode((b, n) -> n.readPathwayAction(b));
 
-    protected static final SignalBoxNetworkMode PATHWAY_SAVER =
+    public static final SignalBoxNetworkMode PATHWAY_SAVER =
             new SignalBoxNetworkMode((b, n) -> n.readSavedPathway(b));
 
-    protected static final SignalBoxNetworkMode SUBSIDIARY =
+    public static final SignalBoxNetworkMode SUBSIDIARY =
             new SignalBoxNetworkMode((b, n) -> n.readSubsidiary(b));
 
-    protected static final SignalBoxNetworkMode TRAINNUMBER =
+    public static final SignalBoxNetworkMode TRAINNUMBER =
             new SignalBoxNetworkMode((b, n) -> n.readUpdateTrainNumber(b));
 
-    protected static final SignalBoxNetworkMode DEBUG_POINTS =
+    public static final SignalBoxNetworkMode DEBUG_POINTS =
             new SignalBoxNetworkMode((b, n) -> n.readDebugPoints(b));
 
     protected SignalBoxNetworkReader reader;
@@ -68,19 +69,18 @@ public class SignalBoxNetworkHandler {
         this.grid = grid;
     }
 
-    public void addListener(final SignalBoxNetworkListener listener, final boolean sendInitPacket) {
+    public void addListener(final SignalBoxNetworkListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
-            if (!sendInitPacket)
-                return;
-            final WriteBuffer buffer = new WriteBuffer();
-            getGrid().writeNetwork(buffer);
-            listener.consumer.accept(buffer);
         }
     }
 
     public void removeListener(final SignalBoxNetworkListener listener) {
         listeners.remove(listener);
+    }
+
+    public List<SignalBoxNetworkListener> getListeners() {
+        return ImmutableList.copyOf(listeners);
     }
 
     public void setUpNetworkReader(final SignalBoxNetworkReader reader) {
@@ -118,6 +118,14 @@ public class SignalBoxNetworkHandler {
         getGrid().writeNetwork(buffer);
         reader.addAdditionalInitialisationData(buffer);
         sendBuffer(buffer);
+    }
+
+    public void sendAllTo(final SignalBoxNetworkReader reader,
+            final SignalBoxNetworkListener listener) {
+        final WriteBuffer buffer = getGridBuffer(GridNetworkMode.SEND_ALL);
+        getGrid().writeNetwork(buffer);
+        reader.addAdditionalInitialisationData(buffer);
+        listener.consumer.accept(buffer);
     }
 
     public void sendCounter() {
@@ -374,48 +382,55 @@ public class SignalBoxNetworkHandler {
                 buffer.getList(ReadBuffer.getINetworkSaveableFunction(Point.class)));
     }
 
-    protected WriteBuffer getSavedPathwayBuffer(final Point p1, final Point p2) {
+    protected static WriteBuffer getSavedPathwayBuffer(final Point p1, final Point p2) {
         final WriteBuffer buffer = PATHWAY_SAVER.getBuffer();
         p1.writeNetwork(buffer);
         p2.writeNetwork(buffer);
         return buffer;
     }
 
-    protected WriteBuffer getNodeBuffer(final Point point, final NodeNetworkMode mode) {
+    protected static WriteBuffer getNodeBuffer(final Point point, final NodeNetworkMode mode) {
         final WriteBuffer buffer = NODE_SPECIAL_ENTRIES.getBuffer();
         buffer.putEnumValue(mode);
         point.writeNetwork(buffer);
         return buffer;
     }
 
-    protected WriteBuffer getGridBuffer(final GridNetworkMode mode) {
+    protected static WriteBuffer getGridBuffer(final GridNetworkMode mode) {
         final WriteBuffer buffer = GRID.getBuffer();
         buffer.putEnumValue(mode);
         return buffer;
     }
 
-    protected WriteBuffer getPathwayBuffer(final PathwayNetworkMode mode) {
+    protected static WriteBuffer getPathwayBuffer(final PathwayNetworkMode mode) {
         final WriteBuffer buffer = PATHWAY.getBuffer();
         buffer.putEnumValue(mode);
         return buffer;
     }
 
-    protected WriteBuffer getEntryBuffer(final ModeIdentifier ident, final EntryNetworkMode mode) {
+    protected static WriteBuffer getEntryBuffer(final ModeIdentifier ident,
+            final EntryNetworkMode mode) {
         final WriteBuffer buffer = ENTRY.getBuffer();
         buffer.putEnumValue(mode);
         ident.writeNetwork(buffer);
         return buffer;
     }
 
-    protected SignalBoxGrid getGrid() {
+    public SignalBoxGrid getGrid() {
         return grid;
     }
 
     public void desirializeBuffer(final ReadBuffer buffer) {
+        desirializeBuffer(buffer, SignalBoxNetworkMode.NETWORK_ENTRIES);
+    }
+
+    public void desirializeBuffer(final ReadBuffer buffer,
+            final List<SignalBoxNetworkMode> allowedModes) {
         if (reader == null)
             return;
         final SignalBoxNetworkMode mode = SignalBoxNetworkMode.getModeFromBuffer(buffer);
-        mode.executeRead(buffer, this);
+        if (allowedModes.contains(mode))
+            mode.executeRead(buffer, this);
     }
 
     protected void sendBuffer(final WriteBuffer buffer) {
@@ -455,8 +470,8 @@ public class SignalBoxNetworkHandler {
 
     public static class SignalBoxNetworkListener {
 
-        private final StateInfo info;
-        private final Consumer<WriteBuffer> consumer;
+        public final StateInfo info;
+        public final Consumer<WriteBuffer> consumer;
 
         public SignalBoxNetworkListener(final StateInfo info,
                 final Consumer<WriteBuffer> consumer) {

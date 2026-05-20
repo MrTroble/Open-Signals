@@ -160,7 +160,7 @@ public class SidePanel {
         emergencyEntity.setWidth(20);
         emergencyEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
                 icons.getMX(iconId), 1));
-        emergencyEntity.add(new UIClickable(e -> gui.network.sendResetAllSignals()));
+        emergencyEntity.add(new UIClickable(e -> gui.container.network.sendResetAllSignals()));
         emergencyEntity.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
         list.add(emergencyEntity);
 
@@ -300,7 +300,7 @@ public class SidePanel {
 
         final UIEntity shButton =
                 GuiElements.createButton("     " + I18Wrapper.format("info.usage.emergency"),
-                        e -> gui.network.sendResetAllSignals());
+                        e -> gui.container.network.sendResetAllSignals());
         shButton.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
 
         final UIEntity emergencyEntity = new UIEntity();
@@ -410,7 +410,7 @@ public class SidePanel {
                             final UIEntity buttonYes =
                                     GuiElements.createButton(I18Wrapper.format("btn.yes"), e1 -> {
                                         gui.pop();
-                                        gui.network.sendResetPathway(node.getPoint());
+                                        gui.container.network.sendResetPathway(node.getPoint());
                                     });
                             final UIEntity buttonNo = GuiElements
                                     .createButton(I18Wrapper.format("btn.no"), e2 -> gui.pop());
@@ -474,7 +474,7 @@ public class SidePanel {
                                                     node.updateState(mode, SignalState.RED);
                                                     subsidiaries.remove(signalPos);
                                                 }
-                                                gui.network.sendSubsidiary(
+                                                gui.container.network.sendSubsidiary(
                                                         new ModeIdentifier(node.getPoint(), mode),
                                                         state, enable);
                                                 gui.container.updateClientSubsidiary(node, mode,
@@ -639,7 +639,7 @@ public class SidePanel {
                             lowerEntity.add(GuiElements.createSpacerH(7));
                             final UIEntity save =
                                     GuiElements.createButton(I18Wrapper.format("btn.save"), e1 -> {
-                                        gui.network.updateTrainNumber(node.getPoint(),
+                                        gui.container.network.updateTrainNumber(node.getPoint(),
                                                 new TrainNumber(input.getText()));
                                         input.setText("");
                                         gui.pop();
@@ -647,7 +647,7 @@ public class SidePanel {
                             save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
                             lowerEntity.add(save);
                             final UIEntity remove = GuiElements.createButton("x", e1 -> {
-                                gui.network.updateTrainNumber(node.getPoint(), TrainNumber.DEFAULT);
+                                gui.container.network.updateTrainNumber(node.getPoint(), TrainNumber.DEFAULT);
                                 gui.pop();
                             });
                             remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
@@ -882,7 +882,7 @@ public class SidePanel {
                 layout.add(GuiElements.createButton("x", 20, _u -> {
                     gui.container.nextPathways.remove(entry);
                     list.remove(layout);
-                    gui.network.sendRemoveSavedPathway(entry.getKey(), entry.getValue());
+                    gui.container.network.sendRemoveSavedPathway(entry.getKey(), entry.getValue());
                     gui.pop();
                 }));
                 list.add(layout);

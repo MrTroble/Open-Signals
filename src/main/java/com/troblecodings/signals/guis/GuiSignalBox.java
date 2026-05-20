@@ -51,7 +51,6 @@ import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SignalBoxConsumer;
 import com.troblecodings.signals.handler.ClientNameHandler;
-import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -70,7 +69,6 @@ public class GuiSignalBox extends GuiBase {
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
-    protected final SignalBoxNetworkHandler network;
     private SignalBoxPage page = SignalBoxPage.OPERATION;
     private SignalBoxNode lastTile = null;
     private UIEntity mainButton;
@@ -84,7 +82,6 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
-        this.network = container.getNetwork();
         container.infoUpdates = this::infoUpdate;
         container.counterUpdater = this::updateCounter;
         container.nodeUpdate = this::updateNode;
@@ -192,7 +189,8 @@ public class GuiSignalBox extends GuiBase {
 
     protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
         final SubsidiaryState state = holder.entry;
-        network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state, false);
+        container.network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state,
+                false);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
 
@@ -272,7 +270,8 @@ public class GuiSignalBox extends GuiBase {
             infoUpdate(
                     I18Wrapper.format("error." + PathwayRequestMode.NO_EQUAL_PATH_TYPE.getName()));
         } else if (possibleTypes.size() == 1) {
-            network.sendRequestPathway(start.getPoint(), end.getPoint(), possibleTypes.get(0));
+            container.network.sendRequestPathway(start.getPoint(), end.getPoint(),
+                    possibleTypes.get(0));
         } else if (possibleTypes.size() > 1) {
             push(GuiElements.createScreen(entity -> {
                 entity.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> pop()));
@@ -282,7 +281,8 @@ public class GuiSignalBox extends GuiBase {
                 entity.add(GuiElements.createSpacerV(10));
                 possibleTypes
                         .forEach(type -> entity.add(GuiElements.createButton(type.name(), e -> {
-                            network.sendRequestPathway(start.getPoint(), end.getPoint(), type);
+                            container.network.sendRequestPathway(start.getPoint(), end.getPoint(),
+                                    type);
                             pop();
                         })));
             }));
@@ -357,7 +357,7 @@ public class GuiSignalBox extends GuiBase {
 
         namingInput.setOnTextUpdate(str -> {
             node.setCustomText(str);
-            network.sendNodeLabel(node.getPoint(), str);
+            container.network.sendNodeLabel(node.getPoint(), str);
             rendering.updateNodeLabeling(node.getPoint(), str);
         });
 
@@ -474,7 +474,7 @@ public class GuiSignalBox extends GuiBase {
 
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
-                network.sendRemovePos(p);
+                container.network.sendRemovePos(p);
                 list.remove(layout);
             }));
             list.add(layout);
@@ -534,7 +534,7 @@ public class GuiSignalBox extends GuiBase {
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
-                network.sendResetAllPathways();
+                container.network.sendResetAllPathways();
                 resetAllSubsidiarySignals();
                 resetColors();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
@@ -645,7 +645,6 @@ public class GuiSignalBox extends GuiBase {
     public void updateFromContainer() {
         updateAllEnabledSubsidiaries();
         initializeBasicUI();
-        System.out.println("Calling UI");
         enabledSubsidiaries.values()
                 .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
     }
@@ -717,7 +716,7 @@ public class GuiSignalBox extends GuiBase {
             final SignalBoxNode node = container.grid.getNode(point);
             states.keySet().forEach(mode -> {
                 node.updateState(mode, SignalState.RED);
-                network.sendSubsidiary(new ModeIdentifier(point, mode), dummy, false);
+                container.network.sendSubsidiary(new ModeIdentifier(point, mode), dummy, false);
             });
             updateSignalState(node);
         });
