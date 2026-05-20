@@ -172,8 +172,9 @@ public class ModeDropDownBoxUI {
                                                     .getUIBorderSettings(),
                                             (rendering, point, mouseKey) -> {
                                                 final SignalBoxNode node =
-                                                        grid.getNodeChecked(point).orElseGet(
-                                                                () -> new SignalBoxNode());
+                                                        grid.getNodeChecked(point)
+                                                                .orElseGet(() -> new SignalBoxNode(
+                                                                        gui.container.network));
                                                 if (mouseKey != MouseEvent.LEFT_MOUSE
                                                         || node.isEmpty())
                                                     return;

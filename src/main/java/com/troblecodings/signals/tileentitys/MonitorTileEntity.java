@@ -1,10 +1,14 @@
 package com.troblecodings.signals.tileentitys;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
@@ -12,14 +16,18 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
+import com.troblecodings.signals.network.SignalBoxNetworkMode;
 import com.troblecodings.signals.network.SignalBoxNetworkReader;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -36,8 +44,14 @@ public class MonitorTileEntity extends SyncableTileEntity
     public static final String RENDER_START_POINT = "renderStartPoint";
     public static final String RENDER_END_POINT = "renderEndPoint";
 
+    private static final List<SignalBoxNetworkMode> allowedNetworkModes =
+            ImmutableList.of(SignalBoxNetworkHandler.GRID, SignalBoxNetworkHandler.ENTRY,
+                    SignalBoxNetworkHandler.NODE_SPECIAL_ENTRIES,
+                    SignalBoxNetworkHandler.SUBSIDIARY, SignalBoxNetworkHandler.TRAINNUMBER);
+
+    private final SignalBoxGrid grid = new SignalBoxGrid();
+    private final Map<Point, Point> translatedPoints = new HashMap<>();
     private SignalBoxNetworkHandler network;
-    private SignalBoxGrid grid = new SignalBoxGrid();
     private BlockPos linkedSignalBox = BlockPos.ZERO;
     private int monitorSizeX, monitorSizeY;
     private Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
@@ -92,6 +106,7 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     @Override
     public boolean unlink() {
+        MonitorNetworkHandler.deregisterMonitorFromBox(this);
         linkedSignalBox = BlockPos.ZERO;
         return true;
     }
@@ -103,29 +118,17 @@ public class MonitorTileEntity extends SyncableTileEntity
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
-            MonitorNetworkHandler.registerMonitorToBox(getStateInfo());
+            MonitorNetworkHandler.registerMonitorToBox(this);
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onLoad() {
-        if (level.isClientSide || linkedSignalBox == null)
-            return;
-        MonitorNetworkHandler.onMonitorLoad(this, getStateInfo());
-    }
-
-    @Override
-    public void onChunkUnloaded() {
-        // MonitorNetworkHandler.unregisterMonitorFromBox(getStateInfo());
     }
 
     public void loadBoxUpdate(final ReadBuffer buffer) {
         if (network == null) {
             network = new SignalBoxNetworkHandler(this, grid);
         }
-        network.desirializeBuffer(buffer);
+        network.desirializeBuffer(buffer, allowedNetworkModes);
         updateRendering();
     }
 
@@ -136,19 +139,49 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     private void updateRendering() {
+        translatedPoints.clear();
         final Map<Point, SignalBoxNode> nodes = new HashMap<>();
         for (final SignalBoxNode node : grid.getNodes()) {
             final Point p = node.getPoint();
-            if (renderStart.getX() <= p.getX() && p.getX() <= renderEnd.getX()
-                    && renderStart.getY() <= p.getY() && p.getY() <= renderEnd.getY()) {
-                nodes.put(new Point(p.getX() - renderStart.getX(), p.getY() - renderStart.getY()),
-                        node);
-            }
+            final Point translated = getPointTranslated(p);
+            if (translated != null)
+                nodes.put(translated, node);
         }
-        rendering = UISignalBoxRendering.createSignalBoxEntity(grid, grid.getUIProfile(),
-                grid.getUIProfile().getOperationModeSettings().getUIBorderSettings(),
-                (_u1, _u2, _u3) -> {
-                }, nodes).rendering;
+        rendering = new UISignalBoxRendering(grid, getProfile(),
+                getProfile().getOperationModeSettings().getUIBorderSettings(), (_u1, _u2, _u3) -> {
+                }, new UIEntity(), nodes);
+        buildColors(nodes.values(), getProfile());
+    }
+
+    private Point getPointTranslated(final Point p) {
+        if (translatedPoints.containsKey(p))
+            return translatedPoints.get(p);
+        if (renderStart.getX() <= p.getX() && p.getX() <= renderEnd.getX()
+                && renderStart.getY() <= p.getY() && p.getY() <= renderEnd.getY()) {
+            final Point translated =
+                    new Point(p.getX() - renderStart.getX(), p.getY() - renderStart.getY());
+            translatedPoints.put(p, translated);
+            return translated;
+        }
+        return null;
+    }
+
+    private void buildColors(final Collection<SignalBoxNode> nodes,
+            final UISignalBoxProfile profile) {
+        nodes.forEach(node -> {
+            final Point translated = getPointTranslated(node.getPoint());
+            if (translated == null)
+                return;
+            this.rendering.setColor(translated, mode -> {
+                if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
+                    return profile.getOperationModeSettings().getTrainnumberBackgroundColor();
+                if (node.containsManuellOutput(mode))
+                    return profile.getOperationModeSettings().getOutputColor();
+                return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
+                        .orElseGet(() -> EnumPathUsage.FREE)
+                        .getColor(profile.getOperationModeSettings());
+            });
+        });
     }
 
     public void setRenderPoints(final Point start, final Point end) {
