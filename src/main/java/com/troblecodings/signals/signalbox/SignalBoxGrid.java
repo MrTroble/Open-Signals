@@ -459,12 +459,14 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                 ReadBuffer.getINetworkSaveableFunction(Point.class),
                 (b, point) -> NetworkBufferWrappers.getSignalBoxNodeFunc(point, network).apply(b)));
         counter = buffer.getInt();
+        uiProfile = UISignalBoxProfile.UI_PROFILES.get(buffer.getInt());
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
         buffer.putINetworkSaveableMap(modeGrid);
         buffer.putInt(counter);
+        buffer.putInt(uiProfile.getID());
     }
 
     public void updateManuellRSOutput(final Point point, final ModeSet mode, final boolean state) {
@@ -488,6 +490,10 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
 
     public UISignalBoxProfile getUIProfile() {
         return uiProfile;
+    }
+
+    public void setUIProfile(final UISignalBoxProfile profile) {
+        this.uiProfile = profile;
     }
 
     public void sendDebugPointUpdates(final List<Point> points) {
