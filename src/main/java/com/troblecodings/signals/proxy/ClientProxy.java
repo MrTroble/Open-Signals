@@ -9,6 +9,7 @@ import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.SignalReader;
 import com.troblecodings.signals.blocks.TrainNumberBlock;
 import com.troblecodings.signals.guis.GuiMonitor;
 import com.troblecodings.signals.guis.GuiMonitorSelection;
@@ -17,6 +18,7 @@ import com.troblecodings.signals.guis.GuiPlacementtool;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.GuiSignalBridge;
 import com.troblecodings.signals.guis.GuiSignalController;
+import com.troblecodings.signals.guis.GuiSignalReader;
 import com.troblecodings.signals.guis.GuiTrainNumber;
 import com.troblecodings.signals.guis.NamableGui;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
@@ -56,6 +58,7 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(SignalBridgeBasicBlock.class, GuiSignalBridge::new);
         OpenSignalsMain.handler.addGui(Monitor.class, GuiMonitorSelection::new);
         OpenSignalsMain.handler.addGui(MonitorTEBlock.class, GuiMonitor::new);
+        OpenSignalsMain.handler.addGui(SignalReader.class, GuiSignalReader::new);
 
         UISignalBoxProfile.loadSignalBoxUIProfiles();
     }
