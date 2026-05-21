@@ -15,6 +15,7 @@ import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -131,6 +132,12 @@ public class SignalBoxNetworkHandler {
     public void sendCounter() {
         final WriteBuffer buffer = getGridBuffer(GridNetworkMode.COUNTER);
         buffer.putInt(getGrid().getCurrentCounter());
+        sendBuffer(buffer);
+    }
+
+    public void sendUIProfile(final UISignalBoxProfile profile) {
+        final WriteBuffer buffer = getGridBuffer(GridNetworkMode.UPDATE_UI_PROFILE);
+        buffer.putInt(profile.getID());
         sendBuffer(buffer);
     }
 
@@ -269,6 +276,8 @@ public class SignalBoxNetworkHandler {
         } else if (mode.equals(GridNetworkMode.COUNTER)) {
             grid.setCounterFromNetwork(buffer.getInt());
             reader.handleCounterUpdate();
+        } else if (mode.equals(GridNetworkMode.UPDATE_UI_PROFILE)) {
+            grid.setUIProfile(UISignalBoxProfile.UI_PROFILES.get(buffer.getInt()));
         } else {
             final BlockPos pos = buffer.getBlockPos();
             SignalBoxHandler.unlinkPosFromSignalBox(reader.getStateInfo(), pos);
@@ -461,7 +470,7 @@ public class SignalBoxNetworkHandler {
     }
 
     protected static enum GridNetworkMode {
-        SEND_ALL, COUNTER, REMOVE_POS;
+        SEND_ALL, COUNTER, REMOVE_POS, UPDATE_UI_PROFILE;
     }
 
     protected static enum EntryNetworkMode {

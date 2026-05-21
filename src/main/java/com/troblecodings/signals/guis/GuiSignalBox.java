@@ -628,7 +628,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void updateUIProfile(final int profileID) {
         this.profile = UISignalBoxProfile.UI_PROFILES.get(profileID);
-        // TODO Sent to Server
+        container.network.sendUIProfile(profile);
     }
 
     private void disableBottomEntity() {
@@ -643,6 +643,7 @@ public class GuiSignalBox extends GuiBase {
 
     @Override
     public void updateFromContainer() {
+        profile = container.grid.getUIProfile();
         updateAllEnabledSubsidiaries();
         initializeBasicUI();
         enabledSubsidiaries.values()
