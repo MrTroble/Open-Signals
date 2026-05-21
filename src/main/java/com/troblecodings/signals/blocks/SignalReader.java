@@ -27,7 +27,7 @@ public class SignalReader extends BasicBlock {
     }
 
     @Override
-    public boolean isSignalSource(final BlockState p_60571_) {
+    public boolean isSignalSource(final BlockState state) {
         return true;
     }
 

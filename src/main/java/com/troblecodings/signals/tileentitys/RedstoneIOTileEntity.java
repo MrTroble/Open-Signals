@@ -32,16 +32,20 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     private int resetDelay = 0;
-    private TimeUnit timeUnit = TimeUnit.SECONDS;
+    private TimeUnit resetTimeUnit = TimeUnit.SECONDS;
+    private int blockingDelay = 0;
+    private TimeUnit blockingTimeUnit = TimeUnit.SECONDS;
 
     private final List<BlockPos> linkedSignalController = new ArrayList<>();
-    private final ScheduledExecutorService resetExecutor = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
 
     public static final String NAME_NBT = "name";
     public static final String LINKED_LIST = "linkedList";
     public static final String LINKED_SIGNAL_CONTROLLER = "linkedSignalContrller";
     public static final String RESET_DELAY = "resetDelay";
-    public static final String RESET_DELAY_UNIT = "ResetDelayUnit";
+    public static final String RESET_DELAY_UNIT = "resetDelayUnit";
+    public static final String BLOCKING_DELAY = "blockingDelay";
+    public static final String BLOCKING_DELAY_UNIT = "blockingDelayUnit";
 
     @Override
     public String getNameWrapper() {
@@ -58,7 +62,9 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         wrapper.putList(LINKED_SIGNAL_CONTROLLER,
                 linkedSignalController.stream().map(NBTWrapper::getBlockPosWrapper).toList());
         wrapper.putInteger(RESET_DELAY, resetDelay);
-        wrapper.putString(RESET_DELAY_UNIT, timeUnit.name());
+        wrapper.putString(RESET_DELAY_UNIT, resetTimeUnit.name());
+        wrapper.putInteger(BLOCKING_DELAY, blockingDelay);
+        wrapper.putString(BLOCKING_DELAY_UNIT, blockingTimeUnit.name());
     }
 
     @Override
@@ -69,8 +75,14 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 .forEach(linkedPositions::add);
         wrapper.getList(LINKED_SIGNAL_CONTROLLER).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedSignalController::add);
-        resetDelay = wrapper.getInteger(RESET_DELAY);
-        timeUnit = TimeUnit.valueOf(wrapper.getString(RESET_DELAY_UNIT));
+        if (wrapper.contains(RESET_DELAY) && wrapper.contains(RESET_DELAY_UNIT)) {
+            resetDelay = wrapper.getInteger(RESET_DELAY);
+            resetTimeUnit = TimeUnit.valueOf(wrapper.getString(RESET_DELAY_UNIT));
+        }
+        if (wrapper.contains(BLOCKING_DELAY) && wrapper.contains(BLOCKING_DELAY_UNIT)) {
+            blockingDelay = wrapper.getInteger(BLOCKING_DELAY);
+            blockingTimeUnit = TimeUnit.valueOf(wrapper.getString(BLOCKING_DELAY_UNIT));
+        }
     }
 
     private ScheduledFuture<?> resetTask;
@@ -78,14 +90,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             .forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, pos,
                     (tile, _u) -> tile.getSignalBoxGrid().updateInput(packet)));
 
-    /**
-     * Is used for the normal SignalBoxInput. Calling Blocking and Resetting in one
-     * without the reset delay.
-     */
-    public void sendInputChanged() {
-        final RedstoneUpdatePacket packet = getRedstoneUpdatePacket();
-        if (packet == null)
-            return;
+    private void sendInputChanged(final RedstoneUpdatePacket packet) {
         updateSignalBoxes.accept(packet);
         linkedSignalController.forEach(pos -> loadChunkAndGetTile(SignalControllerTileEntity.class,
                 (ServerLevel) level, pos, (tile, _u) -> tile.updateFromRSInput()));
@@ -96,7 +101,14 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             resetTask.cancel(false);
             resetTask = null;
         }
-        sendInputChanged();
+        final RedstoneUpdatePacket packet = getRedstoneUpdatePacket();
+        if (packet == null)
+            return;
+        if (blockingDelay > 0) {
+            executor.schedule(() -> sendInputChanged(packet), blockingDelay, blockingTimeUnit);
+        } else {
+            sendInputChanged(packet);
+        }
     }
 
     public void sendInputOff() {
@@ -110,10 +122,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 if (!resetTask.cancel(false))
                     return;
             }
-            resetTask = resetExecutor.schedule(() -> {
+            resetTask = executor.schedule(() -> {
                 updateSignalBoxes.accept(packet);
                 resetTask = null;
-            }, resetDelay, timeUnit);
+            }, resetDelay, resetTimeUnit);
         }
     }
 
@@ -138,12 +150,28 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         this.resetDelay = resetDelay;
     }
 
-    public TimeUnit getTimeUnit() {
-        return timeUnit;
+    public TimeUnit getResetTimeUnit() {
+        return resetTimeUnit;
     }
 
-    public void setTimeUnit(final TimeUnit timeUnit) {
-        this.timeUnit = timeUnit;
+    public void setResetTimeUnit(final TimeUnit resetTimeUnit) {
+        this.resetTimeUnit = resetTimeUnit;
+    }
+
+    public int getBlockingDelay() {
+        return blockingDelay;
+    }
+
+    public void setBlockingDelay(final int blockingDelay) {
+        this.blockingDelay = blockingDelay;
+    }
+
+    public TimeUnit getBlockingTimeUnit() {
+        return blockingTimeUnit;
+    }
+
+    public void setBlockingTimeUnit(final TimeUnit blockingTimeUnit) {
+        this.blockingTimeUnit = blockingTimeUnit;
     }
 
     @Override

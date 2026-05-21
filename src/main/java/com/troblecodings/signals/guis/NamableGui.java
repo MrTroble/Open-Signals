@@ -15,6 +15,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.guis.NamableContainer.NamableContainerNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -73,7 +74,17 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity))
             return;
 
-        addResetInfoEntity(inner);
+        addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
+                NamableContainerNetwork.BLOCKING_TIME_UNIT,
+                I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay,
+                container.blockingTimeUnit);
+        if (container.tile.getBlockState().getBlock() instanceof CombinedRedstoneInput)
+            addDelayEntityFor(inner, NamableContainerNetwork.RESET_TIME,
+                    NamableContainerNetwork.RESET_TIME_UNIT,
+                    I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay,
+                    container.resetTimeUnit);
+
+        inner.add(GuiElements.createSpacerV(10));
 
         inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
@@ -92,7 +103,9 @@ public class NamableGui extends GuiBase {
         inner.add(GuiElements.createPageSelect(layout));
     }
 
-    private void addResetInfoEntity(final UIEntity inner) {
+    private void addDelayEntityFor(final UIEntity inner, final NamableContainerNetwork timeMode,
+            final NamableContainerNetwork timeUnitMode, final String label, final int defaultTime,
+            final TimeUnit defaultTimeUnit) {
         if (!(container.tile.getBlockState().getBlock() instanceof CombinedRedstoneInput))
             return;
 
@@ -102,9 +115,8 @@ public class NamableGui extends GuiBase {
         hentity.add(new UIBox(UIBox.HBOX, 5));
 
         inner.add(hentity);
-        inner.add(GuiElements.createSpacerV(10));
 
-        final UITextInput resetInput = new UITextInput(String.valueOf(container.resetDelay));
+        final UITextInput resetInput = new UITextInput(String.valueOf(defaultTime));
         resetInput.setValidator(input -> {
             if (input.isEmpty())
                 return true;
@@ -116,14 +128,13 @@ public class NamableGui extends GuiBase {
             return true;
         });
         resetInput.setOnTextUpdate(input -> container
-                .sendDelayTimeToServer(input.isEmpty() ? 0 : Integer.valueOf(input)));
+                .sendDelayTimeToServer(input.isEmpty() ? 0 : Integer.valueOf(input), timeMode));
 
         final UIEntity resetInputEntity = new UIEntity();
         resetInputEntity.setInherits(true);
         resetInputEntity.add(resetInput);
 
-        final UIEntity labelEntity =
-                GuiElements.createLabel(I18Wrapper.format("gui.namable.reset_delay"), 1f);
+        final UIEntity labelEntity = GuiElements.createLabel(label, 1f);
         labelEntity.setInheritWidth(false);
         labelEntity.setWidth(100);
         labelEntity.setY(2);
@@ -131,10 +142,10 @@ public class NamableGui extends GuiBase {
         hentity.add(labelEntity);
         hentity.add(resetInputEntity);
 
-        final UIEntity timeUnitSelection =
-                GuiElements.createEnumElement(new EnumIntegerable<>(TimeUnit.class),
-                        i -> container.sendDelayTimeUnitToServer(TimeUnit.values()[i]),
-                        container.resetTimeUnit.ordinal());
+        final UIEntity timeUnitSelection = GuiElements.createEnumElement(
+                new EnumIntegerable<>(TimeUnit.class),
+                i -> container.sendDelayTimeUnitToServer(TimeUnit.values()[i], timeUnitMode),
+                defaultTimeUnit.ordinal());
         timeUnitSelection.setInheritWidth(false);
         timeUnitSelection.setWidth(130);
         hentity.add(timeUnitSelection);

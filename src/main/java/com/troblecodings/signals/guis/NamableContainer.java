@@ -19,12 +19,10 @@ import net.minecraft.core.BlockPos;
 
 public class NamableContainer extends ContainerBase {
 
-    private static final Byte MODE_NAME = 0;
-    private static final Byte MODE_DELAY = 1;
-    private static final Byte MODE_DELAY_UNIT = 2;
-
     protected BasicBlockEntity tile;
     protected BlockPos pos;
+    protected int blockingDelay = 0;
+    protected TimeUnit blockingTimeUnit = TimeUnit.SECONDS;
     protected int resetDelay = 0;
     protected TimeUnit resetTimeUnit = TimeUnit.SECONDS;
     protected final List<BlockPos> linkedPos = new ArrayList<>();
@@ -42,10 +40,12 @@ public class NamableContainer extends ContainerBase {
         buffer.putBlockPos(info.pos);
         buffer.putList(tile.getLinkedPos(), WriteBuffer.BLOCKPOS_CONSUMER);
         if (tile instanceof RedstoneIOTileEntity) {
-            buffer.putList(((RedstoneIOTileEntity) tile).getLinkedController(),
-                    WriteBuffer.BLOCKPOS_CONSUMER);
-            buffer.putInt(((RedstoneIOTileEntity) tile).getResetDelay());
-            buffer.putEnumValue(((RedstoneIOTileEntity) tile).getTimeUnit());
+            final RedstoneIOTileEntity ioTile = (RedstoneIOTileEntity) tile;
+            buffer.putList(ioTile.getLinkedController(), WriteBuffer.BLOCKPOS_CONSUMER);
+            buffer.putInt(ioTile.getBlockingDelay());
+            buffer.putEnumValue(ioTile.getBlockingTimeUnit());
+            buffer.putInt(ioTile.getResetDelay());
+            buffer.putEnumValue(ioTile.getResetTimeUnit());
         }
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
@@ -64,6 +64,8 @@ public class NamableContainer extends ContainerBase {
         linkedPos.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
         if (tile instanceof RedstoneIOTileEntity) {
             linkedController.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
+            blockingDelay = buffer.getInt();
+            blockingTimeUnit = buffer.getEnumValue(TimeUnit.class);
             resetDelay = buffer.getInt();
             resetTimeUnit = buffer.getEnumValue(TimeUnit.class);
         }
@@ -72,8 +74,8 @@ public class NamableContainer extends ContainerBase {
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        final byte mode = buffer.getByte();
-        if (mode == MODE_NAME) {
+        final NamableContainerNetwork mode = buffer.getEnumValue(NamableContainerNetwork.class);
+        if (mode.equals(NamableContainerNetwork.NAME)) {
             final StateInfo info = new StateInfo(this.info.world, this.info.pos);
             final String name = buffer.getString();
             if (tile instanceof SignalTileEntity) {
@@ -84,35 +86,50 @@ public class NamableContainer extends ContainerBase {
         }
         if (!(tile instanceof RedstoneIOTileEntity))
             return;
-        if (mode == MODE_DELAY) {
-            ((RedstoneIOTileEntity) tile).setResetDelay(buffer.getInt());
-        } else if (mode == MODE_DELAY_UNIT) {
-            ((RedstoneIOTileEntity) tile).setTimeUnit(buffer.getEnumValue(TimeUnit.class));
+        final RedstoneIOTileEntity ioTile = (RedstoneIOTileEntity) tile;
+        if (mode.equals(NamableContainerNetwork.BLOCKING_TIME)) {
+            ioTile.setBlockingDelay(buffer.getInt());
         }
-
+        if (mode.equals(NamableContainerNetwork.RESET_TIME)) {
+            ioTile.setResetDelay(buffer.getInt());
+        }
+        if (mode.equals(NamableContainerNetwork.BLOCKING_TIME_UNIT)) {
+            ioTile.setBlockingTimeUnit(buffer.getEnumValue(TimeUnit.class));
+        }
+        if (mode.equals(NamableContainerNetwork.RESET_TIME_UNIT)) {
+            ioTile.setResetTimeUnit(buffer.getEnumValue(TimeUnit.class));
+        }
+        tile.setChanged();
     }
 
     protected void sendNameToServer(final String name) {
-        final WriteBuffer buffer = getBuffer(MODE_NAME);
+        final WriteBuffer buffer = getBuffer(NamableContainerNetwork.NAME);
         buffer.putString(name);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    protected void sendDelayTimeToServer(final int delay) {
-        final WriteBuffer buffer = getBuffer(MODE_DELAY);
+    protected void sendDelayTimeToServer(final int delay, final NamableContainerNetwork mode) {
+        final WriteBuffer buffer = getBuffer(mode);
         buffer.putInt(delay);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    protected void sendDelayTimeUnitToServer(final TimeUnit unit) {
-        final WriteBuffer buffer = getBuffer(MODE_DELAY_UNIT);
+    protected void sendDelayTimeUnitToServer(final TimeUnit unit,
+            final NamableContainerNetwork mode) {
+        final WriteBuffer buffer = getBuffer(mode);
         buffer.putEnumValue(unit);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private static WriteBuffer getBuffer(final byte mode) {
+    private static WriteBuffer getBuffer(final NamableContainerNetwork mode) {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte(mode);
+        buffer.putEnumValue(mode);
         return buffer;
+    }
+
+    protected static enum NamableContainerNetwork {
+
+        NAME, RESET_TIME, RESET_TIME_UNIT, BLOCKING_TIME, BLOCKING_TIME_UNIT;
+
     }
 }
