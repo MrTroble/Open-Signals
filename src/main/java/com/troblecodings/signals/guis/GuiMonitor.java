@@ -25,6 +25,7 @@ public class GuiMonitor extends GuiBase {
     private UILabel ratioInfo;
     private BoxEntity box;
     private float monitorRatio = 0;
+    private UIMouseUpdate mouseUpdate;
 
     public GuiMonitor(final GuiInfo info) {
         super(info);
@@ -54,7 +55,7 @@ public class GuiMonitor extends GuiBase {
         final UIEntity boxEntity = box.entity;
 
         final UISignalBoxProfile uiProfile = container.grid.getUIProfile();
-        final UIMouseUpdate mouseUpdate = getUserSelectionGrid(box, uiProfile);
+        mouseUpdate = getUserSelectionGrid(box, uiProfile);
 
         boxEntity.add(mouseUpdate);
 
@@ -123,6 +124,10 @@ public class GuiMonitor extends GuiBase {
                 return;
             }
             container.sendNewPointsToServer();
+        }, (hoveredPoint) -> {
+            if (selectedPoints.isEmpty())
+                return;
+            updateRatioInfo(selectedPoints.get(0), hoveredPoint);
         }, box.rendering);
     }
 
@@ -178,18 +183,27 @@ public class GuiMonitor extends GuiBase {
         addRenderSelection();
     }
 
+    @Override
+    public void mouseMoved(final double mouseX, final double mouseY) {
+        mouseUpdate.mouseEvent(new MouseEvent(mouseX, mouseY, 0, EnumMouseState.MOVE));
+        super.mouseMoved(mouseX, mouseY);
+    }
+
     private static class UIMouseUpdate extends UIComponent {
 
         private final UISignalBoxRendering rendering;
         private final Consumer<Point> consumer;
         private final Consumer<UIMouseUpdate> onRelease;
+        private final Consumer<Point> ratioUpdate;
         private boolean enable;
 
         public UIMouseUpdate(final Consumer<Point> consumer,
-                final Consumer<UIMouseUpdate> onRelease, final UISignalBoxRendering rendering) {
+                final Consumer<UIMouseUpdate> onRelease, final Consumer<Point> ratioUpdate,
+                final UISignalBoxRendering rendering) {
             this.consumer = consumer;
             this.onRelease = onRelease;
             this.rendering = rendering;
+            this.ratioUpdate = ratioUpdate;
         }
 
         @Override
@@ -214,6 +228,8 @@ public class GuiMonitor extends GuiBase {
             } else if (event.state == EnumMouseState.RELEASE) {
                 enable = false;
                 onRelease.accept(this);
+            } else if (event.state == EnumMouseState.MOVE) {
+                ratioUpdate.accept(point);
             }
         }
     }
