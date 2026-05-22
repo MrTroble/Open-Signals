@@ -59,7 +59,6 @@ public class MonitorTEBlock extends Monitor {
         final DrawInfo drawInfo = new DrawInfo(info.stack);
         drawInfo.push();
         drawInfo.alphaOn();
-        drawInfo.blendOn();
         drawInfo.depthOff();
         drawInfo.applyColor();
 
@@ -91,7 +90,6 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.scale(1, 1, -0.1f);
         rendering.draw(drawInfo);
 
-        drawInfo.blendOff();
         drawInfo.depthOff();
         drawInfo.alphaOff();
         drawInfo.pop();

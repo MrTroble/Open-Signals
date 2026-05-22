@@ -407,7 +407,8 @@ public class GuiSignalBox extends GuiBase {
                 SizeIntegerables.of("ui_profiles", UISignalBoxProfile.UI_PROFILES.size(),
                         i -> I18Wrapper.format("gui.signalbox.profile."
                                 + UISignalBoxProfile.UI_PROFILES.get(i).getName()));
-        lowerEntity.add(GuiElements.createEnumElement(uiProfiles, i -> updateUIProfile(i)));
+        lowerEntity.add(GuiElements.createEnumElement(uiProfiles, i -> updateUIProfile(i),
+                profile.getID()));
 
         final IIntegerable<ShowTypes> sorting = new EnumIntegerable<>(ShowTypes.class);
         lowerEntity.add(GuiElements.createEnumElement(sorting, i -> {
