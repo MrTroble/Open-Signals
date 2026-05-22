@@ -117,7 +117,13 @@ public class GuiMonitor extends GuiBase {
             }
             updateRatioInfo(start, end);
             container.renderEnd = end;
-        }, () -> container.sendNewPointsToServer(), box.rendering);
+        }, (update) -> {
+            if (selectedPoints.size() == 1) {
+                update.enable();
+                return;
+            }
+            container.sendNewPointsToServer();
+        }, box.rendering);
     }
 
     private void updateRatioInfo(final Point start, final Point end) {
@@ -175,13 +181,13 @@ public class GuiMonitor extends GuiBase {
     private static class UIMouseUpdate extends UIComponent {
 
         private final UISignalBoxRendering rendering;
-        private final Consumer<Point> consuner;
-        private final Runnable onRelease;
+        private final Consumer<Point> consumer;
+        private final Consumer<UIMouseUpdate> onRelease;
         private boolean enable;
 
-        public UIMouseUpdate(final Consumer<Point> consuner, final Runnable onRelease,
-                final UISignalBoxRendering rendering) {
-            this.consuner = consuner;
+        public UIMouseUpdate(final Consumer<Point> consumer,
+                final Consumer<UIMouseUpdate> onRelease, final UISignalBoxRendering rendering) {
+            this.consumer = consumer;
             this.onRelease = onRelease;
             this.rendering = rendering;
         }
@@ -204,10 +210,10 @@ public class GuiMonitor extends GuiBase {
             final double actualWidth = UISignalBoxRendering.TILE_WIDTH * parent.getScaleX();
             final Point point = new Point((int) (x / actualWidth), (int) (y / actualWidth));
             if (event.state == EnumMouseState.CLICKED) {
-                this.consuner.accept(point);
+                this.consumer.accept(point);
             } else if (event.state == EnumMouseState.RELEASE) {
-                onRelease.run();
                 enable = false;
+                onRelease.accept(this);
             }
         }
     }
