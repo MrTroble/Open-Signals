@@ -106,9 +106,6 @@ public class NamableGui extends GuiBase {
     private void addDelayEntityFor(final UIEntity inner, final NamableContainerNetwork timeMode,
             final NamableContainerNetwork timeUnitMode, final String label, final int defaultTime,
             final TimeUnit defaultTimeUnit) {
-        if (!(container.tile.getBlockState().getBlock() instanceof CombinedRedstoneInput))
-            return;
-
         final UIEntity hentity = new UIEntity();
         hentity.setHeight(20);
         hentity.setInheritWidth(true);
