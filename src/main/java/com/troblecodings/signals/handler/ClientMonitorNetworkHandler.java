@@ -17,7 +17,7 @@ import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientMonitorNetworkHandler implements INetworkSync {
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
+    private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
 
     @Override
     public void deserializeClient(final ReadBuffer buf) {
@@ -46,7 +46,6 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
                     monitorTile.loadBoxUpdate(buf);
                 }
             });
-
         });
     }
 
