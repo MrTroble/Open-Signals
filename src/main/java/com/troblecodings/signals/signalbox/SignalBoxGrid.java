@@ -499,4 +499,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     public void sendDebugPointUpdates(final List<Point> points) {
         network.sendDebugPoints(points);
     }
+
+    public void removeLinkedPosFromEntries(final BlockPos pos) {
+        modeGrid.values().forEach(node -> node.removeLinkedPos(pos));
+    }
 }
