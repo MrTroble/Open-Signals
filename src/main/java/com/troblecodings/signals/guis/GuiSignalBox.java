@@ -12,7 +12,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
@@ -217,7 +216,6 @@ public class GuiSignalBox extends GuiBase {
             rendering.removeMode(point, modeSet);
         } else {
             rendering.addMode(point, modeSet);
-            buildColors(ImmutableList.of(container.grid.getNode(point)));
         }
     }
 
@@ -573,7 +571,6 @@ public class GuiSignalBox extends GuiBase {
         helpPage = new SidePanel(lowerEntity, this);
 
         final List<SignalBoxNode> nodes = container.grid.getNodes();
-        buildColors(nodes);
         nodes.forEach(this::updateTrainNumbers);
     }
 
@@ -663,20 +660,6 @@ public class GuiSignalBox extends GuiBase {
                     .ifPresent(pos -> enabledSubsidiaries.put(pos,
                             new SubsidiaryHolder(state, point, modeSet)));
         }));
-    }
-
-    private void buildColors(final List<SignalBoxNode> nodes) {
-        nodes.forEach(node -> {
-            this.rendering.setColor(node.getPoint(), mode -> {
-                if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
-                    return profile.getOperationModeSettings().getTrainnumberBackgroundColor();
-                if (node.containsManuellOutput(mode))
-                    return profile.getOperationModeSettings().getOutputColor();
-                return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
-                        .orElseGet(() -> EnumPathUsage.FREE)
-                        .getColor(profile.getOperationModeSettings());
-            });
-        });
     }
 
     private void resetColors() {
