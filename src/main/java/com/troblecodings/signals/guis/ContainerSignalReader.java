@@ -121,7 +121,8 @@ public class ContainerSignalReader extends ContainerBase {
     private Entry<LogicalSymbols[], Entry<SEProperty, String>[]> deserializeEntry(
             final ReadBuffer buffer) {
         final int logicalSymbolLength = buffer.getInt();
-        final LogicalSymbols[] symbols = new LogicalSymbols[9];
+        final LogicalSymbols[] symbols =
+                new LogicalSymbols[SignalReaderTileEntity.MAX_LOGICAL_VALUES_SIZE];
         for (int i = 0; i < logicalSymbolLength; i++) {
             final int logicalSymbol = buffer.getInt();
             if (logicalSymbol != -1) {
@@ -131,7 +132,8 @@ public class ContainerSignalReader extends ContainerBase {
 
         final int propertiesLength = buffer.getInt();
         @SuppressWarnings("unchecked")
-        final Entry<SEProperty, String>[] propertyEntries = new Entry[10];
+        final Entry<SEProperty, String>[] propertyEntries =
+                new Entry[SignalReaderTileEntity.MAX_PROPERTIES_SIZE];
         for (int i = 0; i < propertiesLength; i++) {
             final int propertyID = buffer.getInt();
             if (propertyID != -1) {
