@@ -232,7 +232,6 @@ public class GuiSignalController extends GuiBase {
             if (newProfileID == -1)
                 return;
 
-            controller.sendRSProfile(newProfileID);
             controller.allRSStates.put(newProfileID, new HashMap<>());
             addProfilesToList(list, propertyEntity);
             final int profileToLoad = currentProfile == -1 ? newProfileID : currentProfile;
