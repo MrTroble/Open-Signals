@@ -1,9 +1,10 @@
 package com.troblecodings.signals.guis;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.GuiBase;
@@ -13,6 +14,7 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
+import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
@@ -24,6 +26,8 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.SignalCustomModel;
+import com.troblecodings.signals.parser.interm.LogicalSymbols;
+import com.troblecodings.signals.tileentitys.SignalReaderTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -126,36 +130,139 @@ public class GuiSignalReader extends GuiBase {
 
     private void setUpPropertiesForDirection(final Direction dir, final UIEntity list) {
         list.clearChildren();
-        final Map<SEProperty, String> properties =
-                container.statesForFace.computeIfAbsent(dir, _u -> new HashMap<>());
-        container.selectableProperties.forEach(property -> {
-            if (!properties.containsKey(property)) {
-                properties.put(property, "DISABLED");
+        @SuppressWarnings("unchecked")
+        final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entryForDirection =
+                container.statesForFace.computeIfAbsent(dir,
+                        _u -> Maps.immutableEntry(
+                                new LogicalSymbols[SignalReaderTileEntity.MAX_LOGICAL_VALUES_SIZE],
+                                new Entry[SignalReaderTileEntity.MAX_PROPERTIES_SIZE]));
+        final LogicalSymbols[] logicSymbols = entryForDirection.getKey();
+        final Entry<SEProperty, String>[] propertyEntries = entryForDirection.getValue();
+        for (int i = 0; i < propertyEntries.length; i++) {
+            final Map.Entry<SEProperty, String> entry = propertyEntries[i];
+            if (entry == null)
+                continue;
+            final int index = i;
+            final UIEntity row = new UIEntity();
+            row.setHeight(20);
+            row.setInheritWidth(true);
+            row.add(new UIBox(UIBox.HBOX, 5));
+
+            final int logicSymbolID = i - 1;
+            if (logicSymbolID >= 0) {
+                list.add(getEntityFromSymbol(dir, logicSymbols, logicSymbolID));
             }
-        });
+
+            list.add(row);
+
+            final SEProperty property = entry.getKey();
+            final String value = entry.getValue();
+            final JsonEnum enumJson = property.getParent();
+            previewSidebar.addToRenderNormal(property, enumJson.getIDFromValue(value));
+            final UIEntity entity =
+                    GuiElements.createEnumElement(new DisableIntegerable<>(entry.getKey()), e -> {
+                        if (e == -1) {
+                            propertyEntries[index] = null;
+                            if (logicSymbolID >= 0) {
+                                logicSymbols[logicSymbolID] = null;
+                            } else if (index == 0) {
+                                logicSymbols[0] = null;
+                            }
+                            reorderArray(propertyEntries);
+                            reorderArray(logicSymbols);
+                        } else {
+                            propertyEntries[index] =
+                                    Maps.immutableEntry(property, property.getObjFromID(e));
+                        }
+                        setUpPropertiesForDirection(dir, list);
+                        container.sendToServerForDirection(dir);
+                    }, property.getParent().getIDFromValue(value));
+
+            row.add(entity);
+
+            row.add(GuiElements.createButton("x", 20, e -> {
+                propertyEntries[index] = null;
+                if (logicSymbolID >= 0) {
+                    logicSymbols[logicSymbolID] = null;
+                } else if (index == 0) {
+                    logicSymbols[0] = null;
+                }
+                reorderArray(propertyEntries);
+                reorderArray(logicSymbols);
+
+                setUpPropertiesForDirection(dir, list);
+                container.sendToServerForDirection(dir);
+            }));
+        }
+        list.add(GuiElements.createButton("+", e -> {
+            push(GuiElements.createScreen(screen -> {
+                final UIEntity propertyList = new UIEntity();
+                propertyList.setInherits(true);
+                final UIBox vbox = new UIBox(UIBox.VBOX, 5);
+                propertyList.add(vbox);
+                screen.add(propertyList);
+                container.selectableProperties.forEach(property -> {
+                    propertyList.add(GuiElements.createButton(property.getLocalizedName(), e1 -> {
+                        if (propertyEntries[0] != null) {
+                            logicSymbols[getNextFreeIndex(logicSymbols)] = LogicalSymbols.OR;
+                        }
+                        propertyEntries[getNextFreeIndex(propertyEntries)] =
+                                Maps.immutableEntry(property, property.getDefault());
+                        pop();
+                        setUpPropertiesForDirection(dir, list);
+                        container.sendToServerForDirection(dir);
+                    }));
+                });
+                screen.add(GuiElements.createPageSelect(vbox));
+            }));
+        }));
+
         ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, container.pos))
                 .forEach((property, value) -> {
                     previewSidebar.addToRenderNormal(property,
                             property.getParent().getIDFromValue(value));
                 });
 
-        properties.forEach((property, value) -> {
-            final JsonEnum enumJson = property.getParent();
-            previewSidebar.addToRenderNormal(property, enumJson.getIDFromValue(value));
-            final UIEntity entity =
-                    GuiElements.createEnumElement(new DisableIntegerable<>(property), e -> {
-                        container.sendPropertyToServer(dir, property, e);
-                        previewSidebar.addToRenderNormal(property, e);
-                        if (e == -1) {
-                            properties.remove(property);
-                        } else {
-                            properties.put(property, property.getObjFromID(e));
-                        }
-                        previewSidebar.update(container.signal);
-                    }, property.getParent().getIDFromValue(value));
-            list.add(entity);
-        });
         previewSidebar.update(container.signal);
+    }
+
+    private UIEntity getEntityFromSymbol(final Direction dir, final LogicalSymbols[] logicSymbols,
+            final int logicSymbolID) {
+        final LogicalSymbols symbol = logicSymbols[logicSymbolID];
+        return GuiElements.createButton(getNameForSymbol(symbol), 50, buttonEntity -> {
+            final LogicalSymbols newSymbol =
+                    logicSymbols[logicSymbolID].equals(LogicalSymbols.AND) ? LogicalSymbols.OR
+                            : LogicalSymbols.AND;
+            buttonEntity.findRecursive(UIButton.class)
+                    .forEach(b -> b.setText(getNameForSymbol(newSymbol)));
+            logicSymbols[logicSymbolID] = newSymbol;
+            container.sendToServerForDirection(dir);
+        });
+    }
+
+    private static String getNameForSymbol(final LogicalSymbols symbol) {
+        return symbol.equals(LogicalSymbols.AND) ? "AND" : "OR";
+    }
+
+    private static int getNextFreeIndex(final Object[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == null)
+                return i;
+        }
+        return -1;
+    }
+
+    private static void reorderArray(final Object[] array) {
+        int toMove = 0;
+        for (int i = 0; i < array.length; i++) {
+            final Object obj = array[i];
+            if (obj == null) {
+                toMove++;
+            } else {
+                array[i] = null;
+                array[i - toMove] = obj;
+            }
+        }
     }
 
     private UIEntity getLabelEntity() {
