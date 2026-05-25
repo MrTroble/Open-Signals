@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.troblecodings.core.HexConverter;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.signals.config.ConfigHandler;
@@ -29,7 +30,8 @@ public enum EnumGuiMode {
     }, PathwayModeType.END, 0), //
     PLATFORM(new float[] {
             0, 0.15f, 1, 0.15f
-    }, PathwayModeType.NONE, 0, ConfigHandler.CLIENT.signalboxFreeColor.get(), 3), //
+    }, PathwayModeType.NONE, 0,
+            HexConverter.decodeARGB(ConfigHandler.CLIENT.signalboxFreeColor.get()), 3), //
     BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
     }), //
@@ -49,7 +51,9 @@ public enum EnumGuiMode {
     ZS3(SignalBoxIcons.SIGNS, SignalBoxSigns.ZS3.ordinal(), PathwayModeType.NONE, 1),
     TRAIN_NUMBER(new float[] {
             0, 0.5f, 2, 0.5f
-    }, PathwayModeType.NONE, 2, ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get(), 6), //
+    }, PathwayModeType.NONE, 2,
+            HexConverter.decodeARGB(ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get()),
+            6), //
     CROSSING(new float[] {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
     });
@@ -97,7 +101,8 @@ public enum EnumGuiMode {
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth) {
-        this(array, type, depth, ConfigHandler.CLIENT.signalboxFreeColor.get(), 2);
+        this(array, type, depth,
+                HexConverter.decodeARGB(ConfigHandler.CLIENT.signalboxFreeColor.get()), 2);
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth,
