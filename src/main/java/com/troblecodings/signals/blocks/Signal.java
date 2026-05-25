@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.math.Quaternion;
+import com.troblecodings.core.HexConverter;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
@@ -333,10 +335,13 @@ public class Signal extends BasicBlock {
         return this.prop.canLink;
     }
 
-    @SideOnly(Side.CLIENT)
-    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
-            final BlockPos pos, final int tintIndex) {
-        return this.prop.colors.get(tintIndex);
+    public final boolean isForSignalBridge() {
+        return this.prop.isBridgeSignal;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public int colorMultiplier(final int tintIndex) {
+        return HexConverter.decodeARGB(this.prop.colors.get(tintIndex));
     }
 
     @SideOnly(Side.CLIENT)
@@ -413,10 +418,10 @@ public class Signal extends BasicBlock {
 
         for (int j = 0; j < splitNames.length; j++) {
             final String text = splitNames[j];
-            final float nameWidth = info.font.getStringWidth(text);
-            final float center = (signWidth - nameWidth) / 2;
-            info.font.drawSplitString(text, (int) center - 10, j * 10, (int) signWidth,
-                    this.prop.textColor);
+            final float textWidth = info.font.width(text);
+            final float center = (signWidth - textWidth) / 2;
+            info.font.draw(info.stack, text, (int) center - 10, j * 10,
+                    HexConverter.decodeARGB(this.prop.textColor));
         }
         GlStateManager.popMatrix();
     }
@@ -429,11 +434,12 @@ public class Signal extends BasicBlock {
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
-        GlStateManager.scale(-scale, -scale, 1);
-        info.font.drawString(name, (int) (-nameWidth / 2), 0, this.prop.textColor);
-        GlStateManager.popMatrix();
+        info.stack.pushPose();
+        info.stack.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
+        info.stack.scale(-scale, -scale, 1);
+        info.font.draw(info.stack, name, -nameWidth / 2, 0,
+                HexConverter.decodeARGB(this.prop.textColor));
+        info.stack.popPose();
     }
 
     public Placementtool getPlacementtool() {
