@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.gson.Gson;
+import com.troblecodings.core.HexConverter;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.enums.SignalBoxIcons;
@@ -22,7 +23,7 @@ public class UISignalBoxProfile {
 
     private int id;
     private String name;
-    private int backgroundColor = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
+    private String backgroundColor = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     private EditorModeSettings editorSettings = new EditorModeSettings();
     private OperationModeSettings operationSettings = new OperationModeSettings();
     private TextureSettings textureSettings = new TextureSettings();
@@ -42,7 +43,7 @@ public class UISignalBoxProfile {
     }
 
     public int getBackgroundColor() {
-        return backgroundColor;
+        return HexConverter.decodeARGB(backgroundColor);
     }
 
     public EditorModeSettings getEditorModeSettings() {
@@ -98,19 +99,19 @@ public class UISignalBoxProfile {
 
         protected UIBorderSettings borderSettings = new UIBorderSettings();
 
-        private int modePreviewBackgroundColor = 0xFFAFAFAF;
-        private int modePreviewHighlightColor = 0x45339933;
+        private String modePreviewBackgroundColor = "0xFFAFAFAF";
+        private String modePreviewHighlightColor = "0x45339933";
 
         public UIBorderSettings getUIBorderSettings() {
             return borderSettings;
         }
 
         public int getModePreviewBackgroundColor() {
-            return modePreviewBackgroundColor;
+            return HexConverter.decodeARGB(modePreviewBackgroundColor);
         }
 
         public int getModePreviewHighlightColor() {
-            return modePreviewHighlightColor;
+            return HexConverter.decodeARGB(modePreviewHighlightColor);
         }
 
     }
@@ -119,19 +120,19 @@ public class UISignalBoxProfile {
 
         protected UIBorderSettings borderSettings = new UIBorderSettings();
 
-        private int userSelectionColor = 0x2900FF00;
-        private int editColor = 0x5000A2FF;
+        private String userSelectionColor = "0x2900FF00";
+        private String editColor = "0x5000A2FF";
 
-        private int freeColor = ConfigHandler.CLIENT.signalboxFreeColor.get();
-        private int selectColor = ConfigHandler.CLIENT.signalboxSelectColor.get();
-        private int usedColor = ConfigHandler.CLIENT.signalboxUsedColor.get();
-        private int preparedColor = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-        private int protectedColor = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-        private int shuntingColor = ConfigHandler.CLIENT.signalboxShuntingColor.get();
-        private int outputColor = 0xffff00;
+        private String freeColor = ConfigHandler.CLIENT.signalboxFreeColor.get();
+        private String selectColor = ConfigHandler.CLIENT.signalboxSelectColor.get();
+        private String usedColor = ConfigHandler.CLIENT.signalboxUsedColor.get();
+        private String preparedColor = ConfigHandler.CLIENT.signalboxPreparedColor.get();
+        private String protectedColor = ConfigHandler.CLIENT.signalboxPreparedColor.get();
+        private String shuntingColor = ConfigHandler.CLIENT.signalboxShuntingColor.get();
+        private String outputColor = "0xffff00";
 
-        private int trainNumberColor = ConfigHandler.CLIENT.signalboxTrainNumberColor.get();
-        private int trainnumberBackgroundColor =
+        private String trainNumberColor = ConfigHandler.CLIENT.signalboxTrainNumberColor.get();
+        private String trainnumberBackgroundColor =
                 ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
 
         public UIBorderSettings getUIBorderSettings() {
@@ -139,47 +140,47 @@ public class UISignalBoxProfile {
         }
 
         public int getUserSelectionColor() {
-            return userSelectionColor;
+            return HexConverter.decodeARGB(userSelectionColor);
         }
 
         public int getOutputColor() {
-            return outputColor;
+            return HexConverter.decodeARGB(outputColor);
         }
 
         public int getEditColor() {
-            return editColor;
+            return HexConverter.decodeARGB(editColor);
         }
 
         public int getFreeColor() {
-            return freeColor;
+            return HexConverter.decodeARGB(freeColor);
         }
 
         public int getSelectColor() {
-            return selectColor;
+            return HexConverter.decodeARGB(selectColor);
         }
 
         public int getUsedColor() {
-            return usedColor;
+            return HexConverter.decodeARGB(usedColor);
         }
 
         public int getPreparedColor() {
-            return preparedColor;
+            return HexConverter.decodeARGB(preparedColor);
         }
 
         public int getTrainNumberColor() {
-            return trainNumberColor;
+            return HexConverter.decodeARGB(trainNumberColor);
         }
 
         public int getShuntingColor() {
-            return shuntingColor;
+            return HexConverter.decodeARGB(shuntingColor);
         }
 
         public int getProtectedColor() {
-            return protectedColor;
+            return HexConverter.decodeARGB(protectedColor);
         }
 
         public int getTrainnumberBackgroundColor() {
-            return trainnumberBackgroundColor;
+            return HexConverter.decodeARGB(trainnumberBackgroundColor);
         }
 
     }
@@ -216,7 +217,7 @@ public class UISignalBoxProfile {
     public static class UIBorderSettings {
 
         private boolean showLines = true;
-        private int lineColor = 0xFF5B5B5B;
+        private String lineColor = "0xFF5B5B5B";
         private float lineWidth = 0.5f;
 
         public boolean isShowLines() {
@@ -224,7 +225,7 @@ public class UISignalBoxProfile {
         }
 
         public int getLineColor() {
-            return lineColor;
+            return HexConverter.decodeARGB(lineColor);
         }
 
         public float getLineWidth() {
