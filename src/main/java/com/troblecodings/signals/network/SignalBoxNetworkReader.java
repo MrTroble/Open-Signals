@@ -28,6 +28,9 @@ public interface SignalBoxNetworkReader {
     default void handleCounterUpdate() {
     }
 
+    default void handleUIProfileUpdate() {
+    }
+
     default void handleSignalStateUpdate(final SignalBoxNode node) {
     }
 

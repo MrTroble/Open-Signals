@@ -278,6 +278,7 @@ public class SignalBoxNetworkHandler {
             reader.handleCounterUpdate();
         } else if (mode.equals(GridNetworkMode.UPDATE_UI_PROFILE)) {
             grid.setUIProfile(UISignalBoxProfile.UI_PROFILES.get(buffer.getInt()));
+            reader.handleUIProfileUpdate();
         } else {
             final BlockPos pos = buffer.getBlockPos();
             SignalBoxHandler.unlinkPosFromSignalBox(reader.getStateInfo(), pos);
