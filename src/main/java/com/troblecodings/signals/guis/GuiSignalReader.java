@@ -194,28 +194,31 @@ public class GuiSignalReader extends GuiBase {
                 container.sendToServerForDirection(dir);
             }));
         }
-        list.add(GuiElements.createButton("+", e -> {
-            push(GuiElements.createScreen(screen -> {
-                final UIEntity propertyList = new UIEntity();
-                propertyList.setInherits(true);
-                final UIBox vbox = new UIBox(UIBox.VBOX, 5);
-                propertyList.add(vbox);
-                screen.add(propertyList);
-                container.selectableProperties.forEach(property -> {
-                    propertyList.add(GuiElements.createButton(property.getLocalizedName(), e1 -> {
-                        if (propertyEntries[0] != null) {
-                            logicSymbols[getNextFreeIndex(logicSymbols)] = LogicalSymbols.OR;
-                        }
-                        propertyEntries[getNextFreeIndex(propertyEntries)] =
-                                Maps.immutableEntry(property, property.getDefault());
-                        pop();
-                        setUpPropertiesForDirection(dir, list);
-                        container.sendToServerForDirection(dir);
-                    }));
-                });
-                screen.add(GuiElements.createPageSelect(vbox));
+        if (!isArrayFull(propertyEntries))
+            list.add(GuiElements.createButton("+", e -> {
+                push(GuiElements.createScreen(screen -> {
+                    final UIEntity propertyList = new UIEntity();
+                    propertyList.setInherits(true);
+                    final UIBox vbox = new UIBox(UIBox.VBOX, 5);
+                    propertyList.add(vbox);
+                    screen.add(propertyList);
+                    container.selectableProperties.forEach(property -> {
+                        propertyList
+                                .add(GuiElements.createButton(property.getLocalizedName(), e1 -> {
+                                    if (propertyEntries[0] != null) {
+                                        logicSymbols[getNextFreeIndex(logicSymbols)] =
+                                                LogicalSymbols.OR;
+                                    }
+                                    propertyEntries[getNextFreeIndex(propertyEntries)] =
+                                            Maps.immutableEntry(property, property.getDefault());
+                                    pop();
+                                    setUpPropertiesForDirection(dir, list);
+                                    container.sendToServerForDirection(dir);
+                                }));
+                    });
+                    screen.add(GuiElements.createPageSelect(vbox));
+                }));
             }));
-        }));
 
         ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, container.pos))
                 .forEach((property, value) -> {
@@ -263,6 +266,14 @@ public class GuiSignalReader extends GuiBase {
                 array[i - toMove] = obj;
             }
         }
+    }
+
+    private boolean isArrayFull(final Object[] array) {
+        for (final Object obj : array) {
+            if (obj == null)
+                return false;
+        }
+        return true;
     }
 
     private UIEntity getLabelEntity() {
