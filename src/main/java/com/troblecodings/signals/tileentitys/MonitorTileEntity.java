@@ -139,7 +139,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     public void loadRenderPoints(final ReadBuffer buffer) {
         renderStart = buffer.getINetworkSaveable(Point.class);
         renderEnd = buffer.getINetworkSaveable(Point.class);
-        updateRendering();
+        initRendering();
     }
 
     private void initRendering() {
