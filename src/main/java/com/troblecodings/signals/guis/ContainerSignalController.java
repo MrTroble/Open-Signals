@@ -189,8 +189,8 @@ public class ContainerSignalController extends ContainerBase
                 break;
             }
             case SET_PROFILE: {
-                final EnumState state = buffer.getEnumValue(EnumState.class);
                 final Direction direction = buffer.getEnumValue(Direction.class);
+                final EnumState state = buffer.getEnumValue(EnumState.class);
                 final int profile = buffer.getByteToUnsignedInt();
                 if (profile == -1) {
                     controllerEntity.removeProfileFromDirection(direction, state);
