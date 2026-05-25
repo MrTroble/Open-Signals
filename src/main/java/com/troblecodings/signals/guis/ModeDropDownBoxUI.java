@@ -256,7 +256,6 @@ public class ModeDropDownBoxUI {
                                             option.setEntry(PathEntryType.PROTECTIONWAY_END, point);
                                         }
                                     });
-
                             if (!selcetedPoint.equals(new Point(-1, -1))) {
                                 boxEntity.rendering.addSelection(settings.getUserSelectionColor(),
                                         selcetedPoint, SelectionType.FIRST);

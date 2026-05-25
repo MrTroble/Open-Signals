@@ -30,6 +30,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.guis.UISignalBoxProfile.TextureSettings;
 import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
@@ -37,6 +38,7 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -81,6 +83,7 @@ public class UISignalBoxRendering extends UIComponent {
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
     private final Map<ModeIdentifier, String> trainNumbers = new HashMap<>();
     private final Set<ColorPoint> additionalPoints = new HashSet<>();
+    private final SignalBoxGrid grid;
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final UISignalBoxProfile profile,
             final UIBorderSettings settings, final SignalBoxConsumer consumer,
@@ -89,6 +92,7 @@ public class UISignalBoxRendering extends UIComponent {
         this.profile = profile;
         this.consumer = consumer;
         this.gridParent = gridParent;
+        this.grid = grid;
         gridRender = Maps.newHashMap();
         nodeLabeling = Maps.newHashMap();
         nodes.forEach(this::addNode);
@@ -100,6 +104,7 @@ public class UISignalBoxRendering extends UIComponent {
         node.forEach(modeSet -> modesets.put(modeSet, new ModeRenderInfo(modeSet.mode,
                 node.getState(modeSet), profile.getTextureSettings())));
         gridRender.put(point, modesets);
+        buildColorsFor(node);
         nodeLabeling.put(point, node.getCustomText());
     }
 
@@ -120,10 +125,23 @@ public class UISignalBoxRendering extends UIComponent {
     public void addMode(final Point point, final ModeSet modeSet) {
         gridRender.computeIfAbsent(point, k -> Maps.newHashMap()).put(modeSet,
                 new ModeRenderInfo(modeSet.mode, SignalState.RED, profile.getTextureSettings()));
+        buildColorsFor(grid.getNode(point));
     }
 
     public boolean has(final Point point, final ModeSet modeSet) {
         return gridRender.containsKey(point) && gridRender.get(point).containsKey(modeSet);
+    }
+
+    private void buildColorsFor(final SignalBoxNode node) {
+        setColor(node.getPoint(), mode -> {
+            if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
+                return profile.getOperationModeSettings().getTrainnumberBackgroundColor();
+            if (node.containsManuellOutput(mode))
+                return profile.getOperationModeSettings().getOutputColor();
+            return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
+                    .orElseGet(() -> EnumPathUsage.FREE)
+                    .getColor(profile.getOperationModeSettings());
+        });
     }
 
     private void drawModeSets(final DrawInfo info, final Map<ModeSet, ModeRenderInfo> render) {

@@ -70,8 +70,8 @@ public class GuiTrainNumber extends GuiBase {
                 GuiElements.createButton(I18Wrapper.format("gui.trainnumber.setpoint"),
                         e -> push(GuiElements.createScreen(screen -> {
                             final BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(
-                                    container.grid, UISignalBoxProfile.DEFAULT,
-                                    UISignalBoxProfile.DEFAULT.getOperationModeSettings()
+                                    container.grid, container.grid.getUIProfile(),
+                                    container.grid.getUIProfile().getOperationModeSettings()
                                             .getUIBorderSettings(),
                                     (rendering, point, mouseKey) -> {
                                         if (mouseKey != MouseEvent.LEFT_MOUSE)
