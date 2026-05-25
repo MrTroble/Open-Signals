@@ -38,6 +38,8 @@
 	"item.opensignals.multilinkingtool": "Signal Multi Linker",
 	"item.opensignals.manipulator": "Manipulator",
 	"item.opensignals.signalbridgeitem": "Signal Bridge Configurator",
+    "item.opensignals.signalreader": "Signal-Reader",
+    "item.opensignals.monitorselectionitem": "Monitor Configurator",
 
 	"__Blocks": "",
 	"block.opensignals.hvsignalcontroller": "Signal Controller",
@@ -89,6 +91,7 @@
 	"block.opensignals.zs32": "Zs3/Zs2",
 	"block.opensignals.postconnectable": "Connectable Pole",
 	"block.opensignals.monitor": "Monitor",
+	"block.opensignals.signalreader": "Signalreader",
 
 	"__LinkingToolChatMessages": "",
 	"lt.linkedpos": "§2Linked with: {%d, %d, %d§2}§r",
@@ -361,6 +364,15 @@
 	"btn.return": "Back",
 	"signalbridge.nostartblock": "No start block selected! Please select a start block with shift+rightclick in the editor.",
 	"gui.signalbridge.collision": "You can't place the signalbridge because there is a block in the way.",
+
+	"__MonitorUI": "",
+	"property.monitor_selection.name": "Design",
+	"property.monitor_selection.disc": "Here you can change the design of the monitor block.",
+	"gui.monitor.x_size": "Width",
+	"gui.monitor.y_size": "Height",
+	"gui.monitor.new_section": "New Section",
+	"gui.monitor.current_ratio": "Current Ratio",
+	"gui.monitor.monitor_ratio": "Monitor Ratio",
 
 	"__GeneralUI":"",
 	"label.linkedto": "Linked to",

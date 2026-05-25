@@ -38,6 +38,8 @@
     "item.opensignals.multilinkingtool": "Signal Multi Verlinker",
     "item.opensignals.manipulator": "Manipulator",
     "item.opensignals.signalbridgeitem": "Signalbrückenkonfigurator",
+    "item.opensignals.signalreader": "Signal-Ausleser",
+    "item.opensignals.monitorselectionitem": "Monitor Konfigurator",
 
     "__Blocks": "",
     "block.opensignals.hvsignalcontroller": "Signalsteuerer",
@@ -89,6 +91,7 @@
     "block.opensignals.zs32": "Zs3/Zs2",
     "block.opensignals.postconnectable": "Verbindungsfähiger Mast",
     "block.opensignals.monitor": "Monitor",
+	"block.opensignals.signalreader": "Signal-Ausleser",
 
     "__LinkingToolChatMessages": "",
     "lt.linkedpos": "§2Verlinkt mit: {%d, %d, %d§2}§r",
@@ -362,6 +365,15 @@
     "signalbridge.nostartblock": "Keinen Basisblock ausgewählt! Bitte wähle einen Basisblock mit Shift+Rechtsklick im Editorfeld aus.",
     "gui.signalbridge.collision": "Du kannst die Signalbrücke nicht platzieren, da ein Block im Weg ist.",
     
+	"__MonitorUI": "",
+	"property.monitor_selection.name": "Aussehen",
+	"property.monitor_selection.disc": "Hier kannst du das Aussehen des Monitorblock ändern.",
+	"gui.monitor.x_size": "Breite",
+	"gui.monitor.y_size": "Höhe",
+	"gui.monitor.new_section": "Neue Auswahl",
+	"gui.monitor.current_ratio": "Aktuelle Auflösung",
+	"gui.monitor.monitor_ratio": "Monitor Auflösung",
+
     "__GeneralUI": "",
     "label.linkedto": "Verlinkt mit",
     "btn.apply": "Anwenden",

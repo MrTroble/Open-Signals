@@ -15,6 +15,7 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.EnumMouseState;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -59,27 +60,30 @@ public class GuiMonitor extends GuiBase {
 
         boxEntity.add(mouseUpdate);
 
-        upperEntity.add(GuiElements.createLabel(I18Wrapper.format("tile.monitor.name")));
-        upperEntity.add(GuiElements.createButton("new_section", 70, e -> {
-            box.rendering.clearColoredPoints();
-            selectedPoints.clear();
-            container.renderStart = new Point(-1, -1);
-            container.renderEnd = new Point(-1, -1);
-            ratioInfo.setText("Current Ratio:   :  ");
-            mouseUpdate.enable();
-        }));
+        upperEntity.add(GuiElements
+                .createLabel(I18Wrapper.format("block." + OpenSignalsMain.MODID + ".monitor")));
+        upperEntity.add(
+                GuiElements.createButton(I18Wrapper.format("gui.monitor.new_section"), 70, e -> {
+                    box.rendering.clearColoredPoints();
+                    selectedPoints.clear();
+                    container.renderStart = new Point(-1, -1);
+                    container.renderEnd = new Point(-1, -1);
+                    ratioInfo.setText(I18Wrapper.format("gui.monitor.current_ratio") + ":   :  ");
+                    mouseUpdate.enable();
+                }));
 
         final UIEntity ratioEntity = new UIEntity();
         ratioEntity.setHeight(40);
         ratioEntity.setWidth(100);
         ratioEntity.add(new UIBox(UIBox.VBOX, 2));
 
-        ratioEntity.add(GuiElements.createLabel(
-                "Monitor Ratio: " + container.monitorSizeX + " : " + container.monitorSizeY));
+        ratioEntity.add(GuiElements.createLabel(I18Wrapper.format("gui.monitor.monitor_ratio")
+                + ": " + container.monitorSizeX + " : " + container.monitorSizeY));
 
-        final UIEntity currentRatio = GuiElements.createLabel(
-                "Current Ratio: " + (container.renderEnd.getX() - container.renderStart.getX())
-                        + " : " + (container.renderEnd.getY() - container.renderStart.getY()));
+        final UIEntity currentRatio =
+                GuiElements.createLabel(I18Wrapper.format("gui.monitor.current_ratio") + ": "
+                        + (container.renderEnd.getX() - container.renderStart.getX()) + " : "
+                        + (container.renderEnd.getY() - container.renderStart.getY()));
         ratioInfo = currentRatio.findRecursive(UILabel.class).stream().findFirst()
                 .orElse(new UILabel(""));
         ratioEntity.add(currentRatio);
@@ -217,13 +221,21 @@ public class GuiMonitor extends GuiBase {
             final double y = event.y - parent.getLevelY();
             final double actualWidth = UISignalBoxRendering.TILE_WIDTH * parent.getScaleX();
             final Point point = new Point((int) (x / actualWidth), (int) (y / actualWidth));
-            if (event.state == EnumMouseState.CLICKED) {
-                this.consumer.accept(point);
-            } else if (event.state == EnumMouseState.RELEASE) {
-                enable = false;
-                onRelease.accept(this);
-            } else if (event.state == EnumMouseState.MOVE) {
-                ratioUpdate.accept(point);
+            if (event.state != null) {
+                switch (event.state) {
+                    case CLICKED:
+                        this.consumer.accept(point);
+                        break;
+                    case RELEASE:
+                        enable = false;
+                        onRelease.accept(this);
+                        break;
+                    case MOVE:
+                        ratioUpdate.accept(point);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
