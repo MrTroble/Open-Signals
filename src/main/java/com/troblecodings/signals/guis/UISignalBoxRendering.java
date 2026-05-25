@@ -98,6 +98,11 @@ public class UISignalBoxRendering extends UIComponent {
         nodes.forEach(this::addNode);
     }
 
+    public void updateNode(final Point point, final SignalBoxNode node) {
+        gridRender.remove(point);
+        addNode(point, node);
+    }
+
     private void addNode(final Point point, final SignalBoxNode node) {
         final Map<ModeSet, ModeRenderInfo> modesets =
                 gridRender.computeIfAbsent(point, k -> Maps.newHashMap());

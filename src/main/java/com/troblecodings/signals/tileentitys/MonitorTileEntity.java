@@ -13,9 +13,11 @@ import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.SignalBox;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
@@ -44,10 +46,9 @@ public class MonitorTileEntity extends SyncableTileEntity
     public static final String RENDER_START_POINT = "renderStartPoint";
     public static final String RENDER_END_POINT = "renderEndPoint";
 
-    private static final List<SignalBoxNetworkMode> allowedNetworkModes =
-            ImmutableList.of(SignalBoxNetworkHandler.GRID, SignalBoxNetworkHandler.ENTRY,
-                    SignalBoxNetworkHandler.NODE_SPECIAL_ENTRIES,
-                    SignalBoxNetworkHandler.SUBSIDIARY, SignalBoxNetworkHandler.TRAINNUMBER);
+    private static final List<SignalBoxNetworkMode> allowedNetworkModes = ImmutableList.of(
+            SignalBoxNetworkHandler.GRID, SignalBoxNetworkHandler.ENTRY,
+            SignalBoxNetworkHandler.NODE_SPECIAL_ENTRIES, SignalBoxNetworkHandler.SUBSIDIARY);
 
     private final SignalBoxGrid grid = new SignalBoxGrid();
     private final Map<Point, Point> translatedPoints = new HashMap<>();
@@ -125,11 +126,14 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     public void loadBoxUpdate(final ReadBuffer buffer) {
-        if (network == null) {
+        final boolean wasNetworkNull = network == null;
+        if (wasNetworkNull) {
             network = new SignalBoxNetworkHandler(this, grid);
         }
         network.desirializeBuffer(buffer, allowedNetworkModes);
-        updateRendering();
+        if (wasNetworkNull) {
+            initRendering();
+        }
     }
 
     public void loadRenderPoints(final ReadBuffer buffer) {
@@ -138,8 +142,18 @@ public class MonitorTileEntity extends SyncableTileEntity
         updateRendering();
     }
 
+    private void initRendering() {
+        rendering = new UISignalBoxRendering(grid, getProfile(),
+                UISignalBoxProfile.DEFAULT.getOperationModeSettings().getUIBorderSettings(),
+                (_u1, _u2, _u3) -> {
+                }, new UIEntity(), new HashMap<>());
+        updateRendering();
+    }
+
     private void updateRendering() {
         translatedPoints.clear();
+        if (rendering == null)
+            return;
         final Map<Point, SignalBoxNode> nodes = new HashMap<>();
         for (final SignalBoxNode node : grid.getNodes()) {
             final Point p = node.getPoint();
@@ -147,10 +161,11 @@ public class MonitorTileEntity extends SyncableTileEntity
             if (translated != null)
                 nodes.put(translated, node);
         }
-        rendering = new UISignalBoxRendering(grid, getProfile(),
-                UISignalBoxProfile.DEFAULT.getOperationModeSettings().getUIBorderSettings(),
-                (_u1, _u2, _u3) -> {
-                }, new UIEntity(), nodes);
+        nodes.forEach((p, n) -> {
+            rendering.updateNode(p, n);
+            handleNodeUpdate(n, PathEntryType.TRAINNUMBER);
+            handleNodeUpdate(n, PathEntryType.PATHUSAGE);
+        });
         buildColors(nodes.values(), getProfile());
     }
 
@@ -183,6 +198,41 @@ public class MonitorTileEntity extends SyncableTileEntity
                         .getColor(profile.getOperationModeSettings());
             });
         });
+    }
+
+    @Override
+    public void handleNodeUpdate(final SignalBoxNode node, final PathEntryType<?> entryType) {
+        if (entryType.equals(PathEntryType.TRAINNUMBER)) {
+            node.iterator().forEachRemaining(modeSet -> {
+                if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
+                    return;
+                final Point translated = getPointTranslated(node.getPoint());
+                node.getOption(modeSet).ifPresent(option -> {
+                    final TrainNumber number =
+                            option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+                    final ModeIdentifier modeIdent = new ModeIdentifier(translated, modeSet);
+                    if (number.trainNumber.isEmpty()) {
+                        rendering.removeTrainNumber(modeIdent);
+                    } else {
+                        rendering.putTrainNumber(modeIdent, number.trainNumber);
+                    }
+                });
+            });
+        } else if (entryType.equals(PathEntryType.PATHUSAGE)) {
+            node.toPathIdentifier().forEach(ident -> {
+                node.getOption(ident.getMode()).ifPresent(poe -> {
+                    rendering.setColor(node.getPoint(), ident.getMode(),
+                            poe.getEntry(PathEntryType.PATHUSAGE)
+                                    .orElseGet(() -> EnumPathUsage.FREE)
+                                    .getColor(getProfile().getOperationModeSettings()));
+                });
+            });
+        }
+    }
+
+    @Override
+    public void handleUIProfileUpdate() {
+        initRendering();
     }
 
     public void setRenderPoints(final Point start, final Point end) {
