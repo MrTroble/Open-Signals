@@ -16,6 +16,7 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -26,6 +27,7 @@ import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkMode;
 import com.troblecodings.signals.network.SignalBoxNetworkReader;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -221,13 +223,25 @@ public class MonitorTileEntity extends SyncableTileEntity
         } else if (entryType.equals(PathEntryType.PATHUSAGE)) {
             node.toPathIdentifier().forEach(ident -> {
                 node.getOption(ident.getMode()).ifPresent(poe -> {
-                    rendering.setColor(node.getPoint(), ident.getMode(),
+                    rendering.setColor(getPointTranslated(node.getPoint()), ident.getMode(),
                             poe.getEntry(PathEntryType.PATHUSAGE)
                                     .orElseGet(() -> EnumPathUsage.FREE)
                                     .getColor(getProfile().getOperationModeSettings()));
                 });
             });
         }
+    }
+
+    @Override
+    public void handleSignalStateUpdate(final SignalBoxNode node) {
+        node.forEach((mode) -> {
+            final SubsidiaryState state = node.getSubsidiaryState(mode);
+            if (state != null) {
+                node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
+            }
+            rendering.updateSignalState(getPointTranslated(node.getPoint()), mode,
+                    node.getState(mode));
+        });
     }
 
     @Override

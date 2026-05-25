@@ -39,11 +39,13 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
                 if (!(entity instanceof MonitorTileEntity))
                     return;
                 final MonitorTileEntity monitorTile = (MonitorTileEntity) entity;
-                if (networkMode == MonitorNetworkHandler.NETWORK_TILE_DATA) {
-                    monitorTile.loadRenderPoints(buf);
-                }
-                if (networkMode == MonitorNetworkHandler.NETWORK_UPDATE) {
-                    monitorTile.loadBoxUpdate(buf);
+                synchronized (monitorTile) {
+                    if (networkMode == MonitorNetworkHandler.NETWORK_TILE_DATA) {
+                        monitorTile.loadRenderPoints(buf);
+                    }
+                    if (networkMode == MonitorNetworkHandler.NETWORK_UPDATE) {
+                        monitorTile.loadBoxUpdate(buf);
+                    }
                 }
             });
         });
