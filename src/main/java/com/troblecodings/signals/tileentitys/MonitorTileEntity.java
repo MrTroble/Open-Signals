@@ -148,7 +148,8 @@ public class MonitorTileEntity extends SyncableTileEntity
                 nodes.put(translated, node);
         }
         rendering = new UISignalBoxRendering(grid, getProfile(),
-                getProfile().getOperationModeSettings().getUIBorderSettings(), (_u1, _u2, _u3) -> {
+                UISignalBoxProfile.DEFAULT.getOperationModeSettings().getUIBorderSettings(),
+                (_u1, _u2, _u3) -> {
                 }, new UIEntity(), nodes);
         buildColors(nodes.values(), getProfile());
     }
