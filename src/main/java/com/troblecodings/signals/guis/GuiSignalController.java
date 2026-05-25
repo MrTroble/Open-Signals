@@ -239,6 +239,7 @@ public class GuiSignalController extends GuiBase {
             updateProfileProperties(propertyEntity, profileToLoad);
             if (currentProfile == -1) {
                 currentProfile = newProfileID;
+                controller.sendRSProfile(newProfileID);
             }
         }, "gui.controller.add_profile");
         final UIButton addButton = new UIButton("+");
@@ -286,6 +287,7 @@ public class GuiSignalController extends GuiBase {
                 currentProfile = profile;
                 updateProfileProperties(propertyEntity, profile);
                 enableButton(button);
+                controller.sendRSProfile(profile);
             }, "");
             buttonEntity.add(button);
             list.add(buttonEntity);
@@ -305,11 +307,11 @@ public class GuiSignalController extends GuiBase {
     private void enableButton(final UIButton button) {
         for (final UIButton b : buttonsRSMode) {
             if (b != null) {
-                b.setEnabled(false);
+                b.setEnabled(true);
             }
         }
         if (button != null) {
-            button.setEnabled(true);
+            button.setEnabled(false);
         }
     }
 
