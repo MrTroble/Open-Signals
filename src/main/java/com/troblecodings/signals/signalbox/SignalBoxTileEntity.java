@@ -11,7 +11,6 @@ import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.LinkType;
-import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -31,7 +30,6 @@ import net.minecraft.world.World;
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
     private final SignalBoxGrid grid;
-    private String signalBoxUIProfile = UISignalBoxProfile.DEFAULT.getName();
 
     public SignalBoxTileEntity(final TileEntityInfo info) {
         super(info);
@@ -133,14 +131,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     public SignalBoxGrid getSignalBoxGrid() {
         return grid;
-    }
-
-    public String getSignalBoxUIProfile() {
-        return signalBoxUIProfile;
-    }
-
-    public void setSignalBoxUIProfile(final String signalBoxUIProfile) {
-        this.signalBoxUIProfile = signalBoxUIProfile;
     }
 
     @Override
