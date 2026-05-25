@@ -95,29 +95,16 @@ public class GuiMonitor extends GuiBase {
         final int maxTileX = 10;
         final int maxTileY = 10;
         final int color = uiProfile.getOperationModeSettings().getUserSelectionColor();
-        return new UIMouseUpdate(p -> {
-            if (selectedPoints.contains(p))
+        return new UIMouseUpdate(current -> {
+            if (current.equals(container.renderEnd))
                 return;
-            final Point start = getStartPoint(p);
-            final Point end = getEndPoint(p, container.renderEnd);
-            if (p.getX() < start.getX() || p.getY() < start.getY())
+            final Point start = getStartPoint(current);
+            if (current.getX() < start.getX() || current.getY() < start.getY())
                 return;
 
-            selectedPoints.add(p);
-            box.rendering.addColoredPoint(color, p);
-            if (start.getX() != p.getX() || start.getY() != p.getY()) {
-                for (int i = start.getX(); i <= end.getX(); i++) {
-                    for (int j = start.getY(); j <= end.getY(); j++) {
-                        final Point newPoint = new Point(i, j);
-                        if (!selectedPoints.contains(newPoint)) {
-                            selectedPoints.add(newPoint);
-                            box.rendering.addColoredPoint(color, newPoint);
-                        }
-                    }
-                }
-            }
-            updateRatioInfo(start, end);
-            container.renderEnd = end;
+            setUpSelectionFromTo(start, current, color);
+            updateRatioInfo(start, current);
+            container.renderEnd = current;
         }, (update) -> {
             if (selectedPoints.size() == 1) {
                 update.enable();
@@ -131,9 +118,21 @@ public class GuiMonitor extends GuiBase {
         }, box.rendering);
     }
 
+    private void setUpSelectionFromTo(final Point start, final Point end, final int color) {
+        selectedPoints.clear();
+        box.rendering.clearColoredPoints();
+        for (int i = start.getX(); i <= end.getX(); i++) {
+            for (int j = start.getY(); j <= end.getY(); j++) {
+                final Point newPoint = new Point(i, j);
+                selectedPoints.add(newPoint);
+                box.rendering.addColoredPoint(color, newPoint);
+            }
+        }
+    }
+
     private void updateRatioInfo(final Point start, final Point end) {
-        final int distX = end.getX() - start.getX() + 1;
-        final int distY = end.getY() - start.getY() + 1;
+        final int distX = end.getX() <= start.getX() ? 1 : end.getX() - start.getX() + 1;
+        final int distY = end.getY() <= start.getY() ? 1 : end.getY() - start.getY() + 1;
         final boolean isInRatio = ((float) distX / (float) distY) == monitorRatio;
         ratioInfo.setText("Current Ratio: " + distX + " : " + distY);
         ratioInfo.setTextColor(isInRatio ? 0xFF00FF00 : 0xFFFF0000);
@@ -144,11 +143,6 @@ public class GuiMonitor extends GuiBase {
             container.renderStart = defaultPoint;
         }
         return container.renderStart;
-    }
-
-    private Point getEndPoint(final Point currentSelect, final Point currentEnd) {
-        return new Point(Math.max(currentSelect.getX(), currentEnd.getX()),
-                Math.max(currentSelect.getY(), currentEnd.getY()));
     }
 
     private void addRenderSelection() {
