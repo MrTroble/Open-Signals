@@ -98,13 +98,26 @@ public class UISignalBoxProfile {
 
         protected UIBorderSettings borderSettings = new UIBorderSettings();
 
+        private int modePreviewBackgroundColor = 0xFFAFAFAF;
+        private int modePreviewHighlightColor = 0x45339933;
+
         public UIBorderSettings getUIBorderSettings() {
             return borderSettings;
         }
 
+        public int getModePreviewBackgroundColor() {
+            return modePreviewBackgroundColor;
+        }
+
+        public int getModePreviewHighlightColor() {
+            return modePreviewHighlightColor;
+        }
+
     }
 
-    public static class OperationModeSettings extends EditorModeSettings {
+    public static class OperationModeSettings {
+
+        protected UIBorderSettings borderSettings = new UIBorderSettings();
 
         private int userSelectionColor = 0x2900FF00;
         private int editColor = 0x5000A2FF;
@@ -119,7 +132,11 @@ public class UISignalBoxProfile {
 
         private int trainNumberColor = ConfigHandler.CLIENT.signalboxTrainNumberColor.get();
         private int trainnumberBackgroundColor =
-                ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();;
+                ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
+
+        public UIBorderSettings getUIBorderSettings() {
+            return borderSettings;
+        }
 
         public int getUserSelectionColor() {
             return userSelectionColor;

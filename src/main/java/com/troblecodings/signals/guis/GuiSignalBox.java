@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
@@ -216,6 +217,7 @@ public class GuiSignalBox extends GuiBase {
             rendering.removeMode(point, modeSet);
         } else {
             rendering.addMode(point, modeSet);
+            buildColors(ImmutableList.of(container.grid.getNode(point)));
         }
     }
 
@@ -528,7 +530,7 @@ public class GuiSignalBox extends GuiBase {
                 pop();
                 reset();
                 page = SignalBoxPage.EDITOR;
-                final UIMenu menu = new UIMenu();
+                final UIMenu menu = new UIMenu(profile);
                 initializeFieldTemplate((rendering, point, mouse) -> this.updateTileWithMode(menu,
                         rendering, point, mouse),
                         profile.getEditorModeSettings().getUIBorderSettings());

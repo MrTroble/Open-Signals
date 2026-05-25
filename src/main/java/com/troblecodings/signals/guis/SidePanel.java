@@ -197,18 +197,25 @@ public class SidePanel {
     }
 
     private static void drawMenuFromEnum(final DrawInfo info, final EnumGuiMode modes,
-            final int rotation, final float scale) {
+            final int rotation, final float scale, final UISignalBoxProfile profile) {
         info.push();
         info.scale(scale, scale, 1.0f);
         info.translate(UISignalBoxRendering.HALF_TILE, UISignalBoxRendering.HALF_TILE, 0);
         info.rotate(0, 0, rotation * UIRotate.PERPENDICULAR_ANGLE);
         info.translate(-UISignalBoxRendering.HALF_TILE, -UISignalBoxRendering.HALF_TILE, 0);
-        modes.consumer.apply(SignalState.RED, UISignalBoxProfile.DEFAULT.getTextureSettings())
-                .accept(info, modes.getDefaultColor());
+        modes.consumer.apply(SignalState.RED, profile.getTextureSettings()).accept(info,
+                getColorForMode(modes, profile));
         info.pop();
     }
 
-    public static UIComponent fromEnum(final int selection, final int rotation, final float scale) {
+    private static int getColorForMode(final EnumGuiMode mode, final UISignalBoxProfile profile) {
+        if (mode == EnumGuiMode.TRAIN_NUMBER)
+            return profile.getOperationModeSettings().getTrainnumberBackgroundColor();
+        return EnumPathUsage.FREE.getColor(profile.getOperationModeSettings());
+    }
+
+    public static UIComponent fromEnum(final int selection, final int rotation, final float scale,
+            final UISignalBoxProfile profile) {
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         return new UIComponent() {
 
@@ -216,7 +223,7 @@ public class SidePanel {
             public void draw(final DrawInfo info) {
                 if (this.parent == null)
                     return;
-                drawMenuFromEnum(info, modes, rotation, scale);
+                drawMenuFromEnum(info, modes, rotation, scale, profile);
             }
         };
     }
@@ -231,11 +238,12 @@ public class SidePanel {
         preview.setWidth(60);
         preview.setHeight(60);
         preview.setX(7);
-        preview.add(new UIColor(0xFFAFAFAF));
+        preview.add(
+                new UIColor(gui.profile.getEditorModeSettings().getModePreviewBackgroundColor()));
         preview.add(new UIBorder(preview.getBasicTextColor()));
         preview.add(new UIScissor());
 
-        final UIComponent sbt = fromEnum(selection, rotation, 4.6f);
+        final UIComponent sbt = fromEnum(selection, rotation, 4.6f, gui.profile);
 
         final UIEntity sbtEntity = new UIEntity();
         sbtEntity.setWidth(50);
@@ -647,7 +655,8 @@ public class SidePanel {
                             save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
                             lowerEntity.add(save);
                             final UIEntity remove = GuiElements.createButton("x", e1 -> {
-                                gui.container.network.updateTrainNumber(node.getPoint(), TrainNumber.DEFAULT);
+                                gui.container.network.updateTrainNumber(node.getPoint(),
+                                        TrainNumber.DEFAULT);
                                 gui.pop();
                             });
                             remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
