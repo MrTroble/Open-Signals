@@ -150,7 +150,8 @@ public class GuiSignalReader extends GuiBase {
 
             final int logicSymbolID = i - 1;
             if (logicSymbolID >= 0) {
-                list.add(getEntityFromSymbol(dir, logicSymbols, logicSymbolID));
+                list.add(getCenterdXUIEntity(getEntityFromSymbol(dir, logicSymbols, logicSymbolID),
+                        20));
             }
 
             list.add(row);
@@ -194,14 +195,16 @@ public class GuiSignalReader extends GuiBase {
                 container.sendToServerForDirection(dir);
             }));
         }
-        if (!isArrayFull(propertyEntries))
-            list.add(GuiElements.createButton("+", e -> {
+        if (!isArrayFull(propertyEntries)) {
+            list.add(GuiElements.createSpacerV(10));
+            list.add(getCenterdXUIEntity(GuiElements.createButton("+", 20, e -> {
                 push(GuiElements.createScreen(screen -> {
                     final UIEntity propertyList = new UIEntity();
                     propertyList.setInherits(true);
-                    final UIBox vbox = new UIBox(UIBox.VBOX, 5);
+                    final UIBox vbox = new UIBox(UIBox.VBOX, 2);
                     propertyList.add(vbox);
                     screen.add(propertyList);
+                    propertyList.add(GuiElements.createButton("<", 20, e1 -> pop()));
                     container.selectableProperties.forEach(property -> {
                         propertyList
                                 .add(GuiElements.createButton(property.getLocalizedName(), e1 -> {
@@ -218,7 +221,8 @@ public class GuiSignalReader extends GuiBase {
                     });
                     screen.add(GuiElements.createPageSelect(vbox));
                 }));
-            }));
+            }), 20));
+        }
 
         ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, container.pos))
                 .forEach((property, value) -> {
@@ -241,6 +245,17 @@ public class GuiSignalReader extends GuiBase {
             logicSymbols[logicSymbolID] = newSymbol;
             container.sendToServerForDirection(dir);
         });
+    }
+
+    private static UIEntity getCenterdXUIEntity(final UIEntity entity, final int height) {
+        final UIEntity row = new UIEntity();
+        row.setInheritWidth(true);
+        row.setHeight(height);
+        row.add(new UIBox(UIBox.HBOX, 0));
+        row.add(GuiElements.createSpacerV(height));
+        row.add(entity);
+        row.add(GuiElements.createSpacerV(height));
+        return row;
     }
 
     private static String getNameForSymbol(final LogicalSymbols symbol) {
