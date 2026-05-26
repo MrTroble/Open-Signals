@@ -258,13 +258,13 @@ public class SignalBoxNetworkHandler {
         final PathOptionEntry optionEntry = node.getOrCreateOption(ident.mode);
         if (mode.equals(EntryNetworkMode.ENTRY_REMOVE)) {
             optionEntry.removeEntryNoNetwork(entryType);
-            reader.handleNodeUpdate(node, entryType);
+            reader.onEntryUpdate(node, entryType);
             return;
         }
         final IPathEntry<?> entry = entryType.newValue();
         entry.readNetwork(buffer);
         optionEntry.addEntry(entryType, entry);
-        reader.handleNodeUpdate(node, entryType);
+        reader.onEntryUpdate(node, entryType);
     }
 
     protected void readForGrid(final ReadBuffer buffer) {
@@ -303,8 +303,8 @@ public class SignalBoxNetworkHandler {
         }
         if (mode.equals(NodeNetworkMode.SIGNAL_STATE)) {
             node.readSignalStates(buffer);
-            reader.handleSignalStateUpdate(node);
         }
+        reader.onNodeUpdate(node);
     }
 
     protected void handleManuellOutput(final SignalBoxNode node, final ModeSet mode,

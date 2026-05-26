@@ -22,16 +22,16 @@ public interface SignalBoxNetworkReader {
     default void readAdditionalInitialisationData(final ReadBuffer buffer) {
     }
 
-    default void handleNodeUpdate(final SignalBoxNode node, final PathEntryType<?> entryType) {
+    default void onEntryUpdate(final SignalBoxNode node, final PathEntryType<?> entryType) {
+    }
+
+    default void onNodeUpdate(final SignalBoxNode node) {
     }
 
     default void handleCounterUpdate() {
     }
 
     default void handleUIProfileUpdate() {
-    }
-
-    default void handleSignalStateUpdate(final SignalBoxNode node) {
     }
 
     default void handlePathwayRequestResponse(final PathwayRequestMode mode) {
