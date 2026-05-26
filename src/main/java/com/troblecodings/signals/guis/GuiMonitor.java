@@ -183,7 +183,9 @@ public class GuiMonitor extends GuiBase {
 
     @Override
     public void mouseMoved(final double mouseX, final double mouseY) {
-        mouseUpdate.mouseEvent(new MouseEvent(mouseX, mouseY, 0, EnumMouseState.MOVE));
+        if (mouseUpdate != null) {
+            mouseUpdate.mouseEvent(new MouseEvent(mouseX, mouseY, 0, EnumMouseState.MOVE));
+        }
         super.mouseMoved(mouseX, mouseY);
     }
 
