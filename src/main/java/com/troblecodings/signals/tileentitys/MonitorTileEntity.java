@@ -165,8 +165,8 @@ public class MonitorTileEntity extends SyncableTileEntity
         }
         nodes.forEach((p, n) -> {
             rendering.updateNode(p, n);
-            handleNodeUpdate(n, PathEntryType.TRAINNUMBER);
-            handleNodeUpdate(n, PathEntryType.PATHUSAGE);
+            onEntryUpdate(n, PathEntryType.TRAINNUMBER);
+            onEntryUpdate(n, PathEntryType.PATHUSAGE);
         });
         buildColors(nodes.values(), getProfile());
     }
@@ -203,7 +203,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void handleNodeUpdate(final SignalBoxNode node, final PathEntryType<?> entryType) {
+    public void onEntryUpdate(final SignalBoxNode node, final PathEntryType<?> entryType) {
         if (entryType.equals(PathEntryType.TRAINNUMBER)) {
             node.iterator().forEachRemaining(modeSet -> {
                 if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
@@ -233,15 +233,14 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void handleSignalStateUpdate(final SignalBoxNode node) {
+    public void onNodeUpdate(final SignalBoxNode node) {
         node.forEach((mode) -> {
             final SubsidiaryState state = node.getSubsidiaryState(mode);
             if (state != null) {
                 node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
             }
-            rendering.updateSignalState(getPointTranslated(node.getPoint()), mode,
-                    node.getState(mode));
         });
+        rendering.updateNode(getPointTranslated(node.getPoint()), node);
     }
 
     @Override

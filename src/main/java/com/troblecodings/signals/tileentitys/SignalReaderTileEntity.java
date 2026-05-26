@@ -255,6 +255,8 @@ public class SignalReaderTileEntity extends SyncableTileEntity
     @Override
     public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
             final ChangedState changedState) {
+        if (info.isWorldNullOrClientSide())
+            return;
         if (changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
             unlink();
             return;

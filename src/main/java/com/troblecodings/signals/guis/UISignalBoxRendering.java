@@ -109,7 +109,7 @@ public class UISignalBoxRendering extends UIComponent {
         node.forEach(modeSet -> modesets.put(modeSet, new ModeRenderInfo(modeSet.mode,
                 node.getState(modeSet), profile.getTextureSettings())));
         gridRender.put(point, modesets);
-        buildColorsFor(node);
+        buildColorsFor(point, node);
         nodeLabeling.put(point, node.getCustomText());
     }
 
@@ -130,15 +130,15 @@ public class UISignalBoxRendering extends UIComponent {
     public void addMode(final Point point, final ModeSet modeSet) {
         gridRender.computeIfAbsent(point, k -> Maps.newHashMap()).put(modeSet,
                 new ModeRenderInfo(modeSet.mode, SignalState.RED, profile.getTextureSettings()));
-        buildColorsFor(grid.getNode(point));
+        buildColorsFor(point, grid.getNode(point));
     }
 
     public boolean has(final Point point, final ModeSet modeSet) {
         return gridRender.containsKey(point) && gridRender.get(point).containsKey(modeSet);
     }
 
-    private void buildColorsFor(final SignalBoxNode node) {
-        setColor(node.getPoint(), mode -> {
+    private void buildColorsFor(final Point point, final SignalBoxNode node) {
+        setColor(point, mode -> {
             if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
                 return profile.getOperationModeSettings().getTrainnumberBackgroundColor();
             if (node.containsManuellOutput(mode))

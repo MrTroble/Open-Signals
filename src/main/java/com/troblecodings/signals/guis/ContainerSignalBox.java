@@ -202,12 +202,12 @@ public class ContainerSignalBox extends ContainerBase
     }
 
     @Override
-    public void handleNodeUpdate(final SignalBoxNode node, final PathEntryType<?> type) {
+    public void onEntryUpdate(final SignalBoxNode node, final PathEntryType<?> type) {
         nodeUpdate.accept(node, type);
     }
 
     @Override
-    public void handleSignalStateUpdate(final SignalBoxNode node) {
+    public void onNodeUpdate(final SignalBoxNode node) {
         updateSignalState.accept(node);
     }
 
