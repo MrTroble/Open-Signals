@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.16.5 - 3.8.3]
+* fix: issues in saveing signals
+
 ## [1.16.5 - 3.8.2]
 * feat: added config option to block shunting path with active redstone input
 * feat/fix: pathway can't be set with active subsidiary
