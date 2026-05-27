@@ -145,13 +145,16 @@ public class PathwayData {
             final Path path = new Path(oldPos, newPos);
             newNodes.put(current.getPoint(), new Point(previous));
             previous = current.getPoint();
-            final PathOptionEntry option = current.getOption(path).orElse(null);
+            final ModeSet mode = current.getMode(path);
+            final PathOptionEntry option = current.getOption(mode).orElse(null);
             if (option == null) {
                 continue;
             }
             final EnumPathUsage usage =
                     option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
             if (!(usage.equals(EnumPathUsage.FREE) || usage.equals(EnumPathUsage.PROTECTED))) {
+                if (mode.mode.equals(EnumGuiMode.CROSSING))
+                    return false;
                 final ArrayList<SignalBoxNode> listOfNodes = new ArrayList<>();
                 for (Point point = previous; point != null; point = newNodes.get(point)) {
                     listOfNodes.add(grid.getNode(point));
