@@ -140,8 +140,9 @@ public class GuiSignalReader extends GuiBase {
         final Entry<SEProperty, String>[] propertyEntries = entryForDirection.getValue();
         for (int i = 0; i < propertyEntries.length; i++) {
             final Map.Entry<SEProperty, String> entry = propertyEntries[i];
-            if (entry == null)
+            if (entry == null) {
                 continue;
+            }
             final int index = i;
             final UIEntity row = new UIEntity();
             row.setHeight(20);
@@ -259,7 +260,8 @@ public class GuiSignalReader extends GuiBase {
     }
 
     private static String getNameForSymbol(final LogicalSymbols symbol) {
-        return symbol.equals(LogicalSymbols.AND) ? "AND" : "OR";
+        return symbol.equals(LogicalSymbols.AND) ? I18Wrapper.format("gui.signalreader.and")
+                : I18Wrapper.format("gui.signalreader.or");
     }
 
     private static int getNextFreeIndex(final Object[] array) {

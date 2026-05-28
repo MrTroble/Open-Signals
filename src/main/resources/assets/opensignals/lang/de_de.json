@@ -374,6 +374,10 @@
 	"gui.monitor.current_ratio": "Aktuelle Auflösung",
 	"gui.monitor.monitor_ratio": "Monitor Auflösung",
 
+    "__SignalReaderUI": "",
+    "gui.signalreader.and": "UND",
+    "gui.signalreader.or": "ODER",
+
     "__GeneralUI": "",
     "label.linkedto": "Verlinkt mit",
     "btn.apply": "Anwenden",

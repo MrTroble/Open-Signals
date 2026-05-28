@@ -374,6 +374,10 @@
 	"gui.monitor.current_ratio": "Current Ratio",
 	"gui.monitor.monitor_ratio": "Monitor Ratio",
 
+	"__SignalReaderUI": "",
+    "gui.signalreader.and": "AND",
+    "gui.signalreader.or": "OR",
+
 	"__GeneralUI":"",
 	"label.linkedto": "Linked to",
 	"btn.apply": "Apply",

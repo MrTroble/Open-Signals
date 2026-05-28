@@ -95,9 +95,6 @@ public class GuiMonitor extends GuiBase {
 
     private UIMouseUpdate getUserSelectionGrid(final BoxEntity box,
             final UISignalBoxProfile uiProfile) {
-        // TODO Maby possibility for max value?
-        final int maxTileX = 10;
-        final int maxTileY = 10;
         final int color = uiProfile.getOperationModeSettings().getUserSelectionColor();
         return new UIMouseUpdate(current -> {
             if (current.equals(container.renderEnd))
@@ -138,7 +135,8 @@ public class GuiMonitor extends GuiBase {
         final int distX = end.getX() <= start.getX() ? 1 : end.getX() - start.getX() + 1;
         final int distY = end.getY() <= start.getY() ? 1 : end.getY() - start.getY() + 1;
         final boolean isInRatio = ((float) distX / (float) distY) == monitorRatio;
-        ratioInfo.setText("Current Ratio: " + distX + " : " + distY);
+        ratioInfo.setText(
+                I18Wrapper.format("gui.monitor.current_ratio") + ": " + distX + " : " + distY);
         ratioInfo.setTextColor(isInRatio ? 0xFF00FF00 : 0xFFFF0000);
     }
 
