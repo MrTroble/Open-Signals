@@ -42,11 +42,11 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 
 public class ModeDropDownBoxUI {
 
@@ -203,14 +203,9 @@ public class ModeDropDownBoxUI {
                                                 }
                                                 if (preSignalsList.isEmpty()) {
                                                     option.removeEntry(PathEntryType.PRESIGNALS);
-                                                    gui.removeEntryFromServer(this.node, mode,
-                                                            rotation, PathEntryType.PRESIGNALS);
                                                 } else {
                                                     option.setEntry(PathEntryType.PRESIGNALS,
                                                             preSignalsList);
-                                                    gui.sendModeIdentList(preSignalsList, this.node,
-                                                            mode, rotation,
-                                                            PathEntryType.PRESIGNALS);
                                                 }
                                             });
                             preSignalsList.forEach(ident -> {
@@ -587,7 +582,7 @@ public class ModeDropDownBoxUI {
 
     private UIEntity getCheckBoxEntityforType(final EnumGuiMode mode, final Rotation rotation,
             final PathEntryType<TCBoolean> type, final String name, final TCBoolean defaultValue) {
-        final SoundManager handler = Minecraft.getInstance().getSoundManager();
+        final SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
 
         final UIEntity hentity = new UIEntity();
         hentity.setInheritWidth(true);
@@ -602,13 +597,12 @@ public class ModeDropDownBoxUI {
         checkBox.setChecked((option.getEntry(type).orElseGet(() -> defaultValue)).booleanValue());
         final UIClickable clickable = new UIClickable(e -> {
             checkBox.setChecked(!checkBox.isChecked());
-            handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            handler.playSound(
+                    PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             if (checkBox.isChecked() != defaultValue.booleanValue()) {
                 option.setEntry(type, TCBoolean.valueOf(checkBox.isChecked()));
-                gui.sendZS6Entry(checkBox.isChecked(), node, mode, rotation, type);
             } else {
                 option.removeEntry(type);
-                gui.removeEntryFromServer(node, mode, rotation, type);
             }
         });
         checkBoxEntity.add(checkBox);
@@ -620,7 +614,7 @@ public class ModeDropDownBoxUI {
 
     private UIEntity getCheckBoxEntityforType(final EnumGuiMode mode, final Rotation rotation,
             final PathEntryType<Boolean> type, final String name, final boolean defaultValue) {
-        final SoundManager handler = Minecraft.getInstance().getSoundManager();
+        final SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
 
         final UIEntity hentity = new UIEntity();
         hentity.setInheritWidth(true);
@@ -635,13 +629,12 @@ public class ModeDropDownBoxUI {
         checkBox.setChecked((option.getEntry(type).orElseGet(() -> defaultValue)));
         final UIClickable clickable = new UIClickable(e -> {
             checkBox.setChecked(!checkBox.isChecked());
-            handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            handler.playSound(
+                    PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             if (checkBox.isChecked() != defaultValue) {
                 option.setEntry(type, checkBox.isChecked());
-                gui.sendBoolEntry(checkBox.isChecked(), node.getPoint(), modeSet, type);
             } else {
                 option.removeEntry(type);
-                gui.removeEntryFromServer(node, mode, rotation, type);
             }
         });
         checkBoxEntity.add(checkBox);

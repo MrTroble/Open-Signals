@@ -1,6 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -18,7 +19,7 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
 
 public class NamableGui extends GuiBase {
 
@@ -74,7 +75,8 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity))
             return;
 
-        final Block block = container.tile.getBlockState().getBlock();
+        final Block block =
+                container.tile.getWorld().getBlockState(container.tile.getPos()).getBlock();
         if (block instanceof RedstoneInput) {
             addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
                     I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay);

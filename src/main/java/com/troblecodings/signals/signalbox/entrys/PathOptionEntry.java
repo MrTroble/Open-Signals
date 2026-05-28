@@ -16,7 +16,7 @@ import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.network.PathOptionEntryNetwork;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class PathOptionEntry implements INetworkSaveable, ISaveable {
 

@@ -392,7 +392,7 @@ public class PathwayData {
         final List<ModeIdentifier> idents =
                 signalOption.getEntry(PathEntryType.PRESIGNALS).orElseGet(() -> new ArrayList<>());
         if (idents.removeIf(ident -> !grid.getNodeChecked(ident.point)
-                .orElseGet(() -> new SignalBoxNode()).has(ident.mode))) {
+                .orElseGet(() -> new SignalBoxNode(grid.getNetwork())).has(ident.mode))) {
             signalOption.setEntry(PathEntryType.PRESIGNALS, idents);
         }
         return idents;

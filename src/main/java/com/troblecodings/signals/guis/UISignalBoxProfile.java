@@ -12,7 +12,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.enums.SignalBoxIcons;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
 
 public class UISignalBoxProfile {
 
@@ -23,7 +23,7 @@ public class UISignalBoxProfile {
 
     private int id;
     private String name;
-    private String backgroundColor = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
+    private String backgroundColor = ConfigHandler.signalboxBackgroundColor;
     private EditorModeSettings editorSettings = new EditorModeSettings();
     private OperationModeSettings operationSettings = new OperationModeSettings();
     private TextureSettings textureSettings = new TextureSettings();
@@ -123,17 +123,17 @@ public class UISignalBoxProfile {
         private String userSelectionColor = "0x2900FF00";
         private String editColor = "0x5000A2FF";
 
-        private String freeColor = ConfigHandler.CLIENT.signalboxFreeColor.get();
-        private String selectColor = ConfigHandler.CLIENT.signalboxSelectColor.get();
-        private String usedColor = ConfigHandler.CLIENT.signalboxUsedColor.get();
-        private String preparedColor = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-        private String protectedColor = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-        private String shuntingColor = ConfigHandler.CLIENT.signalboxShuntingColor.get();
+        private String freeColor = ConfigHandler.signalboxFreeColor;
+        private String selectColor = ConfigHandler.signalboxSelectColor;
+        private String usedColor = ConfigHandler.signalboxUsedColor;
+        private String preparedColor = ConfigHandler.signalboxPreparedColor;
+        private String protectedColor = ConfigHandler.signalboxPreparedColor;
+        private String shuntingColor = ConfigHandler.signalboxShuntingColor;
         private String outputColor = "0xffff00";
 
-        private String trainNumberColor = ConfigHandler.CLIENT.signalboxTrainNumberColor.get();
+        private String trainNumberColor = ConfigHandler.signalboxTrainNumberColor;
         private String trainnumberBackgroundColor =
-                ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
+                ConfigHandler.signalboxTrainnumberBackgroundColor;
 
         public UIBorderSettings getUIBorderSettings() {
             return borderSettings;
@@ -187,8 +187,10 @@ public class UISignalBoxProfile {
 
     public static class TextureSettings {
 
-        private String signsTexturePath = SignalBoxIcons.SIGNS.getResourceLocation().getPath();
-        private String signalsTexturePath = SignalBoxIcons.SIGNALS.getResourceLocation().getPath();
+        private String signsTexturePath =
+                SignalBoxIcons.SIGNS.getResourceLocation().getResourcePath();
+        private String signalsTexturePath =
+                SignalBoxIcons.SIGNALS.getResourceLocation().getResourcePath();
 
         private transient ResourceLocation signsLoc;
         private transient ResourceLocation signalsLoc;

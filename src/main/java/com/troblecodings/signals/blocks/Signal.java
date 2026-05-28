@@ -11,9 +11,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.apache.logging.log4j.core.config.plugins.convert.HexConverter;
-
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.core.HexConverter;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;

@@ -11,32 +11,27 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.opensignals.linkableapi.ILinkableTile;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.SignalStateLoadHoler;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 
 public class SignalReaderTileEntity extends SyncableTileEntity
         implements ILinkableTile, SignalStateListener {
-
-    public SignalReaderTileEntity(final TileEntityInfo info) {
-        super(info);
-    }
 
     public static final int MAX_PROPERTIES_SIZE = 10;
     public static final int MAX_LOGICAL_VALUES_SIZE = MAX_PROPERTIES_SIZE - 1;
@@ -50,11 +45,11 @@ public class SignalReaderTileEntity extends SyncableTileEntity
     public static final String POSITION_ID = "positionID";
     public static final String LOGICAL_SYMBOLS = "logicalSymbols";
 
-    private final Map<Direction, Map.Entry<LogicalSymbols[], Map.Entry<SEProperty, String>[]>> statesForFace =
+    private final Map<EnumFacing, Map.Entry<LogicalSymbols[], Map.Entry<SEProperty, String>[]>> statesForFace =
             new HashMap<>();
-    private final Map<Direction, Predicate<Map<SEProperty, String>>> predicateForDirection =
+    private final Map<EnumFacing, Predicate<Map<SEProperty, String>>> predicateForDirection =
             new HashMap<>();
-    private final boolean[] activatedDirections = new boolean[Direction.values().length];
+    private final boolean[] activatedDirections = new boolean[EnumFacing.values().length];
     private BlockPos signalPos;
     private Signal signal;
 
@@ -69,7 +64,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity
                 .collect(Collectors.toMap(prop -> prop.getName(), prop -> prop));
         final List<NBTWrapper> list = wrapper.getList(ALL_STATES);
         list.forEach(directionWrapper -> {
-            final Direction dir = Direction.byName(directionWrapper.getString(DIRECTION));
+            final EnumFacing dir = EnumFacing.byName(directionWrapper.getString(DIRECTION));
 
             final LogicalSymbols[] symbols = new LogicalSymbols[MAX_LOGICAL_VALUES_SIZE];
             final List<NBTWrapper> symbolsList = directionWrapper.getList(LOGICAL_SYMBOLS);
@@ -94,7 +89,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity
             statesForFace.put(dir, Maps.immutableEntry(symbols, propertyEntries));
             activatedDirections[dir.ordinal()] = directionWrapper.getBoolean(REDSTONE_ACTIVATED);
         });
-        generatePredicatesFor(Direction.values());
+        generatePredicatesFor(EnumFacing.values());
     }
 
     @Override
@@ -150,36 +145,38 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         return signalPos;
     }
 
-    public boolean enableRedstoneForDirection(final Direction dir) {
+    public boolean enableRedstoneForDirection(final EnumFacing dir) {
         return activatedDirections[dir.ordinal()];
     }
 
-    public Map<Direction, Entry<LogicalSymbols[], Entry<SEProperty, String>[]>> getPropertiesForFace() {
+    public Map<EnumFacing, Entry<LogicalSymbols[], Entry<SEProperty, String>[]>> getPropertiesForFace() {
         return ImmutableMap.copyOf(statesForFace);
     }
 
-    public void removeDirection(final Direction dir) {
+    public void removeDirection(final EnumFacing dir) {
         statesForFace.remove(dir);
         predicateForDirection.remove(dir);
     }
 
-    public void setUpForDirection(final Direction dir,
+    public void setUpForDirection(final EnumFacing dir,
             final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entry) {
         statesForFace.put(dir, entry);
         generatePredicatesFor(dir);
     }
 
-    private void generatePredicatesFor(final Direction... directions) {
-        for (final Direction dir : directions) {
+    private void generatePredicatesFor(final EnumFacing... directions) {
+        for (final EnumFacing dir : directions) {
             final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entry =
                     statesForFace.get(dir);
-            if (entry == null)
+            if (entry == null) {
                 continue;
+            }
             Predicate<Map<SEProperty, String>> predicate = map -> false;
             for (int i = 0; i < entry.getValue().length; i++) {
                 final Entry<SEProperty, String> propertyEntry = entry.getValue()[i];
-                if (propertyEntry == null)
+                if (propertyEntry == null) {
                     continue;
+                }
 
                 final Predicate<Map<SEProperty, String>> currentPredicate =
                         getPredicateFromEntry(propertyEntry);
@@ -206,29 +203,26 @@ public class SignalReaderTileEntity extends SyncableTileEntity
 
     @Override
     public void onLoad() {
-        if (level.isClientSide || signalPos == null || signal == null)
+        if (world.isRemote || signalPos == null || signal == null)
             return;
-        final SignalStateInfo info = new SignalStateInfo(level, signalPos, signal);
+        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
         SignalStateHandler.addListener(info, this);
-        SignalStateHandler
-                .loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(getBlockPos())));
+        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
     }
 
     @Override
-    public void onChunkUnloaded() {
-        if (level.isClientSide || signalPos == null || signal == null)
+    public void onChunkUnload() {
+        if (world.isRemote || signalPos == null || signal == null)
             return;
-        final SignalStateInfo info = new SignalStateInfo(level, signalPos, signal);
+        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
         SignalStateHandler.removeListener(info, this);
-        SignalStateHandler
-                .unloadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(getBlockPos())));
+        SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundTag tag) {
-        @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(
-                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
+    public boolean link(final BlockPos pos, final NBTTagCompound tag) {
+        final Block block = Block.REGISTRY.getObject(
+                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toString())));
         if (block instanceof Signal) {
             signal = (Signal) block;
             signalPos = pos;
@@ -248,14 +242,14 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         signal = null;
         signalPos = null;
         statesForFace.clear();
-        onChunkUnloaded();
+        onChunkUnload();
         return true;
     }
 
     @Override
     public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
             final ChangedState changedState) {
-        if (info.isWorldNullOrClientSide())
+        if (info.worldNullOrClientSide())
             return;
         if (changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
             unlink();
@@ -264,13 +258,14 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         if (changedState.equals(ChangedState.ADDED_TO_CACHE)
                 || changedState.equals(ChangedState.UPDATED)) {
             final Map<SEProperty, String> allProperties = SignalStateHandler.getStates(info);
-            for (final Direction dir : Direction.values()) {
+            for (final EnumFacing dir : EnumFacing.values()) {
                 activatedDirections[dir.ordinal()] = false;
                 if (predicateForDirection.getOrDefault(dir, _u -> false).test(allProperties)) {
                     activatedDirections[dir.ordinal()] = true;
                 }
             }
-            level.blockUpdated(worldPosition, getBlockState().getBlock());
+            final IBlockState state = world.getBlockState(pos);
+            world.notifyBlockUpdate(signalPos, state, state, 3);
         }
     }
 }

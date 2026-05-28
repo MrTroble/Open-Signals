@@ -34,8 +34,9 @@ public class NamableContainer extends ContainerBase {
 
     private void sendSignalPos() {
         final WriteBuffer buffer = new WriteBuffer();
-        if (tile == null)
-            tile = info.getTile(BasicBlockEntity.class);
+        if (tile == null) {
+            tile = info.getTile();
+        }
         buffer.putBlockPos(info.pos);
         buffer.putList(tile.getLinkedPos(), WriteBuffer.BLOCKPOS_CONSUMER);
         if (tile instanceof RedstoneIOTileEntity) {
@@ -57,7 +58,7 @@ public class NamableContainer extends ContainerBase {
         linkedPos.clear();
         linkedController.clear();
         pos = buffer.getBlockPos();
-        tile = (BasicBlockEntity) info.world.getBlockEntity(pos);
+        tile = (BasicBlockEntity) info.world.getTileEntity(pos);
         linkedPos.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
         if (tile instanceof RedstoneIOTileEntity) {
             linkedController.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
@@ -88,7 +89,7 @@ public class NamableContainer extends ContainerBase {
         if (mode.equals(NamableContainerNetwork.RESET_TIME)) {
             ioTile.setResetDelay(buffer.getInt());
         }
-        tile.setChanged();
+        tile.markDirty();
     }
 
     protected void sendNameToServer(final String name) {

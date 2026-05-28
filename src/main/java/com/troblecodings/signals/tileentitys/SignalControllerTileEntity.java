@@ -100,7 +100,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         allStates.remove(profile);
     }
 
-    public void updateEnabledStates(final Direction direction, final EnumState state,
+    public void updateEnabledStates(final EnumFacing direction, final EnumState state,
             final int profile) {
         enabledStates.computeIfAbsent(direction, _u -> new HashMap<>()).put(state, (byte) profile);
     }
@@ -225,9 +225,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (!world.isRemote) {
             if (linkedSignalPosition != null && linkedSignal != null) {
                 final SignalStateInfo info =
-                        new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
-                final LoadHolder<StateInfo> holder =
-                        new LoadHolder<>(new StateInfo(level, worldPosition));
+                        new SignalStateInfo(world, linkedSignalPosition, linkedSignal);
+                final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, pos));
                 SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
                 SignalStateHandler.addListener(info, listener);
                 NameHandler.loadName(new StateLoadHolder(info.toStateInfo(), holder));
@@ -238,9 +237,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void unloadSignal() {
         if (linkedSignalPosition != null && linkedSignal != null) {
             final SignalStateInfo info =
-                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
-            final LoadHolder<StateInfo> holder =
-                    new LoadHolder<>(new StateInfo(level, worldPosition));
+                    new SignalStateInfo(world, linkedSignalPosition, linkedSignal);
+            final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, pos));
             SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, holder));
             NameHandler.unloadName(new StateLoadHolder(info.toStateInfo(), holder));
         }
@@ -316,7 +314,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                 continue;
             }
             final SignalStateInfo info =
-                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
+                    new SignalStateInfo(world, linkedSignalPosition, linkedSignal);
             SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, _u1,
                     _u2) -> SignalStateHandler.setStates(info, allStates.get(profile)));
         }
@@ -328,7 +326,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         final Map<SEProperty, String> properties = allStates.get(profileRSInput);
         if (properties != null) {
             final SignalStateInfo info =
-                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal);
+                    new SignalStateInfo(world, linkedSignalPosition, linkedSignal);
             SignalStateHandler.runTaskWhenSignalLoaded(info,
                     (stateInfo, _u1, _u2) -> SignalStateHandler.setStates(info, properties));
         }

@@ -1,7 +1,6 @@
 package com.troblecodings.signals.proxy;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Monitor;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.PathwayRequester;
@@ -16,6 +15,7 @@ import com.troblecodings.signals.guis.GuiMonitorSelection;
 import com.troblecodings.signals.guis.GuiPathwayRequester;
 import com.troblecodings.signals.guis.GuiPlacementtool;
 import com.troblecodings.signals.guis.GuiSignalBox;
+import com.troblecodings.signals.guis.GuiSignalBridge;
 import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.GuiSignalReader;
 import com.troblecodings.signals.guis.GuiTrainNumber;
@@ -62,18 +62,14 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(MonitorTEBlock.class, GuiMonitor::new);
         OpenSignalsMain.handler.addGui(SignalReader.class, GuiSignalReader::new);
 
+        ModelLoaderRegistry.registerLoader(CustomModelLoader.INSTANCE);
+        ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEntity.class,
+                new SignalSpecialRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(MonitorTileEntity.class,
+                new MonitorSpecialRenderer());
+        MinecraftForge.EVENT_BUS.register(OSModels.class);
+        MinecraftForge.EVENT_BUS.register(ClientRenderUpdate.INSTANCE);
+
         UISignalBoxProfile.loadSignalBoxUIProfiles();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void preinit(final FMLCommonSetupEvent event) {
-        super.preinit(event);
-
-        BlockEntityRenderers.register(
-                (BlockEntityType<SignalTileEntity>) BasicBlock.BLOCK_ENTITYS.get(Signal.SUPPLIER),
-                SignalSpecialRenderer::new);
-        BlockEntityRenderers.register((BlockEntityType<MonitorTileEntity>) BasicBlock.BLOCK_ENTITYS
-                .get(MonitorTEBlock.SUPPLIER), MonitorSpecialRenderer::new);
     }
 }

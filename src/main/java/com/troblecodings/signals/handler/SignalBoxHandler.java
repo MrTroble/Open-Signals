@@ -56,7 +56,7 @@ public final class SignalBoxHandler {
     }
 
     public static void writeTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -68,7 +68,7 @@ public final class SignalBoxHandler {
     }
 
     public static void readTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -79,7 +79,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean isTileEmpty(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return true;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -92,7 +92,7 @@ public final class SignalBoxHandler {
 
     public static boolean linkPosToSignalBox(final StateInfo identifier, final BlockPos linkPos,
             final BasicBlock block, final LinkType type) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return false;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -102,16 +102,18 @@ public final class SignalBoxHandler {
         final boolean linked = holder.addLinkedPos(linkPos, identifier.world, type);
         if (!linked)
             return false;
-        if (block instanceof Signal)
+        if (block instanceof Signal) {
             holder.addSignal(linkPos, (Signal) block, identifier.world);
+        }
         if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT
-                || block == OSBlocks.COMBI_REDSTONE_INPUT)
+                || block == OSBlocks.COMBI_REDSTONE_INPUT) {
             linkTileToPos(identifier, linkPos);
+        }
         return linked;
     }
 
     public static void relinkAllRedstoneIOs(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -123,7 +125,7 @@ public final class SignalBoxHandler {
     }
 
     public static Signal getSignal(final StateInfo identifier, final BlockPos signalPos) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return null;
         final LinkedPositions signals;
         synchronized (ALL_LINKED_POS) {
@@ -135,7 +137,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkPosFromSignalBox(final StateInfo identifier, final BlockPos pos) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -147,7 +149,7 @@ public final class SignalBoxHandler {
     }
 
     public static Map<BlockPos, LinkType> getAllLinkedPos(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return new HashMap<>();
         final LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -159,12 +161,13 @@ public final class SignalBoxHandler {
     }
 
     public static void onPosRemove(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         synchronized (ALL_LINKED_POS) {
             ALL_LINKED_POS.forEach((pos, holder) -> {
-                if (pos.world.equals(identifier.world))
+                if (pos.world.equals(identifier.world)) {
                     holder.removeLinkedPos(identifier.pos, identifier.world);
+                }
             });
         }
         synchronized (POS_UPDATES) {
@@ -173,7 +176,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkAll(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions allPos;
         synchronized (ALL_LINKED_POS) {
@@ -185,7 +188,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkTileFromPos(final StateInfo identifier, final BlockPos posToUnlink) {
-        if (identifier.worldNullOrClientSide() || tryDirectUnlink(identifier, posToUnlink))
+        if (identifier.isWorldNullOrClientSide() || tryDirectUnlink(identifier, posToUnlink))
             return;
         final LinkingUpdates update;
         synchronized (POS_UPDATES) {
@@ -196,7 +199,7 @@ public final class SignalBoxHandler {
     }
 
     public static void linkTileToPos(final StateInfo identifier, final BlockPos posToLink) {
-        if (identifier.worldNullOrClientSide() || tryDirectLink(identifier, posToLink))
+        if (identifier.isWorldNullOrClientSide() || tryDirectLink(identifier, posToLink))
             return;
         final LinkingUpdates update;
         synchronized (POS_UPDATES) {
@@ -207,7 +210,7 @@ public final class SignalBoxHandler {
     }
 
     private static boolean tryDirectLink(final StateInfo identifier, final BlockPos posToLink) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return false;
         final TileEntity entity = identifier.world.getTileEntity(posToLink);
         if (entity != null && entity instanceof RedstoneIOTileEntity) {
@@ -218,7 +221,7 @@ public final class SignalBoxHandler {
     }
 
     private static boolean tryDirectUnlink(final StateInfo identifier, final BlockPos posToUnlink) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return false;
         final TileEntity entity = identifier.world.getTileEntity(posToUnlink);
         if (entity != null && entity instanceof RedstoneIOTileEntity) {
@@ -229,7 +232,7 @@ public final class SignalBoxHandler {
     }
 
     public static void removeSignalBox(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         synchronized (ALL_GRIDS) {
             ALL_GRIDS.remove(identifier);
@@ -240,7 +243,7 @@ public final class SignalBoxHandler {
     }
 
     public static LinkingUpdates getPosUpdates(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return null;
         synchronized (POS_UPDATES) {
             return POS_UPDATES.remove(identifier);
@@ -248,7 +251,7 @@ public final class SignalBoxHandler {
     }
 
     public static void updateRedstoneOutput(final StateInfo identifier, final boolean state) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         IBlockState blockState = identifier.world.getBlockState(identifier.pos);
         if (blockState != null && blockState.getBlock() == OSBlocks.REDSTONE_OUT) {
@@ -262,7 +265,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean containsOutputUpdates(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return false;
         synchronized (OUTPUT_UPDATES) {
             return OUTPUT_UPDATES.containsKey(identifier);
@@ -270,7 +273,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean getNewOutputState(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return false;
         synchronized (OUTPUT_UPDATES) {
             return OUTPUT_UPDATES.remove(identifier);
@@ -278,7 +281,7 @@ public final class SignalBoxHandler {
     }
 
     public static void loadSignals(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -290,7 +293,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unloadSignals(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -307,7 +310,7 @@ public final class SignalBoxHandler {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
-        final World world = (World) event.getWorld();
+        final World world = event.getWorld();
         if (world.isRemote)
             return;
         final NBTWrapper wrapper = new NBTWrapper();
@@ -340,8 +343,8 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
-                    .toFile();
+            final File file =
+                    PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles").toFile();
             if (!file.exists())
                 return;
             file.delete();
@@ -353,13 +356,13 @@ public final class SignalBoxHandler {
 
     @SubscribeEvent
     public static void onWorldLoad(final WorldEvent.Load event) {
-        final World world = (World) event.getWorld();
+        final World world = event.getWorld();
         if (world.isRemote)
             return;
         migrateFilesToNewDirectory(world);
         try {
-            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
-                    .toFile();
+            final File file =
+                    PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles").toFile();
             if (!file.exists())
                 return;
             final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(file));
@@ -389,9 +392,8 @@ public final class SignalBoxHandler {
                 ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
                         + ((WorldServer) world).provider.getDimensionType().getName().replace(":",
                                 "_"));
-        if (!Files.exists(oldPath)) {
+        if (!Files.exists(oldPath))
             return;
-        }
         final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
         try {
             Files.createDirectories(newPath);

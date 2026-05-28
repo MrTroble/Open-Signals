@@ -142,12 +142,12 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             final MainSignalIdentifier otherLastSignal = pathwayToBlock.data.getEndSignal();
             if (otherLastSignal != null) {
-                final Signal nextSignal =
-                        SignalBoxHandler.getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
-                                pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
+                final Signal nextSignal = SignalBoxHandler.getSignal(
+                        new StateInfo(pathwayToBlock.tile.getWorld(), pathwayToBlock.tile.getPos()),
+                        otherLastSignal.pos);
                 if (nextSignal != null) {
                     lastSignalInfo =
-                            new SignalStateInfo(tile.getLevel(), otherLastSignal.pos, nextSignal);
+                            new SignalStateInfo(tile.getWorld(), otherLastSignal.pos, nextSignal);
                 }
             }
         }

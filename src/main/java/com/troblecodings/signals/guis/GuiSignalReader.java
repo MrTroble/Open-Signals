@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -25,16 +26,14 @@ import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.models.SignalCustomModel;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 import com.troblecodings.signals.tileentitys.SignalReaderTileEntity;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.util.EnumFacing;
 
 public class GuiSignalReader extends GuiBase {
 
@@ -97,12 +96,13 @@ public class GuiSignalReader extends GuiBase {
     }
 
     private void addSideSelection(final UIEntity sideSelection, final UIEntity propertyList) {
-        final Minecraft mc = Minecraft.getInstance();
-        final BlockState state = OSBlocks.SIGNALREADER.defaultBlockState();
-        final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
-        final UIEnumerable toggle = new UIEnumerable(Direction.values().length, "Face");
+        final Minecraft mc = Minecraft.getMinecraft();
+        final IBlockState state = OSBlocks.SIGNALREADER.getDefaultState();
+        final IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(state);
+
+        final UIEnumerable toggle = new UIEnumerable(EnumFacing.values().length, "Face");
         toggle.setOnChange(e -> {
-            final Direction faceing = Direction.values()[e];
+            final EnumFacing faceing = EnumFacing.values()[e];
 
             final List<UIColor> colors = sideSelection.findRecursive(UIColor.class);
             colors.forEach(c -> c.setColor(0x70000000));
@@ -110,9 +110,8 @@ public class GuiSignalReader extends GuiBase {
             setUpPropertiesForDirection(faceing, propertyList);
         });
         sideSelection.add(toggle);
-        for (final Direction face : Direction.values()) {
-            final List<BakedQuad> quad =
-                    model.getQuads(state, face, SignalCustomModel.RANDOM, EmptyModelData.INSTANCE);
+        for (final EnumFacing face : EnumFacing.values()) {
+            final List<BakedQuad> quad = model.getQuads(state, face, 0);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(30);
             faceEntity.setHeight(30);
@@ -125,10 +124,10 @@ public class GuiSignalReader extends GuiBase {
             faceEntity.add(label);
             sideSelection.add(faceEntity);
         }
-        setUpPropertiesForDirection(Direction.values()[0], propertyList);
+        setUpPropertiesForDirection(EnumFacing.values()[0], propertyList);
     }
 
-    private void setUpPropertiesForDirection(final Direction dir, final UIEntity list) {
+    private void setUpPropertiesForDirection(final EnumFacing dir, final UIEntity list) {
         list.clearChildren();
         @SuppressWarnings("unchecked")
         final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entryForDirection =
@@ -225,7 +224,7 @@ public class GuiSignalReader extends GuiBase {
             }), 20));
         }
 
-        ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, container.pos))
+        ClientSignalStateHandler.getClientStates(new StateInfo(mc.world, container.pos))
                 .forEach((property, value) -> {
                     previewSidebar.addToRenderNormal(property,
                             property.getParent().getIDFromValue(value));
@@ -234,7 +233,7 @@ public class GuiSignalReader extends GuiBase {
         previewSidebar.update(container.signal);
     }
 
-    private UIEntity getEntityFromSymbol(final Direction dir, final LogicalSymbols[] logicSymbols,
+    private UIEntity getEntityFromSymbol(final EnumFacing dir, final LogicalSymbols[] logicSymbols,
             final int logicSymbolID) {
         final LogicalSymbols symbol = logicSymbols[logicSymbolID];
         return GuiElements.createButton(getNameForSymbol(symbol), 50, buttonEntity -> {
@@ -300,7 +299,7 @@ public class GuiSignalReader extends GuiBase {
 
         final UILabel label = new UILabel(
                 I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalreader") + "; Name: "
-                        + ClientNameHandler.getClientName(new StateInfo(mc.level, container.pos))
+                        + ClientNameHandler.getClientName(new StateInfo(mc.world, container.pos))
                                 .replace("[n]", " "));
         label.setCenterX(false);
         label.setCenterY(true);
@@ -323,6 +322,11 @@ public class GuiSignalReader extends GuiBase {
     public UIEntity pop() {
         previewSidebar.setDisable(false);
         return super.pop();
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerSignalReader(info);
     }
 
 }

@@ -15,7 +15,7 @@ public class StateInfo {
         this.pos = pos;
     }
 
-    public boolean worldNullOrClientSide() {
+    public boolean isWorldNullOrClientSide() {
         return world == null || world.isRemote;
     }
 
@@ -32,9 +32,7 @@ public class StateInfo {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final StateInfo other = (StateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(world, other.world);

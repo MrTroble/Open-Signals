@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class UISignalBoxRendering extends UIComponent {
     private Map<Point, String> nodeLabeling;
     private final UISignalBoxProfile profile;
     private final UIBorderSettings settings;
-    private final Font font = Minecraft.getInstance().font;
+    private final FontRenderer font = Minecraft.getMinecraft().fontRenderer;
     private final SignalBoxConsumer consumer;
     private final UIEntity gridParent;
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
@@ -114,10 +115,11 @@ public class UISignalBoxRendering extends UIComponent {
     }
 
     public void updateNodeLabeling(final Point point, final String labeling) {
-        if (labeling.isEmpty())
+        if (labeling.isEmpty()) {
             nodeLabeling.remove(point);
-        else
+        } else {
             nodeLabeling.put(point, labeling);
+        }
     }
 
     public void removeMode(final Point point, final ModeSet modeSet) {
@@ -193,9 +195,7 @@ public class UISignalBoxRendering extends UIComponent {
     }
 
     public void clearSelection() {
-        for (int i = 0; i < colorSelections.length; i++) {
-            colorSelections[i] = null;
-        }
+        Arrays.fill(colorSelections, null);
     }
 
     public void addColoredPoint(final int c, final Point point) {
@@ -212,9 +212,7 @@ public class UISignalBoxRendering extends UIComponent {
 
     @Override
     public void mouseEvent(final MouseEvent event) {
-        if (!this.visible)
-            return;
-        if (!this.gridParent.isHovered())
+        if (!this.visible || !this.gridParent.isHovered())
             return;
         final double x = event.x - parent.getLevelX();
         final double y = event.y - parent.getLevelY();
@@ -237,18 +235,15 @@ public class UISignalBoxRendering extends UIComponent {
             info.pop();
         });
         for (final ColorPoint c : colorSelections) {
-            if (c != null)
+            if (c != null) {
                 renderColorPoint(info, c);
+            }
         }
         for (final ColorPoint c : additionalPoints) {
             renderColorPoint(info, c);
         }
         final int signalBoxTrainNumberColor =
                 profile.getOperationModeSettings().getTrainNumberColor();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-                GlStateManager.DestFactor.ZERO);
         trainNumbers.forEach((point, number) -> renderText(info, point.point, point.mode.rotation,
                 number, (int) 6.5f, (4 * TILE_WIDTH - font.getStringWidth(number)) / 2,
                 signalBoxTrainNumberColor, 0.5f));
@@ -283,9 +278,9 @@ public class UISignalBoxRendering extends UIComponent {
         info.alphaOn();
         info.blendOn();
         info.applyColor();
-        final BufferWrapper wrapper = info.builder(GL11.GL_QUADS,
-                DefaultVertexFormats.POSITION_COLOR);
-        wrapper.quad(0, (int) TILE_WIDTH, 0, (int) TILE_WIDTH, c.color);
+        final BufferWrapper wrapper =
+                info.builder(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        wrapper.quad(0, TILE_WIDTH, 0, TILE_WIDTH, c.color);
         info.end();
         info.pop();
     }
@@ -421,9 +416,7 @@ public class UISignalBoxRendering extends UIComponent {
         public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
+            if ((obj == null) || (getClass() != obj.getClass()))
                 return false;
             final ColorPoint other = (ColorPoint) obj;
             return color == other.color && Objects.equals(point, other.point);

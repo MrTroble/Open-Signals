@@ -29,6 +29,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -43,12 +44,11 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class SidePanel {
 
@@ -114,7 +114,6 @@ public class SidePanel {
             spacerEntity.setWidth(85);
             helpPage.clearChildren();
             helpPage.add(infoEntity);
-            lowerEntity.update();
         } else {
             helpPageButton.setText("<-");
             helpPage.clearChildren();
@@ -122,8 +121,8 @@ public class SidePanel {
             helpPage.add(getIcons());
             helpPage.add(label);
             spacerEntity.setWidth(20);
-            lowerEntity.update();
         }
+        lowerEntity.update();
         infoEntity.forEach(entity -> entity.setVisible(showHelpPage));
         label.setVisible(true);
         button.setVisible(true);
@@ -379,7 +378,6 @@ public class SidePanel {
             if (guiModes.contains(EnumGuiMode.HP)) {
                 final UIEntity entity =
                         GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
-                            gui.setAutoPoint(node.getPoint(), (byte) e);
                             node.setAutoPoint(e == 1 ? true : false);
                         }, node.isAutoPoint() ? 1 : 0);
                 entity.setScale(0.95f);
@@ -590,8 +588,12 @@ public class SidePanel {
                                                         }
                                                         gui.rendering.setColor(node.getPoint(),
                                                                 mode,
-                                                                !turnOff ? GuiSignalBox.OUTPUT_COLOR
-                                                                        : SignalBoxUtil.FREE_COLOR);
+                                                                !turnOff ? gui.profile
+                                                                        .getOperationModeSettings()
+                                                                        .getOutputColor()
+                                                                        : gui.profile
+                                                                                .getOperationModeSettings()
+                                                                                .getFreeColor());
                                                     }));
                                         }
                                         gui.pop();

@@ -13,8 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.troblecodings.core.I18Wrapper;
-import com.troblecodings.core.TCBoolean;
-import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -47,7 +46,6 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxIcons;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
@@ -63,6 +61,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -127,21 +126,19 @@ public class GuiSignalBox extends GuiBase {
         return;
     }
 
-    private void updateTrainNumbers(final List<SignalBoxNode> nodes) {
-        nodes.forEach(node -> {
-            node.iterator().forEachRemaining(modeSet -> {
-                if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
-                    return;
-                node.getOption(modeSet).ifPresent(option -> {
-                    final TrainNumber number =
-                            option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
-                    final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
-                    if (number.trainNumber.isEmpty()) {
-                        rendering.removeTrainNumber(modeIdent);
-                    } else {
-                        rendering.putTrainNumber(modeIdent, number.trainNumber);
-                    }
-                });
+    private void updateTrainNumbers(final SignalBoxNode node) {
+        node.iterator().forEachRemaining(modeSet -> {
+            if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
+                return;
+            node.getOption(modeSet).ifPresent(option -> {
+                final TrainNumber number =
+                        option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+                final ModeIdentifier modeIdent = new ModeIdentifier(node.getPoint(), modeSet);
+                if (number.trainNumber.isEmpty()) {
+                    rendering.removeTrainNumber(modeIdent);
+                } else {
+                    rendering.putTrainNumber(modeIdent, number.trainNumber);
+                }
             });
         });
     }
@@ -383,8 +380,8 @@ public class GuiSignalBox extends GuiBase {
 
         bottomRow.add(GuiElements.createSpacerV(20));
         final String text = I18Wrapper.format("gui.signalbox.return");
-        final Font font = Minecraft.getInstance().font;
-        bottomRow.add(GuiElements.createButton(text, font.width(text) + 8,
+        final FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        bottomRow.add(GuiElements.createButton(text, font.getStringWidth(text) + 8,
                 e -> initializeFieldUsage(mainButton)));
         lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
@@ -649,289 +646,6 @@ public class GuiSignalBox extends GuiBase {
         container.network.sendUIProfile(profile);
     }
 
-    private void sendPWRequest(final Point start, final Point end, final PathType type) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REQUEST_PW);
-        start.writeNetwork(buffer);
-        end.writeNetwork(buffer);
-        buffer.putEnumValue(type);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void resetPathwayOnServer(final SignalBoxNode node) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.RESET_PW);
-        node.getPoint().writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void sendPosEntryToServer(final BlockPos pos, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<BlockPos> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_POS_ENTRY);
-        buffer.putBlockPos(pos);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendIntEntryToServer(final int speed, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Integer> entry) {
-        if (speed == 127 || !allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_INT_ENTRY);
-        buffer.putByte((byte) speed);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendZS2Entry(final byte value, final SignalBoxNode node, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<Byte> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_ZS2_ENTRY);
-        buffer.putByte(value);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendZS6Entry(final boolean value, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<TCBoolean> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_ZS6_ENTRY);
-        buffer.putBoolean(value);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendPointEntry(final Point point, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Point> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_POINT_ENTRY);
-        point.writeNetwork(buffer);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void removeEntryFromServer(final SignalBoxNode node, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<?> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REMOVE_ENTRY);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void resetAllPathways() {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_PW);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-        resetColors(container.grid.getNodes());
-        rendering.clearTrainNumbers();
-    }
-
-    private void sendModeChanges() {
-        if (changedModes.isEmpty() || !allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_CHANGED_MODES);
-        buffer.putINetworkSaveableMap(changedModes);
-        container.grid.putAllNodes(changedModes);
-        changedModes.clear();
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void removeBlockPos(final BlockPos pos) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REMOVE_POS);
-        buffer.putBlockPos(pos);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendSubsidiaryRequest(final SubsidiaryState entry, final Point point,
-            final ModeSet mode, final boolean enable) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REQUEST_SUBSIDIARY);
-        entry.writeNetwork(buffer);
-        point.writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        buffer.putBoolean(enable);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void changeRedstoneOutput(final Point point, final ModeSet mode,
-            final boolean state) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.UPDATE_RS_OUTPUT);
-        point.writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        buffer.putBoolean(state);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-        rendering.setColor(point, mode, state ? profile.getOperationModeSettings().getOutputColor()
-                : profile.getOperationModeSettings().getFreeColor());
-    }
-
-    protected void setAutoPoint(final Point point, final byte state) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SET_AUTO_POINT);
-        point.writeNetwork(buffer);
-        buffer.putBoolean(state == 1);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    private void sendName(final Point point, final String name) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_NAME);
-        point.writeNetwork(buffer);
-        buffer.putString(name);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendBoolEntry(final boolean state, final Point point, final ModeSet mode,
-            final PathEntryType<Boolean> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_BOOL_ENTRY);
-        buffer.putBoolean(state);
-        point.writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void removeNextPathwayFromServer(final Point start, final Point end) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
-        start.writeNetwork(buffer);
-        end.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendCurrentCounterToServer() {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
-        buffer.putInt(container.grid.getCurrentCounter());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendTrainNumber(final Point point, final String number) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
-        point.writeNetwork(buffer);
-        buffer.putString(number);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void deleteTrainNumber(final Point point) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
-        point.writeNetwork(buffer);
-        buffer.putString(TrainNumber.DEFAULT.trainNumber);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void resetAllSignals() {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_SIGNALS);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-        container.grid.resetAllSignals();
-    }
-
-    protected void sendModeIdentList(final List<ModeIdentifier> list, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation,
-            final PathEntryType<List<ModeIdentifier>> entry) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_POSIDENT_LIST);
-        buffer.putISaveableList(list);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void sendConnetedTrainNumbers(final ModeIdentifier ident, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_CONNECTED_TRAINNUMBERS);
-        ident.writeNetwork(buffer);
-        node.getPoint().writeNetwork(buffer);
-        buffer.putByte((byte) mode.ordinal());
-        buffer.putByte((byte) rotation.ordinal());
-        buffer.putByte((byte) PathEntryType.CONNECTED_TRAINNUMBER.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
-    protected void updateSignalStateOnServer(final Point point, final ModeSet mode,
-            final SignalState state) {
-        if (!allPacketsRecived)
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SET_SIGNAL_STATE);
-        point.writeNetwork(buffer);
-        buffer.putByte((byte) mode.mode.ordinal());
-        buffer.putByte((byte) mode.rotation.ordinal());
-        buffer.putEnumValue(state);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
     private void reset() {
         lowerEntity.clear();
     }
@@ -939,22 +653,10 @@ public class GuiSignalBox extends GuiBase {
     @Override
     public void updateFromContainer() {
         profile = container.grid.getUIProfile();
-        updateAllEnabledSubsidiaries();
+        updateEnabledSubsidiaries();
         initializeBasicUI();
         enabledSubsidiaries.values()
                 .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
-    }
-
-    private void loadSignalBoxUIProfile() {
-        final String profileString = container.signalBoxUIProfile;
-        if (!(profileString == null || profileString.isEmpty())) {
-            for (final UISignalBoxProfile profile : UISignalBoxProfile.UI_PROFILES) {
-                if (profile.getName().equals(profileString)) {
-                    this.profile = profile;
-                    return;
-                }
-            }
-        }
     }
 
     private void updateEnabledSubsidiaries() {
@@ -1015,6 +717,11 @@ public class GuiSignalBox extends GuiBase {
         });
         enabledSubsidiaries.clear();
         container.enabledSubsidiaryTypes.clear();
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerSignalBox(info);
     }
 
 }

@@ -57,4 +57,9 @@ public class ListModeEntry extends IPathEntry<List<ModeIdentifier>> {
         list.remove(pos);
     }
 
+    @Override
+    public List<ModeIdentifier> getDefaultValue() {
+        return new ArrayList<>();
+    }
+
 }

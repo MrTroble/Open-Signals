@@ -43,7 +43,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class CommonProxy {
 
-    public void initModEvent(final FMLConstructModEvent event) {
+    public void initModEvent(final FMLPreInitializationEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
         MonitorNetworkHandler.init();

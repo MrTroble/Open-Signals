@@ -31,8 +31,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     private final SignalBoxGrid grid;
 
-    public SignalBoxTileEntity(final TileEntityInfo info) {
-        super(info);
+    public SignalBoxTileEntity() {
         grid = SignalBoxFactory.getFactory().getGrid();
     }
 

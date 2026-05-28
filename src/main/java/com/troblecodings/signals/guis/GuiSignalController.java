@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -29,9 +30,9 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
@@ -39,19 +40,19 @@ import com.troblecodings.signals.enums.SignalBoxIcons;
 import com.troblecodings.signals.enums.SignalBoxIcons.SignalBoxSymbols;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.init.OSBlocks;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiSignalController extends GuiBase {
@@ -257,12 +258,12 @@ public class GuiSignalController extends GuiBase {
 
     private static UIEntity getButtonPatternEntity(final Consumer<UIEntity> consumer,
             final String desc) {
-        final SoundManager handler = Minecraft.getInstance().getSoundManager();
+        final SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
         final UIEntity buttonEntity = new UIEntity();
         buttonEntity.setHeight(20);
         buttonEntity.setWidth(20);
-        buttonEntity.add(new UIClickable(consumer.andThen(
-                e -> handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f)))));
+        buttonEntity.add(new UIClickable(consumer.andThen(e -> handler.playSound(
+                PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F)))));
         if (!desc.isEmpty()) {
             buttonEntity.add(new UIToolTip(I18Wrapper.format(desc)));
         }
@@ -313,19 +314,18 @@ public class GuiSignalController extends GuiBase {
     }
 
     private void addSideAndIDSelection(final UIEntity rightSide) {
-        final Minecraft mc = Minecraft.getInstance();
-        final BlockState state = OSBlocks.HV_SIGNAL_CONTROLLER.defaultBlockState();
-        final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        final Minecraft mc = Minecraft.getMinecraft();
+        final IBlockState state = OSBlocks.HV_SIGNAL_CONTROLLER.getDefaultState();
+        final IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(state);
 
         rightSide.add(getRowOfDirectionSelectionInfo());
-        for (final Direction face : Direction.values()) {
+        for (final EnumFacing face : EnumFacing.values()) {
             final UIEntity redstoneEntity = new UIEntity();
             redstoneEntity.setInheritWidth(true);
             redstoneEntity.setHeight(20);
             redstoneEntity.add(new UIBox(UIBox.HBOX, 2));
 
-            final List<BakedQuad> quad =
-                    model.getQuads(state, face, SignalCustomModel.RANDOM, EmptyModelData.INSTANCE);
+            final List<BakedQuad> quad = model.getQuads(state, face, 0);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
             faceEntity.setHeight(20);
@@ -380,7 +380,7 @@ public class GuiSignalController extends GuiBase {
         return icon;
     }
 
-    private void addIDSelection(final UIEntity redstoneEntity, final Direction face) {
+    private void addIDSelection(final UIEntity redstoneEntity, final EnumFacing face) {
         int onIndex = controller.enabledRSStates.getOrDefault(face, new HashMap<>())
                 .getOrDefault(EnumState.ONSTATE, -1);
         int offIndex = controller.enabledRSStates.getOrDefault(face, new HashMap<>())
@@ -390,7 +390,7 @@ public class GuiSignalController extends GuiBase {
         redstoneEntity.add(getRedstoneModeButton(offIndex, face, EnumState.OFFSTATE));
     }
 
-    private UIEntity getRedstoneModeButton(final int defaultIndex, final Direction face,
+    private UIEntity getRedstoneModeButton(final int defaultIndex, final EnumFacing face,
             final EnumState state) {
         final UIButton mainButton =
                 new UIButton(defaultIndex != -1 ? String.valueOf(defaultIndex) : "");
@@ -477,9 +477,9 @@ public class GuiSignalController extends GuiBase {
     }
 
     private void addLinkedPosInfo(final UIEntity leftSide) {
-        final Minecraft mc = Minecraft.getInstance();
-        final BlockState state = OSBlocks.REDSTONE_IN.defaultBlockState();
-        final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        final Minecraft mc = Minecraft.getMinecraft();
+        final IBlockState state = OSBlocks.REDSTONE_IN.getDefaultState();
+        final IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(state);
 
         final UIEntity redstoneEntity = new UIEntity();
         redstoneEntity.setInheritWidth(true);
@@ -487,17 +487,18 @@ public class GuiSignalController extends GuiBase {
         redstoneEntity.add(new UIBox(UIBox.HBOX, 5));
         leftSide.add(redstoneEntity);
 
-        final List<BakedQuad> quad = model.getQuads(state, Direction.DOWN, SignalCustomModel.RANDOM,
-                EmptyModelData.INSTANCE);
+        final List<BakedQuad> quad = model.getQuads(state, EnumFacing.DOWN, 0);
         final UIEntity faceEntity = new UIEntity();
         faceEntity.setWidth(30);
         faceEntity.setHeight(30);
         faceEntity.add(new UITexture(quad.get(0).getSprite()));
         redstoneEntity.add(faceEntity);
 
+        final BlockPos link = controller.linkedRSInput;
         final String posString =
                 controller.linkedRSInput == null ? I18Wrapper.format("gui.controller.not_linked")
-                        : controller.linkedRSInput.toShortString();
+                        : link.getX() + ", " + link.getY() + ", " + link.getZ();
+        ;
         final UIEntity labelEntity = GuiElements.createLabel(posString, 0xFF000000, 1.5f);
         final UILabel label = labelEntity.findRecursive(UILabel.class).stream().findFirst()
                 .orElseGet(() -> new UILabel(posString));
@@ -526,12 +527,12 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
 
-        final String name = I18Wrapper
-                .format("tile."
-                        + signal.getRegistryName().getResourcePath() + ".name")
-                + "; Name: "
-                + ClientNameHandler.getClientName(new StateInfo(mc.world, controller.getPos()))
-                        .replace("[n]", " ");
+        final String name =
+                I18Wrapper.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
+                        + "; Name: "
+                        + ClientNameHandler
+                                .getClientName(new StateInfo(mc.world, controller.getPos()))
+                                .replace("[n]", " ");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);

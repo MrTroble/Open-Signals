@@ -45,7 +45,7 @@ public final class OSItems {
     });
     public static final MultiLinkingTool MULTI_LINKING_TOOL =
             new MultiLinkingTool(OSTabs.TAB, (world, pos) -> {
-                final BlockState state = world.getBlockState(pos);
+                final IBlockState state = world.getBlockState(pos);
                 final Block block = state.getBlock();
                 final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
                         || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
@@ -59,29 +59,27 @@ public final class OSItems {
                         state.getBlock().getRegistryName().getResourcePath());
             });
     public static final Item CONDUCTOR_TROWEL_GREEN =
-            new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item CONDUCTOR_TROWEL_RED =
-            new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item WARNING_FLAG =
-            new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item K_BOARD = new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item L_BOARD = new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final ItemArmorTemplate REFLECTIVE_HEAD =
-            new ItemArmorTemplate(ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlot.HEAD);
-    public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE =
-            new ItemArmorTemplate(ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlot.CHEST);
-    public static final ItemArmorTemplate REFLECTIVE_PANTS =
-            new ItemArmorTemplate(ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlot.LEGS);
-    public static final ItemArmorTemplate REFLECTIVE_SHOES =
-            new ItemArmorTemplate(ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlot.FEET);
-    public static final ItemArmorTemplate DISPATCHER_HEAD =
-            new ItemArmorTemplate(ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlot.HEAD);
-    public static final ItemArmorTemplate DISPATCHER_CHESTPLATE =
-            new ItemArmorTemplate(ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlot.CHEST);
-    public static final ItemArmorTemplate DISPATCHER_PANTS =
-            new ItemArmorTemplate(ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlot.LEGS);
-    public static final ItemArmorTemplate DISPATCHER_SHOES =
-            new ItemArmorTemplate(ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlot.FEET);
+            new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item L_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
+    public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate REFLECTIVE_PANTS = new ItemArmorTemplate(
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
+    public static final ItemArmorTemplate REFLECTIVE_SHOES = new ItemArmorTemplate(
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
+    public static final ItemArmorTemplate DISPATCHER_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
+    public static final ItemArmorTemplate DISPATCHER_CHESTPLATE = new ItemArmorTemplate(
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate DISPATCHER_PANTS = new ItemArmorTemplate(
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
+    public static final ItemArmorTemplate DISPATCHER_SHOES = new ItemArmorTemplate(
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate STATION_MANAGER_HEAD = new ItemArmorTemplate(
             ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate STATION_MANAGER_CHESTPLATE = new ItemArmorTemplate(
@@ -89,31 +87,28 @@ public final class OSItems {
     public static final ItemArmorTemplate STATION_MANAGER_PANTS = new ItemArmorTemplate(
             ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate STATION_MANAGER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, EquipmentSlot.FEET);
-    public static final ItemArmorTemplate TRAIN_DRIVER_HEAD =
-            new ItemArmorTemplate(ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlot.HEAD);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
+    public static final ItemArmorTemplate TRAIN_DRIVER_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate TRAIN_DRIVER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlot.CHEST);
-    public static final ItemArmorTemplate TRAIN_DRIVER_PANTS =
-            new ItemArmorTemplate(ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlot.LEGS);
-    public static final ItemArmorTemplate TRAIN_DRIVER_SHOES =
-            new ItemArmorTemplate(ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlot.FEET);
-    public static final ItemArmorTemplate CONDUCTOR_HEAD =
-            new ItemArmorTemplate(ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.HEAD);
-    public static final ItemArmorTemplate CONDUCTOR_CHESTPLATE =
-            new ItemArmorTemplate(ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.CHEST);
-    public static final ItemArmorTemplate CONDUCTOR_PANTS =
-            new ItemArmorTemplate(ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.LEGS);
-    public static final ItemArmorTemplate CONDUCTOR_SHOES =
-            new ItemArmorTemplate(ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.FEET);
-    public static final Item SIGNAL_PLATE =
-            new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    public static final Item SIGNAL_SHIELD =
-            new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    public static final Item LAMPS = new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    public static final Item ELECTRIC_PARTS =
-            new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    public static final Item MANIPULATOR = new Item(new Properties().tab(OSTabs.TAB));
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate TRAIN_DRIVER_PANTS = new ItemArmorTemplate(
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
+    public static final ItemArmorTemplate TRAIN_DRIVER_SHOES = new ItemArmorTemplate(
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
+    public static final ItemArmorTemplate CONDUCTOR_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
+    public static final ItemArmorTemplate CONDUCTOR_CHESTPLATE = new ItemArmorTemplate(
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate CONDUCTOR_PANTS = new ItemArmorTemplate(
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
+    public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
+    public static final Item SIGNAL_PLATE = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item SIGNAL_SHIELD = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item LAMPS = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item ELECTRIC_PARTS = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item MANIPULATOR = new Item().setCreativeTab(OSTabs.TAB);
     public static final SignalBridgeItem SIGNAL_BRIDGE_ITEM = new SignalBridgeItem();
     public static final MonitorSelectionItem MONITOR_SELECTION_ITEM = new MonitorSelectionItem();
 

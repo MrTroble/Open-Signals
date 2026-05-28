@@ -80,7 +80,7 @@ public class ContainerSignalBox extends ContainerBase
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile(SignalBoxTileEntity.class);
+        this.tile = info.getTile();
         this.grid = tile.getSignalBoxGrid();
         initializeNetwork();
     }

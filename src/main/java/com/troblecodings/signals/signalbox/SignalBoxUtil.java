@@ -239,7 +239,7 @@ public final class SignalBoxUtil {
             final SignalBoxNode previous) {
         final Point delta = lastNode.getPoint().delta(previous.getPoint());
         final Rotation rotation =
-                SignalBoxUtil.getRotationFromDelta(delta).getRotated(Rotation.CLOCKWISE_180);
+                SignalBoxUtil.getRotationFromDelta(delta).add(Rotation.CLOCKWISE_180);
         for (final EnumGuiMode mode : type.getModes()) {
             if (!mode.getModeType().isValidEnd()) {
                 continue;

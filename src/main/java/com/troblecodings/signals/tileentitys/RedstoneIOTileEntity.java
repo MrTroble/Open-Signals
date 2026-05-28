@@ -7,6 +7,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
@@ -27,7 +28,6 @@ import net.minecraft.world.World;
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
     public RedstoneIOTileEntity() {
-        super();
     }
 
     private int resetDelay = 0;
@@ -53,10 +53,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        wrapper.putList(LINKED_LIST,
-                linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper).toList());
-        wrapper.putList(LINKED_SIGNAL_CONTROLLER,
-                linkedSignalController.stream().map(NBTWrapper::getBlockPosWrapper).toList());
+        wrapper.putList(LINKED_LIST, linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper)
+                .collect(Collectors.toList()));
+        wrapper.putList(LINKED_SIGNAL_CONTROLLER, linkedSignalController.stream()
+                .map(NBTWrapper::getBlockPosWrapper).collect(Collectors.toList()));
         wrapper.putInteger(RESET_DELAY, resetDelay);
         wrapper.putInteger(BLOCKING_DELAY, blockingDelay);
     }
@@ -75,7 +75,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
 
     private ScheduledFuture<?> resetTask;
     private final Consumer<RedstoneUpdatePacket> updateSignalBoxes = (packet) -> linkedPositions
-            .forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, pos,
+            .forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, getWorld(), pos,
                     (tile, _u) -> tile.getSignalBoxGrid().updateInput(packet)));
 
     private void sendInputChanged(final RedstoneUpdatePacket packet) {
@@ -119,12 +119,11 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     private RedstoneUpdatePacket getRedstoneUpdatePacket() {
-        if (level.isClientSide)
+        if (world.isRemote)
             return null;
-        final boolean power =
-                this.level.getBlockState(this.worldPosition).getValue(RedstoneIO.POWER);
-        return new RedstoneUpdatePacket(level, worldPosition, power,
-                (RedstoneInput) this.getBlockState().getBlock());
+        final IBlockState state = this.world.getBlockState(pos);
+        final boolean power = state.getValue(RedstoneIO.POWER);
+        return new RedstoneUpdatePacket(world, pos, power, (RedstoneInput) state.getBlock());
     }
 
     public List<BlockPos> getLinkedController() {
@@ -152,8 +151,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         super.onLoad();
         if (world == null || world.isRemote)
             return;
-        final LinkingUpdates update =
-                SignalBoxHandler.getPosUpdates(new StateInfo(level, worldPosition));
+        final LinkingUpdates update = SignalBoxHandler.getPosUpdates(new StateInfo(world, pos));
         if (update == null)
             return;
         update.getPosToRemove().forEach(pos -> unlink(pos));

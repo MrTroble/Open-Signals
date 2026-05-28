@@ -38,8 +38,7 @@ public class SignalReader extends BasicBlock {
     @Override
     public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
             final BlockPos pos, final EnumFacing side) {
-        final SignalReaderTileEntity tile =
-                (SignalReaderTileEntity) blockAccess.getBlockEntity(pos);
+        final SignalReaderTileEntity tile = (SignalReaderTileEntity) blockAccess.getTileEntity(pos);
         return tile.enableRedstoneForDirection(side.getOpposite()) ? 15 : 0;
     }
 

@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler.SignalBoxNetworkListener;
@@ -18,20 +17,18 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.client.CPacketCustomPayload;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.ChunkWatchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.event.EventNetworkChannel;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class MonitorNetworkHandler {
 
@@ -43,18 +40,16 @@ public final class MonitorNetworkHandler {
 
     private static final Map<StateInfo, SignalBoxNetworkListener> listeners = new HashMap<>();
 
-    private static EventNetworkChannel channel;
-    private static ResourceLocation channelName;
+    private static final String CHANNELNAME = "monitor_net";
+    private static FMLEventChannel channel;
 
     public static void init() {
-        channelName = new ResourceLocation(OpenSignalsMain.MODID, "monitor_net");
-        channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
-                OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
-        channel.registerObject(new MonitorNetworkHandler());
+        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
+        channel.register(new MonitorNetworkHandler());
     }
 
     public static void registerToNetworkChannel(final Object obj) {
-        channel.registerObject(obj);
+        channel.register(obj);
     }
 
     public static void registerMonitorToBox(final MonitorTileEntity tile) {
@@ -62,12 +57,12 @@ public final class MonitorNetworkHandler {
     }
 
     public static void registerMonitorToBox(final MonitorTileEntity tile,
-            final @Nullable Player player) {
+            final @Nullable EntityPlayer player) {
         final StateInfo signalBoxInfo = tile.getStateInfo();
         final SignalBoxNetworkHandler network = getNetworkFromSignalBox(signalBoxInfo);
         if (network == null)
             return;
-        final StateInfo monitorInfo = new StateInfo(tile.getLevel(), tile.getBlockPos());
+        final StateInfo monitorInfo = new StateInfo(tile.getWorld(), tile.getPos());
         final SignalBoxNetworkListener listener =
                 new SignalBoxNetworkListener(monitorInfo, b -> sendGridUpdate(tile, b));
         network.addListener(listener);
@@ -80,7 +75,7 @@ public final class MonitorNetworkHandler {
         final SignalBoxNetworkHandler network = getNetworkFromSignalBox(info);
         if (network == null)
             return;
-        final StateInfo monitorInfo = new StateInfo(tile.getLevel(), tile.getBlockPos());
+        final StateInfo monitorInfo = new StateInfo(tile.getWorld(), tile.getPos());
         network.removeListener(listeners.remove(monitorInfo));
     }
 
@@ -95,12 +90,12 @@ public final class MonitorNetworkHandler {
 
     @SubscribeEvent
     public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
-        final ServerLevel world = event.getWorld();
-        if (world.isClientSide)
+        final Chunk chunk = event.getChunkInstance();
+        final World world = chunk.getWorld();
+        if (world.isRemote)
             return;
-        final LevelChunk chunk = (LevelChunk) world.getChunk(event.getPos().getWorldPosition());
-        final Player player = event.getPlayer();
-        ImmutableMap.copyOf(chunk.getBlockEntities()).forEach((pos, tile) -> {
+        final EntityPlayer player = event.getPlayer();
+        ImmutableMap.copyOf(chunk.getTileEntityMap()).forEach((pos, tile) -> {
             if (tile instanceof MonitorTileEntity) {
                 sendTileData((MonitorTileEntity) tile, ImmutableList.of(player));
                 registerMonitorToBox((MonitorTileEntity) tile, player);
@@ -110,11 +105,11 @@ public final class MonitorNetworkHandler {
 
     @SubscribeEvent
     public static void onChunkUnWatch(final ChunkWatchEvent.UnWatch event) {
-        final ServerLevel world = event.getWorld();
-        if (world.isClientSide)
+        final Chunk chunk = event.getChunkInstance();
+        final World world = chunk.getWorld();
+        if (world.isRemote)
             return;
-        final LevelChunk chunk = (LevelChunk) world.getChunk(event.getPos().getWorldPosition());
-        ImmutableMap.copyOf(chunk.getBlockEntities()).forEach((pos, tile) -> {
+        ImmutableMap.copyOf(chunk.getTileEntityMap()).forEach((pos, tile) -> {
             if (tile instanceof MonitorTileEntity) {
                 deregisterMonitorFromBox((MonitorTileEntity) tile);
             }
@@ -122,24 +117,24 @@ public final class MonitorNetworkHandler {
     }
 
     private static SignalBoxNetworkHandler getNetworkFromSignalBox(final StateInfo info) {
-        final BlockEntity tile = info.world.getBlockEntity(info.pos);
+        final TileEntity tile = info.world.getTileEntity(info.pos);
         if (tile == null || !(tile instanceof SignalBoxTileEntity))
             return null;
         final SignalBoxTileEntity signalTile = (SignalBoxTileEntity) tile;
         return signalTile.getSignalBoxGrid().getNetwork();
     }
 
-    public static void sendTileData(final MonitorTileEntity tile,
-            final List<? extends Player> list) {
+    public static void sendTileData(final MonitorTileEntity tile, final List<EntityPlayer> list) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte(NETWORK_TILE_DATA);
-        buffer.putBlockPos(tile.getBlockPos());
+        buffer.putBlockPos(tile.getPos());
         tile.getRenderStart().writeNetwork(buffer);
         tile.getRenderEnd().writeNetwork(buffer);
         list.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
-    private static void sendInitGridUpdate(final MonitorTileEntity tile, final Player player) {
+    private static void sendInitGridUpdate(final MonitorTileEntity tile,
+            final EntityPlayer player) {
         final SignalBoxNetworkHandler network = getNetworkFromSignalBox(tile.getStateInfo());
         if (network == null)
             return;
@@ -147,13 +142,14 @@ public final class MonitorNetworkHandler {
                 new SignalBoxNetworkListener(tile.getStateInfo(), b -> {
                     final WriteBuffer buffer = new WriteBuffer();
                     buffer.putByte(NETWORK_UPDATE);
-                    buffer.putBlockPos(tile.getBlockPos());
+                    buffer.putBlockPos(tile.getPos());
                     buffer.putBuffer(b);
-                    if (player != null)
+                    if (player != null) {
                         sendTo(player, buffer.getBuildedBuffer());
-                    else
-                        tile.getLevel().players()
+                    } else {
+                        tile.getWorld().playerEntities
                                 .forEach(p -> sendTo(p, buffer.getBuildedBuffer()));
+                    }
                 });
         network.sendAllTo(tile, listener);
     }
@@ -162,20 +158,20 @@ public final class MonitorNetworkHandler {
             final WriteBuffer networkBuffer) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte(NETWORK_UPDATE);
-        buffer.putBlockPos(tile.getBlockPos());
+        buffer.putBlockPos(tile.getPos());
         buffer.putBuffer(networkBuffer);
-        tile.getLevel().players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
+        tile.getWorld().playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
 
     }
 
-    private static void sendTo(final Player player, final ByteBuffer buf) {
-        final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
-        if (player instanceof ServerPlayer) {
-            final ServerPlayer server = (ServerPlayer) player;
-            server.connection.send(new ClientboundCustomPayloadPacket(channelName, buffer));
+    private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {
+        final PacketBuffer buffer =
+                new PacketBuffer(Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
+        if (player instanceof EntityPlayerMP) {
+            final EntityPlayerMP server = (EntityPlayerMP) player;
+            channel.sendTo(new FMLProxyPacket(buffer, CHANNELNAME), server);
         } else {
-            final Minecraft mc = Minecraft.getInstance();
-            mc.getConnection().send(new ServerboundCustomPayloadPacket(channelName, buffer));
+            channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(CHANNELNAME, buffer)));
         }
     }
 

@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.opensignals.linkableapi.ILinkableTile;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.SignalBox;
@@ -17,7 +17,6 @@ import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -33,11 +32,10 @@ import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 
 public class MonitorTileEntity extends SyncableTileEntity
         implements ILinkableTile, SignalBoxNetworkReader {
@@ -55,14 +53,10 @@ public class MonitorTileEntity extends SyncableTileEntity
     private final SignalBoxGrid grid = new SignalBoxGrid();
     private final Map<Point, Point> translatedPoints = new HashMap<>();
     private SignalBoxNetworkHandler network;
-    private BlockPos linkedSignalBox = BlockPos.ZERO;
+    private BlockPos linkedSignalBox = BlockPos.ORIGIN;
     private int monitorSizeX, monitorSizeY;
     private Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
     private UISignalBoxRendering rendering;
-
-    public MonitorTileEntity(final TileEntityInfo info) {
-        super(info);
-    }
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
@@ -96,7 +90,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     public void render(final RenderAnimationInfo info) {
-        final Block block = getBlockState().getBlock();
+        final Block block = getWorld().getBlockState(getPos()).getBlock();
         if (!(block instanceof MonitorTEBlock) || rendering == null)
             return;
         ((MonitorTEBlock) block).render(info, this, rendering);
@@ -104,21 +98,20 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     @Override
     public boolean hasLink() {
-        return linkedSignalBox != null && !linkedSignalBox.equals(BlockPos.ZERO);
+        return linkedSignalBox != null && !linkedSignalBox.equals(BlockPos.ORIGIN);
     }
 
     @Override
     public boolean unlink() {
         MonitorNetworkHandler.deregisterMonitorFromBox(this);
-        linkedSignalBox = BlockPos.ZERO;
+        linkedSignalBox = BlockPos.ORIGIN;
         return true;
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundTag tag) {
-        @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(
-                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
+    public boolean link(final BlockPos pos, final NBTTagCompound tag) {
+        final Block block = Block.REGISTRY.getObject(
+                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
             MonitorNetworkHandler.registerMonitorToBox(this);
@@ -160,8 +153,9 @@ public class MonitorTileEntity extends SyncableTileEntity
         for (final SignalBoxNode node : grid.getNodes()) {
             final Point p = node.getPoint();
             final Point translated = getPointTranslated(p);
-            if (translated != null)
+            if (translated != null) {
                 nodes.put(translated, node);
+            }
         }
         nodes.forEach((p, n) -> {
             rendering.updateNode(p, n);
@@ -289,12 +283,12 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     @Override
     public StateInfo getStateInfo() {
-        return new StateInfo(level, linkedSignalBox);
+        return new StateInfo(getWorld(), linkedSignalBox);
     }
 
     @Override
     public boolean isClientSide() {
-        return level != null ? level.isClientSide : false;
+        return world != null ? world.isRemote : false;
     }
 
 }
