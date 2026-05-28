@@ -8,8 +8,8 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Monitor;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 
 public class ContainerMonitorSelection extends ContainerBase {
 
@@ -28,7 +28,7 @@ public class ContainerMonitorSelection extends ContainerBase {
 
     @Override
     public void sendAllDataToRemote() {
-        final ItemStack stack = getPlayer().getMainHandItem();
+        final ItemStack stack = getPlayer().getHeldItemMainhand();
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
 
         final WriteBuffer buffer = new WriteBuffer();
@@ -40,7 +40,7 @@ public class ContainerMonitorSelection extends ContainerBase {
 
     @Override
     public void deserializeServer(final ReadBuffer buf) {
-        final ItemStack stack = info.player.getMainHandItem();
+        final ItemStack stack = info.player.getHeldItemMainhand();
         final byte mode = buf.getByte();
         if (mode == sendBlock) {
             final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
@@ -48,9 +48,9 @@ public class ContainerMonitorSelection extends ContainerBase {
             wrapper.putInteger(MONITOR_TYPE_ID, blockID);
         } else if (mode == sendSize) {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
-            final Direction.Axis axis = buf.getEnumValue(Direction.Axis.class);
+            final EnumFacing.Axis axis = buf.getEnumValue(EnumFacing.Axis.class);
             final int size = buf.getInt();
-            wrapper.putInteger(axis == Direction.Axis.X ? SIZE_X : SIZE_Y, size);
+            wrapper.putInteger(axis == EnumFacing.Axis.X ? SIZE_X : SIZE_Y, size);
         }
     }
 
@@ -69,7 +69,7 @@ public class ContainerMonitorSelection extends ContainerBase {
         OpenSignalsMain.network.sendTo(getPlayer(), buffer);
     }
 
-    public void sendSizeToServer(final Direction.Axis axis, final int value) {
+    public void sendSizeToServer(final EnumFacing.Axis axis, final int value) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte(sendSize);
         buffer.putEnumValue(axis);

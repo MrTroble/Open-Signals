@@ -15,6 +15,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
@@ -52,8 +53,6 @@ import net.minecraft.world.World;
 public class ContainerSignalBox extends ContainerBase
         implements UIClientSync, IChunkLoadable, SignalBoxNetworkReader {
 
-    public SignalBoxGrid grid;
-    public SignalBoxTileEntity tile;
     protected final Map<Point, List<MainSignalIdentifier>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryState>> enabledSubsidiaryTypes =
@@ -65,7 +64,7 @@ public class ContainerSignalBox extends ContainerBase
     protected SignalBoxNetworkHandler network;
 
     private final Map<BlockPos, LinkType> posForType = new HashMap<>();
-    private Player player;
+    private EntityPlayer player;
     private SignalBoxNetworkListener listener;
 
     protected Consumer<SignalBoxNode> updateSignalState = (node) -> {
@@ -91,7 +90,6 @@ public class ContainerSignalBox extends ContainerBase
         this.grid = tile.getSignalBoxGrid();
         this.network = grid.getNetwork();
         initializeNetwork();
-        sendInitialisationPacket();
         network.sendAll(this);
     }
 
@@ -152,7 +150,6 @@ public class ContainerSignalBox extends ContainerBase
     public void deserializeClient(final ReadBuffer buffer) {
         if (grid == null) {
             this.grid = tile.getSignalBoxGrid();
-            this.network = grid.getNetwork();
             initializeNetwork();
         }
         network.desirializeBuffer(buffer);
@@ -166,7 +163,7 @@ public class ContainerSignalBox extends ContainerBase
         MonitorNetworkHandler.checkForClientUpdates(getStateInfo(), network,
                 new WriteBuffer(buffer.getCopiedBuffer().array()));
         network.desirializeBuffer(buffer);
-        tile.setChanged();
+        tile.markDirty();
     }
 
     @Override
@@ -305,8 +302,8 @@ public class ContainerSignalBox extends ContainerBase
     }
 
     @Override
-    public void removed(final Player playerIn) {
-        super.removed(playerIn);
+    public void onContainerClosed(final EntityPlayer playerIn) {
+        super.onContainerClosed(playerIn);
         network.removeListener(listener);
         network.removeNetworkReader();
         if (this.tile != null) {
@@ -336,6 +333,6 @@ public class ContainerSignalBox extends ContainerBase
 
     @Override
     public StateInfo getStateInfo() {
-        return new StateInfo(info.world, tile.getBlockPos());
+        return new StateInfo(info.world, tile.getPos());
     }
 }

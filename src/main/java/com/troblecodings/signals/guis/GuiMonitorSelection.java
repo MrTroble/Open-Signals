@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.VectorWrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -20,17 +21,14 @@ import com.troblecodings.signals.blocks.Monitor;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.EnumFacing;
 
 public class GuiMonitorSelection extends GuiBase {
 
-    private static final ModelInfoWrapper EMPTY_WRAPPER =
-            new ModelInfoWrapper(EmptyModelData.INSTANCE);
-    private static final SoundManager handler = Minecraft.getInstance().getSoundManager();
+    private static final SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
 
     private final UIMultiBlockRender renderer = new UIMultiBlockRender(25, -5.5f);
@@ -83,12 +81,13 @@ public class GuiMonitorSelection extends GuiBase {
         sizeSelection.add(new UIBox(UIBox.HBOX, 5));
 
         sizeSelection.add(getSizeSelection(I18Wrapper.format("gui.monitor.x_size"),
-                monitor.getMonitorProperties().getMaxX(), Direction.Axis.X));
+                monitor.getMonitorProperties().getMaxX(), EnumFacing.Axis.X));
         sizeSelection.add(getSizeSelection(I18Wrapper.format("gui.monitor.y_size"),
-                monitor.getMonitorProperties().getMaxY(), Direction.Axis.Y));
+                monitor.getMonitorProperties().getMaxY(), EnumFacing.Axis.Y));
     }
 
-    private UIEntity getSizeSelection(final String name, final int max, final Direction.Axis axis) {
+    private UIEntity getSizeSelection(final String name, final int max,
+            final EnumFacing.Axis axis) {
         final UIEntity list = new UIEntity();
         list.setInheritWidth(true);
         list.setHeight(50);
@@ -100,13 +99,13 @@ public class GuiMonitorSelection extends GuiBase {
         return list;
     }
 
-    private UIEntity getUserSelectionEntity(final int max, final Direction.Axis axis) {
+    private UIEntity getUserSelectionEntity(final int max, final EnumFacing.Axis axis) {
         final UIEntity list = new UIEntity();
         list.setInherits(true);
         list.add(new UIBox(UIBox.HBOX, 2));
 
         AtomicInteger selectedValue = new AtomicInteger(
-                axis.equals(Direction.Axis.X) ? container.sizeX : container.sizeY);
+                axis.equals(EnumFacing.Axis.X) ? container.sizeX : container.sizeY);
         final UIButton leftButton = new UIButton("<");
         final UIButton middleButton = new UIButton(String.valueOf(selectedValue.get()));
         final UIButton rightButton = new UIButton(">");
@@ -114,9 +113,9 @@ public class GuiMonitorSelection extends GuiBase {
         final Consumer<Integer> updateSideButtons = value -> {
             rightButton.setEnabled(value < max);
             leftButton.setEnabled(value > 0);
-            if (axis.equals(Direction.Axis.X)) {
+            if (axis.equals(EnumFacing.Axis.X)) {
                 container.sizeX = value;
-            } else if (axis.equals(Direction.Axis.Y)) {
+            } else if (axis.equals(EnumFacing.Axis.Y)) {
                 container.sizeY = value;
             }
             updateBlockRenderer();
@@ -165,8 +164,8 @@ public class GuiMonitorSelection extends GuiBase {
             entity.setWidth(width);
         }
         entity.add(button);
-        entity.add(new UIClickable(consumer.andThen(
-                e -> handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f)))));
+        entity.add(new UIClickable(consumer.andThen(e -> handler.playSound(
+                PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F)))));
         return entity;
 
     }
@@ -183,9 +182,9 @@ public class GuiMonitorSelection extends GuiBase {
         renderer.clear();
         for (int i = 0; i < container.sizeX; i++) {
             for (int j = 0; j < container.sizeY; j++) {
-                renderer.setBlockState(
-                        new UIBlockRenderInfo(monitor.defaultBlockState(), EMPTY_WRAPPER,
-                                new VectorWrapper(-i + 0.5f * container.sizeX - 4.8f, j, 0)));
+                renderer.setBlockState(new UIBlockRenderInfo(monitor.getDefaultState(),
+                        new ModelInfoWrapper(monitor),
+                        new VectorWrapper(-i + 0.5f * container.sizeX - 4.8f, j, 0)));
             }
         }
     }
@@ -193,6 +192,11 @@ public class GuiMonitorSelection extends GuiBase {
     @Override
     public void updateFromContainer() {
         initInternal();
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerMonitorSelection(info);
     }
 
 }

@@ -21,8 +21,8 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 import com.troblecodings.signals.tileentitys.SignalReaderTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class ContainerSignalReader extends ContainerBase {
 
@@ -30,7 +30,7 @@ public class ContainerSignalReader extends ContainerBase {
         super(info);
     }
 
-    protected final Map<Direction, Map.Entry<LogicalSymbols[], Map.Entry<SEProperty, String>[]>> statesForFace =
+    protected final Map<EnumFacing, Map.Entry<LogicalSymbols[], Map.Entry<SEProperty, String>[]>> statesForFace =
             new HashMap<>();
     protected final List<SEProperty> selectableProperties = new ArrayList<>();
     protected Signal signal;
@@ -70,7 +70,7 @@ public class ContainerSignalReader extends ContainerBase {
         selectableProperties.clear();
         signal = Signal.getSignalByID(buf.getInt());
         pos = buf.getBlockPos();
-        buf.getMap(ReadBuffer.getEnumFunction(Direction.class), buffer -> deserializeEntry(buffer))
+        buf.getMap(ReadBuffer.getEnumFunction(EnumFacing.class), buffer -> deserializeEntry(buffer))
                 .forEach(statesForFace::put);
         buf.getList(NetworkBufferWrappers.getSEPropertyFunc(signal))
                 .forEach(selectableProperties::add);
@@ -79,7 +79,7 @@ public class ContainerSignalReader extends ContainerBase {
 
     @Override
     public void deserializeServer(final ReadBuffer buf) {
-        final Direction dir = buf.getEnumValue(Direction.class);
+        final EnumFacing dir = buf.getEnumValue(EnumFacing.class);
 
         final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entry = deserializeEntry(buf);
 
@@ -88,10 +88,10 @@ public class ContainerSignalReader extends ContainerBase {
         } else {
             tile.setUpForDirection(dir, Maps.immutableEntry(entry.getKey(), entry.getValue()));
         }
-        tile.setChanged();
+        tile.markDirty();
     }
 
-    protected void sendToServerForDirection(final Direction dir) {
+    protected void sendToServerForDirection(final EnumFacing dir) {
         final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entries = statesForFace.get(dir);
         if (entries == null)
             return;

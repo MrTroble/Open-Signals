@@ -32,7 +32,7 @@ public class ContainerSignalController extends ContainerBase
         implements UIClientSync, IChunkLoadable {
 
     protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
-    protected final Map<Direction, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
+    protected final Map<EnumFacing, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
     protected EnumMode currentMode = EnumMode.MANUELL;
     protected BlockPos linkedRSInput = null;
     protected int linkedRSInputProfile = -1;
@@ -55,12 +55,12 @@ public class ContainerSignalController extends ContainerBase
     private void sendProperitesToClient() {
         if (info.pos == null)
             return;
-        }
         controllerEntity = (SignalControllerTileEntity) info.world.getTileEntity(info.pos);
         linkedPos = controllerEntity.getLinkedPosition();
         if (linkedPos == null)
             return;
         currentSignal = controllerEntity.getLinkedSignal();
+
         final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         if (properties == null || properties.isEmpty())
@@ -89,7 +89,7 @@ public class ContainerSignalController extends ContainerBase
             });
             allStatesToSend.put(profile, propsForProfile);
         });
-        final Map<Direction, Map<EnumState, Byte>> enabledStates =
+        final Map<EnumFacing, Map<EnumState, Byte>> enabledStates =
                 controllerEntity.getEnabledStates();
         currentMode = controllerEntity.getLastMode();
 
@@ -190,7 +190,7 @@ public class ContainerSignalController extends ContainerBase
                 break;
             }
             case SET_PROFILE: {
-                final Direction direction = buffer.getEnumValue(Direction.class);
+                final EnumFacing direction = buffer.getEnumValue(EnumFacing.class);
                 final EnumState state = buffer.getEnumValue(EnumState.class);
                 final int profile = buffer.getByteToUnsignedInt();
                 if (profile == -1) {
@@ -210,8 +210,8 @@ public class ContainerSignalController extends ContainerBase
                 if (info.pos == null || linkedInput == null) {
                     break;
                 }
-                loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) info.world,
-                        linkedInput, (tile, _u) -> tile.unlinkController(info.pos));
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, info.world, linkedInput,
+                        (tile, _u) -> tile.unlinkController(info.pos));
                 controllerEntity.setLinkedRSInput(null);
                 break;
             }
@@ -221,7 +221,7 @@ public class ContainerSignalController extends ContainerBase
         controllerEntity.markDirty();
     }
 
-    protected void sendAndSetProfile(final Direction facing, final int profile,
+    protected void sendAndSetProfile(final EnumFacing facing, final int profile,
             final EnumState state) {
         final Map<EnumState, Integer> map =
                 enabledRSStates.computeIfAbsent(facing, _u -> new HashMap<>());

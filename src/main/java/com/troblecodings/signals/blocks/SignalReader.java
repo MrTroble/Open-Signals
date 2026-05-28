@@ -7,53 +7,52 @@ import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.SignalReaderTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 public class SignalReader extends BasicBlock {
 
     public static final TileEntitySupplierWrapper SUPPLIER = SignalReaderTileEntity::new;
 
     public SignalReader() {
-        super(Properties.of(Material.STONE).noOcclusion());
+        super(Material.ROCK);
     }
 
     @Override
-    public boolean isSignalSource(final BlockState state) {
+    public boolean canProvidePower(final IBlockState state) {
         return true;
     }
 
     @Override
-    public int getSignal(final BlockState state, final BlockGetter getter, final BlockPos pos,
-            final Direction direction) {
-        return getDirectSignal(state, getter, pos, direction);
+    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
+        return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @Override
-    public int getDirectSignal(final BlockState state, final BlockGetter getter, final BlockPos pos,
-            final Direction direction) {
-        final SignalReaderTileEntity tile = (SignalReaderTileEntity) getter.getBlockEntity(pos);
-        return tile.enableRedstoneForDirection(direction.getOpposite()) ? 15 : 0;
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
+        final SignalReaderTileEntity tile =
+                (SignalReaderTileEntity) blockAccess.getBlockEntity(pos);
+        return tile.enableRedstoneForDirection(side.getOpposite()) ? 15 : 0;
     }
 
     @Override
-    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
-            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
-                .equals(OSItems.LINKING_TOOL)) {
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(SignalReader.class, playerIn, worldIn, pos,
                     "signalreader");
-            return InteractionResult.SUCCESS;
+            return true;
         }
-        return InteractionResult.FAIL;
+        return false;
     }
 
     @Override

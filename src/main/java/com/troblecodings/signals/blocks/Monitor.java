@@ -6,44 +6,46 @@ import java.util.List;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.MonitorBlockProperties;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 public class Monitor extends BasicBlock {
 
     public static final List<Monitor> MONITORS = new ArrayList<>();
 
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    public static final BooleanProperty LEFT = BooleanProperty.create("left");
-    public static final BooleanProperty RIGHT = BooleanProperty.create("right");
-    public static final BooleanProperty UP = BooleanProperty.create("up");
-    public static final BooleanProperty DOWN = BooleanProperty.create("down");
+    public static final PropertyDirection FACING = BlockDirectional.FACING;
+    public static final PropertyBool LEFT = PropertyBool.create("left");
+    public static final PropertyBool RIGHT = PropertyBool.create("right");
+    public static final PropertyBool UP = PropertyBool.create("up");
+    public static final PropertyBool DOWN = PropertyBool.create("down");
 
     private final MonitorBlockProperties prop;
     private final MonitorTEBlock teMonitor;
     private int id = -1;
 
     public Monitor(final MonitorBlockProperties prop, final MonitorTEBlock teMonitor) {
-        super(Properties.of(Material.STONE));
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH)
-                .setValue(LEFT, Boolean.valueOf(false)).setValue(RIGHT, Boolean.valueOf(false))
-                .setValue(UP, Boolean.valueOf(false)).setValue(DOWN, Boolean.valueOf(false)));
+        super(Material.ROCK);
+        this.setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH)
+                .withProperty(LEFT, Boolean.valueOf(false))
+                .withProperty(RIGHT, Boolean.valueOf(false))
+                .withProperty(UP, Boolean.valueOf(false))
+                .withProperty(DOWN, Boolean.valueOf(false)));
         this.prop = prop;
         this.teMonitor = teMonitor;
         if (this instanceof MonitorTEBlock)
@@ -53,118 +55,119 @@ public class Monitor extends BasicBlock {
     }
 
     @Override
-    public BlockState getStateForPlacement(final BlockPlaceContext ctx) {
-        final Direction direction = ctx.getHorizontalDirection().getOpposite();
-        BlockState state = defaultBlockState();
-        switch (direction) {
+    public IBlockState getStateForPlacement(final World world, final BlockPos pos,
+            final EnumFacing face, final float hitX, final float hitY, final float hitZ,
+            final int meta, final EntityLivingBase placer, final EnumHand hand) {
+        final EnumFacing facing = face.getOpposite();
+        IBlockState state = getDefaultState();
+        switch (facing) {
             case EAST:
-                state = state.setValue(FACING, Direction.EAST);
+                state = state.withProperty(FACING, EnumFacing.EAST);
                 break;
             case SOUTH:
-                state = state.setValue(FACING, Direction.SOUTH);
+                state = state.withProperty(FACING, EnumFacing.SOUTH);
                 break;
             case WEST:
-                state = state.setValue(FACING, Direction.WEST);
+                state = state.withProperty(FACING, EnumFacing.WEST);
                 break;
             case NORTH:
             default:
-                state = state.setValue(FACING, Direction.NORTH);
+                state = state.withProperty(FACING, EnumFacing.NORTH);
                 break;
         }
         return state;
     }
 
     @Override
-    public BlockState updateShape(final BlockState state, final Direction direction,
-            final BlockState otherState, final LevelAccessor world, final BlockPos pos,
-            final BlockPos otherPos) {
-        BlockState newState = state;
-        Direction dir = newState.getValue(FACING);
+    public IBlockState getActualState(final IBlockState state, final IBlockAccess world,
+            final BlockPos pos) {
+        IBlockState newState = state;
+        EnumFacing dir = newState.getValue(FACING);
         switch (dir) {
             case EAST:
-                newState = newState.setValue(LEFT, connectsTo(world, pos.south(), newState))
-                        .setValue(RIGHT, connectsTo(world, pos.north(), newState))
-                        .setValue(UP, connectsTo(world, pos.above(), newState))
-                        .setValue(DOWN, connectsTo(world, pos.below(), newState));
+                newState = newState.withProperty(LEFT, connectsTo(world, pos.south(), newState))
+                        .withProperty(RIGHT, connectsTo(world, pos.north(), newState))
+                        .withProperty(UP, connectsTo(world, pos.up(), newState))
+                        .withProperty(DOWN, connectsTo(world, pos.down(), newState));
                 break;
             case SOUTH:
-                newState = newState.setValue(LEFT, connectsTo(world, pos.west(), newState))
-                        .setValue(RIGHT, connectsTo(world, pos.east(), newState))
-                        .setValue(UP, connectsTo(world, pos.above(), newState))
-                        .setValue(DOWN, connectsTo(world, pos.below(), newState));
+                newState = newState.withProperty(LEFT, connectsTo(world, pos.west(), newState))
+                        .withProperty(RIGHT, connectsTo(world, pos.east(), newState))
+                        .withProperty(UP, connectsTo(world, pos.up(), newState))
+                        .withProperty(DOWN, connectsTo(world, pos.down(), newState));
                 break;
             case WEST:
-                newState = newState.setValue(LEFT, connectsTo(world, pos.north(), newState))
-                        .setValue(RIGHT, connectsTo(world, pos.south(), newState))
-                        .setValue(UP, connectsTo(world, pos.above(), newState))
-                        .setValue(DOWN, connectsTo(world, pos.below(), newState));
+                newState = newState.withProperty(LEFT, connectsTo(world, pos.north(), newState))
+                        .withProperty(RIGHT, connectsTo(world, pos.south(), newState))
+                        .withProperty(UP, connectsTo(world, pos.up(), newState))
+                        .withProperty(DOWN, connectsTo(world, pos.down(), newState));
                 break;
             case NORTH:
             default:
-                newState = newState.setValue(LEFT, connectsTo(world, pos.east(), newState))
-                        .setValue(RIGHT, connectsTo(world, pos.west(), newState))
-                        .setValue(UP, connectsTo(world, pos.above(), newState))
-                        .setValue(DOWN, connectsTo(world, pos.below(), newState));
+                newState = newState.withProperty(LEFT, connectsTo(world, pos.east(), newState))
+                        .withProperty(RIGHT, connectsTo(world, pos.west(), newState))
+                        .withProperty(UP, connectsTo(world, pos.up(), newState))
+                        .withProperty(DOWN, connectsTo(world, pos.down(), newState));
                 break;
         }
         return newState;
     }
 
-    private boolean connectsTo(final LevelAccessor level, final BlockPos pos,
-            final BlockState thisState) {
-        BlockState otherState = level.getBlockState(pos);
+    private boolean connectsTo(final IBlockAccess level, final BlockPos pos,
+            final IBlockState thisState) {
+        IBlockState otherState = level.getBlockState(pos);
         return otherState.getBlock() instanceof Monitor
                 && thisState.getValue(FACING).equals(otherState.getValue(FACING));
     }
 
     @Override
-    public BlockState rotate(final BlockState state, final Rotation rot) {
-        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public BlockState mirror(final BlockState state, final Mirror mirrow) {
-        return state.rotate(mirrow.getRotation(state.getValue(FACING)));
+    public IBlockState withRotation(final IBlockState state, final Rotation rot) {
+        return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected void createBlockStateDefinition(
-            final StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, LEFT, RIGHT, UP, DOWN);
+    public IBlockState withMirror(final IBlockState state, final Mirror mirrorIn) {
+        return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
     }
 
     @Override
-    public void destroy(final LevelAccessor accessor, final BlockPos pos, final BlockState state) {
-        super.destroy(accessor, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(accessor, pos, state,
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, new IProperty[] {
+                FACING, LEFT, RIGHT, UP, DOWN
+        });
+    }
+
+    @Override
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
+        super.breakBlock(worldIn, pos, state);
+        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state,
                 block -> block instanceof Monitor);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
-            final CollisionContext context) {
-        final BlockPos downPos = pos.below();
-        final BlockState downState = getter.getBlockState(downPos);
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
+            final BlockPos pos) {
+        final BlockPos downPos = pos.down();
+        final IBlockState downState = source.getBlockState(downPos);
         final Block downBlock = downState.getBlock();
         if (downBlock instanceof Monitor)
-            return downBlock.getShape(downState, getter, downPos, context).move(0, -1, 0);
+            return downBlock.getBoundingBox(downState, source, downPos).offset(0, -1, 0);
 
         final BlockPos nextPos = getLeftPos(state, pos);
         final Vec3i relative = nextPos.subtract(pos);
-        final BlockState nextState = getter.getBlockState(nextPos);
+        final IBlockState nextState = source.getBlockState(nextPos);
         final Block nextBlock = nextState.getBlock();
-        if (!relative.equals(BlockPos.ZERO) && nextBlock instanceof Monitor)
-            return nextBlock.getShape(nextState, getter, nextPos, context).move(relative.getX(),
+        if (!relative.equals(BlockPos.ORIGIN) && nextBlock instanceof Monitor)
+            return nextBlock.getBoundingBox(nextState, source, nextPos).offset(relative.getX(),
                     relative.getY(), relative.getZ());
-        return Shapes.block();
+        return FULL_BLOCK_AABB;
     }
 
-    private static BlockPos getLeftPos(final BlockState state, final BlockPos pos) {
+    private static BlockPos getLeftPos(final IBlockState state, final BlockPos pos) {
         if (!(state.getBlock() instanceof Monitor) || !state.getValue(LEFT))
             return pos;
-        Direction dir = state.getValue(FACING);
+        EnumFacing dir = state.getValue(FACING);
         switch (dir) {
             case EAST:
                 return pos.south();
@@ -179,9 +182,9 @@ public class Monitor extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getCollisionShape(final BlockState state, final BlockGetter getter,
-            final BlockPos pos, final CollisionContext context) {
-        return getShape(state, getter, pos, context);
+    public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
+            final IBlockAccess worldIn, final BlockPos pos) {
+        return getBoundingBox(blockState, worldIn, pos);
     }
 
     @Override

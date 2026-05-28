@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -180,11 +181,12 @@ public class GuiMonitor extends GuiBase {
     }
 
     @Override
-    public void mouseMoved(final double mouseX, final double mouseY) {
+    protected void mouseClickMove(final int mouseX, final int mouseY, final int clickedMouseButton,
+            final long timeSinceLastClick) {
         if (mouseUpdate != null) {
             mouseUpdate.mouseEvent(new MouseEvent(mouseX, mouseY, 0, EnumMouseState.MOVE));
         }
-        super.mouseMoved(mouseX, mouseY);
+        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
     }
 
     private static class UIMouseUpdate extends UIComponent {
@@ -238,5 +240,10 @@ public class GuiMonitor extends GuiBase {
                 }
             }
         }
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerMonitor(info);
     }
 }

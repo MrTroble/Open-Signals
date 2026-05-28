@@ -10,7 +10,7 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class ContainerMonitor extends ContainerBase {
 
@@ -26,7 +26,7 @@ public class ContainerMonitor extends ContainerBase {
 
     @Override
     public void sendAllDataToRemote() {
-        tile = (MonitorTileEntity) info.world.getBlockEntity(info.pos);
+        tile = (MonitorTileEntity) info.world.getTileEntity(info.pos);
 
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBoolean(tile.hasLink());
@@ -43,7 +43,7 @@ public class ContainerMonitor extends ContainerBase {
         final Point start = Point.of(buf);
         final Point end = Point.of(buf);
         tile.setRenderPoints(start, end);
-        MonitorNetworkHandler.sendTileData(tile, info.world.players());
+        MonitorNetworkHandler.sendTileData(tile, info.world.playerEntities);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ContainerMonitor extends ContainerBase {
         this.renderEnd = Point.of(buf);
         this.pos = buf.getBlockPos();
 
-        final MonitorTileEntity tile = (MonitorTileEntity) info.world.getBlockEntity(pos);
+        final MonitorTileEntity tile = (MonitorTileEntity) info.world.getTileEntity(pos);
         grid = tile.getGrid();
         update();
     }

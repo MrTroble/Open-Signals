@@ -2,8 +2,8 @@ package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+import org.lwjgl.opengl.GL11;
+
 import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
@@ -15,18 +15,16 @@ import com.troblecodings.signals.guis.UISignalBoxRendering;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 public class MonitorTEBlock extends Monitor {
 
@@ -38,15 +36,15 @@ public class MonitorTEBlock extends Monitor {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
-            final CollisionContext context) {
-        final MonitorTileEntity tile = (MonitorTileEntity) getter.getBlockEntity(pos);
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
+            final BlockPos pos) {
+        final MonitorTileEntity tile = (MonitorTileEntity) source.getTileEntity(pos);
         if (tile == null)
-            return Shapes.block();
-        final Direction direction = state.getValue(FACING).getCounterClockWise();
-        return Shapes.create(Shapes.block().bounds().expandTowards(
-                direction.getStepX() * (tile.getMonitorSizeX() - 1), tile.getMonitorSizeY() - 1,
-                direction.getStepZ() * (tile.getMonitorSizeX() - 1)));
+            return FULL_BLOCK_AABB;
+        final EnumFacing direction = state.getValue(FACING).rotateYCCW();
+        final Vec3i vec = direction.getDirectionVec();
+        return FULL_BLOCK_AABB.expand(vec.getX() * (tile.getMonitorSizeX() - 1),
+                tile.getMonitorSizeY() - 1, vec.getZ() * (tile.getMonitorSizeX() - 1));
     }
 
     public void render(final RenderAnimationInfo info, final MonitorTileEntity tile,
@@ -56,7 +54,7 @@ public class MonitorTEBlock extends Monitor {
         final float renderSizeX = tile.getRenderEnd().getX() - tile.getRenderStart().getX() + 1f;
         final float renderSizeY = tile.getRenderEnd().getY() - tile.getRenderStart().getY() + 1f;
 
-        final DrawInfo drawInfo = new DrawInfo(info.stack);
+        final DrawInfo drawInfo = new DrawInfo(0, 0, 0);
         drawInfo.push();
         drawInfo.alphaOn();
         drawInfo.depthOff();
@@ -70,7 +68,7 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.depthOn();
         drawInfo.translate(-monitorSizeX + 1, 0, -0.001f);
         final BufferWrapper wrapper =
-                drawInfo.builder(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+                drawInfo.builder(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         wrapper.quad(colorInsets, (monitorSizeX - colorInsets), colorInsets,
                 monitorSizeY - colorInsets, tile.getProfile().getBackgroundColor());
         drawInfo.end();
@@ -96,10 +94,10 @@ public class MonitorTEBlock extends Monitor {
     }
 
     private static void rotate(final DrawInfo info, final MonitorTileEntity tile) {
-        final BlockState state = tile.getBlockState();
-        final Direction direction = state.getValue(FACING);
-        if (direction.equals(Direction.DOWN) || direction.equals(Direction.UP)
-                || direction.equals(Direction.NORTH))
+        final IBlockState state = tile.getWorld().getBlockState(tile.getPos());
+        final EnumFacing direction = state.getValue(FACING);
+        if (direction.equals(EnumFacing.DOWN) || direction.equals(EnumFacing.UP)
+                || direction.equals(EnumFacing.NORTH))
             return;
 
         info.translate(0.5f, 0, 0.5f);
@@ -120,15 +118,15 @@ public class MonitorTEBlock extends Monitor {
     }
 
     @Override
-    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
-            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
-                .equals(OSItems.LINKING_TOOL)) {
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(MonitorTEBlock.class, playerIn, worldIn, pos,
                     "monitorTE");
-            return InteractionResult.SUCCESS;
+            return true;
         }
-        return InteractionResult.FAIL;
+        return false;
     }
 
     @Override

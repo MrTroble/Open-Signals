@@ -2,7 +2,7 @@ package com.troblecodings.signals.enums;
 
 import com.troblecodings.signals.OpenSignalsMain;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
 
 public enum SignalBoxIcons {
 
