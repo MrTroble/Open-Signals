@@ -238,7 +238,6 @@ public class GuiSignalBox extends GuiBase {
             }
             return;
         }
-        this.helpPage.setShowHelpPage(false);
         rendering.clearSelection();
         if (mouse != MouseEvent.LEFT_MOUSE)
             return;
