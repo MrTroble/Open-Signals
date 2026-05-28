@@ -20,6 +20,8 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
+import net.minecraft.world.level.block.Block;
+
 public class NamableGui extends GuiBase {
 
     private UILabel labelComp;
@@ -74,15 +76,19 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity))
             return;
 
-        addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
-                NamableContainerNetwork.BLOCKING_TIME_UNIT,
-                I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay,
-                container.blockingTimeUnit);
-        if (container.tile.getBlockState().getBlock() instanceof CombinedRedstoneInput)
-            addDelayEntityFor(inner, NamableContainerNetwork.RESET_TIME,
-                    NamableContainerNetwork.RESET_TIME_UNIT,
-                    I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay,
-                    container.resetTimeUnit);
+        final Block block = container.tile.getBlockState().getBlock();
+        if (block instanceof RedstoneInput) {
+            addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
+                    NamableContainerNetwork.BLOCKING_TIME_UNIT,
+                    I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay,
+                    container.blockingTimeUnit);
+            if (block instanceof CombinedRedstoneInput) {
+                addDelayEntityFor(inner, NamableContainerNetwork.RESET_TIME,
+                        NamableContainerNetwork.RESET_TIME_UNIT,
+                        I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay,
+                        container.resetTimeUnit);
+            }
+        }
 
         inner.add(GuiElements.createSpacerV(10));
 
