@@ -32,15 +32,14 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
     public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
             final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
             final float hitY, final float hitZ) {
+        if (player.isSneaking()) {
+            OpenSignalsMain.handler.invokeGui(Monitor.class, player, worldIn, pos, "monitor");
+            return EnumActionResult.SUCCESS;
+        }
         final BlockPos placePos = pos.offset(facing);
         if (worldIn.isAirBlock(placePos))
             return EnumActionResult.FAIL;
-        if (player.isSneaking()) {
-            if (!worldIn.isRemote) {
-                OpenSignalsMain.handler.invokeGui(Monitor.class, player, worldIn, pos, "monitor");
-            }
-            return EnumActionResult.SUCCESS;
-        }
+
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getHeldItemMainhand());
         final int monitorID = wrapper.getInteger(ContainerMonitorSelection.MONITOR_TYPE_ID);
         final Monitor monitor = Monitor.MONITORS.get(monitorID);
