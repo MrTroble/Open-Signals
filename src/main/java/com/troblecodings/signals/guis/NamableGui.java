@@ -1,9 +1,6 @@
 package com.troblecodings.signals.guis;
 
-import java.util.concurrent.TimeUnit;
-
 import com.troblecodings.core.I18Wrapper;
-import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -14,6 +11,7 @@ import com.troblecodings.guilib.ecs.entitys.input.UIKeyUpdate;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
+import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.guis.NamableContainer.NamableContainerNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
@@ -79,14 +77,10 @@ public class NamableGui extends GuiBase {
         final Block block = container.tile.getBlockState().getBlock();
         if (block instanceof RedstoneInput) {
             addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
-                    NamableContainerNetwork.BLOCKING_TIME_UNIT,
-                    I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay,
-                    container.blockingTimeUnit);
+                    I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay);
             if (block instanceof CombinedRedstoneInput) {
                 addDelayEntityFor(inner, NamableContainerNetwork.RESET_TIME,
-                        NamableContainerNetwork.RESET_TIME_UNIT,
-                        I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay,
-                        container.resetTimeUnit);
+                        I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay);
             }
         }
 
@@ -109,12 +103,11 @@ public class NamableGui extends GuiBase {
     }
 
     private void addDelayEntityFor(final UIEntity inner, final NamableContainerNetwork timeMode,
-            final NamableContainerNetwork timeUnitMode, final String label, final int defaultTime,
-            final TimeUnit defaultTimeUnit) {
+            final String label, final int defaultTime) {
         final UIEntity hentity = new UIEntity();
         hentity.setHeight(20);
         hentity.setInheritWidth(true);
-        hentity.add(new UIBox(UIBox.HBOX, 5));
+        hentity.add(new UIBox(UIBox.HBOX, 0));
 
         inner.add(hentity);
 
@@ -137,20 +130,10 @@ public class NamableGui extends GuiBase {
         resetInputEntity.add(resetInput);
 
         final UIEntity labelEntity = GuiElements.createLabel(label, 1f);
-        labelEntity.setInheritWidth(false);
-        labelEntity.setWidth(100);
         labelEntity.setY(2);
 
         hentity.add(labelEntity);
         hentity.add(resetInputEntity);
-
-        final UIEntity timeUnitSelection = GuiElements.createEnumElement(
-                new EnumIntegerable<>(TimeUnit.class),
-                i -> container.sendDelayTimeUnitToServer(TimeUnit.values()[i], timeUnitMode),
-                defaultTimeUnit.ordinal());
-        timeUnitSelection.setInheritWidth(false);
-        timeUnitSelection.setWidth(130);
-        hentity.add(timeUnitSelection);
     }
 
     private void updateText(final String input) {

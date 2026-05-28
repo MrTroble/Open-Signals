@@ -2,7 +2,6 @@ package com.troblecodings.signals.guis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -22,9 +21,7 @@ public class NamableContainer extends ContainerBase {
     protected BasicBlockEntity tile;
     protected BlockPos pos;
     protected int blockingDelay = 0;
-    protected TimeUnit blockingTimeUnit = TimeUnit.SECONDS;
     protected int resetDelay = 0;
-    protected TimeUnit resetTimeUnit = TimeUnit.SECONDS;
     protected final List<BlockPos> linkedPos = new ArrayList<>();
     protected final List<BlockPos> linkedController = new ArrayList<>();
 
@@ -45,9 +42,7 @@ public class NamableContainer extends ContainerBase {
             final RedstoneIOTileEntity ioTile = (RedstoneIOTileEntity) tile;
             buffer.putList(ioTile.getLinkedController(), WriteBuffer.BLOCKPOS_CONSUMER);
             buffer.putInt(ioTile.getBlockingDelay());
-            buffer.putEnumValue(ioTile.getBlockingTimeUnit());
             buffer.putInt(ioTile.getResetDelay());
-            buffer.putEnumValue(ioTile.getResetTimeUnit());
         }
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
@@ -67,9 +62,7 @@ public class NamableContainer extends ContainerBase {
         if (tile instanceof RedstoneIOTileEntity) {
             linkedController.addAll(buffer.getList(ReadBuffer.BLOCKPOS_FUNCTION));
             blockingDelay = buffer.getInt();
-            blockingTimeUnit = buffer.getEnumValue(TimeUnit.class);
             resetDelay = buffer.getInt();
-            resetTimeUnit = buffer.getEnumValue(TimeUnit.class);
         }
         update();
     }
@@ -95,12 +88,6 @@ public class NamableContainer extends ContainerBase {
         if (mode.equals(NamableContainerNetwork.RESET_TIME)) {
             ioTile.setResetDelay(buffer.getInt());
         }
-        if (mode.equals(NamableContainerNetwork.BLOCKING_TIME_UNIT)) {
-            ioTile.setBlockingTimeUnit(buffer.getEnumValue(TimeUnit.class));
-        }
-        if (mode.equals(NamableContainerNetwork.RESET_TIME_UNIT)) {
-            ioTile.setResetTimeUnit(buffer.getEnumValue(TimeUnit.class));
-        }
         tile.setChanged();
     }
 
@@ -116,13 +103,6 @@ public class NamableContainer extends ContainerBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    protected void sendDelayTimeUnitToServer(final TimeUnit unit,
-            final NamableContainerNetwork mode) {
-        final WriteBuffer buffer = getBuffer(mode);
-        buffer.putEnumValue(unit);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
-    }
-
     private static WriteBuffer getBuffer(final NamableContainerNetwork mode) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(mode);
@@ -131,7 +111,7 @@ public class NamableContainer extends ContainerBase {
 
     protected static enum NamableContainerNetwork {
 
-        NAME, RESET_TIME, RESET_TIME_UNIT, BLOCKING_TIME, BLOCKING_TIME_UNIT;
+        NAME, RESET_TIME, BLOCKING_TIME;
 
     }
 }
