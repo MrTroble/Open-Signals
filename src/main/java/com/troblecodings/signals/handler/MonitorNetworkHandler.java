@@ -45,7 +45,6 @@ public final class MonitorNetworkHandler {
 
     public static void init() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
-        channel.register(new MonitorNetworkHandler());
     }
 
     public static void registerToNetworkChannel(final Object obj) {

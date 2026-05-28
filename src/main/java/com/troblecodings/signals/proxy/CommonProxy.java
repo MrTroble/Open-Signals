@@ -44,11 +44,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void initModEvent(final FMLPreInitializationEvent event) {
-        SignalStateHandler.init();
-        NameHandler.init();
-        MonitorNetworkHandler.init();
-        OSSounds.init();
-
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler = init.getKey();
@@ -56,6 +51,7 @@ public class CommonProxy {
 
         SignalStateHandler.init();
         NameHandler.init();
+        MonitorNetworkHandler.init();
         OSSounds.init();
         OSBlocks.init();
 

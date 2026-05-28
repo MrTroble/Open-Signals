@@ -131,6 +131,16 @@ public class Monitor extends BasicBlock {
     }
 
     @Override
+    public int getMetaFromState(final IBlockState state) {
+        return state.getValue(FACING).ordinal();
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(final int meta) {
+        return getDefaultState().withProperty(FACING, EnumFacing.values()[meta]);
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, new IProperty[] {
                 FACING, LEFT, RIGHT, UP, DOWN
