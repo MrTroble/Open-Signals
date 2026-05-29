@@ -71,10 +71,14 @@ test {
 processResources {
     inputs.property "version", project.version
 
-    filesMatching(["mcmod.info", "mods.toml"]) {
+    filesMatching("META-INF/mods.toml") {
         expand(
             version: project.version,
-            mcversion: project.minecraft_version
+            mcversion: project.minecraft_version,
+            forgeversion: project.forge_version_main,
+            modid: project.mod_id,
+            modname: project.mod_name,
+            author: project.mod_author
         )
     }
 }
