@@ -81,8 +81,6 @@ public class ContainerSignalBox extends ContainerBase
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
         this.tile = info.getTile();
-        this.grid = tile.getSignalBoxGrid();
-        initializeNetwork();
     }
 
     @Override
@@ -150,6 +148,7 @@ public class ContainerSignalBox extends ContainerBase
     public void deserializeClient(final ReadBuffer buffer) {
         if (grid == null) {
             this.grid = tile.getSignalBoxGrid();
+            this.network = grid.getNetwork();
             initializeNetwork();
         }
         network.desirializeBuffer(buffer);
@@ -304,10 +303,16 @@ public class ContainerSignalBox extends ContainerBase
     @Override
     public void onContainerClosed(final EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        network.removeListener(listener);
-        network.removeNetworkReader();
+        deRegisterFromNetwork();
         if (this.tile != null) {
             this.tile.remove(this);
+        }
+    }
+
+    protected void deRegisterFromNetwork() {
+        if (network != null) {
+            network.removeListener(listener);
+            network.removeNetworkReader();
         }
     }
 

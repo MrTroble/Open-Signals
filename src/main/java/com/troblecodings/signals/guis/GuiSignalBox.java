@@ -724,4 +724,9 @@ public class GuiSignalBox extends GuiBase {
         return new ContainerSignalBox(info);
     }
 
+    @Override
+    public void preClose() {
+        container.deRegisterFromNetwork();
+    }
+
 }
