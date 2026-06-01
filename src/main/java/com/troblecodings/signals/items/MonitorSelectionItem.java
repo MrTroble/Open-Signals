@@ -30,14 +30,19 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
 
     @Override
     public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
-            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
+            final BlockPos pos, final EnumHand hand, final EnumFacing face, final float hitX,
             final float hitY, final float hitZ) {
         if (player.isSneaking()) {
-            OpenSignalsMain.handler.invokeGui(Monitor.class, player, worldIn, pos, "monitor");
+            if (!worldIn.isRemote) {
+                OpenSignalsMain.handler.invokeGui(Monitor.class, player, worldIn, pos, "monitor");
+            }
             return EnumActionResult.SUCCESS;
         }
-        final BlockPos placePos = pos.offset(facing);
-        if (worldIn.isAirBlock(placePos))
+        if (worldIn.isRemote)
+            return EnumActionResult.PASS;
+        final EnumFacing facing = player.getHorizontalFacing().getOpposite();
+        final BlockPos placePos = pos.offset(face);
+        if (!worldIn.isAirBlock(placePos))
             return EnumActionResult.FAIL;
 
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getHeldItemMainhand());
@@ -47,7 +52,7 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
         final int sizeX = wrapper.getInteger(ContainerMonitorSelection.SIZE_X);
         final int sizeY = wrapper.getInteger(ContainerMonitorSelection.SIZE_Y);
 
-        final List<BlockPos> allMonitorPos = getMonitorPos(placePos.up(), facing, sizeX, sizeY);
+        final List<BlockPos> allMonitorPos = getMonitorPos(pos.up(), facing, sizeX, sizeY);
 
         if (allMonitorPos.isEmpty())
             return EnumActionResult.FAIL;
@@ -62,13 +67,13 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
         }
         final BlockPos firstPos = allMonitorPos.remove(0);
         worldIn.setBlockState(firstPos, monitor.getTileEntityMonitorBlock().getStateForPlacement(
-                worldIn, firstPos, facing, hitX, hitY, hitZ, sizeY, player, hand), 3);
+                worldIn, firstPos, facing, hitX, hitY, hitZ, 0, player, hand), 3);
         final MonitorTileEntity tile = (MonitorTileEntity) worldIn.getTileEntity(firstPos);
         tile.loadFromItem(sizeX, sizeY);
 
         for (final BlockPos monitorPos : allMonitorPos) {
-            worldIn.setBlockState(monitorPos, monitor.getStateForPlacement(worldIn, firstPos,
-                    facing, hitX, hitY, hitZ, sizeY, player, hand), 3);
+            worldIn.setBlockState(monitorPos, monitor.getStateForPlacement(worldIn, monitorPos,
+                    facing, hitX, hitY, hitZ, 0, player, hand), 3);
         }
         return EnumActionResult.SUCCESS;
     }
@@ -77,12 +82,26 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
             final int sizeX, final int sizeY) {
         final List<BlockPos> list = new ArrayList<>();
         for (int i = 0; i < sizeY; i++) {
-            final BlockPos yPos = start.offset(direction, i);
+            final BlockPos yPos = start.add(0, i, 0);
             for (int j = 0; j < sizeX; j++) {
-                list.add(yPos.offset(direction, j));
+                switch (direction) {
+                    case NORTH:
+                    case DOWN:
+                    case UP:
+                        list.add(yPos.add(-j, 0, 0));
+                        break;
+                    case EAST:
+                        list.add(yPos.add(0, 0, -j));
+                        break;
+                    case SOUTH:
+                        list.add(yPos.add(j, 0, 0));
+                        break;
+                    case WEST:
+                        list.add(yPos.add(0, 0, j));
+                        break;
+                }
             }
         }
         return list;
     }
-
 }

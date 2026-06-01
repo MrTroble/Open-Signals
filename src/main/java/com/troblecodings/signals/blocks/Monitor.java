@@ -58,9 +58,8 @@ public class Monitor extends BasicBlock {
     public IBlockState getStateForPlacement(final World world, final BlockPos pos,
             final EnumFacing face, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
-        final EnumFacing facing = face.getOpposite();
         IBlockState state = getDefaultState();
-        switch (facing) {
+        switch (face) {
             case EAST:
                 state = state.withProperty(FACING, EnumFacing.EAST);
                 break;

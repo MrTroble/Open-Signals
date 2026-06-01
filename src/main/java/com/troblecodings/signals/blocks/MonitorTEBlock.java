@@ -16,6 +16,7 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -41,7 +42,7 @@ public class MonitorTEBlock extends Monitor {
         final MonitorTileEntity tile = (MonitorTileEntity) source.getTileEntity(pos);
         if (tile == null)
             return FULL_BLOCK_AABB;
-        final EnumFacing direction = state.getValue(FACING).rotateYCCW();
+        final EnumFacing direction = state.getValue(FACING).rotateY();
         final Vec3i vec = direction.getDirectionVec();
         return FULL_BLOCK_AABB.expand(vec.getX() * (tile.getMonitorSizeX() - 1),
                 tile.getMonitorSizeY() - 1, vec.getZ() * (tile.getMonitorSizeX() - 1));
@@ -54,19 +55,23 @@ public class MonitorTEBlock extends Monitor {
         final float renderSizeX = tile.getRenderEnd().getX() - tile.getRenderStart().getX() + 1f;
         final float renderSizeY = tile.getRenderEnd().getY() - tile.getRenderStart().getY() + 1f;
 
-        final DrawInfo drawInfo = new DrawInfo(0, 0, 0);
-        drawInfo.push();
-        drawInfo.alphaOn();
-        drawInfo.depthOff();
-        drawInfo.applyColor();
-
         final float insets = getMonitorProperties().getInsets();
         final float colorInsets = insets / STEPS_PER_BLOCK;
 
-        rotate(drawInfo, tile);
+        final DrawInfo drawInfo = new DrawInfo(0, 0, info.tick);
         drawInfo.push();
-        drawInfo.depthOn();
-        drawInfo.translate(-monitorSizeX + 1, 0, -0.001f);
+
+        rotate(drawInfo, tile);
+
+        drawInfo.push();
+        drawInfo.translate(-monitorSizeX + 1 + info.x, info.y, -0.001f + info.z);
+
+        drawInfo.disableTexture();
+        drawInfo.applyColor();
+        drawInfo.blendOn();
+        drawInfo.alphaOn();
+        GlStateManager.disableLighting();
+
         final BufferWrapper wrapper =
                 drawInfo.builder(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         wrapper.quad(colorInsets, (monitorSizeX - colorInsets), colorInsets,
@@ -74,8 +79,9 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.end();
         drawInfo.pop();
 
-        drawInfo.translate(1, 1.05f * monitorSizeY, 0);
-        drawInfo.rotate(0, 0, 2 * UIRotate.PERPENDICULAR_ANGLE);
+        drawInfo.translate(info.x, 1.05f * monitorSizeY + info.y, info.z);
+        GlStateManager.rotate(2 * UIRotate.PERPENDICULAR_ANGLE, 0, 0, 1);
+        drawInfo.translate(-1, 0, 0);
 
         drawInfo.scale(1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK);
         drawInfo.translate(insets, insets, -0.35f);
@@ -88,8 +94,10 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.scale(1, 1, -0.1f);
         rendering.draw(drawInfo);
 
-        drawInfo.depthOff();
         drawInfo.alphaOff();
+        drawInfo.blendOff();
+        drawInfo.enableTexture();
+        GlStateManager.enableLighting();
         drawInfo.pop();
     }
 
@@ -103,13 +111,16 @@ public class MonitorTEBlock extends Monitor {
         info.translate(0.5f, 0, 0.5f);
         switch (direction) {
             case EAST:
-                info.rotate(0, 3 * UIRotate.PERPENDICULAR_ANGLE, 0);
+                GlStateManager.rotate(3 * UIRotate.PERPENDICULAR_ANGLE, 0, 1, 0);
+                // info.rotate(0, 3 * UIRotate.PERPENDICULAR_ANGLE, 0);
                 break;
             case SOUTH:
-                info.rotate(0, 2 * UIRotate.PERPENDICULAR_ANGLE, 0);
+                GlStateManager.rotate(2 * UIRotate.PERPENDICULAR_ANGLE, 0, 1, 0);
+                // info.rotate(0, 2 * UIRotate.PERPENDICULAR_ANGLE, 0);
                 break;
             case WEST:
-                info.rotate(0, UIRotate.PERPENDICULAR_ANGLE, 0);
+                GlStateManager.rotate(UIRotate.PERPENDICULAR_ANGLE, 0, 1, 0);
+                // info.rotate(0, UIRotate.PERPENDICULAR_ANGLE, 0);
                 break;
             default:
                 break;
