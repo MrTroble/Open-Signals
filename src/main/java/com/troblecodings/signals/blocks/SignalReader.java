@@ -10,6 +10,7 @@ import com.troblecodings.signals.tileentitys.SignalReaderTileEntity;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -62,6 +63,11 @@ public class SignalReader extends BasicBlock {
     @Override
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("signalreader");
+    }
+
+    @Override
+    public TileEntity createTileEntity(final World world, final IBlockState state) {
+        return new SignalReaderTileEntity();
     }
 
 }

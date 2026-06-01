@@ -570,11 +570,6 @@ public class Signal extends BasicBlock {
         return Optional.of(SUPPLIER);
     }
 
-    @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
-        return new SignalTileEntity();
-    }
-
     public boolean hasAnimation() {
         return SignalAnimationConfigParser.ALL_ANIMATIONS.containsKey(this);
     }
