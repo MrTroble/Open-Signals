@@ -265,7 +265,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity
                 }
             }
             final IBlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(signalPos, state, state, 3);
+            world.notifyNeighborsOfStateChange(pos, state.getBlock(), true);
         }
     }
 }
