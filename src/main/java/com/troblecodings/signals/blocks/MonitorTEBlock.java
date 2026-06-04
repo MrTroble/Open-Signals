@@ -30,7 +30,7 @@ import net.minecraft.world.World;
 public class MonitorTEBlock extends Monitor {
 
     public static final TileEntitySupplierWrapper SUPPLIER = MonitorTileEntity::new;
-    public static final float STEPS_PER_BLOCK = 100;
+    public static final float STEPS_PER_BLOCK = 50;
 
     public MonitorTEBlock(final MonitorBlockProperties prop) {
         super(prop, null);
@@ -60,11 +60,12 @@ public class MonitorTEBlock extends Monitor {
 
         final DrawInfo drawInfo = new DrawInfo(0, 0, info.tick);
         drawInfo.push();
+        GlStateManager.translate(info.x, info.y, info.z);
 
         rotate(drawInfo, tile);
 
         drawInfo.push();
-        drawInfo.translate(-monitorSizeX + 1 + info.x, info.y, -0.001f + info.z);
+        GlStateManager.translate(-monitorSizeX + 1, 0, -0.001f);
 
         drawInfo.disableTexture();
         drawInfo.applyColor();
@@ -79,19 +80,17 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.end();
         drawInfo.pop();
 
-        drawInfo.translate(info.x, 1.05f * monitorSizeY + info.y, info.z);
+        GlStateManager.translate(1, 1.05f * monitorSizeY, 0);
         GlStateManager.rotate(2 * UIRotate.PERPENDICULAR_ANGLE, 0, 0, 1);
-        drawInfo.translate(-1, 0, 0);
-
-        drawInfo.scale(1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK);
-        drawInfo.translate(insets, insets, -0.35f);
+        GlStateManager.scale(1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK);
+        GlStateManager.translate(insets, insets, -0.35f);
 
         final float maxSizeX = monitorSizeX * STEPS_PER_BLOCK - 2 * insets;
         final float maxSizeY = monitorSizeY * STEPS_PER_BLOCK - 2 * insets;
-        drawInfo.scale(maxSizeX / (renderSizeX * UISignalBoxRendering.TILE_WIDTH),
+        GlStateManager.scale(maxSizeX / (renderSizeX * UISignalBoxRendering.TILE_WIDTH),
                 maxSizeY / (renderSizeY * UISignalBoxRendering.TILE_WIDTH), 1);
 
-        drawInfo.scale(1, 1, -0.1f);
+        GlStateManager.scale(1, 1, -0.1f);
         rendering.draw(drawInfo);
 
         drawInfo.alphaOff();
@@ -108,24 +107,21 @@ public class MonitorTEBlock extends Monitor {
                 || direction.equals(EnumFacing.NORTH))
             return;
 
-        info.translate(0.5f, 0, 0.5f);
+        GlStateManager.translate(0.5f, 0, 0.5f);
         switch (direction) {
             case EAST:
                 GlStateManager.rotate(3 * UIRotate.PERPENDICULAR_ANGLE, 0, 1, 0);
-                // info.rotate(0, 3 * UIRotate.PERPENDICULAR_ANGLE, 0);
                 break;
             case SOUTH:
                 GlStateManager.rotate(2 * UIRotate.PERPENDICULAR_ANGLE, 0, 1, 0);
-                // info.rotate(0, 2 * UIRotate.PERPENDICULAR_ANGLE, 0);
                 break;
             case WEST:
                 GlStateManager.rotate(UIRotate.PERPENDICULAR_ANGLE, 0, 1, 0);
-                // info.rotate(0, UIRotate.PERPENDICULAR_ANGLE, 0);
                 break;
             default:
                 break;
         }
-        info.translate(-0.5f, 0, -0.5f);
+        GlStateManager.translate(-0.5f, 0, -0.5f);
     }
 
     @Override

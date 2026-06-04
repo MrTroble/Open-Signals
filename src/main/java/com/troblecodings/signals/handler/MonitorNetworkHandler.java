@@ -66,6 +66,7 @@ public final class MonitorNetworkHandler {
                 new SignalBoxNetworkListener(monitorInfo, b -> sendGridUpdate(tile, b));
         network.addListener(listener);
         listeners.put(monitorInfo, listener);
+        sendTileData(tile, monitorInfo.world.playerEntities);
         sendInitGridUpdate(tile, player);
     }
 
@@ -127,6 +128,8 @@ public final class MonitorNetworkHandler {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte(NETWORK_TILE_DATA);
         buffer.putBlockPos(tile.getPos());
+        buffer.putInt(tile.getMonitorSizeX());
+        buffer.putInt(tile.getMonitorSizeY());
         tile.getRenderStart().writeNetwork(buffer);
         tile.getRenderEnd().writeNetwork(buffer);
         list.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));

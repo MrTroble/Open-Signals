@@ -33,9 +33,11 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class MonitorTileEntity extends SyncableTileEntity
         implements ILinkableTile, SignalBoxNetworkReader {
@@ -132,6 +134,8 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     public void loadRenderPoints(final ReadBuffer buffer) {
+        monitorSizeX = buffer.getInt();
+        monitorSizeY = buffer.getInt();
         renderStart = buffer.getINetworkSaveable(Point.class);
         renderEnd = buffer.getINetworkSaveable(Point.class);
         initRendering();
@@ -289,6 +293,12 @@ public class MonitorTileEntity extends SyncableTileEntity
     @Override
     public boolean isClientSide() {
         return world != null ? world.isRemote : false;
+    }
+
+    @Override
+    public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
+            final IBlockState newSate) {
+        return false;
     }
 
 }
