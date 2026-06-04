@@ -19,6 +19,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import com.troblecodings.contentpacklib.ContentPackHandler;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -57,6 +58,7 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
+        MinecraftForge.EVENT_BUS.register(MonitorNetworkHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
 
