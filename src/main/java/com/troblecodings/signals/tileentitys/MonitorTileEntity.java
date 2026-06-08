@@ -207,6 +207,8 @@ public class MonitorTileEntity extends SyncableTileEntity
                 if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
                     return;
                 final Point translated = getPointTranslated(node.getPoint());
+                if (translated == null)
+                    return;
                 node.getOption(modeSet).ifPresent(option -> {
                     final TrainNumber number =
                             option.getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
@@ -221,7 +223,8 @@ public class MonitorTileEntity extends SyncableTileEntity
         } else if (entryType.equals(PathEntryType.PATHUSAGE)) {
             node.toPathIdentifier().forEach(ident -> {
                 node.getOption(ident.getMode()).ifPresent(poe -> {
-                    rendering.setColor(getPointTranslated(node.getPoint()), ident.getMode(),
+                    final Point translated = getPointTranslated(node.getPoint());
+                    rendering.setColor(translated, ident.getMode(),
                             poe.getEntry(PathEntryType.PATHUSAGE)
                                     .orElseGet(() -> EnumPathUsage.FREE)
                                     .getColor(getProfile().getOperationModeSettings()));
@@ -232,13 +235,16 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     @Override
     public void onNodeUpdate(final SignalBoxNode node) {
+        final Point translated = getPointTranslated(node.getPoint());
+        if (translated == null)
+            return;
         node.forEach((mode) -> {
             final SubsidiaryState state = node.getSubsidiaryState(mode);
             if (state != null) {
                 node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
             }
         });
-        rendering.updateNode(getPointTranslated(node.getPoint()), node);
+        rendering.updateNode(translated, node);
     }
 
     @Override

@@ -162,8 +162,7 @@ public class Monitor extends BasicBlock {
         final Block downBlock = downState.getBlock();
         if (downBlock instanceof Monitor)
             return downBlock.getBoundingBox(downState, source, downPos).offset(0, -1, 0);
-
-        final BlockPos nextPos = getLeftPos(state, pos);
+        final BlockPos nextPos = getLeftPos(getActualState(state, source, pos), pos);
         final Vec3i relative = nextPos.subtract(pos);
         final IBlockState nextState = source.getBlockState(nextPos);
         final Block nextBlock = nextState.getBlock();

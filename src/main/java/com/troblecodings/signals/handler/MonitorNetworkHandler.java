@@ -163,7 +163,6 @@ public final class MonitorNetworkHandler {
         buffer.putBlockPos(tile.getPos());
         buffer.putBuffer(networkBuffer);
         tile.getWorld().playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
-
     }
 
     private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {

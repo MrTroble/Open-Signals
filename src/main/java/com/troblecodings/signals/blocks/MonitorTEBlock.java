@@ -44,7 +44,7 @@ public class MonitorTEBlock extends Monitor {
             return FULL_BLOCK_AABB;
         final EnumFacing direction = state.getValue(FACING).rotateY();
         final Vec3i vec = direction.getDirectionVec();
-        return FULL_BLOCK_AABB.expand(vec.getX() * (tile.getMonitorSizeX() - 1),
+        return FULL_BLOCK_AABB.expand(-vec.getX() * (tile.getMonitorSizeX() - 1),
                 tile.getMonitorSizeY() - 1, vec.getZ() * (tile.getMonitorSizeX() - 1));
     }
 
@@ -80,7 +80,7 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.end();
         drawInfo.pop();
 
-        GlStateManager.translate(1, 1.05f * monitorSizeY, 0);
+        GlStateManager.translate(1, monitorSizeY, 0);
         GlStateManager.rotate(2 * UIRotate.PERPENDICULAR_ANGLE, 0, 0, 1);
         GlStateManager.scale(1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK, 1 / STEPS_PER_BLOCK);
         GlStateManager.translate(insets, insets, -0.35f);
