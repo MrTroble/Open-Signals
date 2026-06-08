@@ -19,6 +19,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -129,7 +130,8 @@ public class MonitorTEBlock extends Monitor {
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
+        final Item item = playerIn.getHeldItemMainhand().getItem();
+        if (!(item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
             OpenSignalsMain.handler.invokeGui(MonitorTEBlock.class, playerIn, worldIn, pos,
                     "monitorTE");
             return true;
