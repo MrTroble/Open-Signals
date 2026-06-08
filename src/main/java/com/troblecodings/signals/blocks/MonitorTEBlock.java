@@ -45,7 +45,7 @@ public class MonitorTEBlock extends Monitor {
         final EnumFacing direction = state.getValue(FACING).rotateY();
         final Vec3i vec = direction.getDirectionVec();
         return FULL_BLOCK_AABB.expand(-vec.getX() * (tile.getMonitorSizeX() - 1),
-                tile.getMonitorSizeY() - 1, vec.getZ() * (tile.getMonitorSizeX() - 1));
+                tile.getMonitorSizeY() - 1, -vec.getZ() * (tile.getMonitorSizeX() - 1));
     }
 
     public void render(final RenderAnimationInfo info, final MonitorTileEntity tile,
@@ -96,6 +96,7 @@ public class MonitorTEBlock extends Monitor {
         drawInfo.alphaOff();
         drawInfo.blendOff();
         drawInfo.enableTexture();
+        drawInfo.depthOn();
         GlStateManager.enableLighting();
         drawInfo.pop();
     }

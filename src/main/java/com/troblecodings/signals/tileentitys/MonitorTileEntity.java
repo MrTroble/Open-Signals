@@ -202,12 +202,12 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     @Override
     public void onEntryUpdate(final SignalBoxNode node, final PathEntryType<?> entryType) {
+        final Point translated = getPointTranslated(node.getPoint());
+        if (translated == null)
+            return;
         if (entryType.equals(PathEntryType.TRAINNUMBER)) {
             node.iterator().forEachRemaining(modeSet -> {
                 if (!(modeSet.mode == EnumGuiMode.TRAIN_NUMBER))
-                    return;
-                final Point translated = getPointTranslated(node.getPoint());
-                if (translated == null)
                     return;
                 node.getOption(modeSet).ifPresent(option -> {
                     final TrainNumber number =
@@ -223,7 +223,6 @@ public class MonitorTileEntity extends SyncableTileEntity
         } else if (entryType.equals(PathEntryType.PATHUSAGE)) {
             node.toPathIdentifier().forEach(ident -> {
                 node.getOption(ident.getMode()).ifPresent(poe -> {
-                    final Point translated = getPointTranslated(node.getPoint());
                     rendering.setColor(translated, ident.getMode(),
                             poe.getEntry(PathEntryType.PATHUSAGE)
                                     .orElseGet(() -> EnumPathUsage.FREE)
