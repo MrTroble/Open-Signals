@@ -252,6 +252,7 @@ public class SignalBoxNetworkHandler {
         if (mode.equals(EntryNetworkMode.MODE_ADD) || mode.equals(EntryNetworkMode.MODE_REMOVE)) {
             node.applyModeNetworkChanges(ident.mode);
             node.post();
+            reader.onNodeUpdate(node);
             return;
         }
         final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES.get(buffer.getInt());
@@ -439,8 +440,9 @@ public class SignalBoxNetworkHandler {
         if (reader == null)
             return;
         final SignalBoxNetworkMode mode = SignalBoxNetworkMode.getModeFromBuffer(buffer);
-        if (allowedModes.contains(mode))
+        if (allowedModes.contains(mode)) {
             mode.executeRead(buffer, this);
+        }
     }
 
     protected void sendBuffer(final WriteBuffer buffer) {
