@@ -39,6 +39,8 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
             }
             return InteractionResult.sidedSuccess(worldIn.isClientSide);
         }
+        if (worldIn.isClientSide)
+            return InteractionResult.CONSUME;
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getMainHandItem());
         final int monitorID = wrapper.getInteger(ContainerMonitorSelection.MONITOR_TYPE_ID);
         final Monitor monitor = Monitor.MONITORS.get(monitorID);

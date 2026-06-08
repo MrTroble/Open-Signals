@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,8 +48,8 @@ public class SignalReader extends BasicBlock {
     @Override
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
-                .equals(OSItems.LINKING_TOOL)) {
+        final Item item = playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem();
+        if (!(item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
             OpenSignalsMain.handler.invokeGui(SignalReader.class, playerIn, worldIn, pos,
                     "signalreader");
             return InteractionResult.SUCCESS;

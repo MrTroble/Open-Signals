@@ -16,12 +16,12 @@ import net.minecraft.resources.ResourceLocation;
 
 public class UISignalBoxProfile {
 
-    public static final UISignalBoxProfile DEFAULT = getDefaultProfile();
+    public static UISignalBoxProfile DEFAULT = null;
     public static final Map<String, UISignalBoxProfile> NAME_FOR_PROFILE = new HashMap<>();
     public static final List<UISignalBoxProfile> UI_PROFILES = new ArrayList<>();
     private static final Gson GSON = new Gson();
 
-    private int id;
+    private transient int id;
     private String name;
     private String backgroundColor = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     private EditorModeSettings editorSettings = new EditorModeSettings();
@@ -29,6 +29,13 @@ public class UISignalBoxProfile {
     private TextureSettings textureSettings = new TextureSettings();
 
     public void initializeData() {
+        if (name.equals("default")) {
+            DEFAULT = this;
+        }
+        if (NAME_FOR_PROFILE.containsKey(name)) {
+            OpenSignalsMain.exitMinecraftWithMessage(
+                    "The UI Profile [" + name + "] already exists! Please rename a profile!");
+        }
         this.id = UI_PROFILES.size();
         UI_PROFILES.add(this);
         NAME_FOR_PROFILE.put(name, this);
@@ -83,16 +90,8 @@ public class UISignalBoxProfile {
     }
 
     public static void loadSignalBoxUIProfiles() {
-        DEFAULT.initializeData();
         OpenSignalsMain.contentPacks.getFiles("signalbox/profiles").forEach(entry -> GSON
                 .fromJson(entry.getValue(), UISignalBoxProfile.class).initializeData());
-    }
-
-    private static UISignalBoxProfile getDefaultProfile() {
-        final UISignalBoxProfile defaultProfile = new UISignalBoxProfile();
-        defaultProfile.name = "default";
-        defaultProfile.operationSettings.borderSettings.showLines = false;
-        return defaultProfile;
     }
 
     public static class EditorModeSettings {
