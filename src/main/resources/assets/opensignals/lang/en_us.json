@@ -144,7 +144,7 @@
 	"gui.controller.up.OFFSTATE.desc": "Loads the set profile when the Redstone input from §lUp§r is set to §lOff§r.",
 	"gui.controller.up.ONSTATE.desc": "Loads the set profile when the Redstone input from §lUp§r is set to §lOn§r.",
 	"gui.controller.north.OFFSTATE.desc": "Loads the set profile when the Redstone input from §lNorth§r is set to §lOff§r.",
-	"ui.controller.north.ONSTATE.desc": "Loads the set profile when the Redstone input from §lNorth§r is set to §lOn§r.",
+	"gui.controller.north.ONSTATE.desc": "Loads the set profile when the Redstone input from §lNorth§r is set to §lOn§r.",
 	"gui.controller.south.OFFSTATE.desc": "Loads the set profile when the Redstone input from §lSouth§r is set to §lOff§r.",
 	"gui.controller.south.ONSTATE.desc": "Loads the set profile when the Redstone input from §lSouth§r is set to §lOn§r.",
 	"gui.controller.west.OFFSTATE.desc": "Loads the set profile when the Redstone input from §lWest§r is set to §lOff§r.",
