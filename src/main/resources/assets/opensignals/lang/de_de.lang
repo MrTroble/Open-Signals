@@ -37,6 +37,8 @@ item.electricparts.name=Elektronische Teile
 item.multilinkingtool.name=Signal Multi Verlinker
 item.manipulator.name=Manipulator
 item.signalbridgeitem.name=Signalbrückenkonfigurator
+item.signalreader.name=Signal-Ausleser
+item.monitorselectionitem.name=Monitor Konfigurator
 
 # Blocks
 tile.hvsignalcontroller.name=Signalsteuerer
@@ -87,6 +89,8 @@ tile.hlsignalbridge.name=HL Brückensignal
 tile.semaphoresignalbridge.name=HV Form-Brückensignal
 tile.zs32.name=Zs3/Zs2
 tile.postconnectable.name=Verbindungsfähiger Mast
+tile.monitor.name=Monitor
+tile.signalreader.name=Signal-Ausleser
 
 # LinkingToolChatMessages
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
@@ -115,33 +119,40 @@ property.value.MANUELL=Manueller Modus
 property.value.SINGLE=Redstone Modus
 property.value.RS_INPUT=Redstone Eingang
 property.value.MUX=MUX Modus
-gui.unlink=Entlinken
+gui.controller.mode=Modus
+gui.controller.mode.desc=TODO
+gui.controller.profile=Profil
+gui.controller.add_profile=Neues Profil hinzufügen
+gui.controller.remove_profile=Aktuelles Profil löschen
 property.profile.name=Redstone Profil
 property.profile.desc=Hier kannst du verschiedene Redstone Profile speichern, die dann entsprechend der ausgewählten Seite des Signalsteuerer Blocks geladen werden können.
-property.profileOff.down.name=Unten Aus
-property.profileOn.down.name=Unten An
-property.profileOff.up.name=Oben Aus
-property.profileOn.up.name=Oben An
-property.profileOff.north.name=Norden Aus
-property.profileOn.north.name=Norden An
-property.profileOff.south.name=Süden Aus
-property.profileOn.south.name=Süden An
-property.profileOff.west.name=Westen Aus
-property.profileOn.west.name=Westen An
-property.profileOff.east.name=Osten Aus
-property.profileOn.east.name=Osten An
-property.profileOff.down.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lUnten§r auf §lAus§r gestellt wird.
-property.profileOn.down.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lUnten§r auf §lAn§r gestellt wird.
-property.profileOff.up.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOben§r auf §lAus§r gestellt wird.
-property.profileOn.up.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOben§r auf §lAn§r gestellt wird.
-property.profileOff.north.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lNorden§r auf §lAus§r gestellt wird.
-property.profileOn.north.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lNorden§r auf §lAn§r gestellt wird.
-property.profileOff.south.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lSüden§r auf §lAus§r gestellt wird.
-property.profileOn.south.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lSüden§r auf §lAn§r gestellt wird.
-property.profileOff.west.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lWesten§r auf §lAus§r gestellt wird.
-property.profileOn.west.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lWesten§r auf §lAn§r gestellt wird.
-property.profileOff.east.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAus§r gestellt wird.
-property.profileOn.east.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAn§r gestellt wird.
+gui.controller.down.OFFSTATE.name=Unten Aus
+gui.controller.down.ONSTATE.name=Unten An
+gui.controller.up.OFFSTATE.name=Oben Aus
+gui.controller.up.ONSTATE.name=Oben An
+gui.controller.north.OFFSTATE.name=Norden Aus
+gui.controller.north.ONSTATE.name=Norden An
+gui.controller.south.OFFSTATE.name=Süden Aus
+gui.controller.south.ONSTATE.name=Süden An
+gui.controller.west.OFFSTATE.name=Westen Aus
+gui.controller.west.ONSTATE.name=Westen An
+gui.controller.east.OFFSTATE.name=Osten Aus
+gui.controller.east.ONSTATE.name=Osten An
+gui.controller.down.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lUnten§r auf §lAus§r gestellt wird.
+gui.controller.down.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lUnten§r auf §lAn§r gestellt wird.
+gui.controller.up.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOben§r auf §lAus§r gestellt wird.
+gui.controller.up.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOben§r auf §lAn§r gestellt wird.
+gui.controller.north.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lNorden§r auf §lAus§r gestellt wird.
+gui.controller.north.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lNorden§r auf §lAn§r gestellt wird.
+gui.controller.south.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lSüden§r auf §lAus§r gestellt wird.
+gui.controller.south.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lSüden§r auf §lAn§r gestellt wird.
+gui.controller.west.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lWesten§r auf §lAus§r gestellt wird.
+gui.controller.west.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lWesten§r auf §lAn§r gestellt wird.
+gui.controller.east.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAus§r gestellt wird.
+gui.controller.east.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAn§r gestellt wird.
+gui.controller.not_linked=Nicht verlinkt!
+gui.controller.unlink=Entlinken
+gui.controller.unlink.desc=TODO
 
 # TrainNumberBlockGUI
 gui.trainnumber.info.select_point=Wähle ein Fahrstraßenelement für die Zugnummer aus
@@ -179,6 +190,9 @@ error.subsidiary_enabled=Eingeschaltetes ZS Signal
 error.pass=Erfolg
 
 # SignalboxLinkingPage
+property.ui_profiles.name=Stellwerks-Design
+property.ui_profiles.desc=Hier kannst du das Aussehen des Stellwerks ändern.
+gui.signalbox.profile.default=Standard
 property.showtypes.name=Sortierung
 property.showtypes.desc=Hier kannst du den Sortierungsfilter umstellen.
 property.value.ALL=Alle
@@ -320,6 +334,7 @@ property.ZS3=Zs3/Zs2
 property.TRAIN_NUMBER=Zugnummernfeld
 btn.connect.trainnumber=Zugnummernfeld verbinden
 property.CROSSING=Kreuzungselement
+gui.signalbox.return=Back
 
 # SignalbridgeGUI
 gui.signalbridge.edit=Bearbeiten
@@ -348,6 +363,19 @@ gui.signalbridge.namenotvalid=Name ungültig!
 btn.return=Zurück
 signalbridge.nostartblock=Keinen Basisblock ausgewählt! Bitte wähle einen Basisblock mit Shift+Rechtsklick im Editorfeld aus.
 gui.signalbridge.collision=Du kannst die Signalbrücke nicht platzieren, da ein Block im Weg ist.
+
+# MonitorUI
+property.monitor_selection.name=Aussehen
+property.monitor_selection.disc=Hier kannst du das Aussehen des Monitorblock ändern.
+gui.monitor.x_size=Breite
+gui.monitor.y_size=Höhe
+gui.monitor.new_section=Neue Auswahl
+gui.monitor.current_ratio=Aktuelle Auflösung
+gui.monitor.monitor_ratio=Monitor Auflösung
+
+# SignalReaderUI
+gui.signalreader.and=UND
+gui.signalreader.or=ODER
 
 # GeneralUI
 label.linkedto=Verlinkt mit
@@ -669,15 +697,3 @@ property.value.DISTANT_LEFT=Vorsignal links
 property.value.DISTANT_RIGHT=Vorsignal rechts
 property.value.GSMR=GSMR Tafel
 property.value.ZP9_LINE=Zp9 Strich
-info.key.removeother=Andere entfernen?
-info.train_number=Zugnummernfeld
-property.TRAIN_NUMBER=Zugnummernfeld
-btn.connect.trainnumber=Zugnummernfeld verbinden
-gui.tile.notvalid=Nicht erlaubt
-property.SHUNTING=Rangieren
-gui.signalbox.choosetypes=Wähle Fahrstraßentyp
-property.mode_select.name=Wähle Streckenelement
-info.crossing=Kreuzungselement
-property.zs6_state.name=Zs6
-property.zs6_state.desc=Hier kann ausgewählt werden, ob die Fahrstraße ins Gegengleis führt.
-sb.highlight=Clicken um Verlinktes Signal zu markieren

@@ -1,1 +1,1 @@
-{"variants": {"": {"model": "opensignals:block/signalreader"}}}
+{"variants": {"normal": {"model": "opensignals:signalreader"}}}

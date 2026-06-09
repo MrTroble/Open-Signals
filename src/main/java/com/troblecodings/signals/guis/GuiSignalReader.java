@@ -298,7 +298,7 @@ public class GuiSignalReader extends GuiBase {
         labelEntity.setScale(1.5f);
 
         final UILabel label = new UILabel(
-                I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalreader") + "; Name: "
+                I18Wrapper.format("tile.signalreader.name") + "; Name: "
                         + ClientNameHandler.getClientName(new StateInfo(mc.world, container.pos))
                                 .replace("[n]", " "));
         label.setCenterX(false);

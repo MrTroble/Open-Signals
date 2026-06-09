@@ -62,7 +62,7 @@ public class GuiMonitor extends GuiBase {
         boxEntity.add(mouseUpdate);
 
         upperEntity.add(GuiElements
-                .createLabel(I18Wrapper.format("block." + OpenSignalsMain.MODID + ".monitor")));
+                .createLabel(I18Wrapper.format("tile.monitor.name")));
         upperEntity.add(
                 GuiElements.createButton(I18Wrapper.format("gui.monitor.new_section"), 70, e -> {
                     box.rendering.clearColoredPoints();

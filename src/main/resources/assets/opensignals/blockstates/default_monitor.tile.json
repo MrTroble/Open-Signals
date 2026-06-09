@@ -1,86 +1,90 @@
 {
+    "forge_marker": 1,
+    "defaults": {
+        "model": "opensignals:monitor/monitor"
+    },
     "variants": {
-        "left=false,right=false,up=false,down=false,facing=north": { "model": "opensignals:block/monitor/monitor" },
-        "left=true,right=false,up=false,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_single270" },
-        "left=false,right=true,up=false,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_single90" },
-        "left=true,right=true,up=false,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_opposite90" },
+        "down=false,facing=north,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor" },
+        "down=false,facing=north,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_single270" },
+        "down=false,facing=north,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_single90" },
+        "down=false,facing=north,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_opposite90" },
 
-        "left=false,right=false,up=true,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_single0" },
-        "left=true,right=false,up=true,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_corner270" },
-        "left=false,right=true,up=true,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_corner0" },
-        "left=true,right=true,up=true,down=false,facing=north": { "model": "opensignals:block/monitor/monitor_side0" },
+        "down=false,facing=north,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_single0" },
+        "down=false,facing=north,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_corner270" },
+        "down=false,facing=north,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_corner0" },
+        "down=false,facing=north,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_side0" },
 
-        "left=false,right=false,up=false,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_single180" },
-        "left=true,right=false,up=false,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_corner180" },
-        "left=false,right=true,up=false,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_corner90" },
-        "left=true,right=true,up=false,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_side180" },
+        "down=true,facing=north,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor_single180" },
+        "down=true,facing=north,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_corner180" },
+        "down=true,facing=north,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_corner90" },
+        "down=true,facing=north,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_side180" },
 
-        "left=false,right=false,up=true,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_opposite0" },
-        "left=true,right=false,up=true,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_side270" },
-        "left=false,right=true,up=true,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_side90" },
-        "left=true,right=true,up=true,down=true,facing=north": { "model": "opensignals:block/monitor/monitor_full" },
-
-
-        "left=false,right=false,up=false,down=false,facing=east": { "model": "opensignals:block/monitor/monitor", "y": 90 },
-        "left=true,right=false,up=false,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_single270", "y": 90 },
-        "left=false,right=true,up=false,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_single90", "y": 90 },
-        "left=true,right=true,up=false,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_opposite90", "y": 90 },
-
-        "left=false,right=false,up=true,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_single0", "y": 90 },
-        "left=true,right=false,up=true,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_corner270", "y": 90 },
-        "left=false,right=true,up=true,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_corner0", "y": 90 },
-        "left=true,right=true,up=true,down=false,facing=east": { "model": "opensignals:block/monitor/monitor_side0", "y": 90 },
-
-        "left=false,right=false,up=false,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_single180", "y": 90 },
-        "left=true,right=false,up=false,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_corner180", "y": 90 },
-        "left=false,right=true,up=false,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_corner90", "y": 90 },
-        "left=true,right=true,up=false,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_side180", "y": 90 },
-
-        "left=false,right=false,up=true,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_opposite0", "y": 90 },
-        "left=true,right=false,up=true,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_side270", "y": 90 },
-        "left=false,right=true,up=true,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_side90", "y": 90 },
-        "left=true,right=true,up=true,down=true,facing=east": { "model": "opensignals:block/monitor/monitor_full", "y": 90 },
+        "down=true,facing=north,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_opposite0" },
+        "down=true,facing=north,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_side270" },
+        "down=true,facing=north,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_side90" },
+        "down=true,facing=north,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_full" },
 
 
-        "left=false,right=false,up=false,down=false,facing=south": { "model": "opensignals:block/monitor/monitor", "y": 180 },
-        "left=true,right=false,up=false,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_single270", "y": 180 },
-        "left=false,right=true,up=false,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_single90", "y": 180 },
-        "left=true,right=true,up=false,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_opposite90", "y": 180 },
+        "down=false,facing=east,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor", "y": 90 },
+        "down=false,facing=east,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_single270", "y": 90 },
+        "down=false,facing=east,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_single90", "y": 90 },
+        "down=false,facing=east,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_opposite90", "y": 90 },
 
-        "left=false,right=false,up=true,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_single0", "y": 180 },
-        "left=true,right=false,up=true,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_corner270", "y": 180 },
-        "left=false,right=true,up=true,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_corner0", "y": 180 },
-        "left=true,right=true,up=true,down=false,facing=south": { "model": "opensignals:block/monitor/monitor_side0", "y": 180 },
+        "down=false,facing=east,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_single0", "y": 90 },
+        "down=false,facing=east,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_corner270", "y": 90 },
+        "down=false,facing=east,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_corner0", "y": 90 },
+        "down=false,facing=east,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_side0", "y": 90 },
 
-        "left=false,right=false,up=false,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_single180", "y": 180 },
-        "left=true,right=false,up=false,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_corner180", "y": 180 },
-        "left=false,right=true,up=false,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_corner90", "y": 180 },
-        "left=true,right=true,up=false,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_side180", "y": 180 },
+        "down=true,facing=east,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor_single180", "y": 90 },
+        "down=true,facing=east,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_corner180", "y": 90 },
+        "down=true,facing=east,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_corner90", "y": 90 },
+        "down=true,facing=east,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_side180", "y": 90 },
 
-        "left=false,right=false,up=true,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_opposite0", "y": 180 },
-        "left=true,right=false,up=true,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_side270", "y": 180 },
-        "left=false,right=true,up=true,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_side90", "y": 180 },
-        "left=true,right=true,up=true,down=true,facing=south": { "model": "opensignals:block/monitor/monitor_full", "y": 180 },
+        "down=true,facing=east,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_opposite0", "y": 90 },
+        "down=true,facing=east,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_side270", "y": 90 },
+        "down=true,facing=east,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_side90", "y": 90 },
+        "down=true,facing=east,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_full", "y": 90 },
 
 
-        "left=false,right=false,up=false,down=false,facing=west": { "model": "opensignals:block/monitor/monitor", "y": 270 },
-        "left=true,right=false,up=false,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_single270", "y": 270 },
-        "left=false,right=true,up=false,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_single90", "y": 270 },
-        "left=true,right=true,up=false,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_opposite90", "y": 270 },
+        "down=false,facing=south,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor", "y": 180 },
+        "down=false,facing=south,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_single270", "y": 180 },
+        "down=false,facing=south,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_single90", "y": 180 },
+        "down=false,facing=south,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_opposite90", "y": 180 },
 
-        "left=false,right=false,up=true,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_single0", "y": 270 },
-        "left=true,right=false,up=true,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_corner270", "y": 270 },
-        "left=false,right=true,up=true,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_corner0", "y": 270 },
-        "left=true,right=true,up=true,down=false,facing=west": { "model": "opensignals:block/monitor/monitor_side0", "y": 270 },
+        "down=false,facing=south,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_single0", "y": 180 },
+        "down=false,facing=south,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_corner270", "y": 180 },
+        "down=false,facing=south,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_corner0", "y": 180 },
+        "down=false,facing=south,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_side0", "y": 180 },
 
-        "left=false,right=false,up=false,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_single180", "y": 270 },
-        "left=true,right=false,up=false,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_corner180", "y": 270 },
-        "left=false,right=true,up=false,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_corner90", "y": 270 },
-        "left=true,right=true,up=false,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_side180", "y": 270 },
+        "down=true,facing=south,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor_single180", "y": 180 },
+        "down=true,facing=south,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_corner180", "y": 180 },
+        "down=true,facing=south,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_corner90", "y": 180 },
+        "down=true,facing=south,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_side180", "y": 180 },
 
-        "left=false,right=false,up=true,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_opposite0", "y": 270 },
-        "left=true,right=false,up=true,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_side270", "y": 270 },
-        "left=false,right=true,up=true,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_side90", "y": 270 },
-        "left=true,right=true,up=true,down=true,facing=west": { "model": "opensignals:block/monitor/monitor_full", "y": 270 }
+        "down=true,facing=south,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_opposite0", "y": 180 },
+        "down=true,facing=south,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_side270", "y": 180 },
+        "down=true,facing=south,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_side90", "y": 180 },
+        "down=true,facing=south,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_full", "y": 180 },
+
+
+        "down=false,facing=west,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor", "y": 270 },
+        "down=false,facing=west,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_single270", "y": 270 },
+        "down=false,facing=west,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_single90", "y": 270 },
+        "down=false,facing=west,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_opposite90", "y": 270 },
+
+        "down=false,facing=west,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_single0", "y": 270 },
+        "down=false,facing=west,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_corner270", "y": 270 },
+        "down=false,facing=west,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_corner0", "y": 270 },
+        "down=false,facing=west,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_side0", "y": 270 },
+
+        "down=true,facing=west,left=false,right=false,up=false": { "model": "opensignals:monitor/monitor_single180", "y": 270 },
+        "down=true,facing=west,left=true,right=false,up=false": { "model": "opensignals:monitor/monitor_corner180", "y": 270 },
+        "down=true,facing=west,left=false,right=true,up=false": { "model": "opensignals:monitor/monitor_corner90", "y": 270 },
+        "down=true,facing=west,left=true,right=true,up=false": { "model": "opensignals:monitor/monitor_side180", "y": 270 },
+
+        "down=true,facing=west,left=false,right=false,up=true": { "model": "opensignals:monitor/monitor_opposite0", "y": 270 },
+        "down=true,facing=west,left=true,right=false,up=true": { "model": "opensignals:monitor/monitor_side270", "y": 270 },
+        "down=true,facing=west,left=false,right=true,up=true": { "model": "opensignals:monitor/monitor_side90", "y": 270 },
+        "down=true,facing=west,left=true,right=true,up=true": { "model": "opensignals:monitor/monitor_full", "y": 270 }
     }
 }
