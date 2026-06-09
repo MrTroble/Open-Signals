@@ -57,7 +57,7 @@ public class MonitorTEBlock extends Monitor {
         final float renderSizeY = tile.getRenderEnd().getY() - tile.getRenderStart().getY() + 1f;
 
         final float insets = getMonitorProperties().getInsets();
-        final float colorInsets = insets / STEPS_PER_BLOCK;
+        final float colorInsets = (insets - 6) / STEPS_PER_BLOCK;
 
         final DrawInfo drawInfo = new DrawInfo(0, 0, info.tick);
         drawInfo.push();
