@@ -20,7 +20,6 @@ import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.GuiSignalReader;
 import com.troblecodings.signals.guis.GuiTrainNumber;
 import com.troblecodings.signals.guis.NamableGui;
-import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.ClientMonitorNetworkHandler;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientRenderUpdate;
@@ -69,7 +68,5 @@ public class ClientProxy extends CommonProxy {
                 new MonitorSpecialRenderer());
         MinecraftForge.EVENT_BUS.register(OSModels.class);
         MinecraftForge.EVENT_BUS.register(ClientRenderUpdate.INSTANCE);
-
-        UISignalBoxProfile.loadSignalBoxUIProfiles();
     }
 }

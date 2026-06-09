@@ -90,16 +90,8 @@ public class UISignalBoxProfile {
     }
 
     public static void loadSignalBoxUIProfiles() {
-        // DEFAULT.initializeData();
         OpenSignalsMain.contentPacks.getFiles("signalbox/profiles").forEach(entry -> GSON
                 .fromJson(entry.getValue(), UISignalBoxProfile.class).initializeData());
-    }
-
-    private static UISignalBoxProfile getDefaultProfile() {
-        final UISignalBoxProfile defaultProfile = new UISignalBoxProfile();
-        defaultProfile.name = "default";
-        defaultProfile.operationSettings.borderSettings.showLines = false;
-        return defaultProfile;
     }
 
     public static class EditorModeSettings {
