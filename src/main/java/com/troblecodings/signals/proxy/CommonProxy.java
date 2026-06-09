@@ -49,7 +49,6 @@ public class CommonProxy {
         NameHandler.init();
         MonitorNetworkHandler.init();
         OSSounds.init();
-        OSBlocks.init();
         UISignalBoxProfile.loadSignalBoxUIProfiles();
 
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
