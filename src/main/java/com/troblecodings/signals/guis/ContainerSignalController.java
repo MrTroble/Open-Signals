@@ -192,7 +192,7 @@ public class ContainerSignalController extends ContainerBase
             case SET_PROFILE: {
                 final EnumFacing direction = buffer.getEnumValue(EnumFacing.class);
                 final EnumState state = buffer.getEnumValue(EnumState.class);
-                final int profile = buffer.getByteToUnsignedInt();
+                final int profile = buffer.getInt();
                 if (profile == -1) {
                     controllerEntity.removeProfileFromDirection(direction, state);
                 } else {
@@ -234,7 +234,7 @@ public class ContainerSignalController extends ContainerBase
         buffer.putEnumValue(SignalControllerNetwork.SET_PROFILE);
         buffer.putEnumValue(facing);
         buffer.putEnumValue(state);
-        buffer.putByte((byte) profile);
+        buffer.putInt(profile);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
