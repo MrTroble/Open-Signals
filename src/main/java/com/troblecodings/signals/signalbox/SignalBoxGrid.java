@@ -311,7 +311,9 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                     return nodeTag;
                 })::iterator);
         tag.putInteger(SUBSIDIARY_COUNTER, counter);
-        tag.putString(SIGNALBOX_UI_PROFILE, uiProfile.getName());
+        if (!UISignalBoxProfile.DEFAULT.equals(uiProfile)) {
+            tag.putString(SIGNALBOX_UI_PROFILE, uiProfile.getName());
+        }
     }
 
     public void writePathways(final NBTWrapper tag) {

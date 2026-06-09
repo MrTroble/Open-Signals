@@ -30,6 +30,7 @@ import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.ContainerSignalReader;
 import com.troblecodings.signals.guis.ContainerTrainNumber;
 import com.troblecodings.signals.guis.NamableContainer;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -48,6 +49,8 @@ public class CommonProxy {
         NameHandler.init();
         MonitorNetworkHandler.init();
         OSSounds.init();
+        OSBlocks.init();
+        UISignalBoxProfile.loadSignalBoxUIProfiles();
 
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
