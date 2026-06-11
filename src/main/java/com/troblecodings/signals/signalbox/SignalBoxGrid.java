@@ -93,6 +93,10 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public boolean resetPathway(final Point p1) {
+        return resetPathway(p1, false);
+    }
+
+    public boolean resetPathway(final Point p1, final boolean manuellReset) {
         if (startsToPath.isEmpty())
             return false;
         final SignalBoxPathway pathway = startsToPath.get(p1);
@@ -104,7 +108,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             OpenSignalsMain.getLogger().warn("No Pathway to reset on [" + p1 + "]!");
             return false;
         }
-        resetPathway(pathway);
+        resetPathway(pathway, manuellReset);
         tryNextPathways();
         return true;
     }
@@ -117,7 +121,11 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {
-        pathway.resetPathway();
+        resetPathway(pathway, false);
+    }
+
+    protected void resetPathway(final SignalBoxPathway pathway, final boolean manuellReset) {
+        pathway.resetPathway(manuellReset);
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
@@ -188,7 +196,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     }
 
     public void resetAllPathways() {
-        ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
+        ImmutableSet.copyOf(this.startsToPath.values()).forEach(pw -> resetPathway(pw, true));
         clearPaths();
     }
 
@@ -355,8 +363,8 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             });
         });
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
-        uiProfile = UISignalBoxProfile.NAME_FOR_PROFILE
-                .getOrDefault(tag.getString(SIGNALBOX_UI_PROFILE), UISignalBoxProfile.defaultProfile);
+        uiProfile = UISignalBoxProfile.NAME_FOR_PROFILE.getOrDefault(
+                tag.getString(SIGNALBOX_UI_PROFILE), UISignalBoxProfile.defaultProfile);
     }
 
     public void readPathways(final NBTWrapper tag) {

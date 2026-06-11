@@ -1,7 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.Maps;
@@ -158,10 +157,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     public void resetAllSignals() {
         super.resetAllSignals();
         if (pathwayToReset != null) {
-            pathwayToReset.loadTileAndExecute(otherTile -> {
-                final SignalBoxGrid otherGrid = otherTile.getSignalBoxGrid();
-                Optional.of(otherGrid.getPathwayByLastPoint(pathwayToReset.getLastPoint()))
-                        .ifPresent(pw -> pw.resetAllSignals());
+            pathwayToReset.loadTileAndExecute(tile -> {
+                final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
+                pathwayToReset = (InterSignalBoxPathway) otherGrid
+                        .getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                if (pathwayToReset == null)
+                    return;
+                pathwayToReset.updatePathwaySignals();
+                pathwayToReset.updatePrevious();
             });
         }
     }
@@ -197,9 +200,9 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     }
 
     @Override
-    public void resetPathway(final Point point) {
-        super.resetPathway(point);
-        if (data.totalPathwayReset(point) && pathwayToReset != null) {
+    public void resetPathway(final Point point, final boolean manuellReset) {
+        super.resetPathway(point, manuellReset);
+        if (!manuellReset && data.totalPathwayReset(point) && pathwayToReset != null) {
             pathwayToReset.loadTileAndExecute(tile -> {
                 final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
                 final SignalBoxPathway pw =

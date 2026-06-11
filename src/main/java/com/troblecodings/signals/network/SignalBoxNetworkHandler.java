@@ -356,7 +356,7 @@ public class SignalBoxNetworkHandler {
         final SignalBoxGrid grid = getGrid();
         final SignalBoxPathway pw = grid.getPathwayByStartPoint(p1);
         final boolean isShuntingPath = pw != null ? pw.isShuntingPath() : false;
-        if (grid.resetPathway(p1) && !isShuntingPath) {
+        if (grid.resetPathway(p1, true) && !isShuntingPath) {
             grid.count();
         }
     }
