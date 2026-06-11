@@ -7,7 +7,7 @@ import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.MonitorBlockProperties;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -29,7 +29,7 @@ public class Monitor extends BasicBlock {
 
     public static final List<Monitor> MONITORS = new ArrayList<>();
 
-    public static final PropertyDirection FACING = BlockDirectional.FACING;
+    public static final PropertyDirection FACING = BlockHorizontal.FACING;
     public static final PropertyBool LEFT = PropertyBool.create("left");
     public static final PropertyBool RIGHT = PropertyBool.create("right");
     public static final PropertyBool UP = PropertyBool.create("up");
