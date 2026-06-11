@@ -1,10 +1,10 @@
 package com.troblecodings.signals.handler;
 
 import java.util.Calendar;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -25,9 +25,9 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
 
     @Override
     public void deserializeClient(final ReadBuffer buf) {
-        final Minecraft mc = Minecraft.getMinecraft();
+        final Minecraft mc = Minecraft.getInstance();
         mc.doRunTask(() -> {
-            final World world = mc.world;
+            final Level world = mc.level;
             final BlockPos pos = buf.getBlockPos();
             final long startTime = Calendar.getInstance().getTimeInMillis();
             SERVICE.execute(() -> {
@@ -37,7 +37,7 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
                     if (currentTime - startTime >= 5000) {
                         updates.put(new StateInfo(world, pos), buf);
                         return;
-                    }                 
+                    }
                     continue;
                 }
                 if (!(entity instanceof MonitorTileEntity))
@@ -60,7 +60,7 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
     }
 
     public static void loadUpdate(final MonitorTileEntity tile) {
-        final ReadBuffer buf = updates.remove(new StateInfo(tile.getWorld(), tile.getPos()));
+        final ReadBuffer buf = updates.remove(new StateInfo(tile.getLevel(), tile.getBlockPos()));
         if (buf != null) {
             executeUpdate(tile, buf);
         }

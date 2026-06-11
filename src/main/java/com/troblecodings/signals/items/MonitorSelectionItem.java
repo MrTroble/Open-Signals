@@ -73,7 +73,7 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
         for (final BlockPos pos : allMonitorPos) {
             worldIn.setBlock(pos, monitor.getStateForPlacement(placeContext), 3);
         }
-        MonitorNetworkHandler.sendTileData(tile, worldIn.playerEntities);
+        MonitorNetworkHandler.sendTileData(tile, worldIn.players());
         return InteractionResult.SUCCESS;
     }
 

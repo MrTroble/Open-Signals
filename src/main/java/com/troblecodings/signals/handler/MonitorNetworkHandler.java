@@ -132,7 +132,7 @@ public final class MonitorNetworkHandler {
     public static void sendTileData(final MonitorTileEntity tile,
             final List<? extends Player> list) {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putBlockPos(tile.getPos());
+        buffer.putBlockPos(tile.getBlockPos());
         buffer.putByte(NETWORK_TILE_DATA);
         buffer.putInt(tile.getMonitorSizeX());
         buffer.putInt(tile.getMonitorSizeY());
@@ -148,14 +148,15 @@ public final class MonitorNetworkHandler {
         final SignalBoxNetworkListener listener =
                 new SignalBoxNetworkListener(tile.getStateInfo(), b -> {
                     final WriteBuffer buffer = new WriteBuffer();
-                    buffer.putBlockPos(tile.getPos());
+                    buffer.putBlockPos(tile.getBlockPos());
                     buffer.putByte(NETWORK_UPDATE);
                     buffer.putBuffer(b);
-                    if (player != null)
+                    if (player != null) {
                         sendTo(player, buffer.getBuildedBuffer());
-                    else
+                    } else {
                         tile.getLevel().players()
                                 .forEach(p -> sendTo(p, buffer.getBuildedBuffer()));
+                    }
                 });
         network.sendAllTo(tile, listener);
     }
@@ -163,7 +164,7 @@ public final class MonitorNetworkHandler {
     private static void sendGridUpdate(final MonitorTileEntity tile,
             final WriteBuffer networkBuffer) {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putBlockPos(tile.getPos());
+        buffer.putBlockPos(tile.getBlockPos());
         buffer.putByte(NETWORK_UPDATE);
         buffer.putBuffer(networkBuffer);
         tile.getLevel().players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));

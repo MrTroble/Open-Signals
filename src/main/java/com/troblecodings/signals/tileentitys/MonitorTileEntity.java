@@ -130,7 +130,7 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     @Override
     public void onLoad() {
-        if (world.isRemote) {
+        if (level.isClientSide) {
             ClientMonitorNetworkHandler.loadUpdate(this);
         }
     }
@@ -147,6 +147,8 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     public void loadRenderPoints(final ReadBuffer buffer) {
+        monitorSizeX = buffer.getInt();
+        monitorSizeY = buffer.getInt();
         renderStart = buffer.getINetworkSaveable(Point.class);
         renderEnd = buffer.getINetworkSaveable(Point.class);
         initRendering();
