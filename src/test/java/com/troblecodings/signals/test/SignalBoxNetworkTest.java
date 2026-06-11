@@ -52,7 +52,6 @@ public class SignalBoxNetworkTest {
 
     @Test
     public void testAddAndRemoveMode() {
-        System.out.println("Started addRemoveMode test for SignalBox!");
         final Map<Point, ModeSet> modes = new HashMap<>();
         for (int i = 0; i < 500; i++) {
             Point point = getRandPoint();
@@ -68,23 +67,19 @@ public class SignalBoxNetworkTest {
             handler.sendModeRemove(new ModeIdentifier(point, mode));
             assertTrue(!grid.getNode(point).getModes().keySet().contains(mode));
         });
-        System.out.println("Finished addRemoveMode test for SignalBox!");
     }
 
     @Test
     public void testCounter() {
-        System.out.println("Started counter test for SignalBox!");
         final int counter = RANDOM.nextInt(0, 1000);
         grid.setCounter(counter);
         handler.sendCounter();
         assertEquals(counter, grid.getCurrentCounter());
-        System.out.println("Finished counter test for SignalBox!");
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public <T> void testAddAndRemoveEntry() {
-        System.out.println("Started addRemoveEntry test for SignalBox!");
         final Map<ModeIdentifier, Map.Entry<PathOptionEntry, PathEntryType<?>>> entries =
                 new HashMap<>();
         for (int i = 0; i < 500; i++) {
@@ -108,12 +103,10 @@ public class SignalBoxNetworkTest {
             assertTrue(!grid.getNode(modeIdent.point).getOption(modeIdent.mode).get()
                     .equals(entry.getKey()));
         });
-        System.out.println("Finished addRemoveEntry test for SignalBox!");
     }
 
     @Test
     public void testNodeLabel() {
-        System.out.println("Started nodeLabel test for SignalBox!");
         final Map<Point, String> labels = new HashMap<>();
         for (int i = 0; i < 500; i++) {
             Point point = getRandPoint();
@@ -127,12 +120,10 @@ public class SignalBoxNetworkTest {
         }
         labels.forEach(
                 (point, label) -> assertTrue(grid.getNode(point).getCustomText().equals(label)));
-        System.out.println("Finished nodeLabel test for SignalBox!");
     }
 
     @Test
     public void testAutoPoint() {
-        System.out.println("Started autoPoint test for SignalBox!");
         final List<Point> points = new ArrayList<>();
         for (int i = 0; i < 500; i++) {
             Point point = getRandPoint();
@@ -145,12 +136,10 @@ public class SignalBoxNetworkTest {
             points.add(point);
         }
         points.forEach(point -> assertTrue(grid.getNode(point).isAutoPoint()));
-        System.out.println("Finished autoPoint test for SignalBox!");
     }
 
     @Test
     public void testManuellOutput() {
-        System.out.println("Started manuellOutput test for SignalBox!");
         final List<ModeIdentifier> points = new ArrayList<>();
         for (int i = 0; i < 500; i++) {
             Point point = getRandPoint();
@@ -168,7 +157,6 @@ public class SignalBoxNetworkTest {
             handler.sendManuellOutputRemove(ident.point, ident.mode);
             assertTrue(!grid.getNode(ident.point).containsManuellOutput(ident.mode));
         });
-        System.out.println("Finished manuellOutput test for SignalBox!");
     }
 
     private Point getRandPoint() {

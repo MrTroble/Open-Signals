@@ -55,7 +55,6 @@ public class NameFileTestV2 {
 
     @Test
     public void testWriteAndRead() {
-        System.out.println("Startet ReadAndWrite test for NameFile!");
         final BlockPos pos = StateFileTestV2.getRandomBlockPos();
         final String name = "wdasdfdgsddfwadsdf";
         final NameHandlerFileV2 file = new NameHandlerFileV2(path);
@@ -74,12 +73,10 @@ public class NameFileTestV2 {
         assertEquals(name, nameInFile2);
 
         assertEquals(statePos2, file.find(pos));
-        System.out.println("Finished ReadAndWrite test for NameFile!");
     }
 
     @Test
     public void testException() {
-        System.out.println("Started Exception test for NameFile!");
         final NameHandlerFileV2 file = new NameHandlerFileV2(path);
         String str = "";
         for (int i = 0; i < 129; i++) {
@@ -88,12 +85,10 @@ public class NameFileTestV2 {
         final String s = str;
         assertThrowsExactly(IllegalArgumentException.class,
                 () -> file.createState(StateFileTestV2.getRandomBlockPos(), s));
-        System.out.println("Finished Exception test for NameFile!");
     }
 
     @Test
     public void moreThanPossible() {
-        System.out.println("Started moreThanPossible test for NameFile!");
         final NameHandlerFileV2 file = new NameHandlerFileV2(path);
         final Map<BlockPos, String> allNames = new HashMap<>();
         final List<Map.Entry<BlockPos, SignalStatePosV2>> listOfPos = new ArrayList<>();
@@ -110,6 +105,5 @@ public class NameFileTestV2 {
             assertEquals(entry.getValue(), file.find(entry.getKey()));
             assertEquals(allNames.get(entry.getKey()), file.getString(entry.getValue()));
         }
-        System.out.println("Finished moreThanPossible test for NameFile!");
     }
 }

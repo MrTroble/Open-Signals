@@ -68,19 +68,16 @@ public class StateFileTestV2 {
 
     @Test
     public void serializeAndDeserializePos() {
-        System.out.println("Started serializeDeserialize test for SignalStateFile!");
         for (int i = 0; i < 1000; i++) {
             final BlockPos pos = getRandomBlockPos();
             final ChunkPos chunk = new ChunkPos(pos);
             final byte[] array = SignalStateFileV2.getChunkPosFromPos(chunk, pos);
             assertEquals(pos, SignalStateFileV2.getPosFromChunkPos(chunk, array));
         }
-        System.out.println("Finished serializeDeserialize test for SignalStateFile!");
     }
 
     @Test
     public void creationAndAddition() {
-        System.out.println("Started creationAddition test for SignalStateFile!");
         final SignalStateFileV2 file = new SignalStateFileV2(path);
         final BlockPos firstcreate = getRandomBlockPos();
         final SignalStatePosV2 createPos = file.create(firstcreate);
@@ -95,12 +92,10 @@ public class StateFileTestV2 {
         final SignalStatePosV2 position2 = file2.find(firstcreate);
         assertNotNull(position2);
         assertEquals(position2, createPos);
-        System.out.println("Finished creationAddition test for SignalStateFile!");
     }
 
     @Test
     public void readAndWrite() {
-        System.out.println("Started readWrite test for SignalStateFile!");
         final SignalStateFileV2 file = new SignalStateFileV2(path);
 
         final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
@@ -112,12 +107,10 @@ public class StateFileTestV2 {
         final ByteBuffer outbuffer = file.read(positionInFile);
 
         assertArrayEquals(buffer.array(), outbuffer.array());
-        System.out.println("Finished readWrite test for SignalStateFile!");
     }
 
     @Test
     public void moreThenPossible() {
-        System.out.println("Started moreThenPossible test for SignalStateFile!");
         final SignalStateFileV2 file = new SignalStateFileV2(path);
         final List<Map.Entry<BlockPos, SignalStatePosV2>> listOfPos = new ArrayList<>();
         final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
@@ -135,12 +128,10 @@ public class StateFileTestV2 {
             assertEquals(buffer, file.read(findPos));
             assertEquals(entry.getValue(), findPos);
         }
-        System.out.println("Finished moreThenPossible test for SignalStateFile!");
     }
 
     @Test
     public void readAndWriteCritical() {
-        System.out.println("Started readWriteCritical test for SignalStateFile!");
         final SignalStateFileV2 file = new SignalStateFileV2(path);
 
         final BlockPos firstcreate = getRandomBlockPos();
@@ -160,12 +151,10 @@ public class StateFileTestV2 {
 
         final ByteBuffer outbuffer2 = file.read(secondpositionInFile);
         assertArrayEquals(buffer.array(), outbuffer2.array());
-        System.out.println("Finished readWriteCritical test for SignalStateFile!");
     }
 
     @Test
     public void testDelete() {
-        System.out.println("Started Delete test for SignalStateFile!");
         final SignalStateFileV2 file = new SignalStateFileV2(path);
         final BlockPos first = getRandomBlockPos();
         final SignalStatePosV2 posInFile = file.create(first);
@@ -189,20 +178,16 @@ public class StateFileTestV2 {
         assertEquals(secondPos, secondPosToFind);
         file.deleteIndex(first);
         assertNull(file.find(first));
-        System.out.println("Finished Delete test for SignalStateFile!");
     }
 
     @Test
     public void testSpeedOfFind() {
-        System.out.println("Started SpeedOfFind test for SignalStateFile!");
         final SignalStateFileV2 file = new SignalStateFileV2(path);
         assertNull(file.find(getRandomBlockPos()));
-        System.out.println("Finished SpeedOfFind test for SignalStateFile!");
     }
 
     @Test
     public void testMigration() {
-        System.out.println("Started Migration test for SignalStateFile!");
         final SignalStateFile file = new SignalStateFile(path);
         final Map<BlockPos, ByteBuffer> map = new HashMap<>();
         for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 100; i++) {
@@ -227,6 +212,5 @@ public class StateFileTestV2 {
             assertTrue(posInNewFile != null);
             assertEquals(file.read(posOldFile), fileV2.read(posInNewFile));
         });
-        System.out.println("Finished Migration test for SignalStateFile!");
     }
 }
