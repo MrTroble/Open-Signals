@@ -8,6 +8,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Monitor;
 import com.troblecodings.signals.guis.ContainerMonitorSelection;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
@@ -75,6 +76,7 @@ public class MonitorSelectionItem extends Item implements MessageWrapper {
             worldIn.setBlockState(monitorPos, monitor.getStateForPlacement(worldIn, monitorPos,
                     facing, hitX, hitY, hitZ, 0, player, hand), 3);
         }
+        MonitorNetworkHandler.sendTileData(tile, worldIn.playerEntities);
         return EnumActionResult.SUCCESS;
     }
 
