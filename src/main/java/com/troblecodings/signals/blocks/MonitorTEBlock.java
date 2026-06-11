@@ -60,6 +60,7 @@ public class MonitorTEBlock extends Monitor {
         final float colorInsets = insets / STEPS_PER_BLOCK;
 
         final DrawInfo drawInfo = new DrawInfo(0, 0, info.tick);
+        drawInfo.color();
         drawInfo.push();
         GlStateManager.translate(info.x, info.y, info.z);
 
@@ -69,7 +70,6 @@ public class MonitorTEBlock extends Monitor {
         GlStateManager.translate(-monitorSizeX + 1, 0, -0.001f);
 
         drawInfo.disableTexture();
-        drawInfo.applyColor();
         drawInfo.blendOn();
         drawInfo.alphaOn();
         GlStateManager.disableLighting();
@@ -92,12 +92,14 @@ public class MonitorTEBlock extends Monitor {
                 maxSizeY / (renderSizeY * UISignalBoxRendering.TILE_WIDTH), 1);
 
         GlStateManager.scale(1, 1, -0.1f);
+        drawInfo.blendOff();
+        drawInfo.alphaOff();
         rendering.draw(drawInfo);
 
-        drawInfo.alphaOff();
         drawInfo.blendOff();
         drawInfo.enableTexture();
         drawInfo.depthOn();
+        drawInfo.color();
         GlStateManager.enableLighting();
         drawInfo.pop();
     }
