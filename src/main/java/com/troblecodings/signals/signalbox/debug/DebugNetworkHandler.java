@@ -5,8 +5,10 @@ import java.nio.ByteBuffer;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
+import com.troblecodings.signals.network.SignalBoxNetworkReader;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -18,7 +20,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import io.netty.buffer.Unpooled;
 import net.minecraft.util.math.BlockPos;
 
-public class DebugNetworkHandler extends SignalBoxNetworkHandler {
+public class DebugNetworkHandler extends SignalBoxNetworkHandler implements SignalBoxNetworkReader {
 
     public DebugNetworkHandler(final SignalBoxGrid grid) {
         super(grid);
@@ -84,6 +86,16 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
         final IPathEntry<?> entry = entryType.newValue();
         entry.readNetwork(buffer);
         optionEntry.addEntry(entryType, entry);
+    }
+
+    @Override
+    public StateInfo getStateInfo() {
+        return null;
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return false;
     }
 
 }
