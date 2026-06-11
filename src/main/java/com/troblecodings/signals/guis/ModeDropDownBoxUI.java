@@ -391,7 +391,7 @@ public class ModeDropDownBoxUI {
                                     e1 -> gui.pop()));
                             screen.add(GuiElements.createSpacerV(3));
                             screen.add(GuiElements.createLabel(
-                                    I18Wrapper.format("property.inconnection.name"), 0xFFFFFFFF));
+                                    I18Wrapper.format("btn.connect.trainnumber"), 0xFFFFFFFF));
                             screen.add(GuiElements.createSpacerV(3));
 
                             final BoxEntity entity = UISignalBoxRendering.createSignalBoxEntity(
