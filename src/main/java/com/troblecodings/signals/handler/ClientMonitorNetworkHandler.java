@@ -3,9 +3,12 @@ package com.troblecodings.signals.handler;
 import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import net.minecraft.client.Minecraft;
@@ -18,37 +21,49 @@ import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 public class ClientMonitorNetworkHandler implements INetworkSync {
 
     private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
+    private static final Map<StateInfo, ReadBuffer> updates = new HashMap<>();
 
     @Override
     public void deserializeClient(final ReadBuffer buf) {
-        final Minecraft mc = Minecraft.getInstance();
+        final Minecraft mc = Minecraft.getMinecraft();
         mc.doRunTask(() -> {
-            final byte networkMode = buf.getByte();
-            final Level world = mc.level;
+            final World world = mc.world;
             final BlockPos pos = buf.getBlockPos();
-
             final long startTime = Calendar.getInstance().getTimeInMillis();
             SERVICE.execute(() -> {
                 BlockEntity entity;
                 while ((entity = world.getBlockEntity(pos)) == null) {
                     final long currentTime = Calendar.getInstance().getTimeInMillis();
-                    if (currentTime - startTime >= 5000)
+                    if (currentTime - startTime >= 5000) {
+                        updates.put(new StateInfo(world, pos), buf);
                         return;
+                    }                 
                     continue;
                 }
                 if (!(entity instanceof MonitorTileEntity))
                     return;
-                final MonitorTileEntity monitorTile = (MonitorTileEntity) entity;
-                synchronized (monitorTile) {
-                    if (networkMode == MonitorNetworkHandler.NETWORK_TILE_DATA) {
-                        monitorTile.loadRenderPoints(buf);
-                    }
-                    if (networkMode == MonitorNetworkHandler.NETWORK_UPDATE) {
-                        monitorTile.loadBoxUpdate(buf);
-                    }
-                }
+                executeUpdate((MonitorTileEntity) entity, buf);
             });
         });
+    }
+
+    private static void executeUpdate(final MonitorTileEntity tile, final ReadBuffer buf) {
+        final byte networkMode = buf.getByte();
+        synchronized (tile) {
+            if (networkMode == MonitorNetworkHandler.NETWORK_TILE_DATA) {
+                tile.loadRenderPoints(buf);
+            }
+            if (networkMode == MonitorNetworkHandler.NETWORK_UPDATE) {
+                tile.loadBoxUpdate(buf);
+            }
+        }
+    }
+
+    public static void loadUpdate(final MonitorTileEntity tile) {
+        final ReadBuffer buf = updates.remove(new StateInfo(tile.getWorld(), tile.getPos()));
+        if (buf != null) {
+            executeUpdate(tile, buf);
+        }
     }
 
     @SubscribeEvent

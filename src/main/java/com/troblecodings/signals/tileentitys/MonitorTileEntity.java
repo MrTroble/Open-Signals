@@ -23,6 +23,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
+import com.troblecodings.signals.handler.ClientMonitorNetworkHandler;
 import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkMode;
@@ -125,6 +126,13 @@ public class MonitorTileEntity extends SyncableTileEntity
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onLoad() {
+        if (world.isRemote) {
+            ClientMonitorNetworkHandler.loadUpdate(this);
+        }
     }
 
     public void loadBoxUpdate(final ReadBuffer buffer) {
