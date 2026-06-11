@@ -28,7 +28,7 @@ import net.minecraft.util.EnumFacing;
 
 public class GuiMonitorSelection extends GuiBase {
 
-    private static final SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
+    private static final SoundHandler HANDLER = Minecraft.getMinecraft().getSoundHandler();
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
 
     private final UIMultiBlockRender renderer = new UIMultiBlockRender(25, -5.5f);
@@ -164,7 +164,7 @@ public class GuiMonitorSelection extends GuiBase {
             entity.setWidth(width);
         }
         entity.add(button);
-        entity.add(new UIClickable(consumer.andThen(e -> handler.playSound(
+        entity.add(new UIClickable(consumer.andThen(e -> HANDLER.playSound(
                 PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F)))));
         return entity;
 

@@ -16,7 +16,6 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.EnumMouseState;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -61,8 +60,7 @@ public class GuiMonitor extends GuiBase {
 
         boxEntity.add(mouseUpdate);
 
-        upperEntity.add(GuiElements
-                .createLabel(I18Wrapper.format("tile.monitor.name")));
+        upperEntity.add(GuiElements.createLabel(I18Wrapper.format("tile.monitor.name")));
         upperEntity.add(
                 GuiElements.createButton(I18Wrapper.format("gui.monitor.new_section"), 70, e -> {
                     box.rendering.clearColoredPoints();

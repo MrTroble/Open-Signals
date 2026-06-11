@@ -56,7 +56,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
     protected SignalBoxTileEntity tile;
-    protected UISignalBoxProfile uiProfile = UISignalBoxProfile.DEFAULT;
+    protected UISignalBoxProfile uiProfile = UISignalBoxProfile.defaultProfile;
     private int counter;
     private final SignalBoxNetworkHandler network = new SignalBoxNetworkHandler(this);
 
@@ -309,7 +309,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                     return nodeTag;
                 })::iterator);
         tag.putInteger(SUBSIDIARY_COUNTER, counter);
-        if (!UISignalBoxProfile.DEFAULT.equals(uiProfile)) {
+        if (!UISignalBoxProfile.defaultProfile.equals(uiProfile)) {
             tag.putString(SIGNALBOX_UI_PROFILE, uiProfile.getName());
         }
     }
@@ -356,7 +356,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
         });
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
         uiProfile = UISignalBoxProfile.NAME_FOR_PROFILE
-                .getOrDefault(tag.getString(SIGNALBOX_UI_PROFILE), UISignalBoxProfile.DEFAULT);
+                .getOrDefault(tag.getString(SIGNALBOX_UI_PROFILE), UISignalBoxProfile.defaultProfile);
     }
 
     public void readPathways(final NBTWrapper tag) {

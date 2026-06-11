@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 
 public class ClientMonitorNetworkHandler implements INetworkSync {
 
-    private static final Map<StateInfo, ReadBuffer> updates = new HashMap<>();
+    private static final Map<StateInfo, ReadBuffer> UPDATES = new HashMap<>();
 
     @Override
     public void deserializeClient(final ReadBuffer buf) {
@@ -27,7 +27,7 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
             final BlockPos pos = buf.getBlockPos();
             TileEntity entity = world.getTileEntity(pos);
             if (entity == null) {
-                updates.put(new StateInfo(world, pos), buf);
+                UPDATES.put(new StateInfo(world, pos), buf);
                 return;
             }
             if (!(entity instanceof MonitorTileEntity))
@@ -49,7 +49,7 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
     }
 
     public static void loadUpdate(final MonitorTileEntity tile) {
-        final ReadBuffer buf = updates.remove(new StateInfo(tile.getWorld(), tile.getPos()));
+        final ReadBuffer buf = UPDATES.remove(new StateInfo(tile.getWorld(), tile.getPos()));
         if (buf != null) {
             executeUpdate(tile, buf);
         }

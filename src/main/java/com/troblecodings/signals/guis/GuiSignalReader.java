@@ -19,7 +19,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.StateInfo;
@@ -298,9 +297,8 @@ public class GuiSignalReader extends GuiBase {
         labelEntity.setScale(1.5f);
 
         final UILabel label = new UILabel(
-                I18Wrapper.format("tile.signalreader.name") + "; Name: "
-                        + ClientNameHandler.getClientName(new StateInfo(mc.world, container.pos))
-                                .replace("[n]", " "));
+                I18Wrapper.format("tile.signalreader.name") + "; Name: " + ClientNameHandler
+                        .getClientName(new StateInfo(mc.world, container.pos)).replace("[n]", " "));
         label.setCenterX(false);
         label.setCenterY(true);
         labelEntity.add(label);
