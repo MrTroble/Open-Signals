@@ -162,9 +162,14 @@ public class ModeDropDownBoxUI {
                         .createButton(I18Wrapper.format("property.presignals.name"), e -> {
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
-                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(new UIBox(UIBox.VBOX, 0));
+
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
+                            screen.add(GuiElements.createSpacerV(3));
+                            screen.add(GuiElements.createLabel(
+                                    I18Wrapper.format("property.presignals.name"), 0xFFFFFFFF));
+                            screen.add(GuiElements.createSpacerV(3));
 
                             final BoxEntity boxEntity =
                                     UISignalBoxRendering.createSignalBoxEntity(grid, gui.profile,
@@ -227,9 +232,14 @@ public class ModeDropDownBoxUI {
 
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
-                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(new UIBox(UIBox.VBOX, 0));
+
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
+                            screen.add(GuiElements.createSpacerV(3));
+                            screen.add(GuiElements.createLabel(
+                                    I18Wrapper.format("property.protectionway.name"), 0xFFFFFFFF));
+                            screen.add(GuiElements.createSpacerV(3));
 
                             final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
                                     gui.container.grid, gui.profile,
@@ -321,9 +331,14 @@ public class ModeDropDownBoxUI {
 
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
-                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(new UIBox(UIBox.VBOX, 0));
+
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
+                            screen.add(GuiElements.createSpacerV(3));
+                            screen.add(GuiElements.createLabel(
+                                    I18Wrapper.format("property.inconnection.name"), 0xFFFFFFFF));
+                            screen.add(GuiElements.createSpacerV(3));
 
                             final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(
                                     gui.container.grid, gui.profile,
@@ -370,9 +385,15 @@ public class ModeDropDownBoxUI {
                                             .orElse(new ModeIdentifier(new Point(-1, -1), null));
                             final UIEntity screen = new UIEntity();
                             screen.setInherits(true);
-                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(new UIBox(UIBox.VBOX, 0));
+
                             screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
                                     e1 -> gui.pop()));
+                            screen.add(GuiElements.createSpacerV(3));
+                            screen.add(GuiElements.createLabel(
+                                    I18Wrapper.format("property.inconnection.name"), 0xFFFFFFFF));
+                            screen.add(GuiElements.createSpacerV(3));
+
                             final BoxEntity entity = UISignalBoxRendering.createSignalBoxEntity(
                                     gui.container.grid, gui.profile,
                                     gui.profile.getOperationModeSettings().getUIBorderSettings(),
