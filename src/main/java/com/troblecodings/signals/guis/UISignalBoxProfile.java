@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class UISignalBoxProfile {
 
-    public static UISignalBoxProfile DEFAULT = null;
+    public static UISignalBoxProfile defaultProfile = null;
     public static final Map<String, UISignalBoxProfile> NAME_FOR_PROFILE = new HashMap<>();
     public static final List<UISignalBoxProfile> UI_PROFILES = new ArrayList<>();
     private static final Gson GSON = new Gson();
@@ -30,7 +30,7 @@ public class UISignalBoxProfile {
 
     public void initializeData() {
         if (name.equals("default")) {
-            DEFAULT = this;
+            defaultProfile = this;
         }
         if (NAME_FOR_PROFILE.containsKey(name)) {
             OpenSignalsMain.exitMinecraftWithMessage(

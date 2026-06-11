@@ -74,7 +74,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private UIEntity splitter = new UIEntity();
     private SidePanel helpPage;
-    protected UISignalBoxProfile profile = UISignalBoxProfile.DEFAULT;
+    protected UISignalBoxProfile profile = UISignalBoxProfile.defaultProfile;
     protected UISignalBoxRendering rendering;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     protected final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);

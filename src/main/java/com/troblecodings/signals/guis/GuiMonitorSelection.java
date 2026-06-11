@@ -30,7 +30,7 @@ public class GuiMonitorSelection extends GuiBase {
 
     private static final ModelInfoWrapper EMPTY_WRAPPER =
             new ModelInfoWrapper(EmptyModelData.INSTANCE);
-    private static final SoundManager handler = Minecraft.getInstance().getSoundManager();
+    private static final SoundManager HANDLER = Minecraft.getInstance().getSoundManager();
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
 
     private final UIMultiBlockRender renderer = new UIMultiBlockRender(25, -5.5f);
@@ -166,7 +166,7 @@ public class GuiMonitorSelection extends GuiBase {
         }
         entity.add(button);
         entity.add(new UIClickable(consumer.andThen(
-                e -> handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f)))));
+                e -> HANDLER.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f)))));
         return entity;
 
     }

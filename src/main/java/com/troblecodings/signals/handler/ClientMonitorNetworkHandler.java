@@ -21,7 +21,7 @@ import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 public class ClientMonitorNetworkHandler implements INetworkSync {
 
     private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
-    private static final Map<StateInfo, ReadBuffer> updates = new HashMap<>();
+    private static final Map<StateInfo, ReadBuffer> UPDATES = new HashMap<>();
 
     @Override
     public void deserializeClient(final ReadBuffer buf) {
@@ -35,7 +35,7 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
                 while ((entity = world.getBlockEntity(pos)) == null) {
                     final long currentTime = Calendar.getInstance().getTimeInMillis();
                     if (currentTime - startTime >= 5000) {
-                        updates.put(new StateInfo(world, pos), buf);
+                        UPDATES.put(new StateInfo(world, pos), buf);
                         return;
                     }
                     continue;
@@ -60,7 +60,7 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
     }
 
     public static void loadUpdate(final MonitorTileEntity tile) {
-        final ReadBuffer buf = updates.remove(new StateInfo(tile.getLevel(), tile.getBlockPos()));
+        final ReadBuffer buf = UPDATES.remove(new StateInfo(tile.getLevel(), tile.getBlockPos()));
         if (buf != null) {
             executeUpdate(tile, buf);
         }

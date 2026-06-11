@@ -41,7 +41,7 @@ public final class MonitorNetworkHandler {
     public static final byte NETWORK_TILE_DATA = 0;
     public static final byte NETWORK_UPDATE = 1;
 
-    private static final Map<StateInfo, SignalBoxNetworkListener> listeners = new HashMap<>();
+    private static final Map<StateInfo, SignalBoxNetworkListener> LISTENERS = new HashMap<>();
 
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
@@ -71,7 +71,7 @@ public final class MonitorNetworkHandler {
         final SignalBoxNetworkListener listener =
                 new SignalBoxNetworkListener(monitorInfo, b -> sendGridUpdate(tile, b));
         network.addListener(listener);
-        listeners.put(monitorInfo, listener);
+        LISTENERS.put(monitorInfo, listener);
         sendInitGridUpdate(tile, player);
     }
 
@@ -81,7 +81,7 @@ public final class MonitorNetworkHandler {
         if (network == null)
             return;
         final StateInfo monitorInfo = new StateInfo(tile.getLevel(), tile.getBlockPos());
-        network.removeListener(listeners.remove(monitorInfo));
+        network.removeListener(LISTENERS.remove(monitorInfo));
     }
 
     public static void checkForClientUpdates(final StateInfo signalBoxInfo,

@@ -49,7 +49,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     public static final String RENDER_START_POINT = "renderStartPoint";
     public static final String RENDER_END_POINT = "renderEndPoint";
 
-    private static final List<SignalBoxNetworkMode> allowedNetworkModes = ImmutableList.of(
+    private static final List<SignalBoxNetworkMode> ALLOWED_NETWORK_MODES = ImmutableList.of(
             SignalBoxNetworkHandler.GRID, SignalBoxNetworkHandler.ENTRY,
             SignalBoxNetworkHandler.NODE_SPECIAL_ENTRIES, SignalBoxNetworkHandler.SUBSIDIARY);
 
@@ -140,7 +140,7 @@ public class MonitorTileEntity extends SyncableTileEntity
         if (wasNetworkNull) {
             network = new SignalBoxNetworkHandler(this, grid);
         }
-        network.desirializeBuffer(buffer, allowedNetworkModes);
+        network.desirializeBuffer(buffer, ALLOWED_NETWORK_MODES);
         if (wasNetworkNull) {
             initRendering();
         }
@@ -156,7 +156,7 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     private void initRendering() {
         rendering = new UISignalBoxRendering(grid, getProfile(),
-                UISignalBoxProfile.DEFAULT.getOperationModeSettings().getUIBorderSettings(),
+                UISignalBoxProfile.defaultProfile.getOperationModeSettings().getUIBorderSettings(),
                 (_u1, _u2, _u3) -> {
                 }, new UIEntity(), new HashMap<>());
         updateRendering();

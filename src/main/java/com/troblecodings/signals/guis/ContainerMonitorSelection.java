@@ -17,8 +17,8 @@ public class ContainerMonitorSelection extends ContainerBase {
     public static final String SIZE_X = "monitorSizeX";
     public static final String SIZE_Y = "monitorSizeY";
 
-    private static final byte sendBlock = 0;
-    private static final byte sendSize = 1;
+    private static final byte SEND_BLOCK = 0;
+    private static final byte SEND_SIZE = 1;
 
     protected int selectedMonitor, sizeX, sizeY;
 
@@ -42,11 +42,11 @@ public class ContainerMonitorSelection extends ContainerBase {
     public void deserializeServer(final ReadBuffer buf) {
         final ItemStack stack = info.player.getMainHandItem();
         final byte mode = buf.getByte();
-        if (mode == sendBlock) {
+        if (mode == SEND_BLOCK) {
             final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             final int blockID = buf.getInt();
             wrapper.putInteger(MONITOR_TYPE_ID, blockID);
-        } else if (mode == sendSize) {
+        } else if (mode == SEND_SIZE) {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final Direction.Axis axis = buf.getEnumValue(Direction.Axis.class);
             final int size = buf.getInt();
@@ -64,14 +64,14 @@ public class ContainerMonitorSelection extends ContainerBase {
 
     public void sendSelectedMonitorToServer(final Monitor monitor) {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte(sendBlock);
+        buffer.putByte(SEND_BLOCK);
         buffer.putInt(monitor.getID());
         OpenSignalsMain.network.sendTo(getPlayer(), buffer);
     }
 
     public void sendSizeToServer(final Direction.Axis axis, final int value) {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte(sendSize);
+        buffer.putByte(SEND_SIZE);
         buffer.putEnumValue(axis);
         buffer.putInt(value);
         OpenSignalsMain.network.sendTo(getPlayer(), buffer);

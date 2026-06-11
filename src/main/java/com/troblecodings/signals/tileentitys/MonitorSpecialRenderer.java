@@ -16,9 +16,9 @@ public class MonitorSpecialRenderer implements BlockEntityRenderer<MonitorTileEn
     }
 
     @Override
-    public void render(final MonitorTileEntity tile, final float tick, final PoseStack p_112309_,
+    public void render(final MonitorTileEntity tile, final float tick, final PoseStack poseStack,
             final MultiBufferSource source, final int rand1, final int rand2) {
-        tile.render(new RenderAnimationInfo(p_112309_, context.getBlockRenderDispatcher(), source,
+        tile.render(new RenderAnimationInfo(poseStack, context.getBlockRenderDispatcher(), source,
                 rand1, rand2, tick));
     }
 
