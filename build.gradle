@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:5.1.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.+'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         classpath "com.modrinth.minotaur:Minotaur:2.+"
     }
@@ -66,21 +66,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("META-INF/mods.toml") {
-        expand(
-            version: project.version,
-            mcversion: project.minecraft_version,
-            forgeversion: project.forge_version_main,
-            modid: project.mod_id,
-            modname: project.mod_name,
-            author: project.mod_author
-        )
-    }
 }
 
 jar {
