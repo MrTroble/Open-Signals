@@ -614,7 +614,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<SignalStateLoadHoler> signals) {
-        if (signals == null || signals.isEmpty())
+        if (signals == null || signals.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {
             signals.forEach(info -> {
