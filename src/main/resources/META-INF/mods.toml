@@ -6,7 +6,7 @@ license="Apache License Version 2.0"
 [[mods]]
 modId="opensignals"
 version="${file.jarVersion}"
-displayName="$OpenSignals"
+displayName="OpenSignals"
 displayURL="https://troblecodings.com/"
 authors="MrTroble, Jeronimo, Uhutown"
 credits="German Immersive Railroading Community"
