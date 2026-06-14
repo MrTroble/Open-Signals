@@ -1,21 +1,14 @@
 # Open Signals
 
-[
-![Curseforge](https://cf.way2muchnoise.eu/title/440990.svg?badge_style=for_the_badge)
-![Curseforge Downloads](https://cf.way2muchnoise.eu/short_440990.svg?badge_style=for_the_badge)
-![Curseforge Versions](http://cf.way2muchnoise.eu/versions/440990.svg?badge_style=for_the_badge)
-](https://www.curseforge.com/minecraft/mc-mods/open-signals)
-[
-![Discord](https://img.shields.io/discord/166953995951276032?logo=discord&style=for-the-badge)
-](https://discord.gg/Um97SHnrYp)
-[![Java CI with Gradle](https://github.com/MrTroble/Open-Signals/actions/workflows/gradle.yml/badge.svg)](https://github.com/MrTroble/Open-Signals/actions/workflows/gradle.yml)
-[
-![Sponsor](https://img.shields.io/github/sponsors/MrTroble?logo=github&style=for-the-badge)
-](https://github.com/sponsors/MrTroble)
+[![Versions](https://badges.moddingx.org/modrinth/versions/1FAZm7aq) ![Downloads](https://badges.moddingx.org/modrinth/downloads/1FAZm7aq)](https://modrinth.com/mod/opensignals)
+
+[![Versions](https://badges.moddingx.org/curseforge/versions/440990) ![Downloads](https://badges.moddingx.org/curseforge/downloads/440990)](https://www.curseforge.com/minecraft/mc-mods/open-signals)
+
+[![Discord](https://img.shields.io/discord/166953995951276032?logo=discord&style=for-the-badge)](https://discord.gg/E7qhYeR)
 
 ## This mod adds a lot of commonly used german signal systems as controllable signals
 
-- Download on [curseforge](https://www.curseforge.com/minecraft/mc-mods/open-signals).  
+- Download on [Curseforge](https://www.curseforge.com/minecraft/mc-mods/open-signals) and [Modrinth](https://modrinth.com/mod/opensignals).   
 - Find more information in our [wiki](https://github.com/MrTroble/Open-Signals/wiki).
 - Updates can be found in the [changelog](changelog.md).
 
