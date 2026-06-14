@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.12.2 - 3.8.4]
+* update build script
+
 ## [1.16.5 - 3.8.3]
 * fix: issues in saveing signals
 
