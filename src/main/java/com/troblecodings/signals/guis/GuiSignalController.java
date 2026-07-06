@@ -100,6 +100,12 @@ public class GuiSignalController extends GuiBase {
     private void updateProfileProperties(final UIEntity middlePart, final int profile,
             final boolean onlyUpdatePreview) {
         middlePart.clearChildren();
+        final UIEntity list = new UIEntity();
+        list.setInherits(true);
+        middlePart.add(list);
+
+        final UIBox vbox = new UIBox(UIBox.VBOX, 1);
+        list.add(vbox);
         if (profile == -1)
             return;
         final Map<SEProperty, String> properties =
@@ -133,6 +139,7 @@ public class GuiSignalController extends GuiBase {
             }
         });
         previewRedstone.update(controller.getSignal());
+        middlePart.add(GuiElements.createPageSelect(vbox));
     }
 
     private void addProfileSelection(final UIEntity mainEntity) {
