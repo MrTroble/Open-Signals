@@ -51,6 +51,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -168,14 +169,14 @@ public class Signal extends BasicBlock {
     @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,
             final CollisionContext context) {
-        final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
-        if (te == null)
+        final BlockEntity tile = source.getBlockEntity(pos);
+        if (tile == null || !(tile instanceof SignalTileEntity))
             return Shapes.block();
-        final Level world = te.getLevel();
+        final Level world = tile.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
-                : te.getProperties();
+                : ((SignalTileEntity) tile).getProperties();
         return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
 
