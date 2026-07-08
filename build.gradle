@@ -1,112 +1,124 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
-		maven {
-      		url = "https://plugins.gradle.org/m2/"
-    	}
-        jcenter()
+        maven { url = 'https://plugins.gradle.org/m2/' }
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:5.1+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.+'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
+        classpath "com.modrinth.minotaur:Minotaur:2.+"
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'com.modrinth.minotaur'
 
-apply plugin: "com.matthewprenger.cursegradle"
+group = project.mod_group
+version = project.mod_version
 
-sourceSets{
+base {
+    archivesName = "${project.mod_name}-${project.minecraft_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(project.java_version.toInteger())
+}
+
+sourceSets {
     main {
         java {
-            srcDirs("guilib/src/", "linkableapi/src/", "contentPackLib/src")
+            srcDirs(
+                "guilib/src/",
+                "linkableapi/src/",
+                "contentPackLib/src"
+            )
         }
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-
-
-def ver = System.getenv("APPVEYOR_BUILD_VERSION")
-if(ver == null)
-	ver = 'dev'
-
-def key = System.getenv("CURSETOKEN")
-if(key == null)
-	key = 'dev'
-curseforge {
-  apiKey = key
-  project {
-    id = '440990'
-    changelog = file('changelog.md')
-    releaseType = 'release'
-    changelogType = 'markdown'
-    addGameVersion '1.18.2'
-  }
-  options {
-    detectNewerJava = true
-  }
-}
-
-version = ver
-group = 'com.troblecodings'
-archivesBaseName = 'OpenSignals-1.18.2'
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
 minecraft {
-	mappings channel: 'official', version: '1.18.2'
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    mappings channel: 'official', version: project.minecraft_version
+
+    accessTransformer = file(
+        'src/main/resources/META-INF/accesstransformer.cfg'
+    )
+
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
         }
 
         server {
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
         }
     }
 }
 
-dependencies {   
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.86'
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+dependencies {
+    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
 test {
-    useJUnitPlatform {
-    	includeEngines("junit-jupiter")
-    }
-}
-
-processResources {
-	inputs.property "version", project.version
-	
-	filesMatching("mcmod.info") {
-		expand "version": project.version, "mcversion": "1.18.2"
-	}
+    useJUnitPlatform()
 }
 
 jar {
     manifest {
         attributes([
-            "Specification-Title": archivesBaseName,
+            "Specification-Title": project.mod_name,
             "Specification-Vendor": "troblecodings",
-            "Specification-Version": ver,
-            "Implementation-Title": project.name,
-            "Implementation-Version": ver,
-            "Implementation-Vendor" :"troblecodings",
-            "Implementation-Timestamp": new Date().format("dd-MM-yyyy'T'HH:mm:ssZ")
+            "Specification-Version": project.version,
+            "Implementation-Title": project.mod_name,
+            "Implementation-Version": project.version,
+            "Implementation-Vendor": "troblecodings",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
 
 jar.finalizedBy('reobfJar')
+
+def key = System.getenv("CURSETOKEN")
+if (key == null)
+    key = 'dev'
+
+curseforge {
+    apiKey = key 
+
+    project {
+        id = project.curseforge_project_id
+
+        changelog = file("changelog.md")
+        changelogType = "markdown"
+
+        releaseType = "release"
+
+        addGameVersion project.minecraft_version
+    }
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+
+    projectId = project.modrinth_project_id
+
+    versionNumber = project.version
+    versionName = "${project.mod_name} ${project.version}"
+
+    uploadFile = jar
+
+    gameVersions = [project.minecraft_version]
+    loaders = [project.loader]
+
+    changelog = file("changelog.md").text
+}
+
+tasks.register("publishMods") {
+    dependsOn("curseforge", "modrinth")
+}

@@ -1,26 +1,27 @@
 modLoader="javafml"
-loaderVersion="[38,)"
+loaderVersion="[40,)"
 issueTrackerURL="https://github.com/MrTroble/Open-Signals/issues"
 license="Apache License Version 2.0"
 
 [[mods]]
 modId="opensignals"
 version="${file.jarVersion}"
-displayName="Open Signals"
+displayName="OpenSignals"
 displayURL="https://troblecodings.com/"
 authors="MrTroble, Jeronimo, Uhutown"
+credits="German Immersive Railroading Community"
 description="This mod adds a lot of German railway signals. You are able to controlle them via a manuell interface, redstone or our own signal box! You can also add your own signals via a contentpack. Please read the wiki."
 
 [[dependencies.opensignals]]
     modId="forge" 
     mandatory=true 
-    versionRange="[38,)" 
+    versionRange="[40,)" 
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.opensignals]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18, 1.19)"
+    versionRange="[1.18.2]"
     ordering="NONE"
     side="BOTH"

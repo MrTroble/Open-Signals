@@ -78,7 +78,6 @@ public class ClientSignalStateHandler implements INetworkSync {
                 final BlockState state = entity.getBlockState();
                 mc.level.setBlocksDirty(signalPos, state, state);
                 entity.requestModelDataUpdate();
-                ((SignalTileEntity) entity).updateAnimationState(newProperties, changedState);
                 mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
             });
         });

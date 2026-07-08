@@ -1,5 +1,12 @@
 # Changelog
 
+
+## [1.12.2 - 3.8.4]
+* update build script
+
+## [1.18.2 - 3.8.3]
+* fix: signal parts for animation not rendering
+
 ## [1.18.2 - 3.8.2]
 * feat: added config option to block shunting path with active redstone input
 * feat/fix: pathway can't be set with active subsidiary
