@@ -131,7 +131,7 @@ public class UISignalBoxProfile {
         private String outputColor = "0xffff00";
 
         private String trainNumberColor = ConfigHandler.signalboxTrainNumberColor;
-        private String trainnumberBackgroundColor =
+        private String trainNumberBackgroundColor =
                 ConfigHandler.signalboxTrainnumberBackgroundColor;
 
         public UIBorderSettings getUIBorderSettings() {
@@ -179,7 +179,7 @@ public class UISignalBoxProfile {
         }
 
         public int getTrainnumberBackgroundColor() {
-            return HexConverter.decodeARGB(trainnumberBackgroundColor);
+            return HexConverter.decodeARGB(trainNumberBackgroundColor);
         }
 
     }
