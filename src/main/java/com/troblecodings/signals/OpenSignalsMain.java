@@ -89,6 +89,7 @@ public class OpenSignalsMain {
     @EventHandler
     public void onServerStop(final FMLServerStoppingEvent event) {
         SignalStateHandler.onServerStop(event);
+        SignalBoxHandler.onServerStop(event);
         NameHandler.onServerStop(event);
     }
 

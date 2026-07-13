@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
@@ -31,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public final class SignalBoxHandler {
@@ -38,6 +42,11 @@ public final class SignalBoxHandler {
     private SignalBoxHandler() {
     }
 
+    private static final ExecutorService SAVE_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
+        final Thread thread = new Thread(r, "SignalBoxHandlerSave");
+        thread.setDaemon(true);
+        return thread;
+    });
     private static final Map<StateInfo, SignalBoxGrid> ALL_GRIDS = new HashMap<>();
     private static final Map<StateInfo, LinkedPositions> ALL_LINKED_POS = new HashMap<>();
     private static final Map<StateInfo, LinkingUpdates> POS_UPDATES = new HashMap<>();
@@ -342,16 +351,24 @@ public final class SignalBoxHandler {
             });
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
+        final File file;
         try {
-            final File file =
-                    PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles").toFile();
-            if (!file.exists())
-                return;
-            file.delete();
-            CompressedStreamTools.write(wrapper.tag, file);
-        } catch (final IOException e) {
+            file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles").toFile();
+        } catch (final Exception e) {
             e.printStackTrace();
+            return;
         }
+
+        SAVE_EXECUTOR.execute(() -> {
+            try {
+                if (!file.exists())
+                    return;
+                file.delete();
+                CompressedStreamTools.write(wrapper.tag, file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @SubscribeEvent
@@ -384,6 +401,15 @@ public final class SignalBoxHandler {
             });
         } catch (final IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void onServerStop(final FMLServerStoppingEvent event) {
+        SAVE_EXECUTOR.shutdown();
+        try {
+            SAVE_EXECUTOR.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
