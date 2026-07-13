@@ -365,7 +365,7 @@ public final class SignalBoxHandler {
                     return;
                 file.delete();
                 CompressedStreamTools.write(wrapper.tag, file);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         });
