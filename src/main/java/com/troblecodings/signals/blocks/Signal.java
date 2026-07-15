@@ -22,6 +22,7 @@ import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
+import com.troblecodings.signals.core.SignalTextRenderCache;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
@@ -347,51 +348,70 @@ public class Signal extends BasicBlock {
 
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
-        float customRenderHeight = this.prop.customNameRenderHeight;
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
                 new StateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
-        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
-            if (property.predicate.test(map)) {
-                customRenderHeight = property.state;
+
+        final String name = info.tileEntity.getNameWrapper();
+        final SignalTextRenderCache cache = info.tileEntity.getTextRenderCache();
+
+        if (!cache.getLastName().equals(name)) {
+            float customRenderHeight = this.prop.customNameRenderHeight;
+            for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
+                if (property.predicate.test(map)) {
+                    customRenderHeight = property.state;
+                }
             }
+            boolean doubleSidedText = false;
+            for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
+                if (boolProp.predicate.test(map)) {
+                    doubleSidedText = boolProp.state;
+                }
+            }
+            final String[] splitNames = name.split("\\[n\\]");
+            final float[] nameWidths = new float[splitNames.length];
+            for (int i = 0; i < splitNames.length; i++) {
+                nameWidths[i] = info.font.getStringWidth(splitNames[i]);
+            }
+            final float nameWidthFull = info.font.getStringWidth(name);
+            final int textColor = HexConverter.decodeARGB(this.prop.textColor);
+            final float scale = Math.min(1 / (22 * (nameWidthFull / this.prop.signWidth)), 0.1f);
+
+            cache.update(name, customRenderHeight, doubleSidedText, splitNames, nameWidths,
+                    textColor, scale);
         }
-        if (customRenderHeight == -1)
+
+        if (cache.getCustomRenderHeight() == -1)
             return;
+
         final World world = info.tileEntity.getWorld();
         final BlockPos pos = info.tileEntity.getPos();
         final IBlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal))
             return;
-        boolean doubleSidedText = false;
-        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
-            if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.state;
-            }
-        }
-
         final SignalAngel angle = state.getValue(Signal.ANGEL);
 
         GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
-        GlStateManager.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
+        GlStateManager.translate(info.x + 0.5f, info.y + cache.getCustomRenderHeight(),
+                info.z + 0.5f);
         GlStateManager.rotate(angle.getDregree(), 0, 1, 0);
 
         if (!this.prop.autoscale) {
-            renderSingleOverlay(info);
+            renderSingleOverlay(info, cache);
         } else {
-            renderSingleScaleOverlay(info);
+            renderSingleScaleOverlay(info, cache);
         }
 
-        if (doubleSidedText) {
+        if (cache.getDoubleSidedText()) {
             GlStateManager.rotate(180, 0, 1, 0);
 
             if (!this.prop.autoscale) {
-                renderSingleOverlay(info);
+                renderSingleOverlay(info, cache);
             } else {
-                renderSingleScaleOverlay(info);
+                renderSingleScaleOverlay(info, cache);
             }
 
         }
@@ -399,9 +419,10 @@ public class Signal extends BasicBlock {
     }
 
     @SideOnly(Side.CLIENT)
-    public void renderSingleOverlay(final RenderOverlayInfo info) {
-        final String name = info.tileEntity.getNameWrapper();
-        final String[] splitNames = name.split("\\[n\\]");
+    public void renderSingleOverlay(final RenderOverlayInfo info,
+            final SignalTextRenderCache cache) {
+        final String[] splitNames = cache.getSplitNames();
+        final float[] nameWidths = cache.getNameWidth();
         final float signWidth = this.prop.signWidth;
         final float scale = this.prop.signScale;
         final float offsetX = this.prop.offsetX;
@@ -413,28 +434,24 @@ public class Signal extends BasicBlock {
         GlStateManager.translate(offsetX, 0, -4.2f + offsetZ);
 
         for (int j = 0; j < splitNames.length; j++) {
-            final String text = splitNames[j];
-            final float nameWidth = info.font.getStringWidth(text);
-            final float center = (signWidth - nameWidth) / 2;
-            info.font.drawSplitString(text, (int) center - 10, j * 10, (int) signWidth,
-                    HexConverter.decodeARGB(this.prop.textColor));
+            final float center = (signWidth - nameWidths[j]) / 2;
+            info.font.drawSplitString(splitNames[j], (int) center - 10, j * 10, (int) signWidth,
+                    cache.getTextColor());
         }
         GlStateManager.popMatrix();
     }
 
     @SideOnly(Side.CLIENT)
-    private void renderSingleScaleOverlay(final RenderOverlayInfo info) {
-        final String name = info.tileEntity.getNameWrapper();
-        final float nameWidth = info.font.getStringWidth(name);
-        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
+    private void renderSingleScaleOverlay(final RenderOverlayInfo info,
+            final SignalTextRenderCache cache) {
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
-        GlStateManager.scale(-scale, -scale, 1);
-        info.font.drawString(name, (int) (-nameWidth / 2), 0,
-                HexConverter.decodeARGB(this.prop.textColor));
+        GlStateManager.scale(-cache.getScale(), -cache.getScale(), 1);
+        info.font.drawString(cache.getSplitNames()[0], (int) (-cache.getNameWidth()[0] / 2), 0,
+                cache.getTextColor());
         GlStateManager.popMatrix();
     }
 

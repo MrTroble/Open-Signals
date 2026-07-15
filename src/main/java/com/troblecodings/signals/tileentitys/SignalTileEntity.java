@@ -12,6 +12,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalTextRenderCache;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
@@ -31,6 +32,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     private final int renderDistance;
 
     private final Map<SEProperty, String> properties = new HashMap<>();
+    private final SignalTextRenderCache textRenderCache = new SignalTextRenderCache();
 
     public SignalTileEntity() {
         this.handler = new SignalAnimationHandler(this);
@@ -68,6 +70,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         if (signal == null)
             return;
         signal.renderOverlay(info.with(this));
+    }
+
+    public SignalTextRenderCache getTextRenderCache() {
+        return textRenderCache;
     }
 
     public SignalAnimationHandler getAnimationHandler() {
