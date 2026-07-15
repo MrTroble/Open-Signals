@@ -42,7 +42,7 @@ public final class SignalBoxHandler {
     private SignalBoxHandler() {
     }
 
-    private static final ExecutorService SAVE_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
+    private static ExecutorService save_executer = Executors.newSingleThreadExecutor(r -> {
         final Thread thread = new Thread(r, "SignalBoxHandlerSave");
         thread.setDaemon(true);
         return thread;
@@ -359,7 +359,7 @@ public final class SignalBoxHandler {
             return;
         }
 
-        SAVE_EXECUTOR.execute(() -> {
+        save_executer.execute(() -> {
             try {
                 if (!file.exists())
                     return;
@@ -405,12 +405,17 @@ public final class SignalBoxHandler {
     }
 
     public static void onServerStop(final FMLServerStoppingEvent event) {
-        SAVE_EXECUTOR.shutdown();
+        save_executer.shutdown();
         try {
-            SAVE_EXECUTOR.awaitTermination(10, TimeUnit.SECONDS);
+            save_executer.awaitTermination(10, TimeUnit.SECONDS);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        save_executer = Executors.newSingleThreadExecutor(r -> {
+            final Thread thread = new Thread(r, "SignalBoxHandlerSave");
+            thread.setDaemon(true);
+            return thread;
+        });
     }
 
     private static void migrateFilesToNewDirectory(final World world) {
