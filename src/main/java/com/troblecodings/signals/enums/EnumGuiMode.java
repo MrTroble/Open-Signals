@@ -42,10 +42,6 @@ public enum EnumGuiMode {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
     });
 
-    /**
-     * Naming
-     */
-
     public final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer;
     public final Function<SignalState, Integer> depthFunc;
     private int defaultColor;

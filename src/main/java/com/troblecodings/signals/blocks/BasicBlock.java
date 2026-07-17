@@ -11,15 +11,20 @@ import java.util.Set;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class BasicBlock extends Block implements EntityBlock {
+public abstract class BasicBlock extends Block implements EntityBlock {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
     private static final Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER =
@@ -37,6 +42,9 @@ public class BasicBlock extends Block implements EntityBlock {
             });
         });
     }
+
+    public abstract InteractionResult use(BlockState state, Level world, BlockPos pos,
+                                          Player player, InteractionHand hand, BlockHitResult result);
 
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.empty();

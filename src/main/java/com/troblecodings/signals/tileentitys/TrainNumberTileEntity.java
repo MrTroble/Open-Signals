@@ -10,10 +10,10 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Block;
 
 public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkableTile {
@@ -67,7 +67,7 @@ public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkab
     @Override
     public boolean link(final BlockPos pos, final CompoundTag tag) {
         @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(
+        final Block block = ClipContext.Block.get(
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;

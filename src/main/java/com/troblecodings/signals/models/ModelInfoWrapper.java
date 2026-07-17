@@ -5,11 +5,6 @@ import java.util.Map;
 import com.troblecodings.core.interfaces.BlockModelDataWrapper;
 import com.troblecodings.signals.SEProperty;
 
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
-import net.minecraftforge.client.model.data.ModelDataMap.Builder;
-import net.minecraftforge.client.model.data.ModelProperty;
-
 public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     private final IModelData data;

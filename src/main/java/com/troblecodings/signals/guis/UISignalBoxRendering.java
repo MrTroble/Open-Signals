@@ -18,7 +18,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
-import com.mojang.math.Quaternion;
 import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
@@ -43,6 +42,7 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.world.level.block.Rotation;
+import org.joml.Quaterniond;
 
 public class UISignalBoxRendering extends UIComponent {
 
@@ -132,7 +132,7 @@ public class UISignalBoxRendering extends UIComponent {
             info.push();
             info.depthOn();
             info.translate(HALF_TILE, HALF_TILE, 0);
-            info.rotate(Quaternion.fromXYZ(0, 0,
+            info.rotate(Quaterniond.fromXYZ(0, 0,
                     set.rotation.ordinal() * UIRotate.PERPENDICULAR_ANGLE));
             info.translate(-HALF_TILE, -HALF_TILE, set.mode.depthFunc.apply(rInfo.state));
             rInfo.component.accept(info);

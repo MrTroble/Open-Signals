@@ -25,13 +25,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
+import static com.troblecodings.signals.config.ConfigHandler.*;
+
 public final class SignalBoxUtil {
 
-    public static final int FREE_COLOR = ConfigHandler.CLIENT.signalboxFreeColor.get();
-    public static final int SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor.get();
-    public static final int USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor.get();
-    public static final int PREPARED_COLOR = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-    public static final int SHUNTING_COLOR = ConfigHandler.CLIENT.signalboxShuntingColor.get();
+    public static final int FREE_COLOR = CLIENT.signalboxFreeColor.get();
+    public static final int SELECTED_COLOR = CLIENT.signalboxSelectColor.get();
+    public static final int USED_COLOR = CLIENT.signalboxUsedColor.get();
+    public static final int PREPARED_COLOR = CLIENT.signalboxPreparedColor.get();
+    public static final int SHUNTING_COLOR = CLIENT.signalboxShuntingColor.get();
 
     private static List<Point> debugPointList = new ArrayList<>();
 
@@ -135,7 +137,7 @@ public final class SignalBoxUtil {
                 if (!checkForPreviousProtectionWay(grid, p1, passedProtectionWay.stream()
                         .filter(nodes::contains).collect(Collectors.toList())))
                     return PathwayRequestResult.getByMode(PathwayRequestMode.ALREADY_USED);
-                if (ConfigHandler.GENERAL.debugMode.get()) {
+                if (GENERAL.debugMode.get()) {
                     grid.sendDebugPointUpdates(debugPointList);
                     debugPointList.clear();
                 }
@@ -165,7 +167,7 @@ public final class SignalBoxUtil {
                 }
             }
         }
-        if (ConfigHandler.GENERAL.debugMode.get()) {
+        if (GENERAL.debugMode.get()) {
             grid.sendDebugPointUpdates(debugPointList);
             debugPointList.clear();
         }

@@ -10,7 +10,6 @@ import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.init.OSItems;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -25,8 +24,8 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.neoforge.client.model.obj.ObjMaterialLibrary;
 
 public class SignalBridgeBasicBlock extends BasicBlock {
 
@@ -34,11 +33,10 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     public static final List<SignalBridgeBasicBlock> ALL_SIGNALBRIDGE_BLOCKS = new ArrayList<>();
 
     private final SignalBridgeBlockProperties properties;
-    // Just for Networking
     private final int id;
 
     public SignalBridgeBasicBlock(final SignalBridgeBlockProperties properties) {
-        super(Properties.of(Material.STONE).noOcclusion()
+        super(Properties.of(ObjMaterialLibrary.Material.STONE).noOcclusion()
                 .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
                 .isRedstoneConductor((_u1, _u2, _u3) -> false));
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
