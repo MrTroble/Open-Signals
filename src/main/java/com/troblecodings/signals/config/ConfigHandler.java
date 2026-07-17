@@ -2,9 +2,6 @@ package com.troblecodings.signals.config;
 
 import com.troblecodings.guilib.ecs.GuiConfigHandler;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-
 public final class ConfigHandler {
 
     private ConfigHandler() {

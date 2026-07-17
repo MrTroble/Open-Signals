@@ -17,11 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
-import com.mojang.math.Vector3f;
-import com.mojang.math.Vector4f;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
 
@@ -37,11 +33,13 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.ForgeModelBakery;
-import net.minecraftforge.client.model.SimpleModelState;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.SimpleModelState;
+import org.joml.Matrix4f;
+import org.joml.Quaterniond;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements UnbakedModel {
@@ -93,7 +91,7 @@ public class SignalCustomModel implements UnbakedModel {
 
     private BakedModelPair transform(final SignalModelLoaderInfo info, final ModelBakery bakery,
             final ResourceLocation location, final Function<Material, TextureAtlasSprite> function,
-            final Map<String, Either<Material, String>> material, final Quaternion rotation) {
+            final Map<String, Either<Material, String>> material, final Quaterniond rotation) {
         final Transformation transformation =
                 new Transformation(new Vector3f(info.x, info.y, info.z), null, null, null);
         final BlockModel blockModel = (BlockModel) info.model;

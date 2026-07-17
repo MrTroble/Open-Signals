@@ -30,9 +30,8 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
-
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 
 public class CommonProxy {
 

@@ -5,10 +5,8 @@ import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 
 public final class OSModels {
 

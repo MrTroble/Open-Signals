@@ -10,8 +10,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 
 public class JsonEnum extends ModelProperty<String> implements IIntegerable<String> {
 

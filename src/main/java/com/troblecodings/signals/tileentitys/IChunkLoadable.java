@@ -10,7 +10,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunk.EntityCreationType;
-import net.minecraftforge.common.world.ForgeChunkManager;
 
 public interface IChunkLoadable {
 

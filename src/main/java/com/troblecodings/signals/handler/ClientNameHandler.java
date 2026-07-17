@@ -11,8 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class ClientNameHandler implements INetworkSync {
 

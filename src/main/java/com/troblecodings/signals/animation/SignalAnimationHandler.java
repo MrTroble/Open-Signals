@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Quaternion;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -26,7 +25,6 @@ import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
 
 public class SignalAnimationHandler {
 
@@ -69,8 +67,7 @@ public class SignalAnimationHandler {
             info.stack.translate(0.5f, 0.5f, 0.5f);
             info.stack.mulPose(angle.getQuaternion());
             translation.translate(info.stack);
-            renderer.renderModel(info.stack.last(), vertex, state, model, 0, 0, 0, info.lightColor,
-                    info.overlayTexture, data);
+            renderer.renderModel(info.stack.last(), vertex, state, model, 0, 0, 0, info.lightColor, info.overlayTexture, data);
             info.stack.popPose();
 
             if (translation.isAnimationAssigned()) {

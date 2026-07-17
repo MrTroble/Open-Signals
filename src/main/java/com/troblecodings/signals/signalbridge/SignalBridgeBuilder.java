@@ -24,7 +24,6 @@ import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class SignalBridgeBuilder {
 

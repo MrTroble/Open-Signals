@@ -3,9 +3,9 @@ package com.troblecodings.signals.animation;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import com.mojang.math.Vector3f;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.models.ModelInfoWrapper;
+import org.joml.Vector3f;
 
 public class SignalAnimationRotation implements SignalAnimation {
 

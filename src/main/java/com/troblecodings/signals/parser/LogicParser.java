@@ -12,8 +12,6 @@ import com.troblecodings.signals.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 
-import net.minecraftforge.client.model.data.IModelData;
-
 @SuppressWarnings({
         "rawtypes", "unchecked"
 })
