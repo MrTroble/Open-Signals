@@ -25,7 +25,7 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v5
       with:
-        java-version: 8
+        java-version: 25
         distribution: temurin
         cache: gradle
 
@@ -38,9 +38,14 @@ jobs:
     - name: Build
       run: ./gradlew build
 
-    - name: Publish
+    - name: Publishing Curseforge
       if: github.event_name == 'push' && github.ref_protected && github.ref_type == 'branch'
-      run: ./gradlew publishMods
+      run: ./gradlew publishCurseforge
       env:
         CURSETOKEN: ${{ secrets.CURSETOKEN }}
+
+    - name: Publishing Modrinth
+      if: github.event_name == 'push' && github.ref_protected && github.ref_type == 'branch'
+      run: ./gradlew publishModrinth
+      env:
         MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
