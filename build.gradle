@@ -1,5 +1,6 @@
 plugins {
     id 'net.minecraftforge.gradle' version '6.0.+'
+    id 'com.gradleup.shadow' version '9.2.0+'
     id 'eclipse'
     id 'net.darkhax.curseforgegradle' version '1.3.+'
     id 'com.modrinth.minotaur' version '2.+'
@@ -57,6 +58,17 @@ test {
 }
 
 jar {
+    archiveClassifier.set("old")
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    configurations = []
+    relocate 'com.troblecodings.linkableapi', "${project.group}.signals.shadow.linkableapi"
+    relocate 'com.troblecodings.guilib', "${project.group}.signals.shadow.guilib"
+    relocate 'com.troblecodings.core', "${project.group}.signals.shadow.core"
+    relocate 'com.troblecodings.contentpacklib', "${project.group}.signals.shadow.contentpacklib"
+
     manifest {
         attributes([
             "Specification-Title": project.mod_name,
@@ -73,8 +85,12 @@ jar {
     from("LICENSE")
 }
 
-tasks.named('jar') {
-    finalizedBy 'reobfJar'
+reobf {
+    shadowJar {}
+}
+
+tasks.named("build") {
+    dependsOn("reobfShadowJar")
 }
 
 tasks.register("publishCurseforge", net.darkhax.curseforgegradle.TaskPublishCurseForge) {
@@ -82,7 +98,7 @@ tasks.register("publishCurseforge", net.darkhax.curseforgegradle.TaskPublishCurs
     if (key == null)
         key = 'dev'
     apiToken = key
-    def mainFile = upload(project.curseforge_project_id, jar)
+    def mainFile = upload(project.curseforge_project_id, reobfShadowJar)
     mainFile.changelog = file("changelog.md").text
     mainFile.changelogType = 'markdown'
     mainFile.releaseType = 'release'
@@ -99,7 +115,7 @@ modrinth {
     versionNumber = project.version
     versionName = "${project.mod_name} ${project.version}"
 
-    uploadFile = jar
+    uploadFile = reobfShadowJar
 
     gameVersions = [project.minecraft_version]
     loaders = [project.loader.toLowerCase()]
