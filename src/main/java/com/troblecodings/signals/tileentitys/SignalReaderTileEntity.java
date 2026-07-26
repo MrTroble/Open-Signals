@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.opensignals.linkableapi.ILinkableTile;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -173,13 +173,15 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         for (final Direction dir : directions) {
             final Entry<LogicalSymbols[], Entry<SEProperty, String>[]> entry =
                     statesForFace.get(dir);
-            if (entry == null)
+            if (entry == null) {
                 continue;
+            }
             Predicate<Map<SEProperty, String>> predicate = map -> false;
             for (int i = 0; i < entry.getValue().length; i++) {
                 final Entry<SEProperty, String> propertyEntry = entry.getValue()[i];
-                if (propertyEntry == null)
+                if (propertyEntry == null) {
                     continue;
+                }
 
                 final Predicate<Map<SEProperty, String>> currentPredicate =
                         getPredicateFromEntry(propertyEntry);

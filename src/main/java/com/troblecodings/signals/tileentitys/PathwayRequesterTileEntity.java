@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.opensignals.linkableapi.ILinkableTile;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -26,8 +26,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
-    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
-            new Point(-1, -1));
+    private Map.Entry<Point, Point> pathway =
+            Maps.immutableEntry(new Point(-1, -1), new Point(-1, -1));
     private boolean addPWToSaver = true;
 
     public PathwayRequesterTileEntity(final TileEntityInfo info) {
@@ -73,8 +73,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                     final PathType type = SignalBoxUtil.getPathTypeFrom(
                             grid.getNode(pathway.getKey()), grid.getNode(pathway.getValue()));
                     if (!type.equals(PathType.NONE)) {
-                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
-                                pathway.getValue(), type);
+                        final PathwayRequestResult result =
+                                grid.requestWay(pathway.getKey(), pathway.getValue(), type);
                         if (result.canBeAddedToSaver(type) && addPWToSaver) {
                             grid.addNextPathway(pathway.getKey(), pathway.getValue(), type);
                         }

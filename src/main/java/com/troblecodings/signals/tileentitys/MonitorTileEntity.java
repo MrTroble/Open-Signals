@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.opensignals.linkableapi.ILinkableTile;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.SignalBox;
