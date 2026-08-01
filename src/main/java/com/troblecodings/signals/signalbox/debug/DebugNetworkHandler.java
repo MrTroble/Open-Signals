@@ -6,6 +6,7 @@ import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
+import com.troblecodings.signals.network.SignalBoxNetworkReader;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -17,22 +18,10 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 
-public class DebugNetworkHandler extends SignalBoxNetworkHandler {
-
-    private final SignalBoxGrid grid;
+public class DebugNetworkHandler extends SignalBoxNetworkHandler implements SignalBoxNetworkReader {
 
     public DebugNetworkHandler(final SignalBoxGrid grid) {
-        this.grid = grid;
-    }
-
-    @Override
-    protected boolean containerConnected() {
-        return true;
-    }
-
-    @Override
-    protected SignalBoxGrid getGrid() {
-        return grid;
+        super(grid);
     }
 
     @Override
@@ -73,8 +62,7 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
             grid.setCounterFromNetwork(buffer.getInt());
         } else {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(new StateInfo(container.getTile().getLevel(),
-                    container.getTile().getBlockPos()), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(reader.getStateInfo(), pos);
         }
     }
 
@@ -98,4 +86,13 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
         optionEntry.addEntry(entryType, entry);
     }
 
+    @Override
+    public StateInfo getStateInfo() {
+        return null;
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return false;
+    }
 }

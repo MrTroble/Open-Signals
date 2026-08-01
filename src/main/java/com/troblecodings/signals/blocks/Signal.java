@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.math.Quaternion;
+import com.troblecodings.core.HexConverter;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
@@ -268,7 +269,7 @@ public class Signal extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     public int colorMultiplier(final int tintIndex) {
-        return this.prop.colors.get(tintIndex);
+        return HexConverter.decodeARGB(this.prop.colors.get(tintIndex));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -350,7 +351,8 @@ public class Signal extends BasicBlock {
             final String text = splitNames[j];
             final float textWidth = info.font.width(text);
             final float center = (signWidth - textWidth) / 2;
-            info.font.draw(info.stack, text, (int) center - 10, j * 10, this.prop.textColor);
+            info.font.draw(info.stack, text, (int) center - 10, j * 10,
+                    HexConverter.decodeARGB(this.prop.textColor));
         }
         info.stack.popPose();
     }
@@ -366,7 +368,8 @@ public class Signal extends BasicBlock {
         info.stack.pushPose();
         info.stack.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
         info.stack.scale(-scale, -scale, 1);
-        info.font.draw(info.stack, name, -nameWidth / 2, 0, this.prop.textColor);
+        info.font.draw(info.stack, name, -nameWidth / 2, 0,
+                HexConverter.decodeARGB(this.prop.textColor));
         info.stack.popPose();
     }
 

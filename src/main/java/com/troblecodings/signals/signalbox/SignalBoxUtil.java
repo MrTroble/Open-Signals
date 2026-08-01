@@ -27,12 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class SignalBoxUtil {
 
-    public static final int FREE_COLOR = ConfigHandler.CLIENT.signalboxFreeColor.get();
-    public static final int SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor.get();
-    public static final int USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor.get();
-    public static final int PREPARED_COLOR = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-    public static final int SHUNTING_COLOR = ConfigHandler.CLIENT.signalboxShuntingColor.get();
-
     private static List<Point> debugPointList = new ArrayList<>();
 
     private SignalBoxUtil() {

@@ -1,33 +1,33 @@
 package com.troblecodings.signals.guis;
 
 import com.troblecodings.core.I18Wrapper;
-import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
+import com.troblecodings.guilib.ecs.entitys.input.UIKeyUpdate;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
-import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
+import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.guis.NamableContainer.NamableContainerNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 
 public class NamableGui extends GuiBase {
 
     private UILabel labelComp;
     private final NamableContainer container;
-    private final Player player;
 
     public NamableGui(final GuiInfo info) {
         super(info);
         this.container = (NamableContainer) info.base;
-        this.player = info.player;
     }
 
     private void initOwn() {
@@ -35,8 +35,7 @@ public class NamableGui extends GuiBase {
         this.entity.add(new UIBox(UIBox.HBOX, 5));
 
         final UIEntity inner = new UIEntity();
-        inner.setInheritHeight(true);
-        inner.setInheritWidth(true);
+        inner.setInherits(true);
         inner.add(new UIBox(UIBox.VBOX, 2));
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(inner);
@@ -63,6 +62,7 @@ public class NamableGui extends GuiBase {
         final UITextInput input = new UITextInput(container.tile.getNameWrapper());
         textfield.add(input);
         textfield.add(new UIToolTip(I18Wrapper.format("property.customname.desc")));
+        textfield.add(new UIKeyUpdate(_u -> this.updateText(input.getText())));
 
         hbox.add(textfield);
         final UIEntity apply = GuiElements.createButton(I18Wrapper.format("btn.apply"),
@@ -71,13 +71,24 @@ public class NamableGui extends GuiBase {
         apply.setWidth(60);
         hbox.add(apply);
         inner.add(hbox);
-        if (!(container.tile instanceof RedstoneIOTileEntity)) {
+        if (!(container.tile instanceof RedstoneIOTileEntity))
             return;
+
+        final Block block = container.tile.getBlockState().getBlock();
+        if (block instanceof RedstoneInput) {
+            addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
+                    I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay);
+            if (block instanceof CombinedRedstoneInput) {
+                addDelayEntityFor(inner, NamableContainerNetwork.RESET_TIME,
+                        I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay);
+            }
         }
+
+        inner.add(GuiElements.createSpacerV(10));
+
         inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
-        list.setInheritHeight(true);
-        list.setInheritWidth(true);
+        list.setInherits(true);
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
         this.container.linkedPos.forEach(
@@ -92,13 +103,45 @@ public class NamableGui extends GuiBase {
         inner.add(GuiElements.createPageSelect(layout));
     }
 
+    private void addDelayEntityFor(final UIEntity inner, final NamableContainerNetwork timeMode,
+            final String label, final int defaultTime) {
+        final UIEntity hentity = new UIEntity();
+        hentity.setHeight(20);
+        hentity.setInheritWidth(true);
+        hentity.add(new UIBox(UIBox.HBOX, 0));
+
+        inner.add(hentity);
+
+        final UITextInput resetInput = new UITextInput(String.valueOf(defaultTime));
+        resetInput.setValidator(input -> {
+            if (input.isEmpty())
+                return true;
+            try {
+                Integer.valueOf(input);
+            } catch (final NumberFormatException e) {
+                return false;
+            }
+            return true;
+        });
+        resetInput.setOnTextUpdate(input -> container
+                .sendDelayTimeToServer(input.isEmpty() ? 0 : Integer.valueOf(input), timeMode));
+
+        final UIEntity resetInputEntity = new UIEntity();
+        resetInputEntity.setInherits(true);
+        resetInputEntity.add(resetInput);
+
+        final UIEntity labelEntity = GuiElements.createLabel(label, 1f);
+        labelEntity.setY(2);
+
+        hentity.add(labelEntity);
+        hentity.add(resetInputEntity);
+    }
+
     private void updateText(final String input) {
         if (input.isEmpty() || input
                 .equals(ClientNameHandler.getClientName(new StateInfo(mc.level, container.pos))))
             return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putString(input);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        container.sendNameToServer(input);
         labelComp.setText(input);
     }
 

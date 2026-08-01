@@ -27,7 +27,6 @@ import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -147,13 +146,16 @@ public class PathwayData {
             final Path path = new Path(oldPos, newPos);
             newNodes.put(current.getPoint(), new Point(previous));
             previous = current.getPoint();
-            final PathOptionEntry option = current.getOption(path).orElse(null);
+            final ModeSet mode = current.getMode(path);
+            final PathOptionEntry option = current.getOption(mode).orElse(null);
             if (option == null) {
                 continue;
             }
             final EnumPathUsage usage =
                     option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
             if (!(usage.equals(EnumPathUsage.FREE) || usage.equals(EnumPathUsage.PROTECTED))) {
+                if (mode.mode.equals(EnumGuiMode.CROSSING))
+                    return false;
                 final ArrayList<SignalBoxNode> listOfNodes = new ArrayList<>();
                 for (Point point = previous; point != null; point = newNodes.get(point)) {
                     listOfNodes.add(grid.getNode(point));
@@ -365,17 +367,15 @@ public class PathwayData {
             startSignal = Optional.of(firstPos);
             final PathOptionEntry entry =
                     grid.getNode(firstPos.getPoint()).getOption(firstPos.getModeSet()).orElse(null);
-            final List<PosIdentifier> posIdents =
-                    entry.getEntry(PathEntryType.PRESIGNALS).orElse(new ArrayList<>());
-            posIdents.removeIf(ident -> !grid.getNode(ident.getPoint()).has(ident.getModeSet()));
+            final List<ModeIdentifier> posIdents = getPreSignalData(entry, grid);
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
-                final PathOptionEntry vpEntry =
-                        grid.getNode(ident.getPoint()).getOption(ident.getModeSet())
-                                .orElse(SignalBoxFactory.getFactory().getEntry());
-                return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
+                final PathOptionEntry vpEntry = grid.getNode(ident.point).getOption(ident.mode)
+                        .orElse(new PathOptionEntry());
+                return new OtherSignalIdentifier(ident.point, ident.mode,
+                        vpEntry.getEntry(PathEntryType.SIGNAL).orElseGet(() -> null),
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
                         EnumGuiMode.VP, grid);
-            }).collect(Collectors.toList()));
+            }).filter(ident -> ident.pos != null).collect(Collectors.toList()));
         } else {
             startSignal = Optional.empty();
             preSignals = ImmutableList.of();
@@ -384,6 +384,17 @@ public class PathwayData {
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
         this.zs6State = zs6State.get();
         this.delay = delayAtomic.get();
+    }
+
+    private List<ModeIdentifier> getPreSignalData(final PathOptionEntry signalOption,
+            final SignalBoxGrid grid) {
+        final List<ModeIdentifier> idents =
+                signalOption.getEntry(PathEntryType.PRESIGNALS).orElseGet(() -> new ArrayList<>());
+        if (idents.removeIf(ident -> !grid.getNodeChecked(ident.point)
+                .orElseGet(() -> new SignalBoxNode(grid.getNetwork())).has(ident.mode))) {
+            signalOption.setEntry(PathEntryType.PRESIGNALS, idents);
+        }
+        return idents;
     }
 
     private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
