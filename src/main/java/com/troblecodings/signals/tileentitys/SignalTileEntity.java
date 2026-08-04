@@ -83,8 +83,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     @SideOnly(Side.CLIENT)
     public void updateAnimationState(final Map<SEProperty, String> properties,
             final ChangedState state) {
-        handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
-                || state.equals(ChangedState.ADDED_TO_FILE));
+        if (hasAnimation()) {
+            handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
+                    || state.equals(ChangedState.ADDED_TO_FILE));
+        }
     }
 
     @Override

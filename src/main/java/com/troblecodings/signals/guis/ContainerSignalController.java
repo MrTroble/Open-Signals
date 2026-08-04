@@ -171,8 +171,8 @@ public class ContainerSignalController extends ContainerBase
                 break;
             }
             case SEND_PROPERTY: {
-                final SEProperty property = propertiesList.get(buffer.getByteToUnsignedInt());
-                final int valueID = buffer.getByteToUnsignedInt();
+                final SEProperty property = propertiesList.get(buffer.getInt());
+                final int valueID = buffer.getInt();
                 final String value = property.getObjFromID(valueID);
                 if (currentMode.equals(EnumMode.MANUELL)) {
                     SignalStateHandler.setState(
@@ -265,8 +265,8 @@ public class ContainerSignalController extends ContainerBase
     protected void sendPropertyToServer(final SEProperty property, final int value) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalControllerNetwork.SEND_PROPERTY);
-        buffer.putByte((byte) currentSignal.getIDFromProperty(property));
-        buffer.putByte((byte) value);
+        buffer.putInt(currentSignal.getIDFromProperty(property));
+        buffer.putInt(value);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
