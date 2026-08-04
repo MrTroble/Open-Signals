@@ -257,6 +257,7 @@ public class UISignalBoxRendering extends UIComponent {
             final float scale) {
         info.push();
         info.blendOn();
+        info.depthOn();
         info.applyTexture(UIButton.BUTTON_TEXTURES);
         info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 10);
         if (!rot.equals(Rotation.NONE)) {
@@ -268,6 +269,7 @@ public class UISignalBoxRendering extends UIComponent {
         info.scale(scale, scale, scale);
         font.drawString(str, restWidth, restHeight, color);
         info.blendOff();
+        info.depthOff();
         info.color();
         info.pop();
     }
