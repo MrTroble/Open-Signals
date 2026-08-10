@@ -5,22 +5,33 @@ import java.util.Objects;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 
-public class ModeIdentifier {
+public class ModeIdentifier implements INetworkSaveable {
 
-    public final Point point;
-    public final ModeSet mode;
+    public Point point;
+    public ModeSet mode;
+
+    public ModeIdentifier() {
+    }
 
     public ModeIdentifier(final Point point, final ModeSet mode) {
         this.point = point;
         this.mode = mode;
     }
 
+    @Override
     public void writeNetwork(final WriteBuffer buffer) {
         point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
+    }
+
+    @Override
+    public void readNetwork(final ReadBuffer buffer) {
+        point = Point.of(buffer);
+        mode = ModeSet.of(buffer);
     }
 
     public static ModeIdentifier of(final ReadBuffer buffer) {
@@ -45,9 +56,7 @@ public class ModeIdentifier {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final ModeIdentifier other = (ModeIdentifier) obj;
         return Objects.equals(mode, other.mode) && Objects.equals(point, other.point);

@@ -12,6 +12,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalTextRenderCache;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
@@ -31,6 +32,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     private final int renderDistance;
 
     private final Map<SEProperty, String> properties = new HashMap<>();
+    private final SignalTextRenderCache textRenderCache = new SignalTextRenderCache();
 
     public SignalTileEntity() {
         this.handler = new SignalAnimationHandler(this);
@@ -70,6 +72,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         signal.renderOverlay(info.with(this));
     }
 
+    public SignalTextRenderCache getTextRenderCache() {
+        return textRenderCache;
+    }
+
     public SignalAnimationHandler getAnimationHandler() {
         return handler;
     }
@@ -77,8 +83,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     @SideOnly(Side.CLIENT)
     public void updateAnimationState(final Map<SEProperty, String> properties,
             final ChangedState state) {
-        handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
-                || state.equals(ChangedState.ADDED_TO_FILE));
+        if (hasAnimation()) {
+            handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
+                    || state.equals(ChangedState.ADDED_TO_FILE));
+        }
     }
 
     @Override

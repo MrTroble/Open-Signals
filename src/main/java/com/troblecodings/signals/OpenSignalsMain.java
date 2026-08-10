@@ -19,6 +19,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import com.troblecodings.contentpacklib.ContentPackHandler;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -57,6 +58,7 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
+        MinecraftForge.EVENT_BUS.register(MonitorNetworkHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
 
@@ -87,6 +89,7 @@ public class OpenSignalsMain {
     @EventHandler
     public void onServerStop(final FMLServerStoppingEvent event) {
         SignalStateHandler.onServerStop(event);
+        SignalBoxHandler.onServerStop(event);
         NameHandler.onServerStop(event);
     }
 
@@ -104,8 +107,9 @@ public class OpenSignalsMain {
     }
 
     public static Logger getLogger() {
-        if (log == null)
+        if (log == null) {
             log = LogManager.getLogger(MODID);
+        }
         return log;
     }
 
@@ -123,21 +127,20 @@ public class OpenSignalsMain {
             if (url != null) {
                 final URI uri = url.toURI();
                 if ("file".equals(uri.getScheme())) {
-                    if (!location.startsWith("/"))
+                    if (!location.startsWith("/")) {
                         filelocation = "/" + filelocation;
+                    }
                     final URL resource = OSBlocks.class.getResource(filelocation);
                     if (resource == null)
                         return Optional.empty();
                     return Optional.of(Paths.get(resource.toURI()));
-                } else {
-                    if (!"jar".equals(uri.getScheme())) {
-                        return Optional.empty();
-                    }
-                    if (fileSystemCache == null) {
-                        fileSystemCache = FileSystems.newFileSystem(uri, Collections.emptyMap());
-                    }
-                    return Optional.of(fileSystemCache.getPath(filelocation));
                 }
+                if (!"jar".equals(uri.getScheme()))
+                    return Optional.empty();
+                if (fileSystemCache == null) {
+                    fileSystemCache = FileSystems.newFileSystem(uri, Collections.emptyMap());
+                }
+                return Optional.of(fileSystemCache.getPath(filelocation));
             }
         } catch (final IOException | URISyntaxException e) {
             e.printStackTrace();

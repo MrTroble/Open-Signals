@@ -31,7 +31,9 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
 
 public class PreviewSideBar {
+
     public static final float MODIFIER = 0.1f;
+    private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
 
     private UIBlockRender blockRender;
     private final Map<SEProperty, String> properties = new HashMap<>();
@@ -49,7 +51,7 @@ public class PreviewSideBar {
                 .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * MODIFIER, 0))));
 
         blockRenderEntity.add(new UIScissor());
-        blockRenderEntity.add(new UIColor(0xFF8B8B8B));
+        blockRenderEntity.add(new UIColor(BACKGROUND_COLOR));
         blockRenderEntity.add(blockRender);
     }
 
@@ -87,10 +89,14 @@ public class PreviewSideBar {
         properties.clear();
     }
 
+    public void setDisable(final boolean disable) {
+        blockRender.setDisable(disable);
+    }
+
     private void buildRenderListForAnimations(final Signal signal, final ModelInfoWrapper wrapper) {
         animationInfos.clear();
-        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = SignalAnimationConfigParser.ALL_ANIMATIONS
-                .getOrDefault(signal, new HashMap<>());
+        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map =
+                SignalAnimationConfigParser.ALL_ANIMATIONS.get(signal);
         map.forEach((entry, list) -> {
             for (final SignalAnimation animation : list) {
                 final Predicate<ModelInfoWrapper> predicate = animation.getPredicate();

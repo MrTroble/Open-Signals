@@ -34,7 +34,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -46,53 +45,38 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.enums.ShowTypes;
+import com.troblecodings.signals.enums.SignalBoxIcons;
 import com.troblecodings.signals.enums.SignalBoxPage;
+import com.troblecodings.signals.guis.UISignalBoxProfile.UIBorderSettings;
 import com.troblecodings.signals.guis.UISignalBoxRendering.BoxEntity;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.guis.UISignalBoxRendering.SignalBoxConsumer;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientRenderUpdate;
-import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSignalBox extends GuiBase {
 
-    public static final int SELECTION_COLOR = 0x2900FF00;
-    public static final int BACKGROUND_COLOR = ConfigHandler.signalboxBackgroundColor;
-    public static final int EDIT_COLOR = 0x5000A2FF;
-    public static final int OUTPUT_COLOR = 0xffff00;
-    public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
-            ConfigHandler.signalboxTrainnumberBackgroundColor;
-
-    public static final ResourceLocation REDSTONE_OFF =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
-
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
-    protected final SignalBoxNetworkHandler network;
     private SignalBoxPage page = SignalBoxPage.OPERATION;
     private SignalBoxNode lastTile = null;
     private UIEntity mainButton;
     private UIEntity splitter = new UIEntity();
     private SidePanel helpPage;
+    protected UISignalBoxProfile profile = UISignalBoxProfile.defaultProfile;
     protected UISignalBoxRendering rendering;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     protected final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -100,7 +84,6 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
-        this.network = container.getNetwork();
         container.infoUpdates = this::infoUpdate;
         container.counterUpdater = this::updateCounter;
         container.nodeUpdate = this::updateNode;
@@ -128,7 +111,9 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void checkForSubsidiary(final SignalBoxNode node, final ModeSet mode) {
-        final SubsidiaryState state = node.getSubsidiaryState(mode);
+        final Map<ModeSet, SubsidiaryState> subsidiary =
+                container.enabledSubsidiaryTypes.getOrDefault(node.getPoint(), new HashMap<>());
+        final SubsidiaryState state = subsidiary.get(mode);
         if (state != null) {
             node.updateState(mode, SignalState.combine(state.getSubsidiaryShowType()));
         }
@@ -208,7 +193,8 @@ public class GuiSignalBox extends GuiBase {
 
     protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
         final SubsidiaryState state = holder.entry;
-        network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state, false);
+        container.network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state,
+                false);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
 
@@ -250,7 +236,6 @@ public class GuiSignalBox extends GuiBase {
             }
             return;
         }
-        this.helpPage.setShowHelpPage(false);
         rendering.clearSelection();
         if (mouse != MouseEvent.LEFT_MOUSE)
             return;
@@ -258,13 +243,17 @@ public class GuiSignalBox extends GuiBase {
             if (lastTile == null) {
                 if (node.isValidStart()) {
                     this.lastTile = node;
-                    this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.FIRST);
+                    this.rendering.addSelection(
+                            profile.getOperationModeSettings().getUserSelectionColor(), tile,
+                            SelectionType.FIRST);
                 }
             } else {
                 if (lastTile == node) {
                     rendering.clearSelection();
                 } else if (node.isValidEnd()) {
-                    this.rendering.addSelection(SELECTION_COLOR, tile, SelectionType.SECOND);
+                    this.rendering.addSelection(
+                            profile.getOperationModeSettings().getUserSelectionColor(), tile,
+                            SelectionType.SECOND);
                     this.executor.schedule(rendering::clearSelection, 500, TimeUnit.MICROSECONDS);
                     checkForMultiplePathTypes(lastTile, node);
                 }
@@ -286,7 +275,8 @@ public class GuiSignalBox extends GuiBase {
             infoUpdate(
                     I18Wrapper.format("error." + PathwayRequestMode.NO_EQUAL_PATH_TYPE.getName()));
         } else if (possibleTypes.size() == 1) {
-            network.sendRequestPathway(start.getPoint(), end.getPoint(), possibleTypes.get(0));
+            container.network.sendRequestPathway(start.getPoint(), end.getPoint(),
+                    possibleTypes.get(0));
         } else if (possibleTypes.size() > 1) {
             push(GuiElements.createScreen(entity -> {
                 entity.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> pop()));
@@ -296,7 +286,8 @@ public class GuiSignalBox extends GuiBase {
                 entity.add(GuiElements.createSpacerV(10));
                 possibleTypes
                         .forEach(type -> entity.add(GuiElements.createButton(type.name(), e -> {
-                            network.sendRequestPathway(start.getPoint(), end.getPoint(), type);
+                            container.network.sendRequestPathway(start.getPoint(), end.getPoint(),
+                                    type);
                             pop();
                         })));
             }));
@@ -315,10 +306,11 @@ public class GuiSignalBox extends GuiBase {
         if (node.isEmpty())
             return;
         final Point point = node.getPoint();
-        final boolean alredySelected =
-                rendering.hasSelection(EDIT_COLOR, point, SelectionType.FIRST);
+        final boolean alredySelected = rendering.hasSelection(
+                profile.getOperationModeSettings().getEditColor(), point, SelectionType.FIRST);
         if (!alredySelected) {
-            rendering.addSelection(EDIT_COLOR, point, SelectionType.FIRST);
+            rendering.addSelection(profile.getOperationModeSettings().getEditColor(), point,
+                    SelectionType.FIRST);
             helpPage.helpUsageMode(node);
             lastTile = null;
         } else {
@@ -370,7 +362,7 @@ public class GuiSignalBox extends GuiBase {
 
         namingInput.setOnTextUpdate(str -> {
             node.setCustomText(str);
-            network.sendNodeLabel(node.getPoint(), str);
+            container.network.sendNodeLabel(node.getPoint(), str);
             rendering.updateNodeLabeling(node.getPoint(), str);
         });
 
@@ -379,6 +371,18 @@ public class GuiSignalBox extends GuiBase {
             dropDown.addElements(list);
         });
         lowerEntity.add(GuiElements.createPageSelect(box));
+
+        final UIEntity bottomRow = new UIEntity();
+        bottomRow.setHeight(20);
+        bottomRow.setInheritWidth(true);
+        bottomRow.add(new UIBox(UIBox.HBOX, 0));
+        lowerEntity.add(bottomRow);
+
+        bottomRow.add(GuiElements.createSpacerV(20));
+        final String text = I18Wrapper.format("gui.signalbox.return");
+        final FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        bottomRow.add(GuiElements.createButton(text, font.getStringWidth(text) + 8,
+                e -> initializeFieldUsage(mainButton)));
         lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
 
@@ -394,8 +398,15 @@ public class GuiSignalBox extends GuiBase {
         disableBottomEntity();
         page = SignalBoxPage.LINKING;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
-        lowerEntity.setInheritHeight(true);
-        lowerEntity.setInheritWidth(true);
+        lowerEntity.setInherits(true);
+
+        final IIntegerable<String> uiProfiles =
+                SizeIntegerables.of("ui_profiles", UISignalBoxProfile.UI_PROFILES.size(),
+                        i -> I18Wrapper.format("gui.signalbox.profile."
+                                + UISignalBoxProfile.UI_PROFILES.get(i).getName()));
+        lowerEntity.add(GuiElements.createEnumElement(uiProfiles, i -> updateUIProfile(i),
+                profile.getID()));
+
         final IIntegerable<ShowTypes> sorting = new EnumIntegerable<>(ShowTypes.class);
         lowerEntity.add(GuiElements.createEnumElement(sorting, i -> {
             lastValue = i;
@@ -454,15 +465,17 @@ public class GuiSignalBox extends GuiBase {
             layout.add(new UIBox(UIBox.HBOX, 2));
 
             final int id = t.ordinal();
-            final UIEntity icon = new UIEntity();
+            final SignalBoxIcons symbols = SignalBoxIcons.SYMBOLS;
             final UITexture texture = t.equals(LinkType.SIGNALBOX)
                     ? new UITexture(new ResourceLocation(OpenSignalsMain.MODID,
                             "textures/blocks/signalbox.png"))
-                    : new UITexture(UISignalBoxIcons.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
+                    : new UITexture(symbols.getResourceLocation(), symbols.getX(id), 0,
+                            symbols.getMX(id), 1);
+            final UIEntity icon = new UIEntity();
             icon.add(texture);
             icon.setHeight(20);
             icon.setWidth(20);
-            icon.add(new UIToolTip(I18Wrapper.format("type." + t.name())));
+            icon.add(new UIToolTip(I18Wrapper.format("property.value." + t.name())));
             layout.add(icon);
 
             UIEntity btn = GuiElements.createButton(name, e -> {
@@ -471,7 +484,7 @@ public class GuiSignalBox extends GuiBase {
             btn.add(new UIToolTip(I18Wrapper.format("sb.highlight")));
             layout.add(btn);
             layout.add(GuiElements.createButton("x", 20, e -> {
-                network.sendRemovePos(p);
+                container.network.sendRemovePos(p);
                 list.remove(layout);
             }));
             list.add(layout);
@@ -494,7 +507,8 @@ public class GuiSignalBox extends GuiBase {
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
         page = SignalBoxPage.OPERATION;
-        initializeFieldTemplate(this::tileNormal, false);
+        initializeFieldTemplate(this::tileNormal,
+                profile.getOperationModeSettings().getUIBorderSettings());
         resetSelection(entity);
         helpPage.helpUsageMode(null);
         disableBottomEntity();
@@ -523,13 +537,14 @@ public class GuiSignalBox extends GuiBase {
                 pop();
                 reset();
                 page = SignalBoxPage.EDITOR;
-                final UIMenu menu = new UIMenu();
+                final UIMenu menu = new UIMenu(profile);
                 initializeFieldTemplate((rendering, point, mouse) -> this.updateTileWithMode(menu,
-                        rendering, point, mouse), true);
+                        rendering, point, mouse),
+                        profile.getEditorModeSettings().getUIBorderSettings());
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
-                network.sendResetAllPathways();
+                container.network.sendResetAllPathways();
                 resetAllSubsidiarySignals();
                 resetColors();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
@@ -554,9 +569,9 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeFieldTemplate(final SignalBoxConsumer consumer,
-            final boolean showLines) {
-        BoxEntity entitys =
-                UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines, consumer);
+            final UIBorderSettings settings) {
+        final BoxEntity entitys = UISignalBoxRendering.createSignalBoxEntity(container.grid,
+                profile, settings, consumer);
         splitter = entitys.entity;
         rendering = entitys.rendering;
 
@@ -565,7 +580,6 @@ public class GuiSignalBox extends GuiBase {
         helpPage = new SidePanel(lowerEntity, this);
 
         final List<SignalBoxNode> nodes = container.grid.getNodes();
-        buildColors(nodes);
         nodes.forEach(this::updateTrainNumbers);
     }
 
@@ -582,8 +596,7 @@ public class GuiSignalBox extends GuiBase {
         final UIEntity titel = new UIEntity();
         titel.add(new UIScale(1.2f, 1.2f, 1));
         titel.add(titlelabel);
-        titel.setInheritHeight(true);
-        titel.setInheritWidth(true);
+        titel.setInherits(true);
 
         final UIEntity header = new UIEntity();
         header.setInheritWidth(true);
@@ -603,16 +616,15 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.setHeight(0);
 
         final UIEntity middlePart = new UIEntity();
-        middlePart.setInheritHeight(true);
-        middlePart.setInheritWidth(true);
+        middlePart.setInherits(true);
         middlePart.add(new UIBox(UIBox.VBOX, 4));
         middlePart.add(header);
         middlePart.add(lowerEntity);
         middlePart.add(bottomEntity);
 
-        lowerEntity.setInheritHeight(true);
-        lowerEntity.setInheritWidth(true);
-        initializeFieldTemplate(this::tileNormal, false);
+        lowerEntity.setInherits(true);
+        initializeFieldTemplate(this::tileNormal,
+                profile.getOperationModeSettings().getUIBorderSettings());
 
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(middlePart);
@@ -629,20 +641,25 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.getParent().update();
     }
 
+    private void updateUIProfile(final int profileID) {
+        this.profile = UISignalBoxProfile.UI_PROFILES.get(profileID);
+        container.network.sendUIProfile(profile);
+    }
+
     private void reset() {
         lowerEntity.clear();
     }
 
     @Override
     public void updateFromContainer() {
-        updateAllEnabledSubsidiaries();
+        profile = container.grid.getUIProfile();
+        updateEnabledSubsidiaries();
         initializeBasicUI();
         enabledSubsidiaries.values()
                 .forEach(holder -> updateSignalState(container.grid.getNode(holder.point)));
     }
 
-    private void updateAllEnabledSubsidiaries() {
-        enabledSubsidiaries.clear();
+    private void updateEnabledSubsidiaries() {
         container.enabledSubsidiaryTypes.forEach((point, map) -> map.forEach((modeSet, state) -> {
             final SignalBoxNode node = container.grid.getNode(point);
             if (node == null)
@@ -651,19 +668,6 @@ public class GuiSignalBox extends GuiBase {
                     .ifPresent(pos -> enabledSubsidiaries.put(pos,
                             new SubsidiaryHolder(state, point, modeSet)));
         }));
-    }
-
-    private void buildColors(final List<SignalBoxNode> nodes) {
-        nodes.forEach(node -> {
-            this.rendering.setColor(node.getPoint(), mode -> {
-                if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
-                    return mode.mode.getDefaultColor();
-                if (node.containsManuellOutput(mode))
-                    return OUTPUT_COLOR;
-                return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
-                        .orElseGet(() -> EnumPathUsage.FREE).getColor();
-            });
-        });
     }
 
     private void resetColors() {
@@ -675,7 +679,8 @@ public class GuiSignalBox extends GuiBase {
                     case STRAIGHT:
                     case CORNER:
                     case CROSSING:
-                        rendering.setColor(node.getPoint(), mode, SignalBoxUtil.FREE_COLOR);
+                        rendering.setColor(node.getPoint(), mode,
+                                profile.getOperationModeSettings().getFreeColor());
                         entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
                                 _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
                         break;
@@ -695,7 +700,7 @@ public class GuiSignalBox extends GuiBase {
             node.getOption(ident.getMode()).ifPresent(poe -> {
                 rendering.setColor(node.getPoint(), ident.getMode(),
                         poe.getEntry(PathEntryType.PATHUSAGE).orElseGet(() -> EnumPathUsage.FREE)
-                                .getColor());
+                                .getColor(profile.getOperationModeSettings()));
             });
         });
     }
@@ -706,7 +711,7 @@ public class GuiSignalBox extends GuiBase {
             final SignalBoxNode node = container.grid.getNode(point);
             states.keySet().forEach(mode -> {
                 node.updateState(mode, SignalState.RED);
-                network.sendSubsidiary(new ModeIdentifier(point, mode), dummy, false);
+                container.network.sendSubsidiary(new ModeIdentifier(point, mode), dummy, false);
             });
             updateSignalState(node);
         });
@@ -717,6 +722,11 @@ public class GuiSignalBox extends GuiBase {
     @Override
     public ContainerBase getNewGuiContainer(final GuiInfo info) {
         return new ContainerSignalBox(info);
+    }
+
+    @Override
+    public void preClose() {
+        container.deRegisterFromNetwork();
     }
 
 }
