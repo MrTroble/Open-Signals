@@ -404,7 +404,7 @@ public final class SignalBoxHandler {
                                 tag.getBoolean(BOOL_STATE));
                     }
                 });
-            } catch (EOFException e) {
+            } catch (final EOFException e) {
                 System.err.println("Corrupted SignalBoxHandler NBT file: " + file);
                 file.renameTo(new File(file.getAbsolutePath() + ".broken"));
             }
