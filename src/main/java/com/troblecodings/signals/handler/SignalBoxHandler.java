@@ -1,5 +1,6 @@
 package com.troblecodings.signals.handler;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -361,10 +362,13 @@ public final class SignalBoxHandler {
 
         saveExecuter.execute(() -> {
             try {
-                if (!file.exists())
-                    return;
-                file.delete();
-                CompressedStreamTools.write(wrapper.tag, file);
+                File temp = new File(file.getAbsolutePath() + ".tmp");
+                CompressedStreamTools.write(wrapper.tag, temp);
+                if (file.exists()) {
+                    file.delete();
+                }
+                if (!temp.renameTo(file))
+                    throw new IOException("Could not replace NBT file");
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -382,23 +386,28 @@ public final class SignalBoxHandler {
                     PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles").toFile();
             if (!file.exists())
                 return;
-            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(file));
-            if (wrapper.isTagNull())
-                return;
-            wrapper.getList(LINKING_UPDATE).forEach(tag -> {
-                final LinkingUpdates updates = new LinkingUpdates();
-                updates.readNBT(tag);
-                synchronized (POS_UPDATES) {
-                    final StateInfo identifier = new StateInfo(world, tag.getAsPos());
-                    POS_UPDATES.put(identifier, updates);
-                }
-            });
-            wrapper.getList(OUTPUT_UPDATE).forEach(tag -> {
-                synchronized (OUTPUT_UPDATES) {
-                    OUTPUT_UPDATES.put(new StateInfo(world, tag.getAsPos()),
-                            tag.getBoolean(BOOL_STATE));
-                }
-            });
+            try {
+                final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(file));
+                if (wrapper.isTagNull())
+                    return;
+                wrapper.getList(LINKING_UPDATE).forEach(tag -> {
+                    final LinkingUpdates updates = new LinkingUpdates();
+                    updates.readNBT(tag);
+                    synchronized (POS_UPDATES) {
+                        final StateInfo identifier = new StateInfo(world, tag.getAsPos());
+                        POS_UPDATES.put(identifier, updates);
+                    }
+                });
+                wrapper.getList(OUTPUT_UPDATE).forEach(tag -> {
+                    synchronized (OUTPUT_UPDATES) {
+                        OUTPUT_UPDATES.put(new StateInfo(world, tag.getAsPos()),
+                                tag.getBoolean(BOOL_STATE));
+                    }
+                });
+            } catch (EOFException e) {
+                System.err.println("Corrupted SignalBoxHandler NBT file: " + file);
+                file.renameTo(new File(file.getAbsolutePath() + ".broken"));
+            }
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -407,7 +416,7 @@ public final class SignalBoxHandler {
     public static void onServerStop(final FMLServerStoppingEvent event) {
         saveExecuter.shutdown();
         try {
-            saveExecuter.awaitTermination(10, TimeUnit.SECONDS);
+            saveExecuter.awaitTermination(60, TimeUnit.SECONDS);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
