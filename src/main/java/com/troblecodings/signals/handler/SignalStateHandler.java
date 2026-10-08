@@ -176,7 +176,7 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
-            listeners = ALL_LISTENERS.get(info);
+            listeners = ImmutableList.copyOf(ALL_LISTENERS.get(info));
         }
         if (listeners == null)
             return;
