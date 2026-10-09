@@ -176,9 +176,9 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
-            listeners = ImmutableList.copyOf(ALL_LISTENERS.get(info));
+            listeners = ImmutableList.copyOf(ALL_LISTENERS.getOrDefault(info, new ArrayList<>()));
         }
-        if (listeners == null)
+        if (listeners.isEmpty())
             return;
         info.world.getMinecraftServer().addScheduledTask(() -> listeners
                 .forEach(listener -> listener.update(info, changedProperties, changedState)));
