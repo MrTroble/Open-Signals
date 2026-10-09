@@ -362,7 +362,8 @@ public final class SignalBoxHandler {
 
         saveExecuter.execute(() -> {
             try {
-                File temp = new File(file.getAbsolutePath() + ".tmp");
+                final File temp = new File(file.getAbsolutePath() + ".tmp");
+                temp.getParentFile().mkdirs();
                 CompressedStreamTools.write(wrapper.tag, temp);
                 if (file.exists()) {
                     file.delete();
