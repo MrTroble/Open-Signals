@@ -82,7 +82,7 @@ public class BasicBlock extends Block implements ITileEntityProvider {
 
     @Override
     public TileEntity createNewTileEntity(final World worldIn, final int meta) {
-        return null;
+        return getSupplierWrapper().map(type -> type.supply()).orElse(null);
     }
 
     @Override

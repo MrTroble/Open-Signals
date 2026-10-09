@@ -3,8 +3,8 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.handler.ClientRenderUpdate;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.handler.ClientRenderUpdate;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
@@ -53,10 +53,9 @@ public class SignalController extends BasicBlock {
                 }
 
                 return true;
-            } else {
-                OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
-                        "signalcontroller");
             }
+            OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
+                    "signalcontroller");
             return true;
         }
         return false;
@@ -80,10 +79,5 @@ public class SignalController extends BasicBlock {
     @Override
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("controller");
-    }
-
-    @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
-        return new SignalControllerTileEntity();
     }
 }

@@ -1,20 +1,19 @@
 package com.troblecodings.signals.enums;
 
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.FREE_COLOR;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.PREPARED_COLOR;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.SELECTED_COLOR;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.USED_COLOR;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.SHUNTING_COLOR;
+import java.util.function.Function;
+
+import com.troblecodings.signals.guis.UISignalBoxProfile.OperationModeSettings;
 
 public enum EnumPathUsage {
 
-    FREE(FREE_COLOR), SELECTED(SELECTED_COLOR), BLOCKED(USED_COLOR), PREPARED(PREPARED_COLOR),
-    PROTECTED(PREPARED_COLOR), SHUNTING(SHUNTING_COLOR);
+    FREE(mode -> mode.getFreeColor()), SELECTED(mode -> mode.getSelectColor()),
+    BLOCKED(mode -> mode.getUsedColor()), PREPARED(mode -> mode.getPreparedColor()),
+    PROTECTED(mode -> mode.getPreparedColor()), SHUNTING(mode -> mode.getShuntingColor());
 
-    private final int color;
+    private final Function<OperationModeSettings, Integer> func;
 
-    private EnumPathUsage(final int color) {
-        this.color = color;
+    private EnumPathUsage(final Function<OperationModeSettings, Integer> func) {
+        this.func = func;
     }
 
     /**
@@ -22,7 +21,7 @@ public enum EnumPathUsage {
      *
      * @return the color
      */
-    public int getColor() {
-        return color;
+    public int getColor(final OperationModeSettings mode) {
+        return func.apply(mode);
     }
 }

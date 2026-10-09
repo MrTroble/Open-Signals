@@ -21,10 +21,10 @@ public class CombinedRedstoneInput extends RedstoneInput {
         final RedstoneIOTileEntity tile = (RedstoneIOTileEntity) worldIn.getTileEntity(pos);
         if (currentState && !hasNeighborSignal) {
             worldIn.setBlockState(pos, state.withProperty(POWER, false));
-            tile.sendToAll();
+            tile.sendInputOff();
         } else if (hasNeighborSignal && !currentState) {
             worldIn.setBlockState(pos, state.withProperty(POWER, true));
-            tile.sendToAll();
+            tile.sendInputOn();
         } else if (!hasNeighborSignal) {
             worldIn.setBlockState(pos, state.withProperty(POWER, false));
         }

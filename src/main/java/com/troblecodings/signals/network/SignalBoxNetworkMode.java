@@ -10,7 +10,7 @@ import com.troblecodings.core.WriteBuffer;
 
 public class SignalBoxNetworkMode {
 
-    private static final List<SignalBoxNetworkMode> NETWORK_ENTRIES = new ArrayList<>();
+    public static final List<SignalBoxNetworkMode> NETWORK_ENTRIES = new ArrayList<>();
 
     private int id;
     private final BiConsumer<ReadBuffer, SignalBoxNetworkHandler> read;

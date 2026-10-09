@@ -2,6 +2,11 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -23,15 +28,20 @@ import net.minecraft.world.World;
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
     public RedstoneIOTileEntity() {
-        super();
     }
 
+    private int resetDelay = 0;
+    private int blockingDelay = 0;
+
     private final List<BlockPos> linkedSignalController = new ArrayList<>();
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
 
     public static final String NAME_NBT = "name";
     public static final String LINKED_LIST = "linkedList";
 
     public static final String LINKED_SIGNAL_CONTROLLER = "linkedSignalContrller";
+    public static final String RESET_DELAY = "resetDelay";
+    public static final String BLOCKING_DELAY = "blockingDelay";
 
     @Override
     public String getNameWrapper() {
@@ -47,6 +57,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 .collect(Collectors.toList()));
         wrapper.putList(LINKED_SIGNAL_CONTROLLER, linkedSignalController.stream()
                 .map(NBTWrapper::getBlockPosWrapper).collect(Collectors.toList()));
+        wrapper.putInteger(RESET_DELAY, resetDelay);
+        wrapper.putInteger(BLOCKING_DELAY, blockingDelay);
     }
 
     @Override
@@ -57,23 +69,81 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
                 .forEach(linkedPositions::add);
         wrapper.getList(LINKED_SIGNAL_CONTROLLER).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedSignalController::add);
+        resetDelay = wrapper.getInteger(RESET_DELAY);
+        blockingDelay = wrapper.getInteger(BLOCKING_DELAY);
     }
 
-    public void sendToAll() {
-        if (world.isRemote)
-            return;
-        final boolean power = this.world.getBlockState(this.pos).getValue(RedstoneIO.POWER);
-        final RedstoneUpdatePacket update = new RedstoneUpdatePacket(world, pos, power,
-                (RedstoneInput) getBlockType());
-        linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, pos,
-                (tile, _u) -> tile.getSignalBoxGrid().updateInput(update)));
+    private ScheduledFuture<?> resetTask;
+    private final Consumer<RedstoneUpdatePacket> updateSignalBoxes = (packet) -> linkedPositions
+            .forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, getWorld(), pos,
+                    (tile, _u) -> tile.getSignalBoxGrid().updateInput(packet)));
+
+    private void sendInputChanged(final RedstoneUpdatePacket packet) {
+        updateSignalBoxes.accept(packet);
         linkedSignalController.forEach(pos -> loadChunkAndGetTile(SignalControllerTileEntity.class,
                 world, pos, (tile, _u) -> tile.updateFromRSInput()));
 
     }
 
+    public void sendInputOn() {
+        if (resetTask != null) {
+            resetTask.cancel(false);
+            resetTask = null;
+        }
+        final RedstoneUpdatePacket packet = getRedstoneUpdatePacket();
+        if (packet == null)
+            return;
+        if (blockingDelay > 0) {
+            executor.schedule(() -> sendInputChanged(packet), blockingDelay, TimeUnit.SECONDS);
+        } else {
+            sendInputChanged(packet);
+        }
+    }
+
+    public void sendInputOff() {
+        final RedstoneUpdatePacket packet = getRedstoneUpdatePacket();
+        if (packet == null)
+            return;
+        if (resetDelay <= 0) {
+            updateSignalBoxes.accept(packet);
+        } else {
+            if (resetTask != null) {
+                if (!resetTask.cancel(false))
+                    return;
+            }
+            resetTask = executor.schedule(() -> {
+                updateSignalBoxes.accept(packet);
+                resetTask = null;
+            }, resetDelay, TimeUnit.SECONDS);
+        }
+    }
+
+    private RedstoneUpdatePacket getRedstoneUpdatePacket() {
+        if (world.isRemote)
+            return null;
+        final IBlockState state = this.world.getBlockState(pos);
+        final boolean power = state.getValue(RedstoneIO.POWER);
+        return new RedstoneUpdatePacket(world, pos, power, (RedstoneInput) state.getBlock());
+    }
+
     public List<BlockPos> getLinkedController() {
         return ImmutableList.copyOf(linkedSignalController);
+    }
+
+    public int getResetDelay() {
+        return resetDelay;
+    }
+
+    public void setResetDelay(final int resetDelay) {
+        this.resetDelay = resetDelay;
+    }
+
+    public int getBlockingDelay() {
+        return blockingDelay;
+    }
+
+    public void setBlockingDelay(final int blockingDelay) {
+        this.blockingDelay = blockingDelay;
     }
 
     @Override
@@ -97,29 +167,33 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public void link(final BlockPos pos) {
         if (world.isRemote)
             return;
-        if (!linkedPositions.contains(pos))
+        if (!linkedPositions.contains(pos)) {
             linkedPositions.add(pos);
+        }
     }
 
     public void unlink(final BlockPos pos) {
         if (world.isRemote)
             return;
-        if (linkedPositions.contains(pos))
+        if (linkedPositions.contains(pos)) {
             linkedPositions.remove(pos);
+        }
     }
 
     public void linkController(final BlockPos pos) {
         if (world.isRemote)
             return;
-        if (!linkedSignalController.contains(pos))
+        if (!linkedSignalController.contains(pos)) {
             linkedSignalController.add(pos);
+        }
     }
 
     public void unlinkController(final BlockPos pos) {
         if (world.isRemote)
             return;
-        if (linkedSignalController.contains(pos))
+        if (linkedSignalController.contains(pos)) {
             linkedSignalController.remove(pos);
+        }
     }
 
     @Override

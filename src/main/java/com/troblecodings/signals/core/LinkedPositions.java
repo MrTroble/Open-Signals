@@ -14,6 +14,7 @@ import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
@@ -65,14 +66,21 @@ public class LinkedPositions {
             return;
         final StateInfo info = new StateInfo(world, thisPos);
         final LinkType type = linkedBlocks.remove(pos);
-        if (type != null && type == LinkType.SIGNAL) {
-            final Signal signal = signals.remove(pos);
-            SignalStateHandler.unloadSignal(new SignalStateLoadHoler(
-                    new SignalStateInfo(world, pos, signal), new LoadHolder<>(info)));
+        if (type != null) {
+            final SignalBoxGrid grid = SignalBoxHandler.getGrid(info);
+            if (grid == null)
+                return;
+            grid.removeLinkedPosFromEntries(pos);
+            if (type.equals(LinkType.SIGNAL)) {
+                final Signal signal = signals.remove(pos);
+                SignalStateHandler.unloadSignal(new SignalStateLoadHoler(
+                        new SignalStateInfo(world, pos, signal), new LoadHolder<>(info)));
+            }
+            if (!type.equals(LinkType.SIGNALBOX)) {
+                NameHandler.unloadName(
+                        new StateLoadHolder(new StateInfo(world, pos), new LoadHolder<>(info)));
+            }
         }
-        if (type != null && type != LinkType.SIGNALBOX)
-            NameHandler.unloadName(
-                    new StateLoadHolder(new StateInfo(world, pos), new LoadHolder<>(info)));
     }
 
     public boolean isEmpty() {

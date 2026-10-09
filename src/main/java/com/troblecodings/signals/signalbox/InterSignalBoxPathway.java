@@ -114,8 +114,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (otherGrid.get() != null) {
                 final SignalBoxPathway otherPathway =
                         otherGrid.get().getPathwayByLastPoint(blockPW.getValue());
-                if (!(otherPathway instanceof InterSignalBoxPathway))
-                    return;
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
                 blockPW = null;
             }
@@ -131,8 +129,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             if (otherGrid.get() != null) {
                 final SignalBoxPathway otherPathway =
                         otherGrid.get().getPathwayByLastPoint(resetPW.getValue());
-                if (!(otherPathway instanceof InterSignalBoxPathway))
-                    return;
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
                 resetPW = null;
             }
@@ -155,6 +151,22 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             }
         }
         return super.getLastSignalInfo();
+    }
+
+    @Override
+    public void resetAllSignals() {
+        super.resetAllSignals();
+        if (pathwayToReset != null) {
+            pathwayToReset.loadTileAndExecute(tile -> {
+                final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
+                pathwayToReset = (InterSignalBoxPathway) otherGrid
+                        .getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                if (pathwayToReset == null)
+                    return;
+                pathwayToReset.updatePathwaySignals();
+                pathwayToReset.updatePrevious();
+            });
+        }
     }
 
     @Override
@@ -188,9 +200,9 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     }
 
     @Override
-    public void resetPathway(final Point point) {
-        super.resetPathway(point);
-        if (data.totalPathwayReset(point) && pathwayToReset != null) {
+    public void resetPathway(final Point point, final boolean manuellReset) {
+        super.resetPathway(point, manuellReset);
+        if (!manuellReset && data.totalPathwayReset(point) && pathwayToReset != null) {
             pathwayToReset.loadTileAndExecute(tile -> {
                 final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
                 final SignalBoxPathway pw =

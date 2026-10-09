@@ -1,0 +1,10 @@
+{
+    "monitors": [
+        {
+            "name": "Default_Monitor",
+            "maxX": 5,
+            "maxY": 5,
+            "insets": 12
+        }
+    ]
+}

@@ -195,6 +195,7 @@
                 {
                     "predicate": "with(SEMATYPE.DIST) && !with(SEMAVR.VR1)",
                     "mode": "ROTATION",
+                    "animationSpeed": 1.25,
                     "rotationAxis": "X",
                     "rotation": 0
                 },
@@ -202,6 +203,7 @@
                     "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR1)",
                     "mode": "ROTATION",
                     "rotationAxis": "X",
+                    "animationSpeed": 1.25,
                     "rotation": 90
                 }
             ]
@@ -217,6 +219,7 @@
                 {
                     "predicate": "with(SEMATYPE.DIST) && !with(SEMAVR.VR2)",
                     "mode": "ROTATION",
+                    "animationSpeed": 1,
                     "rotationAxis": "Z",
                     "rotation": 0
                 },
@@ -224,6 +227,7 @@
                     "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR2)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
+                    "animationSpeed": 1,
                     "rotation": -45
                 }
             ]
@@ -234,16 +238,22 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "with(SEMATYPE.DIST) && (with(SEMAVR.VR0) || with(SEMAVR.VR2))",
+                    "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR0)",
                     "mode": "TRANSLATION",
-                    "animationSpeed": 0.25,
+                    "animationSpeed": 0.75,
                     "destY": 0
                 },
                 {
                     "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR1)",
                     "mode": "TRANSLATION",
-                    "animationSpeed": 0.25,
+                    "animationSpeed": 0.75,
                     "destY": -0.25
+                },
+                {
+                    "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR2)",
+                    "mode": "TRANSLATION",
+                    "animationSpeed": 0.75,
+                    "destY": 0
                 }
             ]
         },
@@ -255,13 +265,19 @@
                 {
                     "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR0)",
                     "mode": "TRANSLATION",
-                    "animationSpeed": 0.25,
+                    "animationSpeed": 0.75,
                     "destY": 0
                 },
                 {
-                    "predicate": "with(SEMATYPE.DIST) && (with(SEMAVR.VR1) || with(SEMAVR.VR2))",
+                    "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR1)",
                     "mode": "TRANSLATION",
-                    "animationSpeed": 0.25,
+                    "animationSpeed": 0.75,
+                    "destY": 0.25
+                },
+                {
+                    "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR2)",
+                    "mode": "TRANSLATION",
+                    "animationSpeed": 0.75,
                     "destY": 0.25
                 }
             ]

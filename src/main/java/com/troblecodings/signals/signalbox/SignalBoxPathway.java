@@ -282,8 +282,8 @@ public class SignalBoxPathway implements IChunkLoadable {
         this.grid = grid;
     }
 
-    public void resetPathway() {
-        resetPathway(null);
+    public void resetPathway(final boolean manuellReset) {
+        resetPathway(null, manuellReset);
     }
 
     public void resetAllSignals() {
@@ -329,7 +329,11 @@ public class SignalBoxPathway implements IChunkLoadable {
         });
     }
 
-    public void resetPathway(final @Nullable Point point) {
+    public void resetPathway(final Point point) {
+        resetPathway(point, false);
+    }
+
+    public void resetPathway(final @Nullable Point point, final boolean manuellReset) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
         if (data.totalPathwayReset(point)) {
@@ -438,7 +442,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                         if (atomic.get())
                             return;
                         canReset.set(true);
-                        this.resetPathway();
+                        this.resetPathway(null);
                     }));
         }
         return canReset.get();

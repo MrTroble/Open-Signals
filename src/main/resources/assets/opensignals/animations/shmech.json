@@ -12,13 +12,13 @@
                     "predicate": "with(SH_MECH.SH0) && hasandisnot(sh_high)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 1,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(SH_MECH.SH1) && hasandisnot(sh_high)",
                     "mode": "ROTATION",
-                    "animationSpeed": 2,
+                    "animationSpeed": 1,
                     "rotationAxis": "Z",
                     "rotation": -45
                 },
@@ -26,7 +26,7 @@
                     "predicate": "with(SH_MECH.SH1_GSP2) && hasandisnot(sh_high)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 1,
                     "rotation": -90
                 }
             ]
@@ -43,21 +43,21 @@
                     "predicate": "with(SH_MECH.SH0) && hasandis(sh_high)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 1,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(SH_MECH.SH1) && hasandis(sh_high)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 1,
                     "rotation": -45
                 },
                 {
                     "predicate": "with(SH_MECH.SH1_GSP2) && hasandis(sh_high)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 1,
                     "rotation": -90
                 }
             ]

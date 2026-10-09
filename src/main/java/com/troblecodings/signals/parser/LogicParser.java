@@ -56,6 +56,9 @@ public final class LogicParser {
         TRANSLATION_TABLE.put("signalrepeater", new MethodInfo(Boolean.class, "signalrepeater",
                 obj -> PredicateHolder.signalRepeater((boolean) obj[0]), Boolean.class));
 
+        TRANSLATION_TABLE.put("current", new MethodInfo(HashMap.class, "current",
+                objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
+
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
                 new MethodInfo(Map.class, name, objects -> {
                     final Predicate original = info.blockState.apply(objects);
