@@ -391,7 +391,8 @@
 				{
 					"blockstate": "with(SEMATYPE.DIST) && with(SEMAVR.VR2)",
 					"retexture": {
-						"lamp2": "lamp_green_shield"
+						"lamp1": "lamp_green_shield",
+						"lamp2": "lamp_yellow_shield"
 					}
 				}
 			],
