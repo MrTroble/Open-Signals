@@ -593,6 +593,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeBasicUI() {
+        this.entity.clear();
         final String name = I18Wrapper.format("tile.signalbox.name");
 
         final UILabel titlelabel = new UILabel(name);
