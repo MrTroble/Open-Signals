@@ -15,6 +15,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.Mirror;
@@ -186,6 +187,57 @@ public class Monitor extends BasicBlock {
             case NORTH:
             default:
                 return pos.east();
+        }
+    }
+
+    @Override
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        final EnumFacing blockFacing = state.getValue(FACING);
+        final float u = horizontalHit(blockFacing, hitX, hitZ);
+        return forwardClick(worldIn, pos, state, facing, playerIn, hand, u, hitY);
+    }
+
+    protected boolean forwardClick(final World world, final BlockPos pos, final IBlockState state,
+            final EnumFacing facing, final EntityPlayer player, final EnumHand hand, final float u,
+            final float v) {
+        final BlockPos downPos = pos.down();
+        final IBlockState downState = world.getBlockState(downPos);
+        if (downState.getBlock() instanceof Monitor) {
+            return ((Monitor) downState.getBlock()).forwardClick(world, downPos, downState, facing,
+                    player, hand, u, v + 1);
+        }
+        final BlockPos nextPos = getLeftPos(getActualState(state, world, pos), pos);
+        if (!nextPos.equals(pos)) {
+            final IBlockState nextState = world.getBlockState(nextPos);
+            if (nextState.getBlock() instanceof Monitor) {
+                return ((Monitor) nextState.getBlock()).forwardClick(world, nextPos, nextState,
+                        facing, player, hand, u + 1, v);
+            }
+        }
+        return onScreenClick(world, pos, state, facing, player, hand, u, v);
+    }
+
+    protected boolean onScreenClick(final World world, final BlockPos pos, final IBlockState state,
+            final EnumFacing facing, final EntityPlayer player, final EnumHand hand, final float u,
+            final float v) {
+        return false;
+    }
+
+    protected static float horizontalHit(final EnumFacing facing, final float hitX,
+            final float hitZ) {
+        switch (facing) {
+            case NORTH:
+                return 1f - hitX;
+            case SOUTH:
+                return hitX;
+            case EAST:
+                return 1f - hitZ;
+            case WEST:
+                return hitZ;
+            default:
+                return hitX;
         }
     }
 

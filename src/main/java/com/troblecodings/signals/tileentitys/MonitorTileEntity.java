@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -14,14 +15,18 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.MonitorBlockProperties;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
+import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.handler.ClientMonitorNetworkHandler;
 import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
@@ -35,10 +40,15 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MonitorTileEntity extends SyncableTileEntity
         implements ILinkableTile, SignalBoxNetworkReader {
@@ -60,6 +70,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     private int monitorSizeX, monitorSizeY;
     private Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
     private UISignalBoxRendering rendering;
+    private Point startPoint = null;
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
@@ -97,6 +108,65 @@ public class MonitorTileEntity extends SyncableTileEntity
         if (!(block instanceof MonitorTEBlock) || rendering == null)
             return;
         ((MonitorTEBlock) block).render(info, this, rendering);
+    }
+
+    public boolean onBlockActivated(final float hitX, final float hitY,
+            final MonitorBlockProperties props, final EntityPlayer playerIn) {
+        if (!hasLink() || renderStart.equals(new Point(-1, -1)))
+            return false;
+        final int cellsX = renderEnd.getX() - renderStart.getX() + 1;
+        final int cellsY = renderEnd.getY() - renderStart.getY() + 1;
+
+        final float insets = (props.getInsets() - 6) / (float) MonitorTEBlock.STEPS_PER_BLOCK;
+        final float mx = hitX;
+        final float my = monitorSizeY - hitY;
+
+        final float contentW = monitorSizeX - 2 * insets;
+        final float contentH = monitorSizeY - 2 * insets;
+
+        final float u = (mx - insets) / contentW;
+        final float v = (my - insets) / contentH;
+        final int px = clamp((int) Math.floor(u * cellsX), 0, cellsX - 1);
+        final int py = clamp((int) Math.floor(v * cellsY), 0, cellsY - 1);
+
+        final Point point = new Point(px, py);
+        final SignalBoxNode node = grid.getNode(getPointRetranslated(point));
+        if (node == null)
+            return false;
+        if (startPoint == null && node.isValidStart()) {
+            startPoint = point;
+            rendering.addSelection(
+                    grid.getUIProfile().getOperationModeSettings().getUserSelectionColor(), point,
+                    SelectionType.FIRST);
+            return true;
+        }
+        if (!point.equals(startPoint) && node.isValidEnd()) {
+            requestPathway(startPoint, point, playerIn);
+            rendering.removeSelection(SelectionType.FIRST);
+            startPoint = null;
+            return true;
+        } else if (point.equals(startPoint)) {
+            rendering.removeSelection(SelectionType.FIRST);
+            startPoint = null;
+        }
+        return false;
+    }
+
+    private static int clamp(int v, int min, int max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    private void requestPathway(final Point start, final Point end, final EntityPlayer playerIn) {
+        final Point p1 = getPointRetranslated(start);
+        final Point p2 = getPointRetranslated(end);
+        final SignalBoxNode nodeP1 = grid.getNode(p1);
+        final SignalBoxNode nodeP2 = grid.getNode(p2);
+        if (nodeP1 == null || nodeP2 == null) {
+            return;
+        }
+        final PathType pathType =
+                nodeP1.getPossibleTypes(nodeP2).stream().findFirst().orElse(PathType.NONE);
+        MonitorNetworkHandler.sendPathwayRequest(world, linkedSignalBox, p1, p2, pathType);
     }
 
     @Override
@@ -142,6 +212,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     public void loadRenderPoints(final ReadBuffer buffer) {
+        linkedSignalBox = buffer.getBlockPos();
         monitorSizeX = buffer.getInt();
         monitorSizeY = buffer.getInt();
         renderStart = buffer.getINetworkSaveable(Point.class);
@@ -188,6 +259,10 @@ public class MonitorTileEntity extends SyncableTileEntity
             return translated;
         }
         return null;
+    }
+
+    private Point getPointRetranslated(final Point p) {
+        return new Point(p.getX() + renderStart.getX(), p.getY() + renderStart.getY());
     }
 
     private void buildColors(final Collection<SignalBoxNode> nodes,
@@ -257,6 +332,30 @@ public class MonitorTileEntity extends SyncableTileEntity
     @Override
     public void handleUIProfileUpdate() {
         initRendering();
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void handleAddSavedPathway(final Point p1, final Point p2, final PathType type,
+            final PathwayRequestMode result) {
+        final World world = getWorld();
+        if (!world.isRemote)
+            return;
+
+        final EntityPlayer player = Minecraft.getMinecraft().player;
+        player.sendMessage(new TextComponentString(I18Wrapper.format("error." + result.getName())
+                + " - " + I18Wrapper.format("info.pathwaysaver")));
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void handlePathwayRequestResponse(final PathwayRequestMode mode) {
+        final World world = getWorld();
+        if (!world.isRemote)
+            return;
+
+        final EntityPlayer player = Minecraft.getMinecraft().player;
+        player.sendMessage(new TextComponentString(I18Wrapper.format("error." + mode.getName())));
     }
 
     public void setRenderPoints(final Point start, final Point end) {

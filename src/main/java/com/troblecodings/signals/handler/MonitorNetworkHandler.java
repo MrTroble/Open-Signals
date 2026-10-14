@@ -9,42 +9,61 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler.SignalBoxNetworkListener;
+import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
+import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public final class MonitorNetworkHandler {
-
-    private MonitorNetworkHandler() {
-    }
+public final class MonitorNetworkHandler implements IChunkLoadable {
 
     public static final byte NETWORK_TILE_DATA = 0;
     public static final byte NETWORK_UPDATE = 1;
+    public static final byte PATHWAY_ADD_SAVER = 2;
+    public static final byte PATHWAY_RESPONSE = 3;
 
     private static final Map<StateInfo, SignalBoxNetworkListener> LISTENERS = new HashMap<>();
 
     private static final String CHANNELNAME = "monitor_net";
     private static FMLEventChannel channel;
+    private static MonitorNetworkHandler instance;
+
+    public MonitorNetworkHandler() {
+        instance = this;
+    }
 
     public static void init() {
+        new MonitorNetworkHandler();
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
+        channel.register(instance);
     }
 
     public static void registerToNetworkChannel(final Object obj) {
@@ -128,6 +147,7 @@ public final class MonitorNetworkHandler {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(tile.getPos());
         buffer.putByte(NETWORK_TILE_DATA);
+        buffer.putBlockPos(tile.getLinkedSignalBox());
         buffer.putInt(tile.getMonitorSizeX());
         buffer.putInt(tile.getMonitorSizeY());
         tile.getRenderStart().writeNetwork(buffer);
@@ -165,7 +185,21 @@ public final class MonitorNetworkHandler {
         tile.getWorld().playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
-    private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {
+    @SideOnly(Side.CLIENT)
+    public static void sendPathwayRequest(final World world, final BlockPos signalBoxPos,
+            final Point p1, final Point p2, final PathType type) {
+        if (!world.isRemote)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(signalBoxPos);
+        p1.writeNetwork(buffer);
+        p2.writeNetwork(buffer);
+        buffer.putEnumValue(type);
+
+        sendTo(Minecraft.getMinecraft().player, buffer.getBuildedBuffer());
+    }
+
+    public static void sendTo(final EntityPlayer player, final ByteBuffer buf) {
         final PacketBuffer buffer =
                 new PacketBuffer(Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
         if (player instanceof EntityPlayerMP) {
@@ -174,6 +208,42 @@ public final class MonitorNetworkHandler {
         } else {
             channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(CHANNELNAME, buffer)));
         }
+    }
+
+    @SubscribeEvent
+    public void clientEvent(final ServerCustomPacketEvent event) {
+        final NetHandlerPlayServer handler = (NetHandlerPlayServer) event.getHandler();
+        handler.player.mcServer.addScheduledTask(() -> {
+            final World world = handler.player.getEntityWorld();
+            final ReadBuffer buffer = new ReadBuffer(event.getPacket().payload().nioBuffer());
+            final BlockPos signalBoxPos = buffer.getBlockPos();
+            final Point p1 = Point.of(buffer);
+            final Point p2 = Point.of(buffer);
+            final PathType type = buffer.getEnumValue(PathType.class);
+
+            loadChunkAndGetTile(SignalBoxTileEntity.class, world, signalBoxPos, (tile, chunk) -> {
+                final SignalBoxGrid grid = tile.getSignalBoxGrid();
+                final PathwayRequestResult request = grid.requestWay(p1, p2, type);
+                if (!request.wasSuccesfull()) {
+                    final SignalBoxNode endNode = grid.getNode(p2);
+                    if (request.canBeAddedToSaver(type) && !endNode.containsOutConnection()
+                            && grid.addNextPathway(p1, p2, type)) {
+                        sendResponseToClient(request, handler.player, PATHWAY_ADD_SAVER);
+                        return;
+                    }
+                    sendResponseToClient(request, handler.player, PATHWAY_RESPONSE);
+                }
+            });
+        });
+    }
+
+    private static void sendResponseToClient(final PathwayRequestResult result,
+            final EntityPlayerMP player, final byte mode) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(BlockPos.ORIGIN);
+        buffer.putByte(mode);
+        buffer.putEnumValue(result.getMode());
+        sendTo(player, buffer.getBuildedBuffer());
     }
 
 }
