@@ -20,6 +20,8 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiPathwayRequester extends GuiBase {
 
+    private static final int SELECTION_COLOR = 0xFF00FF00;
+
     private final ContainerPathwayRequester container;
     private final EntityPlayer player;
 
@@ -45,32 +47,33 @@ public class GuiPathwayRequester extends GuiBase {
                 1f);
         higherEntity.add(label);
 
-        final BoxEntity boxEntity = UISignalBoxRendering.createSignalBoxEntity(container.grid,
-                false, (rendering, point, mouseKey) -> {
-                    if (mouseKey != MouseEvent.LEFT_MOUSE)
-                        return;
-                    container.grid.getNodeChecked(point).ifPresent(node -> {
-                        if (container.start == null && node.isValidStart()) {
-                            container.start = point;
-                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
-                                    SelectionType.FIRST);
-                        } else if (container.start != null && container.end == null
-                                && node.isValidEnd()) {
-                            container.end = point;
-                            rendering.addSelection(GuiSignalBox.SELECTION_COLOR, point,
-                                    SelectionType.SECOND);
-                            sendPWToServer();
-                            infoUpdate(I18Wrapper.format("gui.pwr.saved"));
-                        }
-                    });
-                });
+        final BoxEntity boxEntity =
+                UISignalBoxRendering.createSignalBoxEntity(container.grid,
+                        container.grid.getUIProfile(), container.grid.getUIProfile()
+                                .getOperationModeSettings().getUIBorderSettings(),
+                        (rendering, point, mouseKey) -> {
+                            if (mouseKey != MouseEvent.LEFT_MOUSE)
+                                return;
+                            container.grid.getNodeChecked(point).ifPresent(node -> {
+                                if (container.start == null && node.isValidStart()) {
+                                    container.start = point;
+                                    rendering.addSelection(SELECTION_COLOR, point,
+                                            SelectionType.FIRST);
+                                } else if (container.start != null && container.end == null
+                                        && node.isValidEnd()) {
+                                    container.end = point;
+                                    rendering.addSelection(SELECTION_COLOR, point,
+                                            SelectionType.SECOND);
+                                    sendPWToServer();
+                                    infoUpdate(I18Wrapper.format("gui.pwr.saved"));
+                                }
+                            });
+                        });
         if (container.start != null) {
-            boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR, container.start,
-                    SelectionType.FIRST);
+            boxEntity.rendering.addSelection(SELECTION_COLOR, container.start, SelectionType.FIRST);
         }
         if (container.end != null) {
-            boxEntity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR, container.end,
-                    SelectionType.SECOND);
+            boxEntity.rendering.addSelection(SELECTION_COLOR, container.end, SelectionType.SECOND);
         }
 
         final UIEntity newPathButton = GuiElements

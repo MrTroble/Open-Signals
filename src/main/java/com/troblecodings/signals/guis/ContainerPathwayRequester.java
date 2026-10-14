@@ -30,7 +30,7 @@ public class ContainerPathwayRequester extends ContainerBase implements IChunkLo
 
     public ContainerPathwayRequester(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile(PathwayRequesterTileEntity.class);
+        this.tile = info.getTile();
     }
 
     @Override
@@ -53,15 +53,17 @@ public class ContainerPathwayRequester extends ContainerBase implements IChunkLo
                 return;
             grid.get().writeNetwork(buffer);
         }
-        if (signalBoxPos != null)
+        if (signalBoxPos != null) {
             OpenSignalsMain.network.sendTo(info.player, buffer);
+        }
     }
 
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         this.linkedPos = buffer.getBlockPos();
-        if (this.linkedPos.equals(BlockPos.ORIGIN))
+        if (this.linkedPos.equals(BlockPos.ORIGIN)) {
             this.linkedPos = null;
+        }
         start = Point.of(buffer);
         end = Point.of(buffer);
         addToPWToSavedPW = buffer.getByte();

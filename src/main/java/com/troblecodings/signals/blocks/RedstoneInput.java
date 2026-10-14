@@ -20,11 +20,12 @@ public class RedstoneInput extends RedstoneIO {
         if (worldIn.isRemote)
             return;
         if (worldIn.isBlockPowered(pos)) {
-            if (state.getValue(RedstoneIO.POWER) != true) {
+            if (!state.getValue(RedstoneIO.POWER)) {
                 worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, true));
                 final TileEntity entity = worldIn.getTileEntity(pos);
-                if (entity instanceof RedstoneIOTileEntity)
-                    ((RedstoneIOTileEntity) entity).sendToAll();
+                if (entity instanceof RedstoneIOTileEntity) {
+                    ((RedstoneIOTileEntity) entity).sendInputOn();
+                }
             }
         } else {
             worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, false));

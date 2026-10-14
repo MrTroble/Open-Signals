@@ -23,7 +23,8 @@ public class ChangeConfigParser {
     private Map<String, String> savedPredicates;
     private Map<String, List<String>> values;
 
-    public static final Map<Map.Entry<Signal, Signal>, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
+    public static final Map<Map.Entry<Signal, Signal>, List<ConfigProperty>> CHANGECONFIGS =
+            new HashMap<>();
 
     private static final Gson GSON = new Gson();
 
@@ -31,8 +32,8 @@ public class ChangeConfigParser {
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
                 .getFiles("signalconfigs/change")) {
             try {
-                final ChangeConfigParserV2 parser = GSON.fromJson(files.getValue(),
-                        ChangeConfigParserV2.class);
+                final ChangeConfigParserV2 parser =
+                        GSON.fromJson(files.getValue(), ChangeConfigParserV2.class);
                 for (final String currentSignal : parser.currentSignals) {
                     for (final String nextSignal : parser.nextSignals) {
                         loadConfigForPair(files.getKey(), currentSignal, nextSignal,
@@ -42,8 +43,8 @@ public class ChangeConfigParser {
             } catch (final Exception e) {
                 OpenSignalsMain.getLogger()
                         .error("Please update your change config [" + files.getKey() + "]!");
-                final ChangeConfigParser parser = GSON.fromJson(files.getValue(),
-                        ChangeConfigParser.class);
+                final ChangeConfigParser parser =
+                        GSON.fromJson(files.getValue(), ChangeConfigParser.class);
                 loadConfigForPair(files.getKey(), parser.currentSignal, parser.nextSignal,
                         parser.savedPredicates, parser.values);
             }
@@ -65,15 +66,14 @@ public class ChangeConfigParser {
                 return;
             }
             final Map.Entry<Signal, Signal> pair = Maps.immutableEntry(start, end);
-            if (CHANGECONFIGS.containsKey(pair)) {
+            if (CHANGECONFIGS.containsKey(pair))
                 throw new LogicalParserException(
                         "A signalconfig with the signals [" + start.getSignalTypeName() + ", "
                                 + end.getSignalTypeName() + "] does alredy exists! '" + fileName
-                                + "' tried to register a chaneconfig for the same signalpair!");
-            }
+                                + "' tried to register a changeconfig for the same signalpair!");
             final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
-            final FunctionParsingInfo endInfo = new FunctionParsingInfo(
-                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
+            final FunctionParsingInfo endInfo =
+                    new FunctionParsingInfo(LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
             for (final Map.Entry<String, List<String>> entry : values.entrySet()) {
@@ -138,8 +138,8 @@ public class ChangeConfigParser {
                 for (final String value : entry.getValue()) {
 
                     final String[] valuetoChange = value.split("\\.");
-                    final SEProperty property = (SEProperty) startInfo
-                            .getProperty(valuetoChange[0]);
+                    final SEProperty property =
+                            (SEProperty) startInfo.getProperty(valuetoChange[0]);
                     propertiesToSet.put(property, valuetoChange[1]);
                 }
 
