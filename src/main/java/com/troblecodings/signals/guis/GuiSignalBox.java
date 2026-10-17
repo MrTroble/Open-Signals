@@ -677,10 +677,6 @@ public class GuiSignalBox extends GuiBase {
             this.rendering.setColor(node.getPoint(), mode -> {
                 if (mode.mode == EnumGuiMode.TRAIN_NUMBER)
                     return mode.mode.getDefaultColor();
-                if (mode.mode == EnumGuiMode.TRACK_BREAK)
-                    return node.getOption(mode).get().getEntry(PathEntryType.BREAK_COLOR)
-                            .map(index -> SignalBoxUtil.BREAK_COLORS[index - 1])
-                            .orElse(mode.mode.getDefaultColor());
                 if (node.containsManuellOutput(mode))
                     return OUTPUT_COLOR;
                 return node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
@@ -714,15 +710,13 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void updateColor(final SignalBoxNode node) {
-        node.toPathIdentifier().stream()
-                .filter(ident -> ident.getMode().mode != EnumGuiMode.TRACK_BREAK)
-                .forEach(ident -> {
-                    node.getOption(ident.getMode()).ifPresent(poe -> {
-                        rendering.setColor(node.getPoint(), ident.getMode(),
-                                poe.getEntry(PathEntryType.PATHUSAGE)
-                                        .orElseGet(() -> EnumPathUsage.FREE).getColor());
-                    });
-                });
+        node.toPathIdentifier().forEach(ident -> {
+            node.getOption(ident.getMode()).ifPresent(poe -> {
+                rendering.setColor(node.getPoint(), ident.getMode(),
+                        poe.getEntry(PathEntryType.PATHUSAGE).orElseGet(() -> EnumPathUsage.FREE)
+                                .getColor());
+            });
+        });
     }
 
     private void resetAllSubsidiarySignals() {

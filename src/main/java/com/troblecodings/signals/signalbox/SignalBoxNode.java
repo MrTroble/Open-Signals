@@ -227,18 +227,6 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
                             break;
                     }
                     break;
-                case TRACK_BREAK: {
-                    final Optional<ModeIdentifier> partner =
-                            entry.getValue().getEntry(PathEntryType.CONNECTED_BREAK);
-                    if (!partner.isPresent())
-                        continue;
-                    final Point delta = SignalBoxUtil
-                            .getDeltaFromRotation(mode.rotation.add(Rotation.CLOCKWISE_180));
-                    p1.translate(delta.getX(), delta.getY());
-                    p2.translate(partner.get().point.getX() - point.getX(),
-                            partner.get().point.getY() - point.getY());
-                    break;
-                }
                 default:
                     continue;
             }
@@ -564,6 +552,7 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         copy.manuellEnabledOutputs.addAll(manuellEnabledOutputs);
         copy.isAutoPoint = isAutoPoint;
         copy.customText = customText;
+        copy.post();
         return copy;
     }
 

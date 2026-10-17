@@ -28,23 +28,6 @@ import net.minecraft.world.World;
 public final class SignalBoxUtil {
 
     public static final int FREE_COLOR = ConfigHandler.signalboxFreeColor;
-    public static final int BREAK_COLOR_NONE = 0xFF525252;
-    public static final int[] BREAK_COLORS = {
-            0xFFE8D84B, // 0: Gelb
-            0xFF6C7BE8, // 1: Blau
-            0xFF6FE06F, // 2: Grün
-            0xFFE86F6F, // 3: Rot
-            0xFFF0A020, // 4: Orange
-            0xFFB06CE0, // 5: Lila
-            0xFF4FD8D8, // 6: Türkis
-            0xFFE06CB0, // 7: Pink
-            0xFFA0D030, // 8: Hellgrün
-            0xFF9C6B3C, // 9: Braun
-            0xFFFFFFFF, // 10: Weiß
-            0xFFFF8080, // 11: Lachs
-            0xFFFF80FF, // 12: Hell-Lila
-            0xFF8080FF  // 13: Kornblumenblau
-    };
     public static final int SELECTED_COLOR = ConfigHandler.signalboxSelectColor;
     public static final int USED_COLOR = ConfigHandler.signalboxUsedColor;
     public static final int PREPARED_COLOR = ConfigHandler.signalboxPreparedColor;
@@ -336,7 +319,6 @@ public final class SignalBoxUtil {
             case IN_CONNECTION:
             case ARROW:
             case OUT_CONNECTION:
-            case TRACK_BREAK:
             case CROSSING: {
                 return 0;
             }

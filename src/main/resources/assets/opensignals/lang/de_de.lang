@@ -206,25 +206,6 @@ info.ne5=Ne5 - Haltetafel
 info.zs3=Zs3 - Geschwindigkeitsanzeiger
 info.train_number=Zugnummernfeld
 info.crossing=Kreuzungselement
-property.TRACK_BREAK=Gleisumbruch
-btn.connect.break=Gleisumbruch verbinden
-property.break_color.name=Farbe
-property.break_color.desc=Farbe der verbundenen Gleisumbrüche.
-property.break_color.0=Gelb
-property.break_color.1=Blau
-property.break_color.2=Grün
-property.break_color.3=Rot
-property.break_color.4=Orange
-property.break_color.5=Lila
-property.break_color.6=Türkis
-property.break_color.7=Pink
-property.break_color.8=Hellgrün
-property.break_color.9=Braun
-property.break_color.10=Weiß
-property.break_color.11=Lachs
-property.break_color.12=Hell-Lila
-property.break_color.13=Kornblumenblau
-info.track_break=Gleisumbruch
 
 # SignalboxSidePanel
 info.info=Info

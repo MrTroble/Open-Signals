@@ -277,14 +277,12 @@ public class SignalBoxNetworkHandler {
         final PathOptionEntry optionEntry = node.getOrCreateOption(ident.mode);
         if (mode.equals(EntryNetworkMode.ENTRY_REMOVE)) {
             optionEntry.removeEntryNoNetwork(entryType);
-        } else {
-            final IPathEntry<?> entry = entryType.newValue();
-            entry.readNetwork(buffer);
-            optionEntry.addEntry(entryType, entry);
+            container.handleNodeUpdate(node, entryType);
+            return;
         }
-        if (entryType.equals(PathEntryType.CONNECTED_BREAK)) {
-            node.post();
-        }
+        final IPathEntry<?> entry = entryType.newValue();
+        entry.readNetwork(buffer);
+        optionEntry.addEntry(entryType, entry);
         container.handleNodeUpdate(node, entryType);
     }
 
