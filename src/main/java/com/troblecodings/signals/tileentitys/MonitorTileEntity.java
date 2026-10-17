@@ -117,7 +117,7 @@ public class MonitorTileEntity extends SyncableTileEntity
         final int cellsX = renderEnd.getX() - renderStart.getX() + 1;
         final int cellsY = renderEnd.getY() - renderStart.getY() + 1;
 
-        final float insets = (props.getInsets() - 6) / (float) MonitorTEBlock.STEPS_PER_BLOCK;
+        final float insets = (props.getInsets() - 6) / MonitorTEBlock.STEPS_PER_BLOCK;
         final float mx = hitX;
         final float my = monitorSizeY - hitY;
 
@@ -145,14 +145,15 @@ public class MonitorTileEntity extends SyncableTileEntity
             rendering.removeSelection(SelectionType.FIRST);
             startPoint = null;
             return true;
-        } else if (point.equals(startPoint)) {
+        }
+        if (point.equals(startPoint)) {
             rendering.removeSelection(SelectionType.FIRST);
             startPoint = null;
         }
         return false;
     }
 
-    private static int clamp(int v, int min, int max) {
+    private static int clamp(final int v, final int min, final int max) {
         return Math.max(min, Math.min(max, v));
     }
 
@@ -161,9 +162,8 @@ public class MonitorTileEntity extends SyncableTileEntity
         final Point p2 = getPointRetranslated(end);
         final SignalBoxNode nodeP1 = grid.getNode(p1);
         final SignalBoxNode nodeP2 = grid.getNode(p2);
-        if (nodeP1 == null || nodeP2 == null) {
+        if (nodeP1 == null || nodeP2 == null)
             return;
-        }
         final PathType pathType =
                 nodeP1.getPossibleTypes(nodeP2).stream().findFirst().orElse(PathType.NONE);
         MonitorNetworkHandler.sendPathwayRequest(world, linkedSignalBox, p1, p2, pathType);
