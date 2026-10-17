@@ -171,6 +171,7 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
             modeGrid.put(newPoint, node.copyTo(newPoint));
         });
         updateMovedReferences(area, dx, dy);
+        modeGrid.values().forEach(SignalBoxNode::post);
         return true;
     }
 
@@ -186,16 +187,22 @@ public class SignalBoxGrid implements INetworkSaveable, ISaveable {
                 updateMovedPoint(option, PathEntryType.POINT, area, dx, dy);
             }
             updateMovedPoint(option, PathEntryType.PROTECTIONWAY_END, area, dx, dy);
-            option.getEntry(PathEntryType.CONNECTED_TRAINNUMBER).ifPresent(ident -> {
-                if (ident.point == null || !area.contains(ident.point))
-                    return;
-                final IPathEntry<ModeIdentifier> entry =
-                        PathEntryType.CONNECTED_TRAINNUMBER.newValue();
-                entry.setValue(new ModeIdentifier(
-                        new Point(ident.point.getX() + dx, ident.point.getY() + dy), ident.mode));
-                option.addEntry(PathEntryType.CONNECTED_TRAINNUMBER, entry);
-            });
+            updateMovedIdent(option, PathEntryType.CONNECTED_TRAINNUMBER, area, dx, dy);
+            updateMovedIdent(option, PathEntryType.CONNECTED_BREAK, area, dx, dy);
         }));
+    }
+
+    private static void updateMovedIdent(final PathOptionEntry option,
+            final PathEntryType<ModeIdentifier> type, final Area area, final int dx,
+            final int dy) {
+        option.getEntry(type).ifPresent(ident -> {
+            if (ident.point == null || !area.contains(ident.point))
+                return;
+            final IPathEntry<ModeIdentifier> entry = type.newValue();
+            entry.setValue(new ModeIdentifier(
+                    new Point(ident.point.getX() + dx, ident.point.getY() + dy), ident.mode));
+            option.addEntry(type, entry);
+        });
     }
 
     private static void updateMovedPoint(final PathOptionEntry option,

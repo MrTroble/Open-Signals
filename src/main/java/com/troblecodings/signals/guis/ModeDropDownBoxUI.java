@@ -1,6 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -451,9 +452,117 @@ public class ModeDropDownBoxUI {
                 parent.add(button);
                 break;
             }
+            case TRACK_BREAK: {
+                final ModeIdentifier thisIdent = new ModeIdentifier(node.getPoint(), modeSet);
+                parent.add(GuiElements.createButton(I18Wrapper.format("btn.connect.break"),
+                        e -> selectBreak(thisIdent)));
+                option.getEntry(PathEntryType.CONNECTED_BREAK)
+                        .ifPresent(partner -> parent.add(GuiElements.createEnumElement(
+                                new SizeIntegerables<>("break_color",
+                                        SignalBoxUtil.BREAK_COLORS.length,
+                                        i -> I18Wrapper.format("property.break_color." + i)),
+                                id -> linkBreaks(thisIdent, partner, id + 1),
+                                option.getEntry(PathEntryType.BREAK_COLOR).orElse(1) - 1)));
+                break;
+            }
             default:
                 break;
         }
+    }
+
+    private void selectBreak(final ModeIdentifier thisIdent) {
+        final Optional<ModeIdentifier> partner = getBreakOption(thisIdent)
+                .flatMap(entry -> entry.getEntry(PathEntryType.CONNECTED_BREAK));
+        final UIEntity screen = new UIEntity();
+        screen.setInherits(true);
+        screen.add(new UIBox(UIBox.VBOX, 5));
+        screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> gui.pop()));
+        final BoxEntity entity = UISignalBoxRendering.createSignalBoxEntity(gui.container.grid,
+                false, (rendering, point, mouseKey) -> {
+                    if (mouseKey != MouseEvent.LEFT_MOUSE)
+                        return;
+                    final Optional<ModeIdentifier> target = gui.container.grid
+                            .getNodeChecked(point)
+                            .flatMap(other -> other.getModes().keySet().stream()
+                                    .filter(set -> set.mode == EnumGuiMode.TRACK_BREAK)
+                                    .map(set -> new ModeIdentifier(point, set))
+                                    .filter(ident -> !ident.equals(thisIdent)
+                                            && (partner.filter(ident::equals).isPresent()
+                                                    || !isBreakLinked(ident)))
+                                    .findFirst());
+                    if (!target.isPresent()) {
+                        final UIToolTip tip =
+                                new UIToolTip(I18Wrapper.format("gui.tile.notvalid"), true);
+                        screen.add(tip);
+                        gui.executor.schedule(() -> screen.remove(tip), 3, TimeUnit.SECONDS);
+                        return;
+                    }
+                    toggleBreakLink(thisIdent, target.get());
+                    gui.pop();
+                    update.run();
+                });
+        partner.ifPresent(ident -> entity.rendering.addSelection(GuiSignalBox.SELECTION_COLOR,
+                ident.point, SelectionType.FIRST));
+        screen.add(entity.entity);
+        gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
+    }
+
+    private void toggleBreakLink(final ModeIdentifier first, final ModeIdentifier second) {
+        final boolean linked = getBreakOption(first)
+                .flatMap(entry -> entry.getEntry(PathEntryType.CONNECTED_BREAK))
+                .filter(second::equals).isPresent();
+        unlinkBreak(first);
+        if (!linked) {
+            final Set<Integer> used = new HashSet<>();
+            gui.container.grid.getNodes().forEach(other -> other.getModes().values()
+                    .forEach(entry -> entry.getEntry(PathEntryType.BREAK_COLOR).ifPresent(used::add)));
+            int color = 1;
+            while (used.contains(color) && color < SignalBoxUtil.BREAK_COLORS.length) {
+                color++;
+            }
+            linkBreaks(first, second, color);
+        }
+    }
+
+    private void linkBreaks(final ModeIdentifier first, final ModeIdentifier second,
+            final int color) {
+        setBreak(first, second, color);
+        setBreak(second, first, color);
+    }
+
+    private void setBreak(final ModeIdentifier ident, final ModeIdentifier partner,
+            final int color) {
+        getBreakOption(ident).ifPresent(entry -> {
+            entry.setEntry(PathEntryType.CONNECTED_BREAK, partner);
+            entry.setEntry(PathEntryType.BREAK_COLOR, color);
+        });
+        gui.rendering.setColor(ident.point, ident.mode, SignalBoxUtil.BREAK_COLORS[color - 1]);
+    }
+
+    private void unlinkBreak(final ModeIdentifier ident) {
+        getBreakOption(ident).flatMap(entry -> entry.getEntry(PathEntryType.CONNECTED_BREAK))
+                .ifPresent(this::resetBreak);
+        resetBreak(ident);
+    }
+
+    private void resetBreak(final ModeIdentifier ident) {
+        getBreakOption(ident).filter(entry -> entry.containsEntry(PathEntryType.CONNECTED_BREAK))
+                .ifPresent(entry -> {
+                    entry.removeEntry(PathEntryType.CONNECTED_BREAK);
+                    entry.removeEntry(PathEntryType.BREAK_COLOR);
+                });
+        gui.rendering.setColor(ident.point, ident.mode,
+                EnumGuiMode.TRACK_BREAK.getDefaultColor());
+    }
+
+    private boolean isBreakLinked(final ModeIdentifier ident) {
+        return getBreakOption(ident)
+                .filter(entry -> entry.containsEntry(PathEntryType.CONNECTED_BREAK)).isPresent();
+    }
+
+    private Optional<PathOptionEntry> getBreakOption(final ModeIdentifier ident) {
+        return Optional.ofNullable(gui.container.grid.getNode(ident.point))
+                .flatMap(other -> other.getOption(ident.mode));
     }
 
     private void handleTrainNumberChange(final SignalBoxNode node, final ModeSet mode,

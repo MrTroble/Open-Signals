@@ -92,6 +92,12 @@ public final class PathEntryType<T> {
     public static final PathEntryType<EnumPathUsage> PATHUSAGE = new PathEntryType<>(
             EnumPathUsageEntry.class, "pathusage");
 
+    public static final PathEntryType<ModeIdentifier> CONNECTED_BREAK = new PathEntryType<>(
+            ModeIdentifierEntry.class, "connected_break");
+
+    public static final PathEntryType<Integer> BREAK_COLOR = new PathEntryType<>(
+            IntegerEntry.class, "break_color");
+
     /**
      * Creates a new value holder
      *

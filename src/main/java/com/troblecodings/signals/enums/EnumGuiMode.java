@@ -40,7 +40,8 @@ public enum EnumGuiMode {
     }, PathwayModeType.NONE, 2, ConfigHandler.signalboxTrainnumberBackgroundColor, 6),
     CROSSING(new float[] {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
-    });
+    }), TRACK_BREAK((_u) -> (info, c) -> UISignalBoxRendering.drawTrackBreak(info, c),
+            PathwayModeType.NONE, (_u) -> 0, SignalBoxUtil.BREAK_COLOR_NONE);
 
     /**
      * Naming
@@ -103,6 +104,13 @@ public enum EnumGuiMode {
                 UISignalBoxRendering.TILE_WIDTH, UISignalBoxRendering.TILE_WIDTH, 0, 0, 1, 1));
         this.type = type;
         this.depthFunc = (_u) -> depth;
+    }
+
+    private EnumGuiMode(final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer,
+            final PathwayModeType type, final Function<SignalState, Integer> depthFunc,
+            final int color) {
+        this(consumer, type, depthFunc);
+        this.defaultColor = color;
     }
 
     private EnumGuiMode(final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer,

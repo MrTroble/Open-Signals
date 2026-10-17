@@ -206,6 +206,25 @@ info.ne5=Ne5 - Holding sign
 info.zs3=Zs3 - Speed indicator signal
 info.train_number=Train number field
 info.crossing=Crossing element
+property.TRACK_BREAK=Track break
+btn.connect.break=Connect track break
+property.break_color.name=Color
+property.break_color.desc=Color of the connected track breaks.
+property.break_color.0=Yellow
+property.break_color.1=Blue
+property.break_color.2=Green
+property.break_color.3=Red
+property.break_color.4=Orange
+property.break_color.5=Purple
+property.break_color.6=Turquoise
+property.break_color.7=Pink
+property.break_color.8=Light Green
+property.break_color.9=Brown
+property.break_color.10=White
+property.break_color.11=Salmon
+property.break_color.12=Light Purple
+property.break_color.13=Cornflower Blue
+info.track_break=Track break
 
 # SignalboxSidePanel
 info.info=Info

@@ -36,6 +36,7 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.client.Minecraft;
@@ -53,6 +54,9 @@ public class UISignalBoxRendering extends UIComponent {
     public static final int AREA_INVALID_COLOR = 0x50FF0000;
     public static final int GRID_COLOR = 0xFF5B5B5B;
     private static final float[] ALL_LINES = getLines();
+    private static final float[] BREAK_LINE = {
+            0, HALF_TILE, HALF_TILE, HALF_TILE
+    };
 
     private static float[] getLines() {
         final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
@@ -460,6 +464,19 @@ public class UISignalBoxRendering extends UIComponent {
         font.drawString(str, restWidth, restHeight, color);
         info.blendOff();
         info.color();
+        info.pop();
+    }
+
+    public static void drawTrackBreak(final DrawInfo info, final int color) {
+        info.lines(SignalBoxUtil.FREE_COLOR, 2, BREAK_LINE);
+        info.push();
+        info.alphaOn();
+        info.blendOn();
+        info.applyColor();
+        final BufferWrapper wrapper = info.builder(GL11.GL_QUADS,
+                DefaultVertexFormats.POSITION_COLOR);
+        wrapper.quad(HALF_TILE, TILE_WIDTH, TILE_WIDTH * 0.15f, TILE_WIDTH * 0.85f, color);
+        info.end();
         info.pop();
     }
 
