@@ -120,7 +120,7 @@ property.value.SINGLE=Redstone Modus
 property.value.RS_INPUT=Redstone Eingang
 property.value.MUX=MUX Modus
 gui.controller.mode=Modus
-gui.controller.mode.desc=TODO
+gui.controller.mode.desc=Hier kannst du ein Profil beim Anschalten von Redstone und beim Ausschalten von Redstone einstellen.
 gui.controller.profile=Profil
 gui.controller.add_profile=Neues Profil hinzufügen
 gui.controller.remove_profile=Aktuelles Profil löschen
@@ -152,7 +152,7 @@ gui.controller.east.OFFSTATE.desc=Lädt das eingestellte Profil, wenn der Redsto
 gui.controller.east.ONSTATE.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAn§r gestellt wird.
 gui.controller.not_linked=Nicht verlinkt!
 gui.controller.unlink=Entlinken
-gui.controller.unlink.desc=TODO
+gui.controller.unlink.desc=Hier kannst du Verlinkung von einem Redstone Input aufheben.
 
 # TrainNumberBlockGUI
 gui.trainnumber.info.select_point=Wähle ein Fahrstraßenelement für die Zugnummer aus
@@ -200,6 +200,7 @@ property.value.SIGNAL=Signal
 property.value.INPUT=Redstone Input
 property.value.OUTPUT=Redstone Output
 property.value.SIGNALBOX=Stellwerk
+sb.highlight=Herzlichen Glückwunsch, dass du diesen Text gefunden hast, du hast dir einen Keks verdient.
 
 # SignalboxEditorElements
 info.straight=Gerader Pfad
@@ -376,6 +377,10 @@ gui.monitor.monitor_ratio=Monitor Auflösung
 # SignalReaderUI
 gui.signalreader.and=UND
 gui.signalreader.or=ODER
+
+# RedstoneIOUI
+gui.nameable.blocking_delay=Blockier-Verzögerung
+gui.nameable.reset_delay=Zurücksetz-Verzögerung
 
 # GeneralUI
 label.linkedto=Verlinkt mit
