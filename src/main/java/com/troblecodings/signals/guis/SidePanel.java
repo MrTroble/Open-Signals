@@ -63,6 +63,10 @@ public class SidePanel {
             new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/emergency.png");
 
     private boolean showHelpPage = true;
+    private boolean moveMode = false;
+    private boolean drawMode = false;
+    private UIEntity moveToggle;
+    private UIEntity drawToggle;
     private final UIEntity helpPage = new UIEntity();
     private final UIEntity infoEntity = new UIEntity();
     private final UIButton helpPageButton = new UIButton(">");
@@ -214,8 +218,20 @@ public class SidePanel {
 
     public void updateNextNode(final int selection, final int rotation) {
         infoEntity.clearChildren();
-        infoEntity.add(GuiElements.createSpacerV(2));
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.editor.nextelement"),
+        final UIEntity editScroll = new UIEntity();
+        editScroll.setInherits(true);
+        editScroll.add(new UIBox(UIBox.HBOX, 0));
+        editScroll.add(new UIScissor());
+        infoEntity.add(editScroll);
+
+        final UIEntity editList = new UIEntity();
+        editList.setInherits(true);
+        editScroll.add(editList);
+
+        final UIScrollBox editScrollbox = new UIScrollBox(UIBox.VBOX, 1);
+
+        editList.add(GuiElements.createSpacerV(2));
+        editList.add(GuiElements.createLabel(I18Wrapper.format("info.editor.nextelement"),
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
@@ -239,20 +255,61 @@ public class SidePanel {
         preview.add(new UIScale(0.9f, 0.9f, 0));
 
         final EnumGuiMode mode = EnumGuiMode.values()[selection];
-        infoEntity.add(
+        editList.add(
                 GuiElements.createLabel(I18Wrapper.format("info." + mode.toString().toLowerCase()),
                         new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity.add(preview);
-        infoEntity.add(getSpacerLine());
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
+        editList.add(preview);
+        moveToggle = getToggle("move", true);
+        drawToggle = getToggle("draw", false);
+        editList.add(moveToggle);
+        editList.add(drawToggle);
+        editList.add(getSpacerLine());
+        editList.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
-        infoEntity.add(GuiElements.createLabel("[R] = " + I18Wrapper.format("info.editor.key.r"),
+        editList.add(GuiElements.createLabel("[R] = " + I18Wrapper.format("info.editor.key.r"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity
+        editList
                 .add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.editor.key.lmb"),
                         new UIEntity().getInfoTextColor(), 0.5f));
 
+        final UIScroll editScrolling = new UIScroll();
+        final UIEntity editScrollBar = GuiElements.createScrollBar(editScrollbox, 7, editScrolling);
+        editScrollbox.setConsumer(size -> {
+            if (size > editList.getHeight()) {
+            editScroll.add(editScrolling);
+            editScroll.add(editScrollBar);
+            } else {
+            editScroll.remove(editScrollBar);
+            editScroll.remove(editScrolling);
+            }
+        });
+        editList.add(editScrollbox);
         addHelpPageToPlane();
+    }
+
+    private UIEntity getToggle(final String name, final boolean move) {
+        final UIEntity toggle = GuiElements.createButton(I18Wrapper.format("info.editor." + name),
+                e -> switchTool(move));
+        toggle.add(new UIToolTip(I18Wrapper.format("info.editor." + name + ".desc")));
+        toggle.setScale(0.95f);
+        updateHighlight(toggle, move ? moveMode : drawMode);
+        return toggle;
+    }
+
+    private void switchTool(final boolean move) {
+        moveMode = move && !moveMode;
+        drawMode = !move && !drawMode;
+        gui.rendering.setAreaToolActive(moveMode);
+        gui.rendering.setDrawToolActive(drawMode);
+        updateHighlight(moveToggle, moveMode);
+        updateHighlight(drawToggle, drawMode);
+    }
+
+    private void updateHighlight(final UIEntity toggle, final boolean active) {
+        toggle.findRecursive(UIColor.class).forEach(toggle::remove);
+        if (active) {
+            toggle.add(new UIColor(UIMenu.HIGHLIGHT_COLOR));
+        }
     }
 
     public void resetHelpUsageMode() {

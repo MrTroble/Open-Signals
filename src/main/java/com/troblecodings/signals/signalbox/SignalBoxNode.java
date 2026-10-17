@@ -540,6 +540,22 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
                 (buf, entry) -> entry.writeNetwork(buf));
     }
 
+    public SignalBoxNode copyTo(final Point newPoint) {
+        final SignalBoxNode copy = new SignalBoxNode(newPoint, network);
+        possibleModes.forEach((mode, entry) -> {
+            entry.setUpNetwork(new PathOptionEntryNetwork().setUpNetwork(network,
+                    new ModeIdentifier(newPoint, mode)));
+            copy.possibleModes.put(mode, entry);
+        });
+        copy.signalStates.putAll(signalStates);
+        copy.enabledSubsidiaryStates.putAll(enabledSubsidiaryStates);
+        copy.manuellEnabledOutputs.addAll(manuellEnabledOutputs);
+        copy.isAutoPoint = isAutoPoint;
+        copy.customText = customText;
+        copy.post();
+        return copy;
+    }
+
     public void applyModeNetworkChanges(final ModeSet mode) {
         if (!has(mode)) {
             final PathOptionEntry entry = factory.getEntry();

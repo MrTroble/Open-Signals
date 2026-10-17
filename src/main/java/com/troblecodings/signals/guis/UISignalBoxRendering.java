@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +47,10 @@ public class UISignalBoxRendering extends UIComponent {
 
     public static final int TILE_WIDTH = 10;
     public static final int HALF_TILE = UISignalBoxRendering.TILE_WIDTH / 2;
-    public static final int TILE_COUNT = 100;
+    public static final int TILE_COUNT = SignalBoxGrid.GRID_SIZE;
+    public static final int AREA_COLOR = 0x4000A2FF;
+    public static final int AREA_MOVE_COLOR = 0x5000FF00;
+    public static final int AREA_INVALID_COLOR = 0x50FF0000;
     public static final int GRID_COLOR = 0xFF5B5B5B;
     private static final float[] ALL_LINES = getLines();
 
@@ -80,9 +84,26 @@ public class UISignalBoxRendering extends UIComponent {
     private final ColorPoint[] colorSelections = new ColorPoint[SelectionType.values().length];
     private final Map<ModeIdentifier, String> trainNumbers = new HashMap<>();
     private final Set<ColorPoint> additionalPoints = new HashSet<>();
+    private final SignalBoxGrid grid;
+    private AreaMoveSender areaMoveSender;
+    private BiConsumer<Point, Boolean> drawConsumer;
+    private boolean drawToolActive = false;
+    private Point lastDrawPoint = null;
+
+    private boolean areaToolActive = false;
+    private boolean areaSelecting = false;
+    private boolean areaMoving = false;
+    private Point areaStart = null;
+    private Point areaMin = null;
+    private Point areaMax = null;
+    private Point moveAnchor = null;
+    private int moveDx = 0;
+    private int moveDy = 0;
+    private boolean moveValid = false;
 
     public UISignalBoxRendering(final SignalBoxGrid grid, final boolean showLines,
             final SignalBoxConsumer consumer, final UIEntity gridParent) {
+        this.grid = grid;
         this.showLines = showLines;
         this.consumer = consumer;
         this.gridParent = gridParent;
@@ -181,10 +202,190 @@ public class UISignalBoxRendering extends UIComponent {
         additionalPoints.remove(new ColorPoint(point, c));
     }
 
+    public void setAreaMoveSender(final AreaMoveSender sender) {
+        this.areaMoveSender = sender;
+    }
+
+    public void setDrawConsumer(final BiConsumer<Point, Boolean> consumer) {
+        this.drawConsumer = consumer;
+    }
+
+    public void setDrawToolActive(final boolean active) {
+        this.drawToolActive = active;
+        lastDrawPoint = null;
+    }
+
+    public void setAreaToolActive(final boolean active) {
+        this.areaToolActive = active;
+        if (!active) {
+            clearArea();
+        }
+    }
+
+    public void clearArea() {
+        areaSelecting = false;
+        areaMoving = false;
+        areaStart = null;
+        areaMin = null;
+        areaMax = null;
+        moveAnchor = null;
+        moveDx = 0;
+        moveDy = 0;
+        moveValid = false;
+    }
+
+    private static Point translate(final Point point, final int dx, final int dy) {
+        return new Point(point.getX() + dx, point.getY() + dy);
+    }
+
+    private static boolean isInside(final Point point, final Point min, final Point max) {
+        return point.getX() >= min.getX() && point.getX() <= max.getX()
+                && point.getY() >= min.getY() && point.getY() <= max.getY();
+    }
+
+    private int toTile(final double position) {
+        return (int) Math.floor(position / (TILE_WIDTH * parent.getScaleX()));
+    }
+
+    private Point toClampedPoint(final MouseEvent event) {
+        final int tileX = toTile(event.x - parent.getLevelX());
+        final int tileY = toTile(event.y - parent.getLevelY());
+        return new Point(Math.max(0, Math.min(TILE_COUNT - 1, tileX)),
+                Math.max(0, Math.min(TILE_COUNT - 1, tileY)));
+    }
+
+    private void drawMouseEvent(final MouseEvent event) {
+        if (event.state == EnumMouseState.RELEASE) {
+            lastDrawPoint = null;
+            return;
+        }
+        final boolean first = lastDrawPoint == null;
+        if ((first && (event.state != EnumMouseState.CLICKED
+                || event.key != MouseEvent.LEFT_MOUSE)) || !this.gridParent.isHovered())
+            return;
+        final int tileX = toTile(event.x - parent.getLevelX());
+        final int tileY = toTile(event.y - parent.getLevelY());
+        if (tileX < 0 || tileY < 0 || tileX >= TILE_COUNT || tileY >= TILE_COUNT)
+            return;
+        final Point point = new Point(tileX, tileY);
+        if (point.equals(lastDrawPoint))
+            return;
+        drawConsumer.accept(point, first);
+        lastDrawPoint = point;
+    }
+
+    private void areaMouseEvent(final MouseEvent event) {
+        if (event.state == EnumMouseState.RELEASE) {
+            finishAreaAction();
+            return;
+        }
+        if (event.state != EnumMouseState.CLICKED && event.state != EnumMouseState.MOVE)
+            return;
+        if (areaSelecting || areaMoving) {
+            updateAreaAction(toClampedPoint(event));
+            return;
+        }
+        if (event.state != EnumMouseState.CLICKED || !this.gridParent.isHovered())
+            return;
+        if (event.key == MouseEvent.RIGHT_MOUSE) {
+            clearArea();
+            return;
+        }
+        if (event.key != MouseEvent.LEFT_MOUSE)
+            return;
+        startAreaAction(toClampedPoint(event));
+    }
+
+    private void startAreaAction(final Point point) {
+        if (areaMin != null && isInside(point, areaMin, areaMax)) {
+            areaMoving = true;
+            moveAnchor = point;
+            moveDx = 0;
+            moveDy = 0;
+            moveValid = false;
+        } else {
+            areaSelecting = true;
+            areaStart = point;
+            areaMin = point;
+            areaMax = point;
+        }
+    }
+
+    private void updateAreaAction(final Point point) {
+        if (areaSelecting) {
+            areaMin = new Point(Math.min(areaStart.getX(), point.getX()),
+                    Math.min(areaStart.getY(), point.getY()));
+            areaMax = new Point(Math.max(areaStart.getX(), point.getX()),
+                    Math.max(areaStart.getY(), point.getY()));
+        } else if (areaMoving) {
+            final int dx = point.getX() - moveAnchor.getX();
+            final int dy = point.getY() - moveAnchor.getY();
+            if (dx != moveDx || dy != moveDy) {
+                moveDx = dx;
+                moveDy = dy;
+                moveValid = grid.canMoveArea(areaMin, areaMax, dx, dy);
+            }
+        }
+    }
+
+    private void finishAreaAction() {
+        if (areaSelecting) {
+            areaSelecting = false;
+            areaStart = null;
+        } else if (areaMoving) {
+            areaMoving = false;
+            if (moveValid) {
+                grid.moveArea(areaMin, areaMax, moveDx, moveDy);
+                moveNodes(areaMin, areaMax, moveDx, moveDy);
+                areaMoveSender.send(areaMin, areaMax, moveDx, moveDy);
+                areaMin = translate(areaMin, moveDx, moveDy);
+                areaMax = translate(areaMax, moveDx, moveDy);
+            }
+            moveAnchor = null;
+            moveDx = 0;
+            moveDy = 0;
+            moveValid = false;
+        }
+    }
+
+    private void moveNodes(final Point min, final Point max, final int dx, final int dy) {
+        final Map<Point, Map<ModeSet, ModeRenderInfo>> movedRender = new HashMap<>();
+        final Map<Point, String> movedLabels = new HashMap<>();
+        for (final Point point : new ArrayList<>(gridRender.keySet())) {
+            final Map<ModeSet, ModeRenderInfo> modes = gridRender.get(point);
+            if (!isInside(point, min, max) || modes.isEmpty())
+                continue;
+            final Point newPoint = translate(point, dx, dy);
+            movedRender.put(newPoint, gridRender.remove(point));
+            final String label = nodeLabeling.remove(point);
+            if (label != null) {
+                movedLabels.put(newPoint, label);
+            }
+        }
+        final Map<ModeIdentifier, String> movedNumbers = new HashMap<>();
+        for (final ModeIdentifier ident : new ArrayList<>(trainNumbers.keySet())) {
+            if (!isInside(ident.point, min, max))
+                continue;
+            movedNumbers.put(new ModeIdentifier(translate(ident.point, dx, dy), ident.mode),
+                    trainNumbers.remove(ident));
+        }
+        gridRender.putAll(movedRender);
+        nodeLabeling.putAll(movedLabels);
+        trainNumbers.putAll(movedNumbers);
+    }
+
     @Override
     public void mouseEvent(final MouseEvent event) {
         if (!this.visible)
             return;
+        if (areaToolActive) {
+            areaMouseEvent(event);
+            return;
+        }
+        if (drawToolActive) {
+            drawMouseEvent(event);
+            return;
+        }
         if (!this.gridParent.isHovered())
             return;
         final double x = event.x - parent.getLevelX();
@@ -206,6 +407,26 @@ public class UISignalBoxRendering extends UIComponent {
             drawModeSets(info, modelist);
             info.pop();
         });
+        if (areaMin != null) {
+            final boolean preview = areaMoving && (moveDx != 0 || moveDy != 0);
+            if (preview) {
+                gridRender.forEach((point, modelist) -> {
+                    if (!isInside(point, areaMin, areaMax))
+                        return;
+                    info.push();
+                    info.translate(TILE_WIDTH * (point.getX() + moveDx),
+                            TILE_WIDTH * (point.getY() + moveDy), 0);
+                    drawModeSets(info, modelist);
+                    info.pop();
+                });
+            }
+            renderRect(info, areaMin, areaMax, AREA_COLOR);
+            if (preview) {
+                renderRect(info, translate(areaMin, moveDx, moveDy),
+                        translate(areaMax, moveDx, moveDy),
+                        moveValid ? AREA_MOVE_COLOR : AREA_INVALID_COLOR);
+            }
+        }
         for (final ColorPoint c : colorSelections) {
             if (c != null)
                 renderColorPoint(info, c);
@@ -239,6 +460,21 @@ public class UISignalBoxRendering extends UIComponent {
         font.drawString(str, restWidth, restHeight, color);
         info.blendOff();
         info.color();
+        info.pop();
+    }
+
+    private void renderRect(final DrawInfo info, final Point min, final Point max,
+            final int color) {
+        info.push();
+        info.translate(min.getX() * TILE_WIDTH, min.getY() * TILE_WIDTH, 0);
+        info.alphaOn();
+        info.blendOn();
+        info.applyColor();
+        final BufferWrapper wrapper = info.builder(GL11.GL_QUADS,
+                DefaultVertexFormats.POSITION_COLOR);
+        wrapper.quad(0, (max.getX() - min.getX() + 1) * TILE_WIDTH, 0,
+                (max.getY() - min.getY() + 1) * TILE_WIDTH, color);
+        info.end();
         info.pop();
     }
 
@@ -383,6 +619,11 @@ public class UISignalBoxRendering extends UIComponent {
             return color == other.color && Objects.equals(point, other.point);
         }
 
+    }
+
+    public static interface AreaMoveSender {
+
+        void send(Point corner1, Point corner2, int dx, int dy);
     }
 
     public static interface SignalBoxConsumer

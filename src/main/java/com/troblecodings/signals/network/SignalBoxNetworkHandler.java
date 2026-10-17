@@ -120,6 +120,18 @@ public class SignalBoxNetworkHandler {
         sendBuffer(buffer);
     }
 
+    public void sendMoveArea(final Point corner1, final Point corner2, final int dx,
+            final int dy) {
+        if (!containerConnected())
+            return;
+        final WriteBuffer buffer = getGridBuffer(GridNetworkMode.MOVE_AREA);
+        corner1.writeNetwork(buffer);
+        corner2.writeNetwork(buffer);
+        buffer.putInt(dx);
+        buffer.putInt(dy);
+        sendBuffer(buffer);
+    }
+
     public void sendNodeLabel(final Point point, final String label) {
         if (!containerConnected())
             return;
@@ -283,6 +295,17 @@ public class SignalBoxNetworkHandler {
         } else if (mode.equals(GridNetworkMode.COUNTER)) {
             grid.setCounterFromNetwork(buffer.getInt());
             container.handleCounterUpdate();
+        } else if (mode.equals(GridNetworkMode.MOVE_AREA)) {
+            final Point corner1 = Point.of(buffer);
+            final Point corner2 = Point.of(buffer);
+            final int dx = buffer.getInt();
+            final int dy = buffer.getInt();
+            if (grid.canMoveArea(corner1, corner2, dx, dy)) {
+                if (!container.isClientSide()) {
+                    grid.resetAllPathways();
+                }
+                grid.moveArea(corner1, corner2, dx, dy);
+            }
         } else {
             final BlockPos pos = buffer.getBlockPos();
             SignalBoxHandler.unlinkPosFromSignalBox(
@@ -470,7 +493,7 @@ public class SignalBoxNetworkHandler {
     }
 
     protected static enum GridNetworkMode {
-        SEND_ALL, COUNTER, REMOVE_POS;
+        SEND_ALL, COUNTER, REMOVE_POS, MOVE_AREA;
     }
 
     protected static enum EntryNetworkMode {

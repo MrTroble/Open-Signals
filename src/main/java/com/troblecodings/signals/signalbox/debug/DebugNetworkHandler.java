@@ -73,6 +73,12 @@ public class DebugNetworkHandler extends SignalBoxNetworkHandler {
             grid.readNetwork(buffer);
         } else if (mode.equals(GridNetworkMode.COUNTER)) {
             grid.setCounterFromNetwork(buffer.getInt());
+        } else if (mode.equals(GridNetworkMode.MOVE_AREA)) {
+            final Point corner1 = Point.of(buffer);
+            final Point corner2 = Point.of(buffer);
+            final int dx = buffer.getInt();
+            final int dy = buffer.getInt();
+            grid.moveArea(corner1, corner2, dx, dy);
         } else {
             final BlockPos pos = buffer.getBlockPos();
             SignalBoxHandler.unlinkPosFromSignalBox(

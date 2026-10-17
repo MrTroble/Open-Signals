@@ -94,6 +94,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity splitter = new UIEntity();
     private SidePanel helpPage;
     protected UISignalBoxRendering rendering;
+    private boolean drawAdd;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     protected final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
@@ -224,11 +225,27 @@ public class GuiSignalBox extends GuiBase {
             final Point point, final int mouse) {
         if ((mouse != MouseEvent.LEFT_MOUSE) || !splitter.isHovered())
             return;
-        final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
-        final Rotation rotation = Rotation.values()[menu.getRotation()];
+        toggleTile(rendering, point, getSelectedModeSet(menu));
+    }
 
-        final ModeSet modeSet = new ModeSet(mode, rotation);
+    private void drawTile(final UIMenu menu, final Point point, final boolean first) {
+        final ModeSet modeSet = getSelectedModeSet(menu);
+        final boolean exists = rendering.has(point, modeSet);
+        if (first) {
+            drawAdd = !exists;
+        } else if (exists == drawAdd) {
+            return;
+        }
+        toggleTile(rendering, point, modeSet);
+    }
 
+    private ModeSet getSelectedModeSet(final UIMenu menu) {
+        return new ModeSet(EnumGuiMode.values()[menu.getSelection()],
+                Rotation.values()[menu.getRotation()]);
+    }
+
+    private void toggleTile(final UISignalBoxRendering rendering, final Point point,
+            final ModeSet modeSet) {
         container.grid.updateMode(point, modeSet);
         if (rendering.has(point, modeSet)) {
             rendering.removeMode(point, modeSet);
@@ -528,6 +545,7 @@ public class GuiSignalBox extends GuiBase {
                         rendering, point, mouse), true);
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
+                rendering.setDrawConsumer((point, first) -> drawTile(menu, point, first));
                 resetSelection(entity);
                 network.sendResetAllPathways();
                 resetAllSubsidiarySignals();
@@ -559,6 +577,7 @@ public class GuiSignalBox extends GuiBase {
                 UISignalBoxRendering.createSignalBoxEntity(container.grid, showLines, consumer);
         splitter = entitys.entity;
         rendering = entitys.rendering;
+        rendering.setAreaMoveSender(network::sendMoveArea);
 
         lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
