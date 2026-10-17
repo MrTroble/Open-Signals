@@ -218,8 +218,20 @@ public class SidePanel {
 
     public void updateNextNode(final int selection, final int rotation) {
         infoEntity.clearChildren();
-        infoEntity.add(GuiElements.createSpacerV(2));
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.editor.nextelement"),
+        final UIEntity editScroll = new UIEntity();
+        editScroll.setInherits(true);
+        editScroll.add(new UIBox(UIBox.HBOX, 0));
+        editScroll.add(new UIScissor());
+        infoEntity.add(editScroll);
+
+        final UIEntity editList = new UIEntity();
+        editList.setInherits(true);
+        editScroll.add(editList);
+
+        final UIScrollBox editScrollbox = new UIScrollBox(UIBox.VBOX, 1);
+
+        editList.add(GuiElements.createSpacerV(2));
+        editList.add(GuiElements.createLabel(I18Wrapper.format("info.editor.nextelement"),
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
@@ -243,23 +255,35 @@ public class SidePanel {
         preview.add(new UIScale(0.9f, 0.9f, 0));
 
         final EnumGuiMode mode = EnumGuiMode.values()[selection];
-        infoEntity.add(
+        editList.add(
                 GuiElements.createLabel(I18Wrapper.format("info." + mode.toString().toLowerCase()),
                         new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity.add(preview);
+        editList.add(preview);
         moveToggle = getToggle("move", true);
         drawToggle = getToggle("draw", false);
-        infoEntity.add(moveToggle);
-        infoEntity.add(drawToggle);
-        infoEntity.add(getSpacerLine());
-        infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
+        editList.add(moveToggle);
+        editList.add(drawToggle);
+        editList.add(getSpacerLine());
+        editList.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
-        infoEntity.add(GuiElements.createLabel("[R] = " + I18Wrapper.format("info.editor.key.r"),
+        editList.add(GuiElements.createLabel("[R] = " + I18Wrapper.format("info.editor.key.r"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity
+        editList
                 .add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.editor.key.lmb"),
                         new UIEntity().getInfoTextColor(), 0.5f));
 
+        final UIScroll editScrolling = new UIScroll();
+        final UIEntity editScrollBar = GuiElements.createScrollBar(editScrollbox, 7, editScrolling);
+        editScrollbox.setConsumer(size -> {
+            if (size > editList.getHeight()) {
+            editScroll.add(editScrolling);
+            editScroll.add(editScrollBar);
+            } else {
+            editScroll.remove(editScrollBar);
+            editScroll.remove(editScrolling);
+            }
+        });
+        editList.add(editScrollbox);
         addHelpPageToPlane();
     }
 
