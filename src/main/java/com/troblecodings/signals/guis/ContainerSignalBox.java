@@ -45,9 +45,10 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class ContainerSignalBox extends ContainerBase
         implements UIClientSync, IChunkLoadable, SignalBoxNetworkReader {
