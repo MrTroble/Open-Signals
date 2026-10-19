@@ -91,8 +91,12 @@ public class LinkedPositions {
         return ImmutableMap.copyOf(linkedBlocks);
     }
 
-    public void unlink(final BlockPos tilePos, final Level world) {
-        if (world.isClientSide)
+    public Map<BlockPos, Signal> getAllSignals() {
+        return ImmutableMap.copyOf(signals);
+    }
+
+    public void unlink(final BlockPos tilePos, final World world) {
+        if (world.isRemote)
             return;
         final List<SignalStateLoadHoler> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
