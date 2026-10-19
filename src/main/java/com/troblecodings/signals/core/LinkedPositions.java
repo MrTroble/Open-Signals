@@ -91,6 +91,10 @@ public class LinkedPositions {
         return ImmutableMap.copyOf(linkedBlocks);
     }
 
+    public Map<BlockPos, Signal> getAllSignals() {
+        return ImmutableMap.copyOf(signals);
+    }
+
     public void unlink(final BlockPos tilePos, final World world) {
         if (world.isRemote)
             return;

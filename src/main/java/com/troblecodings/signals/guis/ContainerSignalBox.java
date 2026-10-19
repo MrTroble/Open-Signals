@@ -20,6 +20,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.LinkType;
@@ -45,7 +46,6 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -95,7 +95,9 @@ public class ContainerSignalBox extends ContainerBase
     public void addAdditionalInitialisationData(final WriteBuffer buffer) {
         final StateInfo identifier = new StateInfo(info.world, tile.getPos());
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
+        final Map<BlockPos, Signal> signals = SignalBoxHandler.getAllSignals(identifier);
         final Map<Map.Entry<Point, Point>, PathType> nextPathways = grid.getNextPathways();
+
         buffer.putMap(positions, WriteBuffer.BLOCKPOS_CONSUMER, WriteBuffer.getEnumConsumer());
         buffer.putMap(nextPathways, (b, entry) -> {
             entry.getKey().writeNetwork(b);
@@ -116,6 +118,8 @@ public class ContainerSignalBox extends ContainerBase
                 });
         buffer.putMap(validInConnections, WriteBuffer.BLOCKPOS_CONSUMER,
                 (b, list) -> b.putISaveableList(list));
+        buffer.putMap(signals, WriteBuffer.BLOCKPOS_CONSUMER,
+                NetworkBufferWrappers.SIGNAL_CONSUMER);
     }
 
     @Override
@@ -123,6 +127,7 @@ public class ContainerSignalBox extends ContainerBase
         posForType.clear();
         nextPathways.clear();
         validInConnections.clear();
+
         posForType.putAll(buffer.getMap(ReadBuffer.BLOCKPOS_FUNCTION,
                 ReadBuffer.getEnumFunction(LinkType.class)));
         nextPathways.putAll(buffer.getMap((b -> Maps.immutableEntry(Point.of(b), Point.of(b))),
@@ -136,7 +141,8 @@ public class ContainerSignalBox extends ContainerBase
                 enabledSubsidiaryTypes.put(node.getPoint(), subsidiares);
             }
         });
-        loadPossibleSubsidiaires();
+        loadPossibleSubsidiaires(
+                buffer.getMap(ReadBuffer.BLOCKPOS_FUNCTION, NetworkBufferWrappers.SIGNAL_FUNCTION));
         update();
     }
 
@@ -216,19 +222,13 @@ public class ContainerSignalBox extends ContainerBase
         network.setUpNetworkReader(this);
     }
 
-    private void loadPossibleSubsidiaires() {
-        posForType.forEach((pos, linkType) -> {
-            if (!linkType.equals(LinkType.SIGNAL))
-                return;
+    private void loadPossibleSubsidiaires(final Map<BlockPos, Signal> signals) {
+        signals.forEach((pos, signal) -> {
             final StateInfo info = new StateInfo(this.info.world, pos);
-            final Block signal = info.world.getBlockState(pos).getBlock();
-            if (!(signal instanceof Signal))
-                return;
             final Map<SEProperty, String> properties =
                     ClientSignalStateHandler.getClientStates(info);
             final Map<SubsidiaryState, ConfigProperty> subsidiaries =
                     SubsidiarySignalParser.SUBSIDIARY_SIGNALS.get(signal);
-            System.out.println("Properties for [" + info + "]: " + properties);
             if (subsidiaries == null || properties.isEmpty())
                 return;
             final List<SubsidiaryState> validStates = new ArrayList<>();
@@ -242,7 +242,6 @@ public class ContainerSignalBox extends ContainerBase
             });
             possibleSubsidiaries.put(info.pos, validStates);
         });
-
     }
 
     protected void updateClientSubsidiary(final SignalBoxNode node, final ModeSet mode,

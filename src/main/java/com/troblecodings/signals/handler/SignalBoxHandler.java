@@ -170,6 +170,18 @@ public final class SignalBoxHandler {
         return holder.getAllLinkedPos();
     }
 
+    public static Map<BlockPos, Signal> getAllSignals(final StateInfo identifier) {
+        if (identifier.isWorldNullOrClientSide())
+            return new HashMap<>();
+        final LinkedPositions holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(identifier);
+        }
+        if (holder == null)
+            return new HashMap<>();
+        return holder.getAllSignals();
+    }
+
     public static void onPosRemove(final StateInfo identifier) {
         if (identifier.isWorldNullOrClientSide())
             return;
