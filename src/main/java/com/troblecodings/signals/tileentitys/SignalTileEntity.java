@@ -13,6 +13,7 @@ import com.troblecodings.signals.animation.SignalAnimationHandler;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalTextRenderCache;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
@@ -30,6 +31,7 @@ import net.minecraftforge.client.model.data.IModelData;
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
     protected final SignalAnimationHandler handler;
+    private final SignalTextRenderCache textRenderCache = new SignalTextRenderCache();
 
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
@@ -87,6 +89,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     public Map<SEProperty, String> getProperties() {
         return ImmutableMap.copyOf(properties);
+    }
+
+    public SignalTextRenderCache getTextRenderCache() {
+        return textRenderCache;
     }
 
     public SignalAnimationHandler getAnimationHandler() {

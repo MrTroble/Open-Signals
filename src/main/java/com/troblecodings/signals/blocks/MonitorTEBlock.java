@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.troblecodings.guilib.ecs.entitys.BufferWrapper;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.linkableapi.Linkingtool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.MonitorBlockProperties;
 import com.troblecodings.signals.core.RenderAnimationInfo;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -118,6 +120,30 @@ public class MonitorTEBlock extends Monitor {
                 break;
         }
         info.translate(-0.5f, 0, -0.5f);
+    }
+
+    protected boolean onScreenClick(final Level world, final BlockPos pos, final BlockState state,
+            final Direction facing, final Player player, final InteractionHand hand, final float u,
+            final float v) {
+        final Item item = player.getMainHandItem().getItem();
+        if (item.equals(OSItems.MANIPULATOR)) {
+            OpenSignalsMain.handler.invokeGui(MonitorTEBlock.class, player, world, pos,
+                    "monitorTE");
+            return true;
+        } else if (item instanceof Linkingtool) {
+            return false;
+        }
+        final Direction blockFacing = state.getValue(FACING);
+        if (!facing.equals(blockFacing) || !hand.equals(InteractionHand.MAIN_HAND))
+            return false;
+        if (!world.isClientSide)
+            return true;
+        final BlockEntity tile = world.getBlockEntity(pos);
+        if (tile instanceof MonitorTileEntity) {
+            return ((MonitorTileEntity) tile).onBlockActivated(u, v, getMonitorProperties(),
+                    player);
+        }
+        return false;
     }
 
     @Override

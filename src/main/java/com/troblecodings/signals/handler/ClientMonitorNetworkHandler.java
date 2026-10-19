@@ -6,15 +6,21 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -23,12 +29,17 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
     private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
     private static final Map<StateInfo, ReadBuffer> UPDATES = new HashMap<>();
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void deserializeClient(final ReadBuffer buf) {
         final Minecraft mc = Minecraft.getInstance();
         mc.doRunTask(() -> {
             final Level world = mc.level;
             final BlockPos pos = buf.getBlockPos();
+            if (pos.equals(BlockPos.ZERO)) {
+                sendInfoMessageToPlayer(buf);
+                return;
+            }
             final long startTime = Calendar.getInstance().getTimeInMillis();
             SERVICE.execute(() -> {
                 BlockEntity entity;
@@ -45,6 +56,23 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
                 executeUpdate((MonitorTileEntity) entity, buf);
             });
         });
+    }
+
+    private static void sendInfoMessageToPlayer(final ReadBuffer buffer) {
+        final LocalPlayer player = Minecraft.getInstance().player;
+        final byte mode = buffer.getByte();
+        final PathwayRequestMode requestMode = buffer.getEnumValue(PathwayRequestMode.class);
+        if (mode == MonitorNetworkHandler.PATHWAY_ADD_SAVER) {
+            player.sendMessage(new TextComponent("[" + I18Wrapper.format("tile.signalbox.name")
+                    + "]: " + I18Wrapper.format("error." + requestMode.getName()) + " - "
+                    + I18Wrapper.format("info.pathwaysaver")), player.getUUID());
+        }
+        if (mode == MonitorNetworkHandler.PATHWAY_RESPONSE) {
+            player.sendMessage(
+                    new TextComponent("[" + I18Wrapper.format("tile.signalbox.name") + "]: "
+                            + I18Wrapper.format("error." + requestMode.getName())),
+                    player.getUUID());
+        }
     }
 
     private static void executeUpdate(final MonitorTileEntity tile, final ReadBuffer buf) {

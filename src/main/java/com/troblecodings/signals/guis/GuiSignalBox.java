@@ -204,7 +204,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void updateTileWithMode(final UIMenu menu, final UISignalBoxRendering rendering,
             final Point point, final int mouse) {
-        if ((mouse != MouseEvent.LEFT_MOUSE) || !splitter.isHovered())
+        if ((mouse != MouseEvent.LEFT_MOUSE) || !splitter.isHovered() || !isInBuildingRange(point))
             return;
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
@@ -217,6 +217,11 @@ public class GuiSignalBox extends GuiBase {
         } else {
             rendering.addMode(point, modeSet);
         }
+    }
+
+    private static boolean isInBuildingRange(final Point p) {
+        return p.getX() >= 0 && p.getX() < UISignalBoxRendering.TILE_COUNT && p.getY() >= 0
+                && p.getY() < UISignalBoxRendering.TILE_COUNT;
     }
 
     private void tileNormal(final UISignalBoxRendering rendering, final Point tile,
@@ -578,6 +583,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeBasicUI() {
+        this.entity.clear();
         final String name = I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalbox");
 
         final UILabel titlelabel = new UILabel(name);

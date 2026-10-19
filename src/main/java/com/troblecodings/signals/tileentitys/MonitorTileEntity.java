@@ -14,6 +14,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.MonitorBlockProperties;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -21,8 +22,10 @@ import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.guis.UISignalBoxProfile;
 import com.troblecodings.signals.guis.UISignalBoxRendering;
+import com.troblecodings.signals.guis.UISignalBoxRendering.SelectionType;
 import com.troblecodings.signals.handler.ClientMonitorNetworkHandler;
 import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
@@ -38,6 +41,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 
 public class MonitorTileEntity extends SyncableTileEntity
@@ -60,6 +64,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     private int monitorSizeX, monitorSizeY;
     private Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
     private UISignalBoxRendering rendering;
+    private Point startPoint = null;
 
     public MonitorTileEntity(final TileEntityInfo info) {
         super(info);
@@ -101,6 +106,69 @@ public class MonitorTileEntity extends SyncableTileEntity
         if (!(block instanceof MonitorTEBlock) || rendering == null)
             return;
         ((MonitorTEBlock) block).render(info, this, rendering);
+    }
+
+    public boolean onBlockActivated(final float hitX, final float hitY,
+            final MonitorBlockProperties props, final Player playerIn) {
+        if (!hasLink() || renderStart.equals(new Point(-1, -1)))
+            return false;
+        final int cellsX = renderEnd.getX() - renderStart.getX() + 1;
+        final int cellsY = renderEnd.getY() - renderStart.getY() + 1;
+
+        final float insets = (props.getInsets() - 6) / MonitorTEBlock.STEPS_PER_BLOCK;
+        final float mx = hitX;
+        final float my = monitorSizeY - hitY;
+
+        final float contentW = monitorSizeX - 2 * insets;
+        final float contentH = monitorSizeY - 2 * insets;
+
+        final float u = (mx - insets) / contentW;
+        final float v = (my - insets) / contentH;
+        final int px = clamp((int) Math.floor(u * cellsX), 0, cellsX - 1);
+        final int py = clamp((int) Math.floor(v * cellsY), 0, cellsY - 1);
+
+        final Point point = new Point(px, py);
+        final SignalBoxNode node = grid.getNode(getPointRetranslated(point));
+        if (node == null)
+            return false;
+        if (startPoint == null && node.isValidStart()) {
+            startPoint = point;
+            rendering.addSelection(
+                    grid.getUIProfile().getOperationModeSettings().getUserSelectionColor(), point,
+                    SelectionType.FIRST);
+            return true;
+        }
+        if (!point.equals(startPoint) && node.isValidEnd()) {
+            requestPathway(startPoint, point, playerIn);
+            rendering.removeSelection(SelectionType.FIRST);
+            startPoint = null;
+            return true;
+        }
+        if (point.equals(startPoint)) {
+            rendering.removeSelection(SelectionType.FIRST);
+            startPoint = null;
+        }
+        return false;
+    }
+
+    private static int clamp(final int v, final int min, final int max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    private Point getPointRetranslated(final Point p) {
+        return new Point(p.getX() + renderStart.getX(), p.getY() + renderStart.getY());
+    }
+
+    private void requestPathway(final Point start, final Point end, final Player playerIn) {
+        final Point p1 = getPointRetranslated(start);
+        final Point p2 = getPointRetranslated(end);
+        final SignalBoxNode nodeP1 = grid.getNode(p1);
+        final SignalBoxNode nodeP2 = grid.getNode(p2);
+        if (nodeP1 == null || nodeP2 == null)
+            return;
+        final PathType pathType =
+                nodeP1.getPossibleTypes(nodeP2).stream().findFirst().orElse(PathType.NONE);
+        MonitorNetworkHandler.sendPathwayRequest(level, linkedSignalBox, p1, p2, pathType);
     }
 
     @Override

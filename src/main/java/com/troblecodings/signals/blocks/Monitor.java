@@ -8,9 +8,14 @@ import com.troblecodings.signals.core.MonitorBlockProperties;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -21,6 +26,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -175,6 +181,58 @@ public class Monitor extends BasicBlock {
             case NORTH:
             default:
                 return pos.east();
+        }
+    }
+
+    @Override
+    public InteractionResult use(final BlockState state, final Level world, final BlockPos pos,
+            final Player player, final InteractionHand hand, final BlockHitResult result) {
+        final Direction blockFacing = state.getValue(FACING);
+        final double u = horizontalHit(blockFacing, result.getLocation().get(Axis.X),
+                result.getLocation().get(Axis.Z));
+        return forwardClick(world, pos, state, result.getDirection(), player, hand, u,
+                result.getLocation().get(Axis.Y));
+    }
+
+    protected InteractionResult forwardClick(final Level world, final BlockPos pos,
+            final BlockState state, final Direction facing, final Player player,
+            final InteractionHand hand, final double u, final double v) {
+        final BlockPos downPos = pos.below();
+        final BlockState downState = world.getBlockState(downPos);
+        if (downState.getBlock() instanceof Monitor) {
+            return ((Monitor) downState.getBlock()).forwardClick(world, downPos, downState, facing,
+                    player, hand, u, v + 1);
+        }
+        final BlockPos nextPos = getLeftPos(state, pos);
+        if (!nextPos.equals(pos)) {
+            final BlockState nextState = world.getBlockState(nextPos);
+            if (nextState.getBlock() instanceof Monitor) {
+                return ((Monitor) nextState.getBlock()).forwardClick(world, nextPos, nextState,
+                        facing, player, hand, u + 1, v);
+            }
+        }
+        return onScreenClick(world, pos, state, facing, player, hand, u, v);
+    }
+
+    protected InteractionResult onScreenClick(final Level world, final BlockPos pos,
+            final BlockState state, final Direction facing, final Player player,
+            final InteractionHand hand, final double u, final double v) {
+        return InteractionResult.CONSUME;
+    }
+
+    protected static double horizontalHit(final Direction facing, final double hitX,
+            final double hitZ) {
+        switch (facing) {
+            case NORTH:
+                return 1f - hitX;
+            case SOUTH:
+                return hitX;
+            case EAST:
+                return 1f - hitZ;
+            case WEST:
+                return hitZ;
+            default:
+                return hitX;
         }
     }
 

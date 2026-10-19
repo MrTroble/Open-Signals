@@ -12,6 +12,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
+import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
@@ -70,8 +71,15 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, linkedSignalBox,
                 (tile, _u) -> {
                     final SignalBoxGrid grid = tile.getSignalBoxGrid();
-                    final PathType type = SignalBoxUtil.getPathTypeFrom(
-                            grid.getNode(pathway.getKey()), grid.getNode(pathway.getValue()));
+                    final SignalBoxNode startNode = grid.getNode(pathway.getKey());
+                    final SignalBoxNode endNode = grid.getNode(pathway.getValue());
+                    if (startNode == null || endNode == null) {
+                        OpenSignalsMain.getLogger().error("Points in PW Requester on ["
+                                + getBlockPos()
+                                + "] aren't in grid. PW Request not possible, please check!");
+                        return;
+                    }
+                    final PathType type = SignalBoxUtil.getPathTypeFrom(startNode, endNode);
                     if (!type.equals(PathType.NONE)) {
                         final PathwayRequestResult result =
                                 grid.requestWay(pathway.getKey(), pathway.getValue(), type);

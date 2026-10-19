@@ -332,7 +332,7 @@ public class GuiSignalBridge extends GuiBase {
                 for (int i = 0; i < availableSignals.count(); i++) {
                     final int index = i;
                     final Signal signal = availableSignals.getObjFromID(index);
-                    final String name = availableSignals.getLocalizedName() + ": "
+                    final String name = availableSignals.getName() + ": "
                             + I18Wrapper.format(signal.toString());
                     final UIEntity button = GuiElements.createButton(name, e2 -> {
                         final UIEntity nameEntity = new UIEntity();
@@ -707,11 +707,9 @@ public class GuiSignalBridge extends GuiBase {
         blockEntity.setHeight(height);
         blockEntity.add(new UIColor(BACKGROUD_COLOR));
         if (showName) {
-            final UILabel label =
-                    new UILabel(customName.isEmpty()
-                            ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "."
-                                    + block.delegate.name().getPath())
-                            : customName);
+            final UILabel label = new UILabel(customName.isEmpty()
+                    ? I18Wrapper.format("tile." + block.delegate.name().getPath() + ".name")
+                    : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());
             blockEntity.add(label);

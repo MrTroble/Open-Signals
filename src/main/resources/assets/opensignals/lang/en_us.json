@@ -121,7 +121,7 @@
 	"property.value.RS_INPUT": "Redstone Input Mode",
 	"property.value.MUX": "MUX Mode",
 	"gui.controller.mode": "Mode",
-    "gui.controller.mode.desc": "TODO",
+    "gui.controller.mode.desc": "Here, you can set a profile for when Redstone is turned on and when it is turned off.",
     "gui.controller.profile": "Profile",
     "gui.controller.add_profile": "Add new profile",
     "gui.controller.remove_profile": "Delete current profile",
@@ -153,7 +153,7 @@
 	"gui.controller.east.ONSTATE.desc": "Loads the set profile when the Redstone input from §lEast§r is set to §lOn§r.",
     "gui.controller.not_linked": "Not linked!",
     "gui.controller.unlink": "Unlink",
-    "gui.controller.unlink.desc": "TODO",
+    "gui.controller.unlink.desc": "Here, you can remove the link from a Redstone input.",
 
 	"__TrainNumberBlockGUI": "",
 	"gui.trainnumber.info.select_point": "Select point on a path for the train number",
@@ -201,6 +201,7 @@
 	"property.value.INPUT": "Redstone Input",
 	"property.value.OUTPUT": "Redstone Output",
 	"property.value.SIGNALBOX": "Signalbox",
+	"sb.highlight": "Congratulations for finding this text. You've earned yourself a cookie.",
 
 	"__SignalboxEditorElements": "",
 	"info.straight": "Straight path",
@@ -377,6 +378,10 @@
 	"__SignalReaderUI": "",
     "gui.signalreader.and": "AND",
     "gui.signalreader.or": "OR",
+
+	"__RedstoneIOUI": "",
+    "gui.nameable.blocking_delay": "blocking delay",
+    "gui.nameable.reset_delay": "reset delay",
 
 	"__GeneralUI":"",
 	"label.linkedto": "Linked to",

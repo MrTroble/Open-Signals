@@ -101,6 +101,11 @@ public class GuiSignalController extends GuiBase {
     private void updateProfileProperties(final UIEntity middlePart, final int profile,
             final boolean onlyUpdatePreview) {
         middlePart.clearChildren();
+        final UIEntity list = new UIEntity();
+        list.setInherits(true);
+
+        final UIBox vbox = new UIBox(UIBox.VBOX, 1);
+        list.add(vbox);
         if (profile == -1)
             return;
         final Map<SEProperty, String> properties =
@@ -131,10 +136,12 @@ public class GuiSignalController extends GuiBase {
                             }
                             previewRedstone.update(controller.getSignal());
                         }, property.getParent().getIDFromValue(value));
-                middlePart.add(entity);
+                list.add(entity);
             }
         });
         previewRedstone.update(controller.getSignal());
+        middlePart.add(list);
+        middlePart.add(GuiElements.createPageSelect(vbox));
     }
 
     private void addProfileSelection(final UIEntity mainEntity) {
@@ -186,6 +193,7 @@ public class GuiSignalController extends GuiBase {
 
         selectionEntity.add(listWithScroll);
 
+        addDefaultProfileWhenEmpty();
         addProfilesToList(list, propertyEntity);
 
         if (buttonsRSMode.length > 0) {
@@ -210,11 +218,19 @@ public class GuiSignalController extends GuiBase {
         });
     }
 
+    private void addDefaultProfileWhenEmpty() {
+        if (!controller.allRSStates.isEmpty())
+            return;
+
+        buttonsRSMode[0] = new UIButton(String.valueOf(0));
+        currentProfile = 0;
+        controller.allRSStates.put(0, new HashMap<>());
+    }
+
     private UIEntity getRemoveIcon() {
         final UIEntity entity = new UIEntity();
         entity.setHeight(20);
         entity.setWidth(20);
-        // TODO Add remove texture
         entity.add(new UIButton("x"));
         entity.add(new UIClickable(e -> {
             controller.allRSStates.remove(currentProfile);

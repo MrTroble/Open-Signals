@@ -262,6 +262,7 @@ public class UISignalBoxRendering extends UIComponent {
             final String str, final int restHeight, final int restWidth, final int color,
             final float scale) {
         info.push();
+        info.depthOn();
         info.translate(TILE_WIDTH * point.getX(), TILE_WIDTH * point.getY(), 10);
         if (!rot.equals(Rotation.NONE)) {
             info.translate(HALF_TILE, HALF_TILE, 0);
@@ -270,6 +271,7 @@ public class UISignalBoxRendering extends UIComponent {
         }
         info.scale(scale, scale, scale);
         font.draw(info.stack, str, restWidth, restHeight, color);
+        info.depthOff();
         info.pop();
     }
 
