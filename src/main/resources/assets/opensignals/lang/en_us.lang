@@ -379,8 +379,8 @@ gui.signalreader.and=AND
 gui.signalreader.or=OR
 
 # RedstoneIOUI
-gui.nameable.blocking_delay=Blockier-Verzögerung
-gui.nameable.reset_delay=Zurücksetz-Verzögerung
+gui.nameable.blocking_delay=blocking delay
+gui.nameable.reset_delay=reset delay
 
 # GeneralUI
 label.linkedto=Linked to

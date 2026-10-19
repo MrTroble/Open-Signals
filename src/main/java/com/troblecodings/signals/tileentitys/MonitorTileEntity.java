@@ -157,6 +157,10 @@ public class MonitorTileEntity extends SyncableTileEntity
         return Math.max(min, Math.min(max, v));
     }
 
+    private Point getPointRetranslated(final Point p) {
+        return new Point(p.getX() + renderStart.getX(), p.getY() + renderStart.getY());
+    }
+
     private void requestPathway(final Point start, final Point end, final EntityPlayer playerIn) {
         final Point p1 = getPointRetranslated(start);
         final Point p2 = getPointRetranslated(end);
@@ -259,10 +263,6 @@ public class MonitorTileEntity extends SyncableTileEntity
             return translated;
         }
         return null;
-    }
-
-    private Point getPointRetranslated(final Point p) {
-        return new Point(p.getX() + renderStart.getX(), p.getY() + renderStart.getY());
     }
 
     private void buildColors(final Collection<SignalBoxNode> nodes,
