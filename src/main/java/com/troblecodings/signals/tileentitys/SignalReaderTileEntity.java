@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class SignalReaderTileEntity extends SyncableTileEntity
-        implements ILinkableTile, SignalStateListener {
+public class SignalReaderTileEntity extends SyncableTileEntity implements ILinkableTile {
 
     public static final int MAX_PROPERTIES_SIZE = 10;
     public static final int MAX_LOGICAL_VALUES_SIZE = MAX_PROPERTIES_SIZE - 1;
@@ -50,6 +50,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity
     private final Map<EnumFacing, Predicate<Map<SEProperty, String>>> predicateForDirection =
             new HashMap<>();
     private final boolean[] activatedDirections = new boolean[EnumFacing.values().length];
+    private final SignalReaderListener listener = new SignalReaderListener(this);
     private BlockPos signalPos;
     private Signal signal;
 
@@ -145,6 +146,11 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         return signalPos;
     }
 
+    public void onBlockDestroy() {
+        loadChunkAndGetTile(SignalTileEntity.class, world, signalPos,
+                (tile, chunk) -> tile.removeLinkedSignalReader(pos));
+    }
+
     public boolean enableRedstoneForDirection(final EnumFacing dir) {
         return activatedDirections[dir.ordinal()];
     }
@@ -206,17 +212,21 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         if (world.isRemote || signalPos == null || signal == null)
             return;
         final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
-        SignalStateHandler.addListener(info, this);
+        SignalStateHandler.addListener(info, listener);
         SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
+        // TODO Workaround for already placed SignalReaders so they work correctly, will
+        // be removed after TestBuild
+        registerLinkOnSignal();
     }
 
     @Override
     public void onChunkUnload() {
         if (world.isRemote || signalPos == null || signal == null)
             return;
-        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
-        SignalStateHandler.removeListener(info, this);
-        SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
+        // final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        // SignalStateHandler.removeListener(info, this);
+        // SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, new
+        // LoadHolder<>(pos)));
     }
 
     @Override
@@ -226,10 +236,17 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         if (block instanceof Signal) {
             signal = (Signal) block;
             signalPos = pos;
+            // TODO Will be added when Workaround removed (look in onLoad();)
+            // registerLinkOnSignal();
             onLoad();
             return true;
         }
         return false;
+    }
+
+    private void registerLinkOnSignal() {
+        loadChunkAndGetTile(SignalTileEntity.class, world, signalPos,
+                (tile, chunk) -> tile.addLinkedSignalReader(getPos()));
     }
 
     @Override
@@ -246,26 +263,62 @@ public class SignalReaderTileEntity extends SyncableTileEntity
         return true;
     }
 
-    @Override
-    public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
-            final ChangedState changedState) {
-        if (info.worldNullOrClientSide())
-            return;
-        if (changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
-            unlink();
-            return;
+    public static class SignalReaderListener implements SignalStateListener {
+
+        private final SignalReaderTileEntity tile;
+
+        public SignalReaderListener(final SignalReaderTileEntity tile) {
+            this.tile = tile;
         }
-        if (changedState.equals(ChangedState.ADDED_TO_CACHE)
-                || changedState.equals(ChangedState.UPDATED)) {
-            final Map<SEProperty, String> allProperties = SignalStateHandler.getStates(info);
-            for (final EnumFacing dir : EnumFacing.values()) {
-                activatedDirections[dir.ordinal()] = false;
-                if (predicateForDirection.getOrDefault(dir, _u -> false).test(allProperties)) {
-                    activatedDirections[dir.ordinal()] = true;
-                }
-            }
-            final IBlockState state = world.getBlockState(pos);
-            world.notifyNeighborsOfStateChange(pos, state.getBlock(), true);
+
+        @Override
+        public void update(final SignalStateInfo info,
+                final Map<SEProperty, String> changedProperties, final ChangedState changedState) {
+            if (info.worldNullOrClientSide())
+                return;
+            tile.loadChunkAndGetTile(SignalReaderTileEntity.class, tile.world, tile.pos,
+                    (tile, chunk) -> {
+                        if (changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
+                            tile.unlink();
+                            return;
+                        }
+                        if (changedState.equals(ChangedState.ADDED_TO_CACHE)
+                                || changedState.equals(ChangedState.UPDATED)) {
+                            final Map<SEProperty, String> allProperties =
+                                    SignalStateHandler.getStates(info);
+                            for (final EnumFacing dir : EnumFacing.values()) {
+                                tile.activatedDirections[dir.ordinal()] = false;
+                                if (tile.predicateForDirection.getOrDefault(dir, _u -> false)
+                                        .test(allProperties)) {
+                                    tile.activatedDirections[dir.ordinal()] = true;
+                                }
+                            }
+                            final IBlockState state = tile.world.getBlockState(tile.pos);
+                            tile.world.notifyNeighborsOfStateChange(tile.pos, state.getBlock(),
+                                    true);
+                        }
+                    });
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(tile.pos, tile.signalPos, tile.signal);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final SignalReaderListener other = (SignalReaderListener) obj;
+            return Objects.equals(tile.pos, other.tile.pos)
+                    && Objects.equals(tile.signalPos, other.tile.signalPos)
+                            & Objects.equals(tile.signal, other.tile.signal);
+        }
+
     }
+
 }

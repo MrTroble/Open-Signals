@@ -2,8 +2,10 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
@@ -23,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,6 +36,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     private final Map<SEProperty, String> properties = new HashMap<>();
     private final SignalTextRenderCache textRenderCache = new SignalTextRenderCache();
+
+    public static final String LINKED_LIST = "linkedList";
 
     public SignalTileEntity() {
         this.handler = new SignalAnimationHandler(this);
@@ -104,6 +109,32 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
                 : name;
     }
 
+    @Override
+    public void saveWrapper(final NBTWrapper wrapper) {
+        wrapper.putList(LINKED_LIST, linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public void loadWrapper(final NBTWrapper wrapper) {
+        linkedPositions.clear();
+        wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
+                .forEach(linkedPositions::add);
+        System.out.println(pos + " - " + linkedPositions);
+    }
+
+    public void addLinkedSignalReader(final BlockPos pos) {
+        if (!linkedPositions.contains(pos)) {
+            linkedPositions.add(pos);
+            System.out.println("Adding " + pos);
+        }
+    }
+
+    public void removeLinkedSignalReader(final BlockPos pos) {
+        System.out.println("Removeing " + pos);
+        linkedPositions.remove(pos);
+    }
+
     public Signal getSignal() {
         final Block block = getBlockType();
         return block instanceof Signal ? (Signal) block : null;
@@ -128,6 +159,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             world.markBlockRangeForRenderUpdate(pos, pos);
             markDirty();
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
+            linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalReaderTileEntity.class, world,
+                    pos, (tile, chunk) -> {
+                        tile.onLoad();
+                    }));
         } else if (hasAnimation()) {
             handler.updateAnimationListFromBlock();
             handler.updateStates(

@@ -72,4 +72,13 @@ public class SignalReader extends BasicBlock {
         return new SignalReaderTileEntity();
     }
 
+    @Override
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
+        final TileEntity tile = worldIn.getTileEntity(pos);
+        if (tile instanceof SignalReaderTileEntity) {
+            ((SignalReaderTileEntity) tile).onBlockDestroy();
+        }
+        super.breakBlock(worldIn, pos, state);
+    }
+
 }

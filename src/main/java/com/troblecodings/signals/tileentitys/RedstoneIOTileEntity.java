@@ -130,6 +130,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         return ImmutableList.copyOf(linkedSignalController);
     }
 
+    public List<BlockPos> getLinkedPos() {
+        return ImmutableList.copyOf(linkedPositions);
+    }
+
     public int getResetDelay() {
         return resetDelay;
     }
