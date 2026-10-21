@@ -23,13 +23,14 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
@@ -38,7 +39,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     public static final String LINKED_LIST = "linkedList";
 
-    public SignalTileEntity() {
+    public SignalTileEntity(final TileEntityInfo info) {
+        super(info);
         this.handler = new SignalAnimationHandler(this);
     }
 
@@ -97,7 +99,6 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         linkedPositions.clear();
         wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedPositions::add);
-        System.out.println(pos + " - " + linkedPositions);
     }
 
     public void addLinkedSignalReader(final BlockPos pos) {
@@ -148,17 +149,12 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public void onLoad() {
-        if (!world.isRemote) {
-            final IBlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(pos, state, state, 3);
-            world.markBlockRangeForRenderUpdate(pos, pos);
-            markDirty();
-            SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
-            linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalReaderTileEntity.class, world,
-                    pos, (tile, chunk) -> {
-                        tile.onLoad();
-                    }));
-        } else if (hasAnimation()) {
+        if (!level.isClientSide) {
+            SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
+                    listener);
+            linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalReaderTileEntity.class,
+                    (ServerLevel) level, pos, (tile, chunk) -> tile.onLoad()));
+        } else if (getSignal().hasAnimation()) {
             handler.updateAnimationListFromBlock();
             handler.updateStates(
                     ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition)),

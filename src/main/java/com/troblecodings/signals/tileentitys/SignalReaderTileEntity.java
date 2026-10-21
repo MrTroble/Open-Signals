@@ -30,6 +30,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 
 public class SignalReaderTileEntity extends SyncableTileEntity implements ILinkableTile {
@@ -54,7 +55,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
             new HashMap<>();
     private final Map<Direction, Predicate<Map<SEProperty, String>>> predicateForDirection =
             new HashMap<>();
-    private final boolean[] activatedDirections = new boolean[EnumFacing.values().length];
+    private final boolean[] activatedDirections = new boolean[Direction.values().length];
     private final SignalReaderListener listener = new SignalReaderListener(this);
     private BlockPos signalPos;
     private Signal signal;
@@ -152,11 +153,13 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
     }
 
     public void onBlockDestroy() {
-        loadChunkAndGetTile(SignalTileEntity.class, world, signalPos,
-                (tile, chunk) -> tile.removeLinkedSignalReader(pos));
+        if (level.isClientSide)
+            return;
+        loadChunkAndGetTile(SignalTileEntity.class, (ServerLevel) level, signalPos,
+                (tile, chunk) -> tile.removeLinkedSignalReader(getBlockPos()));
     }
 
-    public boolean enableRedstoneForDirection(final EnumFacing dir) {
+    public boolean enableRedstoneForDirection(final Direction dir) {
         return activatedDirections[dir.ordinal()];
     }
 
@@ -216,27 +219,21 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
     public void onLoad() {
         if (level.isClientSide || signalPos == null || signal == null)
             return;
-        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        final SignalStateInfo info = new SignalStateInfo(level, signalPos, signal);
         SignalStateHandler.addListener(info, listener);
-        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
-        // TODO Workaround for already placed SignalReaders so they work correctly, will
-        // be removed after TestBuild
-        registerLinkOnSignal();
+        SignalStateHandler
+                .loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(getBlockPos())));
     }
 
-    @Override
-    public void onChunkUnloaded() {
-        if (level.isClientSide || signalPos == null || signal == null)
-            return;
     @Override
     public boolean link(final BlockPos pos, final CompoundTag tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(
+                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof Signal) {
             signal = (Signal) block;
             signalPos = pos;
-            // TODO Will be added when Workaround removed (look in onLoad();)
-            // registerLinkOnSignal();
+            registerLinkOnSignal();
             onLoad();
             return true;
         }
@@ -244,8 +241,10 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
     }
 
     private void registerLinkOnSignal() {
-        loadChunkAndGetTile(SignalTileEntity.class, world, signalPos,
-                (tile, chunk) -> tile.addLinkedSignalReader(getPos()));
+        if (level.isClientSide)
+            return;
+        loadChunkAndGetTile(SignalTileEntity.class, (ServerLevel) level, signalPos,
+                (tile, chunk) -> tile.addLinkedSignalReader(getBlockPos()));
     }
 
     @Override
@@ -273,10 +272,10 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
         @Override
         public void update(final SignalStateInfo info,
                 final Map<SEProperty, String> changedProperties, final ChangedState changedState) {
-            if (info.worldNullOrClientSide())
+            if (info.isWorldNullOrClientSide())
                 return;
-            tile.loadChunkAndGetTile(SignalReaderTileEntity.class, tile.world, tile.pos,
-                    (tile, chunk) -> {
+            tile.loadChunkAndGetTile(SignalReaderTileEntity.class, (ServerLevel) tile.level,
+                    tile.getBlockPos(), (tile, chunk) -> {
                         if (changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
                             tile.unlink();
                             return;
@@ -285,23 +284,22 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
                                 || changedState.equals(ChangedState.UPDATED)) {
                             final Map<SEProperty, String> allProperties =
                                     SignalStateHandler.getStates(info);
-                            for (final EnumFacing dir : EnumFacing.values()) {
+                            for (final Direction dir : Direction.values()) {
                                 tile.activatedDirections[dir.ordinal()] = false;
                                 if (tile.predicateForDirection.getOrDefault(dir, _u -> false)
                                         .test(allProperties)) {
                                     tile.activatedDirections[dir.ordinal()] = true;
                                 }
                             }
-                            final IBlockState state = tile.world.getBlockState(tile.pos);
-                            tile.world.notifyNeighborsOfStateChange(tile.pos, state.getBlock(),
-                                    true);
+                            tile.level.blockUpdated(tile.worldPosition,
+                                    tile.getBlockState().getBlock());
                         }
                     });
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(tile.pos, tile.signalPos, tile.signal);
+            return Objects.hash(tile.worldPosition, tile.signalPos, tile.signal);
         }
 
         @Override
@@ -313,7 +311,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
             if (getClass() != obj.getClass())
                 return false;
             final SignalReaderListener other = (SignalReaderListener) obj;
-            return Objects.equals(tile.pos, other.tile.pos)
+            return Objects.equals(tile.worldPosition, other.tile.worldPosition)
                     && Objects.equals(tile.signalPos, other.tile.signalPos)
                             & Objects.equals(tile.signal, other.tile.signal);
         }

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
@@ -68,17 +69,13 @@ public class SignalReader extends BasicBlock {
     }
 
     @Override
-    public TileEntity createTileEntity(final World world, final IBlockState state) {
-        return new SignalReaderTileEntity();
-    }
-
-    @Override
-    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
-        final TileEntity tile = worldIn.getTileEntity(pos);
+    public void playerWillDestroy(final Level world, final BlockPos pos, final BlockState state,
+            final Player player) {
+        final BlockEntity tile = world.getBlockEntity(pos);
         if (tile instanceof SignalReaderTileEntity) {
             ((SignalReaderTileEntity) tile).onBlockDestroy();
         }
-        super.breakBlock(worldIn, pos, state);
+        super.playerWillDestroy(world, pos, state, player);
     }
 
 }
