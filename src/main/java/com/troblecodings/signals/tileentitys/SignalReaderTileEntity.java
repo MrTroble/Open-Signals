@@ -220,16 +220,6 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
     }
 
     @Override
-    public void onChunkUnload() {
-        if (world.isRemote || signalPos == null || signal == null)
-            return;
-        // final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
-        // SignalStateHandler.removeListener(info, this);
-        // SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, new
-        // LoadHolder<>(pos)));
-    }
-
-    @Override
     public boolean link(final BlockPos pos, final NBTTagCompound tag) {
         final Block block = Block.REGISTRY.getObject(
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toString())));
