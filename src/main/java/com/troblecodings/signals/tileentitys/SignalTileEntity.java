@@ -120,18 +120,14 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         linkedPositions.clear();
         wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedPositions::add);
-        System.out.println(pos + " - " + linkedPositions);
     }
 
     public void addLinkedSignalReader(final BlockPos pos) {
-        if (!linkedPositions.contains(pos)) {
+        if (!linkedPositions.contains(pos))
             linkedPositions.add(pos);
-            System.out.println("Adding " + pos);
-        }
     }
 
     public void removeLinkedSignalReader(final BlockPos pos) {
-        System.out.println("Removeing " + pos);
         linkedPositions.remove(pos);
     }
 
@@ -160,9 +156,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             markDirty();
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
             linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalReaderTileEntity.class, world,
-                    pos, (tile, chunk) -> {
-                        tile.onLoad();
-                    }));
+                    pos, (tile, chunk) -> tile.onLoad()));
         } else if (hasAnimation()) {
             handler.updateAnimationListFromBlock();
             handler.updateStates(
