@@ -275,7 +275,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
             if (info.isWorldNullOrClientSide())
                 return;
             tile.loadChunkAndGetTile(SignalReaderTileEntity.class, (ServerLevel) tile.level,
-                    tile.getBlockPos(), (tile, chunk) -> {
+                    tile.worldPosition, (tile, chunk) -> {
                         if (changedState.equals(ChangedState.REMOVED_FROM_FILE)) {
                             tile.unlink();
                             return;
