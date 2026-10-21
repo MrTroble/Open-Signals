@@ -26,7 +26,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -122,38 +121,27 @@ public class MonitorTEBlock extends Monitor {
         info.translate(-0.5f, 0, -0.5f);
     }
 
-    protected boolean onScreenClick(final Level world, final BlockPos pos, final BlockState state,
-            final Direction facing, final Player player, final InteractionHand hand, final float u,
-            final float v) {
+    @Override
+    protected InteractionResult onScreenClick(final Level world, final BlockPos pos,
+            final BlockState state, final Direction facing, final Player player,
+            final InteractionHand hand, final double u, final double v) {
         final Item item = player.getMainHandItem().getItem();
         if (item.equals(OSItems.MANIPULATOR)) {
             OpenSignalsMain.handler.invokeGui(MonitorTEBlock.class, player, world, pos,
                     "monitorTE");
-            return true;
+            return InteractionResult.PASS;
         } else if (item instanceof Linkingtool) {
-            return false;
+            return InteractionResult.CONSUME;
         }
         final Direction blockFacing = state.getValue(FACING);
         if (!facing.equals(blockFacing) || !hand.equals(InteractionHand.MAIN_HAND))
-            return false;
+            return InteractionResult.FAIL;
         if (!world.isClientSide)
-            return true;
+            return InteractionResult.CONSUME;
         final BlockEntity tile = world.getBlockEntity(pos);
         if (tile instanceof MonitorTileEntity) {
             return ((MonitorTileEntity) tile).onBlockActivated(u, v, getMonitorProperties(),
                     player);
-        }
-        return false;
-    }
-
-    @Override
-    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
-            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        final Item item = playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem();
-        if (!(item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
-            OpenSignalsMain.handler.invokeGui(MonitorTEBlock.class, playerIn, worldIn, pos,
-                    "monitorTE");
-            return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
     }

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.PathwayRequestResult.PathwayRequestMode;
 import com.troblecodings.signals.tileentitys.MonitorTileEntity;
@@ -63,14 +64,18 @@ public class ClientMonitorNetworkHandler implements INetworkSync {
         final byte mode = buffer.getByte();
         final PathwayRequestMode requestMode = buffer.getEnumValue(PathwayRequestMode.class);
         if (mode == MonitorNetworkHandler.PATHWAY_ADD_SAVER) {
-            player.sendMessage(new TextComponent("[" + I18Wrapper.format("tile.signalbox.name")
-                    + "]: " + I18Wrapper.format("error." + requestMode.getName()) + " - "
-                    + I18Wrapper.format("info.pathwaysaver")), player.getUUID());
+            player.sendMessage(
+                    new TextComponent(
+                            "[" + I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalbox")
+                                    + "]: " + I18Wrapper.format("error." + requestMode.getName())
+                                    + " - " + I18Wrapper.format("info.pathwaysaver")),
+                    player.getUUID());
         }
         if (mode == MonitorNetworkHandler.PATHWAY_RESPONSE) {
             player.sendMessage(
-                    new TextComponent("[" + I18Wrapper.format("tile.signalbox.name") + "]: "
-                            + I18Wrapper.format("error." + requestMode.getName())),
+                    new TextComponent(
+                            "[" + I18Wrapper.format("block." + OpenSignalsMain.MODID + ".signalbox")
+                                    + "]: " + I18Wrapper.format("error." + requestMode.getName())),
                     player.getUUID());
         }
     }

@@ -41,6 +41,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 
@@ -108,47 +109,47 @@ public class MonitorTileEntity extends SyncableTileEntity
         ((MonitorTEBlock) block).render(info, this, rendering);
     }
 
-    public boolean onBlockActivated(final float hitX, final float hitY,
+    public InteractionResult onBlockActivated(final double hitX, final double hitY,
             final MonitorBlockProperties props, final Player playerIn) {
         if (!hasLink() || renderStart.equals(new Point(-1, -1)))
-            return false;
+            return InteractionResult.FAIL;
         final int cellsX = renderEnd.getX() - renderStart.getX() + 1;
         final int cellsY = renderEnd.getY() - renderStart.getY() + 1;
 
-        final float insets = (props.getInsets() - 6) / MonitorTEBlock.STEPS_PER_BLOCK;
-        final float mx = hitX;
-        final float my = monitorSizeY - hitY;
+        final double insets = props.getInsets() / MonitorTEBlock.STEPS_PER_BLOCK;
+        final double mx = hitX;
+        final double my = monitorSizeY * 1.05 - hitY;
 
-        final float contentW = monitorSizeX - 2 * insets;
-        final float contentH = monitorSizeY - 2 * insets;
+        final double contentW = monitorSizeX - 2 * insets;
+        final double contentH = monitorSizeY - 2 * insets;
 
-        final float u = (mx - insets) / contentW;
-        final float v = (my - insets) / contentH;
+        final double u = (mx - insets) / contentW;
+        final double v = (my - insets) / contentH;
         final int px = clamp((int) Math.floor(u * cellsX), 0, cellsX - 1);
         final int py = clamp((int) Math.floor(v * cellsY), 0, cellsY - 1);
 
         final Point point = new Point(px, py);
         final SignalBoxNode node = grid.getNode(getPointRetranslated(point));
         if (node == null)
-            return false;
+            return InteractionResult.FAIL;
         if (startPoint == null && node.isValidStart()) {
             startPoint = point;
             rendering.addSelection(
                     grid.getUIProfile().getOperationModeSettings().getUserSelectionColor(), point,
                     SelectionType.FIRST);
-            return true;
+            return InteractionResult.SUCCESS;
         }
         if (!point.equals(startPoint) && node.isValidEnd()) {
             requestPathway(startPoint, point, playerIn);
             rendering.removeSelection(SelectionType.FIRST);
             startPoint = null;
-            return true;
+            return InteractionResult.SUCCESS;
         }
         if (point.equals(startPoint)) {
             rendering.removeSelection(SelectionType.FIRST);
             startPoint = null;
         }
-        return false;
+        return InteractionResult.FAIL;
     }
 
     private static int clamp(final int v, final int min, final int max) {
@@ -215,6 +216,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     }
 
     public void loadRenderPoints(final ReadBuffer buffer) {
+        linkedSignalBox = buffer.getBlockPos();
         monitorSizeX = buffer.getInt();
         monitorSizeY = buffer.getInt();
         renderStart = buffer.getINetworkSaveable(Point.class);
