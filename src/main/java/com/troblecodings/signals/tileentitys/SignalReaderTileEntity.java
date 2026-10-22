@@ -155,6 +155,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
     public void onBlockDestroy() {
         if (level.isClientSide)
             return;
+        unlink();
         loadChunkAndGetTile(SignalTileEntity.class, (ServerLevel) level, signalPos,
                 (tile, chunk) -> tile.removeLinkedSignalReader(getBlockPos()));
     }
@@ -222,7 +223,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
         final SignalStateInfo info = new SignalStateInfo(level, signalPos, signal);
         SignalStateHandler.addListener(info, listener);
         SignalStateHandler
-                .loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(getBlockPos())));
+                .loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(worldPosition)));
     }
 
     @Override
@@ -257,7 +258,11 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
         signal = null;
         signalPos = null;
         statesForFace.clear();
-        onChunkUnloaded();
+
+        final SignalStateInfo info = new SignalStateInfo(level, signalPos, signal);
+        SignalStateHandler.removeListener(info, listener);
+        SignalStateHandler
+                .unloadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(worldPosition)));
         return true;
     }
 
