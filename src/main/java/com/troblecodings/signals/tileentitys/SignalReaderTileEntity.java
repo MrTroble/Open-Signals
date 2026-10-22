@@ -147,6 +147,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
     }
 
     public void onBlockDestroy() {
+        unlink();
         loadChunkAndGetTile(SignalTileEntity.class, world, signalPos,
                 (tile, chunk) -> tile.removeLinkedSignalReader(pos));
     }
@@ -214,9 +215,6 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
         final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
         SignalStateHandler.addListener(info, listener);
         SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
-        // TODO Workaround for already placed SignalReaders so they work correctly, will
-        // be removed after TestBuild
-        registerLinkOnSignal();
     }
 
     @Override
@@ -226,8 +224,7 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
         if (block instanceof Signal) {
             signal = (Signal) block;
             signalPos = pos;
-            // TODO Will be added when Workaround removed (look in onLoad();)
-            // registerLinkOnSignal();
+            registerLinkOnSignal();
             onLoad();
             return true;
         }
@@ -249,7 +246,10 @@ public class SignalReaderTileEntity extends SyncableTileEntity implements ILinka
         signal = null;
         signalPos = null;
         statesForFace.clear();
-        onChunkUnload();
+
+        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        SignalStateHandler.removeListener(info, listener);
+        SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, new LoadHolder<>(pos)));
         return true;
     }
 
