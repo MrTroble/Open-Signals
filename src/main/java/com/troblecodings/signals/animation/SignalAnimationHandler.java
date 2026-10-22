@@ -45,7 +45,7 @@ public class SignalAnimationHandler {
     private int animationsRunning = 0;
     private long lastWorldTick = -1;
 
-    public static final float BASIC_ANIMATION_SPEED = 0.001f;
+    public static final float BASIC_ANIMATION_SPEED = 0.00055f;
 
     public SignalAnimationHandler(final SignalTileEntity tile) {
         this.tile = tile;

@@ -34,52 +34,52 @@ public final class ConfigHandler {
     public static boolean canInputBlockShuntingPath = false;
 
     @Name("Signalbox background color")
-    @Comment("Change the background color of the signalbox gui. Default: -7631989")
-    public static int signalboxBackgroundColor = 0xFF8B8B8B;
+    @Comment("Change the background color of the signalbox gui. Default: 0xFF8B8B8B")
+    public static String signalboxBackgroundColor = "0xFF8B8B8B";
 
     @Name("Signalbox free color")
-    @Comment("Change the color of normal path elements. Default: -16777216")
-    public static int signalboxFreeColor = 0xFF000000;
+    @Comment("Change the color of normal path elements. Default: 0xFF000000")
+    public static String signalboxFreeColor = "0xFF000000";
 
     @Name("Signalbox select color")
-    @Comment("Change the color of a selected path. Default: -16711936")
-    public static int signalboxSelectColor = 0xFF00FF00;
+    @Comment("Change the color of a selected path. Default: 0xFF00FF00")
+    public static String signalboxSelectColor = "0xFF00FF00";
 
     @Name("Signalbox used color")
-    @Comment("Change the color of a blocked path. Default: -65536")
-    public static int signalboxUsedColor = 0xFFFF0000;
+    @Comment("Change the color of a blocked path. Default: 0xFFFF0000")
+    public static String signalboxUsedColor = "0xFFFF0000";
 
     @Name("Signalbox prepared color")
-    @Comment("Change the color of a prepared path. Default: 16776960")
-    public static int signalboxPreparedColor = 0xffff00;
+    @Comment("Change the color of a prepared path. Default: 0xffff00")
+    public static String signalboxPreparedColor = "0xffff00";
 
     @Name("Signalbox shunting color")
-    @Comment("Change the color of a selected shunting path. Default: -16711936")
-    public static int signalboxShuntingColor = 0xFF00FF00;
+    @Comment("Change the color of a selected shunting path. Default: 0xFF00FF00")
+    public static String signalboxShuntingColor = "0xFF00FF00";
 
     @Name("Signalbox TrainNumber color")
-    @Comment("Change the color of the TrainNumber in the UI. Default: -65536")
-    public static int signalboxTrainNumberColor = 0xFFFF0000;
+    @Comment("Change the color of the TrainNumber in the UI. Default: 0xFFFF0000")
+    public static String signalboxTrainNumberColor = "0xFFFF0000";
 
     @Name("Basic text color")
-    @Comment("Change the color of a default text. Default: -16777216")
-    public static int basicTextColor = GuiConfigHandler.basicTextColor;
+    @Comment("Change the color of a default text. Default: -0xFF000000")
+    public static String basicTextColor = GuiConfigHandler.basicTextColor;
 
     @Name("info text color")
-    @Comment("Change the color of an info text. Default: -16777046")
-    public static int infoTextColor = GuiConfigHandler.infoTextColor;
+    @Comment("Change the color of an info text. Default: -0xFF0000AA")
+    public static String infoTextColor = GuiConfigHandler.infoTextColor;
 
     @Name("Error text color")
-    @Comment("Change the color of an error text. Default: -16776961")
-    public static int errorTextColor = GuiConfigHandler.errorTextColor;
+    @Comment("Change the color of an error text. Default: 0xFF0000FF")
+    public static String errorTextColor = GuiConfigHandler.errorTextColor;
 
     @Name("Signalbox trainnumber text color")
-    @Comment("Change the color of trainnumber in the signalbox. Default: -65536")
-    public static int signalboxTrainnumberColor = 0xFFFF0000;
+    @Comment("Change the color of trainnumber in the signalbox. Default: 0xFFFF0000")
+    public static String signalboxTrainnumberColor = "0xFFFF0000";
 
     @Name("Signalbox trainnumber background color")
-    @Comment("Change the background color of trainnumber in the signalbox. Default: -11534336")
-    public static int signalboxTrainnumberBackgroundColor = 0xFF500000;
+    @Comment("Change the background color of trainnumber in the signalbox. Default: 0xFF500000")
+    public static String signalboxTrainnumberBackgroundColor = "0xFF500000";
 
     @RequiresMcRestart
     @Name("Render distance")

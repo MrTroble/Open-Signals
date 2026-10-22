@@ -12,26 +12,29 @@
                     "predicate": "with(WN_MECH.WN1) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": 0
+
                 },
                 {
                     "predicate": "with(WN_MECH.WN2) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": -90
                 },
                 {
                     "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandisnot(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]
@@ -48,26 +51,28 @@
                     "predicate": "with(WN_MECH.WN1) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(WN_MECH.WN2) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": -90
                 },
                 {
                     "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandis(SWITCHSIDE) && hasandisnot(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]
@@ -84,26 +89,28 @@
                     "predicate": "with(WN_MECH.WN1) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(WN_MECH.WN2) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": -90
                 },
                 {
                     "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandisnot(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]
@@ -120,26 +127,28 @@
                     "predicate": "with(WN_MECH.WN1) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "with(WN_MECH.WN2) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandisnot(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
+                    "animationSpeed": 1.5,
                     "rotation": -90
                 },
                 {
                     "predicate": "(with(WN_MECH.WN1) || hasandisnot(POWERED)) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "(with(WN_MECH.WN2) || hasandis(POWERED)) && hasandis(SWITCHSIDE) && hasandis(FALLBACK_SWITCH) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Y",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]
@@ -156,14 +165,14 @@
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.WHITE_BLACK) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.WHITE_BLACK) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 90
                 }
             ]
@@ -180,14 +189,14 @@
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 90
                 }
             ]
@@ -204,14 +213,14 @@
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 90
                 }
             ]
@@ -228,14 +237,14 @@
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.RED_YELLOW) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.RED_YELLOW) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 90
                 }
             ]
@@ -252,14 +261,14 @@
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.YELLOW) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.YELLOW) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 90
                 }
             ]
@@ -276,14 +285,14 @@
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]
@@ -300,14 +309,14 @@
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]
@@ -324,14 +333,14 @@
                     "predicate": "hasandis(POWERED) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": 0
                 },
                 {
                     "predicate": "hasandisnot(POWERED) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(MANUAL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "animationSpeed": 2,
+                    "animationSpeed": 2.5,
                     "rotation": -90
                 }
             ]

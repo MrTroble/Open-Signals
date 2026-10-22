@@ -2,8 +2,10 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
@@ -12,6 +14,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalTextRenderCache;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
@@ -22,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,6 +35,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     private final int renderDistance;
 
     private final Map<SEProperty, String> properties = new HashMap<>();
+    private final SignalTextRenderCache textRenderCache = new SignalTextRenderCache();
+
+    public static final String LINKED_LIST = "linkedList";
 
     public SignalTileEntity() {
         this.handler = new SignalAnimationHandler(this);
@@ -70,6 +77,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         signal.renderOverlay(info.with(this));
     }
 
+    public SignalTextRenderCache getTextRenderCache() {
+        return textRenderCache;
+    }
+
     public SignalAnimationHandler getAnimationHandler() {
         return handler;
     }
@@ -77,8 +88,10 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     @SideOnly(Side.CLIENT)
     public void updateAnimationState(final Map<SEProperty, String> properties,
             final ChangedState state) {
-        handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
-                || state.equals(ChangedState.ADDED_TO_FILE));
+        if (hasAnimation()) {
+            handler.updateStates(properties, state.equals(ChangedState.ADDED_TO_CACHE)
+                    || state.equals(ChangedState.ADDED_TO_FILE));
+        }
     }
 
     @Override
@@ -94,6 +107,28 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return name == null || name.isEmpty()
                 ? signal != null ? signal.getSignalTypeName() : "signal"
                 : name;
+    }
+
+    @Override
+    public void saveWrapper(final NBTWrapper wrapper) {
+        wrapper.putList(LINKED_LIST, linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public void loadWrapper(final NBTWrapper wrapper) {
+        linkedPositions.clear();
+        wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
+                .forEach(linkedPositions::add);
+    }
+
+    public void addLinkedSignalReader(final BlockPos pos) {
+        if (!linkedPositions.contains(pos))
+            linkedPositions.add(pos);
+    }
+
+    public void removeLinkedSignalReader(final BlockPos pos) {
+        linkedPositions.remove(pos);
     }
 
     public Signal getSignal() {
@@ -120,6 +155,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
             world.markBlockRangeForRenderUpdate(pos, pos);
             markDirty();
             SignalStateHandler.addListener(new SignalStateInfo(world, pos, getSignal()), listener);
+            linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalReaderTileEntity.class, world,
+                    pos, (tile, chunk) -> tile.onLoad()));
         } else if (hasAnimation()) {
             handler.updateAnimationListFromBlock();
             handler.updateStates(
