@@ -112,8 +112,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             }
 
             if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(blockPW.getValue());
+                final SignalBoxPathway otherPathway =
+                        otherGrid.get().getPathwayByLastPoint(blockPW.getValue());
                 pathwayToBlock = (InterSignalBoxPathway) otherPathway;
                 blockPW = null;
             }
@@ -127,8 +127,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             }
 
             if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(resetPW.getValue());
+                final SignalBoxPathway otherPathway =
+                        otherGrid.get().getPathwayByLastPoint(resetPW.getValue());
                 pathwayToReset = (InterSignalBoxPathway) otherPathway;
                 resetPW = null;
             }
@@ -141,8 +141,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             final MainSignalIdentifier otherLastSignal = pathwayToBlock.data.getEndSignal();
             if (otherLastSignal != null) {
-                final Signal nextSignal = SignalBoxHandler
-                        .getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
+                final Signal nextSignal =
+                        SignalBoxHandler.getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
                                 pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
                 if (nextSignal != null) {
                     lastSignalInfo = new SignalStateInfo(tile.getLevel(), otherLastSignal.pos,
@@ -151,6 +151,22 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             }
         }
         return super.getLastSignalInfo();
+    }
+
+    @Override
+    public void resetAllSignals() {
+        super.resetAllSignals();
+        if (pathwayToReset != null) {
+            pathwayToReset.loadTileAndExecute(tile -> {
+                final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
+                pathwayToReset = (InterSignalBoxPathway) otherGrid
+                        .getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                if (pathwayToReset == null)
+                    return;
+                pathwayToReset.updatePathwaySignals();
+                pathwayToReset.updatePrevious();
+            });
+        }
     }
 
     @Override
@@ -168,11 +184,32 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     }
 
     @Override
-    public void resetPathway(final Point point) {
-        super.resetPathway(point);
-        if (data.totalPathwayReset(point) && pathwayToReset != null) {
-            pathwayToReset.loadTileAndExecute(
-                    tile -> tile.getSignalBoxGrid().resetPathway(pathwayToReset.getFirstPoint()));
+    public void compact(final Point point) {
+        super.compact(point);
+        if (pathwayToBlock != null) {
+            pathwayToBlock.loadTileAndExecute(tile -> {
+                final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
+                pathwayToBlock = (InterSignalBoxPathway) otherGrid
+                        .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
+                if (pathwayToBlock == null)
+                    return;
+                pathwayToBlock.setOtherPathwayToReset(this);
+            });
+        }
+    }
+
+    @Override
+    public void resetPathway(final Point point, final boolean manuellReset) {
+        super.resetPathway(point, manuellReset);
+        if (!manuellReset && data.totalPathwayReset(point) && pathwayToReset != null) {
+            pathwayToReset.loadTileAndExecute(tile -> {
+                final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
+                final SignalBoxPathway pw =
+                        otherGrid.getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                if (pw == null)
+                    return;
+                otherGrid.resetPathway(pw.getFirstPoint());
+            });
         }
     }
 
@@ -203,8 +240,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                 signalIdent.updateSignalState(SignalState.GREEN);
             });
         }
-        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
-                .getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions =
+                data.getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
             if (holder.shouldTurnSignalOff()) {
                 position.updateSignalState(SignalState.OFF);

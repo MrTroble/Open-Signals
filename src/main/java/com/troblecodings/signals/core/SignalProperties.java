@@ -23,9 +23,9 @@ public class SignalProperties {
     public final float signScale;
     public final boolean autoscale;
     public final List<PredicateProperty<Boolean>> doubleSidedText;
-    public final int textColor;
+    public final String textColor;
     public final boolean canLink;
-    public final List<Integer> colors;
+    public final List<String> colors;
     public final List<SoundProperty> sounds;
     public final List<ValuePack> redstoneOutputs;
     public final List<ValuePack> redstoneOutputPacks;
@@ -37,7 +37,7 @@ public class SignalProperties {
             final int height, final List<PredicateProperty<Integer>> signalHeights,
             final float signWidth, final float offsetX, final float offsetY, final float signScale,
             final boolean autoscale, final List<PredicateProperty<Boolean>> doubleSidedText,
-            final int textColor, final boolean canLink, final List<Integer> colors,
+            final String textColor, final boolean canLink, final List<String> colors,
             final List<PredicateProperty<Float>> renderheights, final List<SoundProperty> sounds,
             final List<ValuePack> redstoneOutputs, final int defaultItemDamage,
             final List<ValuePack> redstoneOutputPacks, final boolean isBridgeSignal,

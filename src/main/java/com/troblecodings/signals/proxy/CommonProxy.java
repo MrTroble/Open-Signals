@@ -6,24 +6,32 @@ import com.troblecodings.core.UIInit;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.Monitor;
+import com.troblecodings.signals.blocks.MonitorTEBlock;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.SignalReader;
 import com.troblecodings.signals.blocks.TrainNumberBlock;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalNonPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
+import com.troblecodings.signals.guis.ContainerMonitor;
+import com.troblecodings.signals.guis.ContainerMonitorSelection;
 import com.troblecodings.signals.guis.ContainerPathwayRequester;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalBridge;
 import com.troblecodings.signals.guis.ContainerSignalController;
+import com.troblecodings.signals.guis.ContainerSignalReader;
 import com.troblecodings.signals.guis.ContainerTrainNumber;
 import com.troblecodings.signals.guis.NamableContainer;
+import com.troblecodings.signals.guis.UISignalBoxProfile;
+import com.troblecodings.signals.handler.MonitorNetworkHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSItems;
@@ -39,7 +47,9 @@ public class CommonProxy {
     public void initModEvent(final FMLConstructModEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
+        MonitorNetworkHandler.init();
         OSSounds.init();
+        UISignalBoxProfile.loadSignalBoxUIProfiles();
 
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
@@ -53,6 +63,9 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(PathwayRequester.class, ContainerPathwayRequester::new);
         OpenSignalsMain.handler.addServer(TrainNumberBlock.class, ContainerTrainNumber::new);
         OpenSignalsMain.handler.addServer(SignalBridgeBasicBlock.class, ContainerSignalBridge::new);
+        OpenSignalsMain.handler.addServer(Monitor.class, ContainerMonitorSelection::new);
+        OpenSignalsMain.handler.addServer(MonitorTEBlock.class, ContainerMonitor::new);
+        OpenSignalsMain.handler.addServer(SignalReader.class, ContainerSignalReader::new);
     }
 
     public void preinit(final FMLCommonSetupEvent event) {

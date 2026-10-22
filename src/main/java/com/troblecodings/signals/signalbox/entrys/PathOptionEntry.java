@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -14,6 +15,8 @@ import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.network.PathOptionEntryNetwork;
+
+import net.minecraft.core.BlockPos;
 
 public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
@@ -131,4 +134,12 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
         buffer.putMap(pathEntrys, NetworkBufferWrappers.PATHENTRYTYPE_CONSUMER,
                 WriteBuffer.getINetworkSaveableConsumer());
     }
+
+    public void removeLinkedPos(final BlockPos pos) {
+        ImmutableMap.copyOf(pathEntrys).entrySet().stream()
+                .filter(entry -> entry.getKey().getEntryClass().equals(BlockposEntry.class)
+                        && entry.getValue().getValue().equals(pos))
+                .forEach(entry -> removeEntry(entry.getKey()));
+    }
+
 }

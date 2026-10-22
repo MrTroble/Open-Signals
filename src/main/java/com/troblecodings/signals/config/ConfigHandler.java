@@ -53,61 +53,61 @@ public final class ConfigHandler {
 
     public static class Client {
 
-        public final ConfigValue<Integer> signalboxBackgroundColor;
-        public final ConfigValue<Integer> signalboxFreeColor;
-        public final ConfigValue<Integer> signalboxSelectColor;
-        public final ConfigValue<Integer> signalboxUsedColor;
-        public final ConfigValue<Integer> signalboxPreparedColor;
-        public final ConfigValue<Integer> signalboxTrainNumberColor;
-        public final ConfigValue<Integer> signalboxShuntingColor;
-        public final ConfigValue<Integer> signalboxTrainnumberBackgroundColor;
+        public final ConfigValue<String> signalboxBackgroundColor;
+        public final ConfigValue<String> signalboxFreeColor;
+        public final ConfigValue<String> signalboxSelectColor;
+        public final ConfigValue<String> signalboxUsedColor;
+        public final ConfigValue<String> signalboxPreparedColor;
+        public final ConfigValue<String> signalboxTrainNumberColor;
+        public final ConfigValue<String> signalboxShuntingColor;
+        public final ConfigValue<String> signalboxTrainnumberBackgroundColor;
         public final ConfigValue<Integer> renderDistance;
 
         public Client(final ForgeConfigSpec.Builder builder) {
             String desc;
             builder.push("Client Only");
 
-            desc = "Change the background color of the signalbox gui. Default: -7631989";
-            signalboxBackgroundColor = builder.comment(desc).define("Signalbox background color",
-                    0xFF8B8B8B);
+            desc = "Change the background color of the signalbox gui. Default: 0xFF8B8B8B";
+            signalboxBackgroundColor =
+                    builder.comment(desc).define("Signalbox background color", "0xFF8B8B8B");
 
-            desc = "Change the color of normal path elements. Default: -16777216";
-            signalboxFreeColor = builder.comment(desc).define("Signalbox free color", 0xFF000000);
+            desc = "Change the color of normal path elements. Default: 0xFF000000";
+            signalboxFreeColor = builder.comment(desc).define("Signalbox free color", "0xFF000000");
 
-            desc = "Change the color of a selected path. Default: -16711936";
-            signalboxSelectColor = builder.comment(desc).define("Signalbox select color",
-                    0xFF00FF00);
+            desc = "Change the color of a selected path. Default: 0xFF00FF00";
+            signalboxSelectColor =
+                    builder.comment(desc).define("Signalbox select color", "0xFF00FF00");
 
-            desc = "Change the color of a blocked path. Default: -65536";
-            signalboxUsedColor = builder.comment(desc).define("Signalbox used color", 0xFFFF0000);
+            desc = "Change the color of a blocked path. Default: 0xFFFF0000";
+            signalboxUsedColor = builder.comment(desc).define("Signalbox used color", "0xFFFF0000");
 
-            desc = "Change the color of a prepared path. Default: 16776960";
-            signalboxPreparedColor = builder.comment(desc).define("Signalbox prepared color",
-                    0xffff00);
+            desc = "Change the color of a prepared path. Default: 0xFFFF00";
+            signalboxPreparedColor =
+                    builder.comment(desc).define("Signalbox prepared color", "0xffff00");
 
-            desc = "Change the color of a selected shunting path. Default: -16711936";
-            signalboxShuntingColor = builder.comment(desc).define("Signalbox shunting color",
-                    0xFF00FF00);
+            desc = "Change the color of a selected shunting path. Default: 0xFF00FF00";
+            signalboxShuntingColor =
+                    builder.comment(desc).define("Signalbox shunting color", "0xFF00FF00");
 
-            desc = "Change the color of trainnumber in the signalbox. Default: -65536";
-            signalboxTrainNumberColor = builder.comment(desc)
-                    .define("Signalbox trainnumber text color", 0xFFFF0000);
+            desc = "Change the color of trainnumber in the signalbox. Default: 0xFFFF0000";
+            signalboxTrainNumberColor =
+                    builder.comment(desc).define("Signalbox trainnumber text color", "0xFFFF0000");
 
-            desc = "Change the background color of trainnumber in the signalbox. Default: -11534336";
+            desc = "Change the background color of trainnumber in the signalbox. Default: 0xFF500000";
             signalboxTrainnumberBackgroundColor = builder.comment(desc)
-                    .define("Signalbox trainnumber background color", 0xFF500000);
+                    .define("Signalbox trainnumber background color", "0xFF500000");
 
-            desc = "Change the color of a default text. Default: -16777216";
-            GuiConfigHandler.basicTextColor = builder.comment(desc).define("Basic text color",
-                    0xFF000000);
+            desc = "Change the color of a default text. Default: 0xFF000000";
+            GuiConfigHandler.basicTextColor =
+                    builder.comment(desc).define("Basic text color", "0xFF000000");
 
-            desc = "Change the color of an info text. Default: -16777046";
-            GuiConfigHandler.infoTextColor = builder.comment(desc).define("info text color",
-                    0xFF0000AA);
+            desc = "Change the color of an info text. Default: 0xFF0000AA";
+            GuiConfigHandler.infoTextColor =
+                    builder.comment(desc).define("info text color", "0xFF0000AA");
 
-            desc = "Change the color of an error text. Default: -16776961";
-            GuiConfigHandler.errorTextColor = builder.comment(desc).define("Error text color",
-                    0xFF0000FF);
+            desc = "Change the color of an error text. Default: 0xFF0000FF";
+            GuiConfigHandler.errorTextColor =
+                    builder.comment(desc).define("Error text color", "0xFF0000FF");
 
             desc = "Change the render distance for animated signals. Default: 128";
             renderDistance = builder.comment(desc).define("Render distance", 128);

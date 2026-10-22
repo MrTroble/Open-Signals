@@ -9,3 +9,4 @@
 [submodule "contentPackLib"]
 	path = contentPackLib
 	url = https://github.com/MrTroble/contentPackLib
+		branch = master
