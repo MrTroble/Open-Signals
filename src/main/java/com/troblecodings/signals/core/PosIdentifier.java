@@ -74,9 +74,7 @@ public class PosIdentifier implements INetworkSaveable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final PosIdentifier other = (PosIdentifier) obj;
         return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos);
@@ -84,7 +82,7 @@ public class PosIdentifier implements INetworkSaveable {
 
     @Override
     public String toString() {
-        return "MainSignalIdentifier [ModeIdentifier=" + identifier + ",pos=" + pos + "]";
+        return "PosIdentifier [ModeIdentifier=" + identifier + ",pos=" + pos + "]";
     }
 
 }

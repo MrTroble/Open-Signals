@@ -51,8 +51,8 @@ public class GuiPlacementtool extends GuiBase {
         this.container = (ContainerPlacementtool) info.base;
         final ItemStack stack = info.player.getMainHandItem();
         tool = (Placementtool) stack.getItem();
-        final int usedBlock = NBTWrapper.getOrCreateWrapper(stack)
-                .getInteger(Placementtool.BLOCK_TYPE_ID);
+        final int usedBlock =
+                NBTWrapper.getOrCreateWrapper(stack).getInteger(Placementtool.BLOCK_TYPE_ID);
         currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
     }
@@ -76,8 +76,8 @@ public class GuiPlacementtool extends GuiBase {
 
         enumerable = new UIEnumerable(tool.count(), tool.getName());
 
-        final UIEntity selectBlockEntity = GuiElements.createEnumElement(enumerable, tool,
-                input -> {
+        final UIEntity selectBlockEntity =
+                GuiElements.createEnumElement(enumerable, tool, input -> {
                     currentSelectedBlock = tool.getObjFromID(input);
                     this.list.clearChildren();
                     if (container.signalID != input) {
@@ -86,8 +86,7 @@ public class GuiPlacementtool extends GuiBase {
                     }
                 });
         final UIEntity leftSide = new UIEntity();
-        leftSide.setInheritHeight(true);
-        leftSide.setInheritWidth(true);
+        leftSide.setInherits(true);
         leftSide.add(new UIBox(UIBox.VBOX, 5));
 
         leftSide.add(selectBlockEntity);

@@ -24,19 +24,18 @@ import net.minecraft.world.level.block.Rotation;
 
 public class UIMenu extends UIComponentEntity {
 
-    public static final int BACKGROUND_COLOR = 0xFFAFAFAF;
-    public static final int HIGHLIGHT_COLOR = 0x45339933;
-
     private final Map<EnumGuiMode, UIEntity> modeForEntity = new HashMap<>();
 
+    private final UISignalBoxProfile profile;
     private final UIRotate rotate = new UIRotate();
     private int selection = 0;
     private int rotation = 0;
     private BiConsumer<Integer, Integer> consumer = (i1, i2) -> {
     };
 
-    public UIMenu() {
+    public UIMenu(final UISignalBoxProfile profile) {
         super(new UIEntity());
+        this.profile = profile;
         entity.setInheritWidth(true);
         entity.setX(2);
         entity.setY(2);
@@ -52,20 +51,22 @@ public class UIMenu extends UIComponentEntity {
         list.add(scrollbox);
         for (final EnumGuiMode mode : EnumGuiMode.values()) {
             final UIEntity preview = new UIEntity();
-            preview.add(new UIColor(BACKGROUND_COLOR));
+            preview.add(
+                    new UIColor(profile.getEditorModeSettings().getModePreviewBackgroundColor()));
             preview.add(new UIReentrantScissor());
 
             preview.add(new UIIndependentTranslate(10, 10, 0));
             preview.add(rotate);
             preview.add(new UIIndependentTranslate(-10, -10, 0));
 
-            final UIComponent sbt = SidePanel.fromEnum(mode.ordinal(), rotation, 1.95f);
+            final UIComponent sbt = SidePanel.fromEnum(mode.ordinal(), rotation, 1.95f, profile);
             preview.add(sbt);
             preview.setHeight(20);
             preview.setWidth(20);
             preview.add(new UIClickable(e -> updateSelection(mode)));
             if (mode.ordinal() == this.selection)
-                preview.add(new UIColor(HIGHLIGHT_COLOR));
+                preview.add(new UIColor(
+                        profile.getEditorModeSettings().getModePreviewHighlightColor()));
 
             list.add(preview);
             modeForEntity.put(mode, preview);
@@ -82,12 +83,12 @@ public class UIMenu extends UIComponentEntity {
         final UIEntity previousEntity = modeForEntity.get(EnumGuiMode.values()[selection]);
         if (previousEntity != null) {
             previousEntity.findRecursive(UIColor.class).forEach(c -> {
-                if (c.getColor() == HIGHLIGHT_COLOR)
+                if (c.getColor() == profile.getEditorModeSettings().getModePreviewHighlightColor())
                     previousEntity.remove(c);
             });
         }
         final UIEntity newEntity = modeForEntity.get(newMode);
-        newEntity.add(new UIColor(HIGHLIGHT_COLOR));
+        newEntity.add(new UIColor(profile.getEditorModeSettings().getModePreviewHighlightColor()));
         this.selection = newMode.ordinal();
         consumer.accept(selection, rotation);
     }

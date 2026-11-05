@@ -18,21 +18,27 @@ public final class NetworkBufferWrappers {
 
     }
 
-    public static final BiConsumer<WriteBuffer, SignalBoxNode> POINT_SIGNALBOXNODE_CONSUMER = (
-            buffer, node) -> {
-        node.getPoint().writeNetwork(buffer);
-        node.writeNetwork(buffer);
-    };
+    public static final BiConsumer<WriteBuffer, SignalBoxNode> POINT_SIGNALBOXNODE_CONSUMER =
+            (buffer, node) -> {
+                node.getPoint().writeNetwork(buffer);
+                node.writeNetwork(buffer);
+            };
 
     public static BiConsumer<WriteBuffer, SEProperty> getSEPropertyConsumer(final Signal signal) {
         return (buffer, prop) -> buffer.putByte((byte) signal.getIDFromProperty(prop));
     }
 
-    public static final BiConsumer<WriteBuffer, PathEntryType<?>> PATHENTRYTYPE_CONSUMER = (buf,
-            type) -> buf.putByte((byte) type.getID());
+    public static final BiConsumer<WriteBuffer, PathEntryType<?>> PATHENTRYTYPE_CONSUMER =
+            (buf, type) -> buf.putByte((byte) type.getID());
 
-    public static final Function<ReadBuffer, PathEntryType<?>> PATHENTRYTYPE_FUNCTION = buf -> PathEntryType.ALL_ENTRIES
-            .get(buf.getByteToUnsignedInt());
+    public static final BiConsumer<WriteBuffer, Signal> SIGNAL_CONSUMER =
+            (buf, signal) -> buf.putInt(signal.getID());
+
+    public static final Function<ReadBuffer, PathEntryType<?>> PATHENTRYTYPE_FUNCTION =
+            buf -> PathEntryType.ALL_ENTRIES.get(buf.getByteToUnsignedInt());
+
+    public static final Function<ReadBuffer, Signal> SIGNAL_FUNCTION =
+            buf -> Signal.getSignalByID(buf.getInt());
 
     public static Function<ReadBuffer, SignalBoxNode> getSignalBoxNodeFunc(
             final SignalBoxNetworkHandler network) {
