@@ -2,9 +2,9 @@
     "currentSignals": ["semaphoresignalbridge"],
     "values": {
         "speed(<.1) || speed(>.15)": ["wing1.TRUE", "wing2.FALSE"],
-        "speed(==.1)": ["zs3.ZS13", "wing1.TRUE", "wing2.TRUE"],
-        "speed(==.2)": ["zs3.ZS13", "wing1.TRUE", "wing2.TRUE"],
-        "speed(==.3)": ["zs3.ZS13", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.2)": ["zs3.Z2", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.3)": ["zs3.Z3", "wing1.TRUE", "wing2.TRUE"],
         "speed(==.4)": ["wing1.TRUE", "wing2.TRUE"],
         "speed(==.5)": ["zs3.Z5", "wing1.TRUE", "wing2.TRUE"],
         "speed(==.6)": ["zs3.Z6", "wing1.TRUE", "wing2.TRUE"],
