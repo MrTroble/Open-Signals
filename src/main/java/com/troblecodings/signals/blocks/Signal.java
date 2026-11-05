@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.math.Quaternion;
+import org.joml.Quaternionf;
+
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
@@ -54,7 +56,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -93,8 +95,8 @@ public class Signal extends BasicBlock {
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
 
     public Signal(final SignalProperties prop, final String name) {
-        super(Properties.of(Material.STONE).noOcclusion()
-                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
+        super(Properties.of().mapColor(MapColor.STONE).noOcclusion()
+                .lightLevel(u -> ConfigHandler.lightEmission())
                 .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
         this.id = getIDFromName(name);
@@ -220,7 +222,7 @@ public class Signal extends BasicBlock {
     }
 
     public String getSignalTypeName() {
-        return this.delegate.name().getPath();
+        return this.getBlockName();
     }
 
     @Override
@@ -305,7 +307,7 @@ public class Signal extends BasicBlock {
         }
 
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final Quaternion angle = face.getQuaternion();
+        final Quaternionf angle = face.getQuaternion();
 
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
@@ -318,8 +320,8 @@ public class Signal extends BasicBlock {
         }
 
         if (doubleSidedText) {
-            final Quaternion quad = new Quaternion(
-                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            final Quaternionf quad = new Quaternionf(
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
 
@@ -350,7 +352,7 @@ public class Signal extends BasicBlock {
             final String text = splitNames[j];
             final float textWidth = info.font.width(text);
             final float center = (signWidth - textWidth) / 2;
-            info.font.draw(info.stack, text, (int) center - 10, j * 10, this.prop.textColor);
+            info.drawText(text, (int) center - 10, j * 10, this.prop.textColor);
         }
         info.stack.popPose();
     }
@@ -366,7 +368,7 @@ public class Signal extends BasicBlock {
         info.stack.pushPose();
         info.stack.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
         info.stack.scale(-scale, -scale, 1);
-        info.font.draw(info.stack, name, -nameWidth / 2, 0, this.prop.textColor);
+        info.drawText(name, -nameWidth / 2, 0, this.prop.textColor);
         info.stack.popPose();
     }
 
@@ -480,7 +482,7 @@ public class Signal extends BasicBlock {
 
     @Override
     public void tick(final BlockState state, final ServerLevel world, final BlockPos pos,
-            final Random rand) {
+            final RandomSource rand) {
         if (this.prop.sounds.isEmpty() || world.isClientSide)
             return;
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);

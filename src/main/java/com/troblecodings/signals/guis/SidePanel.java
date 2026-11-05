@@ -501,7 +501,7 @@ public class SidePanel {
                                         final UIEntity info = new UIEntity();
                                         info.setInherits(true);
                                         info.add(new UIBox(UIBox.VBOX, 5));
-                                        info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                                        info.add(new UIColor(GuiSignalBox.backgroundColor()));
                                         info.add(new UIClickable(_u -> gui.pop(), 1));
                                         info.add(statusEntity);
                                         final UIEntity textureEntity = new UIEntity();
@@ -565,7 +565,7 @@ public class SidePanel {
                                                         gui.rendering.setColor(node.getPoint(),
                                                                 mode,
                                                                 !turnOff ? GuiSignalBox.OUTPUT_COLOR
-                                                                        : SignalBoxUtil.FREE_COLOR);
+                                                                        : SignalBoxUtil.FREE_COLOR.getAsInt());
                                                     }));
                                         }
                                         gui.pop();
@@ -750,7 +750,7 @@ public class SidePanel {
                     info.setInherits(true);
                     info.add(new UIBox(UIBox.VBOX, 5));
                     info.add(new UIClickable(_u -> gui.pop(), 1));
-                    info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    info.add(new UIColor(GuiSignalBox.backgroundColor()));
                     info.add(statusEntity);
                     final UIEntity textureEntity = new UIEntity();
                     textureEntity.setHeight(40);
@@ -799,7 +799,7 @@ public class SidePanel {
                             textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
                         }
                         gui.rendering.setColor(currentNode.getPoint(), mode,
-                                !turnOff ? GuiSignalBox.OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR);
+                                !turnOff ? GuiSignalBox.OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR.getAsInt());
                     }));
                     gui.push(GuiElements.createScreen(entity -> entity.add(info)));
                 });

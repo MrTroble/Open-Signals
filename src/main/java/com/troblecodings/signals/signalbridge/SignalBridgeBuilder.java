@@ -22,14 +22,14 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class SignalBridgeBuilder {
 
-    public static final ModelInfoWrapper EMPTY_WRAPPER = new ModelInfoWrapper(
-            EmptyModelData.INSTANCE);
+    public static final ModelInfoWrapper EMPTY_WRAPPER = new ModelInfoWrapper(ModelData.EMPTY);
 
     public static final String SIGNALBRIDGE_BLOCKS = "signalBridgeBlocks";
     public static final String SIGNALS_ON_BRIDGE = "signalsOnBridge";
@@ -166,14 +166,14 @@ public class SignalBridgeBuilder {
         pointForBlocks.forEach((point, block) -> {
             final NBTWrapper tag = new NBTWrapper();
             point.write(tag);
-            tag.putString(SIGNALBRIDGE_BLOCKS, block.getRegistryName().getPath());
+            tag.putString(SIGNALBRIDGE_BLOCKS, ForgeRegistries.BLOCKS.getKey(block).getPath());
             blockList.add(tag);
         });
         final List<NBTWrapper> signalList = new ArrayList<>();
         vecForSignal.forEach((entry, vec) -> {
             final NBTWrapper tag = new NBTWrapper();
             vec.write(tag);
-            tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getPath());
+            tag.putString(SIGNALS_ON_BRIDGE, ForgeRegistries.BLOCKS.getKey(entry.getValue()).getPath());
             tag.putString(CUSTOMNAME, entry.getKey());
             signalList.add(tag);
         });
@@ -196,12 +196,12 @@ public class SignalBridgeBuilder {
             final Point point = new Point();
             point.read(tag);
             pointForBlocks.put(point,
-                    (SignalBridgeBasicBlock) Registry.BLOCK.get(new ResourceLocation(
+                    (SignalBridgeBasicBlock) BuiltInRegistries.BLOCK.get(new ResourceLocation(
                             OpenSignalsMain.MODID, tag.getString(SIGNALBRIDGE_BLOCKS))));
         });
         wrapper.getList(SIGNALS_ON_BRIDGE).forEach(tag -> {
             vecForSignal.put(Maps.immutableEntry(tag.getString(CUSTOMNAME),
-                    (Signal) Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
+                    (Signal) BuiltInRegistries.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                             tag.getString(SIGNALS_ON_BRIDGE)))),
                     VectorWrapper.of(tag));
         });

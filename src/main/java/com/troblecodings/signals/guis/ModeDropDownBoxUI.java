@@ -468,7 +468,7 @@ public class ModeDropDownBoxUI {
                     final UIEntity entity = new UIEntity();
                     entity.setInherits(true);
                     entity.add(new UIBox(UIBox.VBOX, 5));
-                    entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    entity.add(new UIColor(GuiSignalBox.backgroundColor()));
                     entity.add(GuiElements.createSpacerV(30));
                     entity.add(GuiElements.createLabel(I18Wrapper.format("info.key.removeother")));
                     entity.add(GuiElements.createSpacerV(30));

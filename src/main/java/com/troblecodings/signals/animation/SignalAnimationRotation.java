@@ -3,7 +3,7 @@ package com.troblecodings.signals.animation;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
@@ -37,7 +37,9 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public void setUpAnimationValues(final ModelTranslation currentTranslation) {
-        final Vector3f vec = currentTranslation.getQuaternion().toYXZ();
+        // Mojang's Quaternion.toYXZ became JOML's getEulerAnglesYXZ, which writes into the
+        // destination vector rather than returning a new one.
+        final Vector3f vec = currentTranslation.getQuaternion().getEulerAnglesYXZ(new Vector3f());
         switch (axis) {
             case X: {
                 progress = vec.x();

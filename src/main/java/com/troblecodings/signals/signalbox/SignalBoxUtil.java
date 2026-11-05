@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -27,11 +28,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class SignalBoxUtil {
 
-    public static final int FREE_COLOR = ConfigHandler.CLIENT.signalboxFreeColor.get();
-    public static final int SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor.get();
-    public static final int USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor.get();
-    public static final int PREPARED_COLOR = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-    public static final int SHUNTING_COLOR = ConfigHandler.CLIENT.signalboxShuntingColor.get();
+    /**
+     * Read lazily: Forge 47 throws "Cannot get config value before config is loaded" if a
+     * ForgeConfigSpec value is read during class initialisation, which is what these used to do.
+     * Resolving on access also means a config reload is picked up without a restart.
+     */
+    public static final IntSupplier FREE_COLOR = ConfigHandler.CLIENT.signalboxFreeColor::get;
+    public static final IntSupplier SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor::get;
+    public static final IntSupplier USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor::get;
+    public static final IntSupplier PREPARED_COLOR =
+            ConfigHandler.CLIENT.signalboxPreparedColor::get;
+    public static final IntSupplier SHUNTING_COLOR =
+            ConfigHandler.CLIENT.signalboxShuntingColor::get;
 
     private static List<Point> debugPointList = new ArrayList<>();
 

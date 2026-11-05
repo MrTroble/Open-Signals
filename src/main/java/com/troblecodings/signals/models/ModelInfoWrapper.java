@@ -5,38 +5,45 @@ import java.util.Map;
 import com.troblecodings.core.interfaces.BlockModelDataWrapper;
 import com.troblecodings.signals.SEProperty;
 
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
-import net.minecraftforge.client.model.data.ModelDataMap.Builder;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
+/**
+ * Wraps a {@link ModelData} so signal state can be queried by {@link SEProperty}.
+ *
+ * Up to 1.18 this implemented Forge's {@code IModelData} interface directly. Since 1.19
+ * {@code ModelData} is a final, immutable class built through a builder, so the wrapper holds one
+ * instead of being one, and mutation produces a new instance.
+ */
 public class ModelInfoWrapper implements BlockModelDataWrapper {
 
-    private final IModelData data;
+    private ModelData data;
 
     public ModelInfoWrapper(final Map<SEProperty, String> states) {
-        final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> builder.withInitial(property, value));
+        final ModelData.Builder builder = ModelData.builder();
+        states.forEach((property, value) -> builder.with(property, value));
         this.data = builder.build();
     }
 
-    public ModelInfoWrapper(final IModelData data) {
+    public ModelInfoWrapper(final ModelData data) {
         this.data = data;
     }
 
     @Override
+    public ModelData getModelData() {
+        return data;
+    }
+
     public boolean hasProperty(final ModelProperty<?> prop) {
-        return data.hasProperty(prop);
+        return data.has(prop);
     }
 
-    @Override
     public <T> T getData(final ModelProperty<T> prop) {
-        return data.getData(prop);
+        return data.get(prop);
     }
 
-    @Override
-    public <T> T setData(final ModelProperty<T> prop, final T value) {
-        return data.setData(prop, value);
+    public <T> void setData(final ModelProperty<T> prop, final T value) {
+        this.data = data.derive().with(prop, value).build();
     }
 
     public boolean has(final SEProperty property) {

@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import com.google.common.collect.Maps;
-import com.mojang.math.Quaternion;
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.NamedEnumIntegerable;
@@ -199,7 +199,7 @@ public class GuiSignalBridge extends GuiBase {
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.add(new UIBorder(UISignalBoxRendering.GRID_COLOR, 2));
-        plane.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        plane.add(new UIColor(GuiSignalBox.backgroundColor()));
         plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
         for (int x = 0; x < TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
@@ -267,7 +267,7 @@ public class GuiSignalBridge extends GuiBase {
         entity.setHeight(TILE_COUNT * TILE_WIDTH);
         entity.setWidth(TILE_COUNT * TILE_WIDTH);
         entity.add(new UIBorder(UISignalBoxRendering.GRID_COLOR, 2));
-        entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        entity.add(new UIColor(GuiSignalBox.backgroundColor()));
         renderEntity = new UIEntity();
         renderEntity.setHeight(TILE_COUNT * TILE_WIDTH);
         renderEntity.setWidth(TILE_COUNT * TILE_WIDTH);
@@ -301,7 +301,7 @@ public class GuiSignalBridge extends GuiBase {
         list.setInherits(true);
         list.add(new UIBox(UIBox.VBOX, 1).setPageable(false));
         final IIntegerable<Signal> availableSignals =
-                SizeIntegerables.of(I18Wrapper.format("gui.signalbridge.signals"),
+                SizeIntegerables.of(I18Wrapper.format("gui.signalbridge.signals").toLowerCase(),
                         SIGNALS_FOR_BRIDGE.size(), i -> SIGNALS_FOR_BRIDGE.get(i));
         final UIEntity addButton = GuiElements.createButton("+", e -> {
             disableMultiRenderer();
@@ -703,13 +703,12 @@ public class GuiSignalBridge extends GuiBase {
         final UIEntity blockEntity = new UIEntity();
         blockEntity.setWidth(width);
         blockEntity.setHeight(height);
-        blockEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        blockEntity.add(new UIColor(GuiSignalBox.backgroundColor()));
         if (showName) {
-            final UILabel label =
-                    new UILabel(customName.isEmpty()
-                            ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "."
-                                    + block.delegate.name().getPath())
-                            : customName);
+            final UILabel label = new UILabel(customName.isEmpty()
+                    ? I18Wrapper
+                            .format("block." + OpenSignalsMain.MODID + "." + block.getBlockName())
+                    : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());
             blockEntity.add(label);
@@ -724,9 +723,8 @@ public class GuiSignalBridge extends GuiBase {
         preview.add(new UIScale(previewScale, previewScale, previewScale));
 
         if (enableRotation) {
-            preview.add(new UIDrag(
-                    (x, y) -> renderer.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0)),
-                    1));
+            preview.add(new UIDrag((x, y) -> renderer
+                    .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * 0.1f, 0)), 1));
         }
 
         preview.add(new UIScissor());

@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalController extends BasicBlock {
@@ -23,7 +23,7 @@ public class SignalController extends BasicBlock {
     public static final TileEntitySupplierWrapper SUPPLIER = SignalControllerTileEntity::new;
 
     public SignalController() {
-        super(Properties.of(Material.METAL));
+        super(Properties.of().mapColor(MapColor.METAL));
     }
 
     @Override

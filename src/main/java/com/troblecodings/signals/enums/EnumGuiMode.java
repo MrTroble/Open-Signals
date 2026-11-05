@@ -1,6 +1,7 @@
 package com.troblecodings.signals.enums;
 
 import java.util.Arrays;
+import java.util.function.IntSupplier;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -37,7 +38,7 @@ public enum EnumGuiMode {
     NE5(UISignalBoxIcons.NE5_ICON, PathwayModeType.START_END, 1),
     ZS3(UISignalBoxIcons.ZS3_ICON, PathwayModeType.NONE, 1), TRAIN_NUMBER(new float[] {
             0, 0.5f, 2, 0.5f
-    }, PathwayModeType.NONE, 2, ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get(), 6),
+    }, PathwayModeType.NONE, 2, ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor::get, 6),
     CROSSING(new float[] {
             0.5f, 0, 0.5f, 1, 0, 0.5f, 1, 0.5f
     });
@@ -48,7 +49,11 @@ public enum EnumGuiMode {
 
     public final Function<SignalState, BiConsumer<DrawInfo, Integer>> consumer;
     public final Function<SignalState, Integer> depthFunc;
-    private int defaultColor;
+    /**
+     * Supplier rather than int: Forge 47 refuses config reads during class initialisation, which is
+     * exactly when enum constants are built.
+     */
+    private IntSupplier defaultColor = () -> 0;
     private final PathwayModeType type;
 
     private EnumGuiMode(final int id, final PathwayModeType type, final int depth) {
@@ -86,7 +91,7 @@ public enum EnumGuiMode {
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type, final int depth,
-            final int color, final int width) {
+            final IntSupplier color, final int width) {
         this((_u) -> {
             float[] currentArray = Arrays.copyOf(array, array.length);
             for (int i = 0; i < array.length; i++) {
@@ -121,7 +126,7 @@ public enum EnumGuiMode {
     }
 
     public int getDefaultColor() {
-        return defaultColor;
+        return defaultColor.getAsInt();
     }
 
     public Rotation getLocalRotation(final Rotation rot) {

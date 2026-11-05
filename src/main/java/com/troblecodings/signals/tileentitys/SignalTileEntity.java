@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
@@ -94,8 +94,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
-    public @Nonnull IModelData getModelData() {
-        return new ModelInfoWrapper(properties);
+    public @Nonnull ModelData getModelData() {
+        return new ModelInfoWrapper(properties).getModelData();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -112,6 +112,16 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public void onLoad() {
+        if (level != null && level.isClientSide()) {
+            final StateInfo info = new StateInfo(level, getBlockPos());
+            final Map<SEProperty, String> cached =
+                    ClientSignalStateHandler.refreshAndGetClientStates(info);
+            if (!cached.isEmpty()) {
+                requestModelDataUpdate();
+                level.setBlocksDirty(getBlockPos(), getBlockState(), getBlockState());
+                ClientSignalStateHandler.scheduleRebuild(getBlockPos());
+            }
+        }
         if (!level.isClientSide) {
             SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
                     listener);

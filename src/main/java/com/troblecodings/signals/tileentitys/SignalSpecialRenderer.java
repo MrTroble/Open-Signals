@@ -20,7 +20,7 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
     public void render(final SignalTileEntity tile, final float tick, final PoseStack stack,
             final MultiBufferSource source, final int rand1, final int rand2) {
         if (tile.hasCustomName()) {
-            tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));
+            tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont(), source));
         }
         if (tile.getSignal().hasAnimation()) {
             tile.getAnimationHandler().render(new RenderAnimationInfo(stack,

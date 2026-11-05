@@ -2,7 +2,9 @@ package com.troblecodings.signals.animation;
 
 import java.util.Arrays;
 
-import com.mojang.math.Quaternion;
+import org.joml.Quaternionf;
+
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 
 public enum RotationAxis {
@@ -26,16 +28,16 @@ public enum RotationAxis {
                 });
     }
 
-    public Quaternion getForAxis(final float value) {
+    public Quaternionf getForAxis(final float value) {
         switch (this) {
             case X:
-                return Quaternion.fromXYZ(value, 0, 0);
+                return QuaternionWrapper.fromXYZ(value, 0, 0);
             case Y:
-                return Quaternion.fromXYZ(0, value, 0);
+                return QuaternionWrapper.fromXYZ(0, value, 0);
             case Z:
-                return Quaternion.fromXYZ(0, 0, value);
+                return QuaternionWrapper.fromXYZ(0, 0, value);
             default:
-                return Quaternion.fromXYZ(0, 0, 0);
+                return QuaternionWrapper.fromXYZ(0, 0, 0);
         }
     }
 

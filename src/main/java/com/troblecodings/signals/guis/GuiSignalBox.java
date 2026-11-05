@@ -67,11 +67,20 @@ import net.minecraft.world.level.block.Rotation;
 public class GuiSignalBox extends GuiBase {
 
     public static final int SELECTION_COLOR = 0x2900FF00;
-    public static final int BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
-    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor
-            .get();
+
+    /**
+     * Read on demand rather than at class initialisation: Forge 47 refuses config reads before the
+     * config is loaded, and it also means a config change applies without a restart.
+     */
+    public static int backgroundColor() {
+        return ConfigHandler.CLIENT.signalboxBackgroundColor.get();
+    }
+
+    public static int trainNumberBackgroundColor() {
+        return ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
+    }
 
     public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/redstone_off.png");
@@ -667,7 +676,7 @@ public class GuiSignalBox extends GuiBase {
                     case STRAIGHT:
                     case CORNER:
                     case CROSSING:
-                        rendering.setColor(node.getPoint(), mode, SignalBoxUtil.FREE_COLOR);
+                        rendering.setColor(node.getPoint(), mode, SignalBoxUtil.FREE_COLOR.getAsInt());
                         entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
                                 _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
                         break;

@@ -21,15 +21,12 @@ import com.troblecodings.signals.blocks.TrainNumberBlock;
 import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
 import com.troblecodings.signals.core.SignalLoader;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegisterEvent;
 
 public final class OSBlocks {
 
@@ -76,7 +73,7 @@ public final class OSBlocks {
         if (BLOCKS_TO_REGISTER.contains(block))
             return;
         final String name = pName.toLowerCase().trim();
-        block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+        block.setBlockName(name);
         BLOCKS_TO_REGISTER.add(block);
         if (block instanceof Signal) {
             if (Signal.SIGNALS.containsKey(name))
@@ -86,36 +83,28 @@ public final class OSBlocks {
         }
     }
 
+    /**
+     * Forge removed RegistryEvent.Register in 1.19. RegisterEvent is used rather
+     * than DeferredRegister because the block set is not known until content packs
+     * have been read by {@link #init()}, so there are no static entries to declare
+     * up front.
+     */
     @SubscribeEvent
-    public static void registerBlock(final RegistryEvent.Register<Block> event) {
-        if (POST.getRegistryName() == null || POST_CONNECTABLE.getRegistryName() == null) {
+    public static void registerAll(final RegisterEvent event) {
+        event.register(Registries.BLOCK, helper -> {
             OSBlocks.init();
-        }
-        final IForgeRegistry<Block> registry = event.getRegistry();
-        BLOCKS_TO_REGISTER.forEach(registry::register);
-    }
-
-    @SubscribeEvent
-    public static void registerBlockEntitys(
-            final RegistryEvent.Register<BlockEntityType<?>> event) {
-        if (POST.getRegistryName() == null || POST_CONNECTABLE.getRegistryName() == null) {
-            OSBlocks.init();
-        }
-        final IForgeRegistry<BlockEntityType<?>> registry = event.getRegistry();
-        BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
-    }
-
-    @SubscribeEvent
-    public static void registerItem(final RegistryEvent.Register<Item> event) {
-        if (POST.getRegistryName() == null || POST_CONNECTABLE.getRegistryName() == null) {
-            OSBlocks.init();
-        }
-        final IForgeRegistry<Item> registry = event.getRegistry();
-        BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block.shouldHaveItem()) {
-                registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
-                        .setRegistryName(block.getRegistryName()));
-            }
+            BLOCKS_TO_REGISTER.forEach(block -> helper.register(
+                    new ResourceLocation(OpenSignalsMain.MODID, block.getBlockName()), block));
         });
+        event.register(Registries.BLOCK_ENTITY_TYPE,
+                helper -> BasicBlock.BLOCK_ENTITYS.values()
+                        .forEach(type -> helper.register(new ResourceLocation(OpenSignalsMain.MODID,
+                                BasicBlock.TYPE_TO_NAME.get(type)), type)));
+        event.register(Registries.ITEM,
+                helper -> BLOCKS_TO_REGISTER.stream().filter(BasicBlock::shouldHaveItem)
+                        .forEach(block -> helper.register(
+                                new ResourceLocation(OpenSignalsMain.MODID, block.getBlockName()),
+                                OSItems.assignTab(new BlockItem(block, new Properties()),
+                                        OSTabs.TAB.getKey()))));
     }
 }

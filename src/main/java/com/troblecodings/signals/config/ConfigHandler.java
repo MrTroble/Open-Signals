@@ -20,6 +20,23 @@ public final class ConfigHandler {
     public static final ForgeConfigSpec CLIENT_SPEC = CLIENT_BUILDER.build();
     public static final ForgeConfigSpec GENERAL_SPEC = GENERAL_BUILDER.build();
 
+    /**
+     * Reads a config value, falling back to its default when the config has not been loaded yet.
+     *
+     * Forge 47 throws on {@code ConfigValue.get()} before the config file is read, which happens
+     * for anything consulted during registration or class initialisation. Block light emission is
+     * one of those: {@code BlockBehaviour.Properties.lightLevel} is evaluated eagerly while the
+     * block states are built, long before configs load. Falling back to the default matches what
+     * 1.18 silently did in the same situation.
+     */
+    public static <T> T getOrDefault(final ForgeConfigSpec spec, final ConfigValue<T> value) {
+        return spec.isLoaded() ? value.get() : value.getDefault();
+    }
+
+    public static int lightEmission() {
+        return getOrDefault(GENERAL_SPEC, GENERAL.lightEmission);
+    }
+
     public static class General {
 
         public final ConfigValue<Integer> lightEmission;

@@ -9,7 +9,7 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
-import com.troblecodings.opensignals.linkableapi.ILinkableTile;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneInput;
@@ -29,7 +29,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -278,7 +278,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     @Override
     public boolean link(final BlockPos pos, final CompoundTag tag) {
         @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(
+        final Block block = BuiltInRegistries.BLOCK.get(
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block != null && block instanceof Signal) {
             unlink();

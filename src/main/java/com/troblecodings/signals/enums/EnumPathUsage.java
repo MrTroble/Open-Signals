@@ -6,14 +6,20 @@ import static com.troblecodings.signals.signalbox.SignalBoxUtil.SELECTED_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.SHUNTING_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.USED_COLOR;
 
+import java.util.function.IntSupplier;
+
 public enum EnumPathUsage {
 
     FREE(FREE_COLOR), SELECTED(SELECTED_COLOR), BLOCKED(USED_COLOR), PREPARED(PREPARED_COLOR),
     PROTECTED(PREPARED_COLOR), SHUNTING(SHUNTING_COLOR);
 
-    private final int color;
+    /**
+     * Held as a supplier rather than an int: these come from the Forge config, which cannot be
+     * read while this enum is being initialised.
+     */
+    private final IntSupplier color;
 
-    private EnumPathUsage(final int color) {
+    private EnumPathUsage(final IntSupplier color) {
         this.color = color;
     }
 
@@ -23,6 +29,6 @@ public enum EnumPathUsage {
      * @return the color
      */
     public int getColor() {
-        return color;
+        return color.getAsInt();
     }
 }

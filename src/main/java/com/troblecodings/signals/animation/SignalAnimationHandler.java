@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Quaternion;
+import org.joml.Quaternionf;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -22,11 +22,12 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.Util;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 public class SignalAnimationHandler {
 
@@ -53,9 +54,9 @@ public class SignalAnimationHandler {
         }
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final ModelBlockRenderer renderer = info.dispatcher.getModelRenderer();
-        final VertexConsumer vertex =
-                info.source.getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
-        final IModelData data = tile.getModelData();
+        final RenderType renderType = ItemBlockRenderTypes.getRenderType(state, false);
+        final VertexConsumer vertex = info.source.getBuffer(renderType);
+        final ModelData data = tile.getModelData();
 
         final float tick = currentTick - this.lastWorldTick;
         this.lastWorldTick = currentTick;
@@ -70,7 +71,7 @@ public class SignalAnimationHandler {
             info.stack.mulPose(angle.getQuaternion());
             translation.translate(info.stack);
             renderer.renderModel(info.stack.last(), vertex, state, model, 0, 0, 0, info.lightColor,
-                    info.overlayTexture, data);
+                    info.overlayTexture, data, renderType);
             info.stack.popPose();
 
             if (translation.isAnimationAssigned()) {
@@ -149,7 +150,7 @@ public class SignalAnimationHandler {
             final BakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
             final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, Quaternion.ONE);
+                    new ModelTranslation(VectorWrapper.ZERO, new Quaternionf());
             translation.setModelTranslation(entry.getValue().copy());
             animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
                     .map(animation -> animation.copy()).collect(Collectors.toList())));

@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 
 public class BasicBlock extends Block implements EntityBlock {
 
@@ -26,6 +26,13 @@ public class BasicBlock extends Block implements EntityBlock {
             new HashMap<>();
     public static final Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS =
             new HashMap<>();
+    /**
+     * Registry names moved off the entries themselves in 1.19, so block entity type names are held
+     * here and applied when the registry event fires.
+     */
+    public static final Map<BlockEntityType<?>, String> TYPE_TO_NAME = new HashMap<>();
+
+    private String name = "";
 
     public BasicBlock(final Properties properties) {
         super(properties);
@@ -36,6 +43,14 @@ public class BasicBlock extends Block implements EntityBlock {
                 BLOCK_NAMES.computeIfAbsent(supplier, _u -> name);
             });
         });
+    }
+
+    public void setBlockName(final String name) {
+        this.name = name;
+    }
+
+    public String getBlockName() {
+        return name;
     }
 
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
@@ -60,8 +75,8 @@ public class BasicBlock extends Block implements EntityBlock {
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
             final BlockEntityType type = new BlockEntityType(wrapper, blocks, null);
-            type.setRegistryName(BLOCK_NAMES.get(wrapper));
             BLOCK_ENTITYS.put(wrapper, type);
+            TYPE_TO_NAME.put(type, BLOCK_NAMES.get(wrapper));
         });
     }
 
@@ -71,7 +86,7 @@ public class BasicBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public List<ItemStack> getDrops(final BlockState state, final LootContext.Builder builder) {
+    public List<ItemStack> getDrops(final BlockState state, final LootParams.Builder builder) {
         List<ItemStack> drops = new ArrayList<ItemStack>();
         drops.add(new ItemStack(this.asBlock().asItem()));
         return drops;

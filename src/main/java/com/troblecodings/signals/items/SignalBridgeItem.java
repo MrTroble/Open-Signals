@@ -19,6 +19,7 @@ import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
@@ -35,7 +36,8 @@ import net.minecraft.world.level.Level;
 public class SignalBridgeItem extends Item implements MessageWrapper {
 
     public SignalBridgeItem() {
-        super(new Item.Properties().tab(OSTabs.TAB).durability(100).setNoRepair());
+        super(new Item.Properties().durability(100).setNoRepair());
+        OSItems.assignTab(this, OSTabs.TAB.getKey());
     }
 
     @Override
@@ -77,8 +79,8 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 .forEach(wrapper -> {
                     final Map<SEProperty, Integer> properties = new HashMap<>();
                     final String name = wrapper.getString(ContainerSignalBridge.SIGNAL_NAME);
-                    final Signal signal = Signal.SIGNALS
-                            .get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
+                    final Signal signal =
+                            Signal.SIGNALS.get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
                     signal.getProperties().forEach(
                             property -> property.readFromNBT(wrapper).ifPresent(value -> properties
                                     .put(property, property.getParent().getIDFromValue(value))));
@@ -108,11 +110,9 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                         && propertiesToInt.get(property) > 0) {
                     signalProperties.put(property, property.getDefault());
                 }
-            } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
-                    && property.testMap(signalProperties)) {
-                signalProperties.put(property, property.getDefault());
-            } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)
-                    || property.isChangabelAtStage(ChangeableStage.AUTOMATICSTAGE)) {
+            } else if ((property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
+                    && property.testMap(signalProperties)) || (property.isChangabelAtStage(ChangeableStage.GUISTAGE)
+                    || property.isChangabelAtStage(ChangeableStage.AUTOMATICSTAGE))) {
                 signalProperties.put(property, property.getDefault());
             }
         }

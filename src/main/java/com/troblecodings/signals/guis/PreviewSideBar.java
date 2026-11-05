@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-import com.mojang.math.Quaternion;
+
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
@@ -45,10 +46,10 @@ public class PreviewSideBar {
         blockRenderEntity.setWidth(60);
 
         blockRenderEntity.add(new UIDrag((x, y) -> blockRender
-                .updateRotation(Quaternion.fromXYZ(0, (float) x * MODIFIER, 0))));
+                .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * MODIFIER, 0))));
 
         blockRenderEntity.add(new UIScissor());
-        blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        blockRenderEntity.add(new UIColor(GuiSignalBox.backgroundColor()));
         blockRenderEntity.add(blockRender);
     }
 

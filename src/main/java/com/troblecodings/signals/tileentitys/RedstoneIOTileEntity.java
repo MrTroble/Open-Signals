@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
+import com.troblecodings.signals.blocks.BasicBlock;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
@@ -36,7 +37,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
         return name == null || name.isEmpty()
-                ? this.getBlockState().getBlock().getRegistryName().getPath()
+                ? ((BasicBlock) this.getBlockState().getBlock()).getBlockName()
                 : name;
     }
 

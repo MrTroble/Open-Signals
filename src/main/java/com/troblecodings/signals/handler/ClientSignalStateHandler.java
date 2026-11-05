@@ -1,8 +1,11 @@
 package com.troblecodings.signals.handler;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,6 +41,13 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
+    private static final Set<BlockPos> PENDING_REBUILDS =
+            Collections.synchronizedSet(new HashSet<>());
+
+    public static void scheduleRebuild(final BlockPos pos) {
+        PENDING_REBUILDS.add(pos);
+    }
+
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getInstance();
@@ -57,8 +67,9 @@ public class ClientSignalStateHandler implements INetworkSync {
                     NetworkBufferWrappers.getSEPropertyFunc(signal),
                     (buf, prop) -> prop.getObjFromID(buf.getByteToUnsignedInt()));
             synchronized (CURRENTLY_LOADED_STATES) {
+                final Map<SEProperty, String> existing = CURRENTLY_LOADED_STATES.remove(stateInfo);
                 final Map<SEProperty, String> properties =
-                        CURRENTLY_LOADED_STATES.computeIfAbsent(stateInfo, _u -> new HashMap<>());
+                        existing != null ? existing : new HashMap<>();
                 properties.putAll(newProperties);
                 CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
@@ -94,4 +105,16 @@ public class ClientSignalStateHandler implements INetworkSync {
         deserializeClient(event.getPayload().nioBuffer());
         event.getSource().get().setPacketHandled(true);
     }
+
+    public static Map<SEProperty, String> refreshAndGetClientStates(final StateInfo info) {
+        synchronized (CURRENTLY_LOADED_STATES) {
+            Map<SEProperty, String> existing = CURRENTLY_LOADED_STATES.remove(info);
+            if (existing == null) {
+                existing = new HashMap<>();
+            }
+            CURRENTLY_LOADED_STATES.put(info, existing);
+            return ImmutableMap.copyOf(existing);
+        }
+    }
+
 }

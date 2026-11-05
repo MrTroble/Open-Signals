@@ -2,9 +2,7 @@ package com.troblecodings.signals.blocks;
 
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
-import com.troblecodings.signals.models.CustomModelLoader;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -17,21 +15,22 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
-        super(Properties.of(Material.GLASS).noOcclusion()
-                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get()));
+        // Material.GLASS was MapColor.NONE plus notSolidBlocking; the latter is expressed as
+        // isSuffocating/isViewBlocking since 1.20 dropped Material.
+        super(Properties.of().mapColor(MapColor.NONE).noOcclusion()
+                .isSuffocating((_u1, _u2, _u3) -> false)
+                .isViewBlocking((_u1, _u2, _u3) -> false)
+                .lightLevel(u -> ConfigHandler.lightEmission()));
         registerDefaultState(defaultBlockState());
     }
 
@@ -69,15 +68,6 @@ public class GhostBlock extends BasicBlock {
         DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new Direction[] {
                 Direction.UP, Direction.DOWN
         }, block -> block instanceof GhostBlock || block instanceof Signal);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public StateDefinition<Block, BlockState> getStateDefinition() {
-        if (!Minecraft.getInstance().isLocalServer()) {
-            CustomModelLoader.INSTANCE.prepare();
-        }
-        return super.getStateDefinition();
     }
 
     @Override

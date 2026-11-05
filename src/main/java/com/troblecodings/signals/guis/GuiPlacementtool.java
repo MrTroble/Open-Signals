@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.IntConsumer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
@@ -57,12 +57,15 @@ public class GuiPlacementtool extends GuiBase {
         initInternal();
     }
 
-    @Override
-    public void renderComponentTooltip(final PoseStack stack, final List<Component> list,
+    /**
+     * 1.20 moved tooltip rendering from Screen onto GuiGraphics, so the width narrowing is applied
+     * around a GuiGraphics call instead.
+     */
+    public void renderComponentTooltip(final GuiGraphics graphics, final List<Component> list,
             final int mouseX, final int mouseY) {
         final int oldWidth = this.width;
         this.width *= 0.7;
-        super.renderComponentTooltip(stack, list, mouseX, mouseY);
+        graphics.renderComponentTooltip(this.font, list, mouseX, mouseY);
         this.width = oldWidth;
     }
 

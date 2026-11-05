@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class PathwayRequester extends BasicBlock {
@@ -27,7 +27,7 @@ public class PathwayRequester extends BasicBlock {
     public static final TileEntitySupplierWrapper WRAPPER = PathwayRequesterTileEntity::new;
 
     public PathwayRequester() {
-        super(Properties.of(Material.METAL));
+        super(Properties.of().mapColor(MapColor.METAL));
     }
 
     @Override

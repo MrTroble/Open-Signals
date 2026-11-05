@@ -2,10 +2,7 @@ package com.troblecodings.signals.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 import java.util.function.Function;
-
-import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -15,7 +12,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BuiltInModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -33,15 +30,13 @@ public final class DefaultModel implements UnbakedModel {
     }
 
     @Override
-    public Collection<Material> getMaterials(
-            final Function<ResourceLocation, UnbakedModel> function,
-            final Set<Pair<String, String>> set) {
-        return new ArrayList<>();
+    public void resolveParents(final Function<ResourceLocation, UnbakedModel> function) {
+        // No parents to resolve; getMaterials was removed in 1.19.3.
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public BakedModel bake(final ModelBakery bakery,
+    public BakedModel bake(final ModelBaker baker,
             final Function<Material, TextureAtlasSprite> function, final ModelState stat,
             final ResourceLocation location) {
         return new BuiltInModel(ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY,
