@@ -592,7 +592,16 @@ public class GuiSignalBox extends GuiBase {
         helpPage.updateCounterButton();
     }
 
+    private int count = 0;
+
     private void initializeBasicUI() {
+        if (count > 0) {
+            OpenSignalsMain.getLogger().info("Calling the Init Method for SignalBox UI again!");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println("       " + e);
+            }
+        }
+        count++;
         this.entity.clear();
         final String name = I18Wrapper.format("tile.signalbox.name");
 
