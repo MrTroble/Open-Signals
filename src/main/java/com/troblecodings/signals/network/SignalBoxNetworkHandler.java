@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -291,6 +292,11 @@ public class SignalBoxNetworkHandler {
         final Point point = Point.of(buffer);
         final SignalBoxGrid grid = getGrid();
         final SignalBoxNode node = grid.getNode(point);
+        if (node == null) {
+            OpenSignalsMain.getLogger()
+                    .error("Node on Grid [" + grid + "] is null for [" + point + "]!");
+            return;
+        }
         if (mode.equals(NodeNetworkMode.LABEL)) {
             node.setCustomText(buffer.getString());
         }
