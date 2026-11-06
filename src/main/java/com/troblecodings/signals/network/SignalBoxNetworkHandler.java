@@ -128,6 +128,7 @@ public class SignalBoxNetworkHandler {
         getGrid().writeNetwork(buffer);
         reader.addAdditionalInitialisationData(buffer);
         listener.consumer.accept(buffer);
+        OpenSignalsMain.getLogger().error("Sending all Data to " + listener);
     }
 
     public void sendCounter() {
