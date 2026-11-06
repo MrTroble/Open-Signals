@@ -18,7 +18,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -101,11 +100,6 @@ public class RedstoneIO extends BasicBlock {
     @Override
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("redstoneio");
-    }
-
-    @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
-        return new RedstoneIOTileEntity();
     }
 
     @Override

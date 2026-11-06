@@ -11,6 +11,7 @@ import com.troblecodings.linkableapi.MultiLinkingTool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
+import com.troblecodings.signals.items.MonitorSelectionItem;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.SignalBridgeItem;
 import com.troblecodings.signals.items.ToolParser;
@@ -42,8 +43,8 @@ public final class OSItems {
         final NBTWrapper wrapper = new NBTWrapper(tag);
         wrapper.putString(pos.toString(), state.getBlock().getRegistryName().getResourcePath());
     });
-    public static final MultiLinkingTool MULTI_LINKING_TOOL = new MultiLinkingTool(OSTabs.TAB,
-            (world, pos) -> {
+    public static final MultiLinkingTool MULTI_LINKING_TOOL =
+            new MultiLinkingTool(OSTabs.TAB, (world, pos) -> {
                 final IBlockState state = world.getBlockState(pos);
                 final Block block = state.getBlock();
                 final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
@@ -57,8 +58,8 @@ public final class OSItems {
                 wrapper.putString(pos.toString(),
                         state.getBlock().getRegistryName().getResourcePath());
             });
-    public static final Item CONDUCTOR_TROWEL_GREEN = new Item()
-            .setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item CONDUCTOR_TROWEL_GREEN =
+            new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
@@ -109,6 +110,7 @@ public final class OSItems {
     public static final Item ELECTRIC_PARTS = new Item().setCreativeTab(CreativeTabs.MISC);
     public static final Item MANIPULATOR = new Item().setCreativeTab(OSTabs.TAB);
     public static final SignalBridgeItem SIGNAL_BRIDGE_ITEM = new SignalBridgeItem();
+    public static final MonitorSelectionItem MONITOR_SELECTION_ITEM = new MonitorSelectionItem();
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
