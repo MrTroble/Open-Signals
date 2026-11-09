@@ -17,7 +17,9 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.SignalReader;
 import com.troblecodings.signals.blocks.TrainNumberBlock;
+import com.troblecodings.signals.contentpacks.MonitorBlockParser;
 import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
 import com.troblecodings.signals.core.SignalLoader;
 
@@ -46,6 +48,7 @@ public final class OSBlocks {
     public static final PathwayRequester PATHWAY_REQUESTER = new PathwayRequester();
     public static final TrainNumberBlock TRAIN_NUMBER_BLOCK = new TrainNumberBlock();
     public static final PostConnectable POST_CONNECTABLE = new PostConnectable();
+    public static final SignalReader SIGNALREADER = new SignalReader();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
@@ -70,6 +73,8 @@ public final class OSBlocks {
         OSItems.init();
         SignalLoader.loadAllSignals();
         SignalBridgeBlockParser.loadSignalBridgeBlocks();
+        MonitorBlockParser.loadMonitorBlocks();
+        BasicBlock.prepare();
     }
 
     @SuppressWarnings("deprecation")
