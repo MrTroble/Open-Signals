@@ -76,6 +76,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private UIEntity splitter = new UIEntity();
     private SidePanel helpPage;
+    private boolean dataLoaded = false;
     protected UISignalBoxProfile profile = UISignalBoxProfile.defaultProfile;
     protected UISignalBoxRendering rendering;
     protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
@@ -592,16 +593,7 @@ public class GuiSignalBox extends GuiBase {
         helpPage.updateCounterButton();
     }
 
-    private int count = 0;
-
     private void initializeBasicUI() {
-        if (count > 0) {
-            OpenSignalsMain.getLogger().info("Calling the Init Method for SignalBox UI again!");
-            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-                System.out.println("       " + e);
-            }
-        }
-        count++;
         this.entity.clear();
         final String name = I18Wrapper.format("tile.signalbox.name");
 
@@ -667,6 +659,9 @@ public class GuiSignalBox extends GuiBase {
 
     @Override
     public void updateFromContainer() {
+        if (dataLoaded)
+            return;
+        dataLoaded = true;
         profile = container.grid.getUIProfile();
         updateEnabledSubsidiaries();
         initializeBasicUI();

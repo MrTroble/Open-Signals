@@ -83,21 +83,12 @@ public class ContainerSignalBox extends ContainerBase
         this.tile = info.getTile();
     }
 
-    private int count = 0;
-
     @Override
     public void sendAllDataToRemote() {
         this.grid = tile.getSignalBoxGrid();
         this.network = grid.getNetwork();
         initializeNetwork();
         network.sendAll(this);
-        if (count > 0) {
-            OpenSignalsMain.getLogger().info("Calling the Init Method for SignalBox UI again!");
-            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-                System.out.println("       " + e);
-            }
-        }
-        count++;
     }
 
     @Override
