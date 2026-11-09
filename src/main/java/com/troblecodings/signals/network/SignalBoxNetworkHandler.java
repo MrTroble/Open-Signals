@@ -120,6 +120,10 @@ public class SignalBoxNetworkHandler {
         getGrid().writeNetwork(buffer);
         reader.addAdditionalInitialisationData(buffer);
         sendBuffer(buffer);
+        System.out.println("Sending data trough for " + reader.getStateInfo());
+        for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+            System.out.println("         " + e);
+        }
     }
 
     public void sendAllTo(final SignalBoxNetworkReader reader,
@@ -128,7 +132,11 @@ public class SignalBoxNetworkHandler {
         getGrid().writeNetwork(buffer);
         reader.addAdditionalInitialisationData(buffer);
         listener.consumer.accept(buffer);
-        OpenSignalsMain.getLogger().error("Sending all Data to " + listener);
+        System.out.println(
+                "Sending data trough for " + reader.getStateInfo() + " to " + listener.info);
+        for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+            System.out.println("         " + e);
+        }
     }
 
     public void sendCounter() {
