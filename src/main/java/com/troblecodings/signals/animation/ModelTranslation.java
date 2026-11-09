@@ -28,8 +28,8 @@ public class ModelTranslation {
     }
 
     public void translate() {
-        GlStateManager.translate(modelTranslation.getX() - 0.5f, modelTranslation.getY() - 0.5f,
-                modelTranslation.getZ() - 0.5f);
+        GlStateManager.translate(modelTranslation.getX() - 0.5f,
+                modelTranslation.getY() - 0.5f, modelTranslation.getZ() - 0.5f);
         if (quaternion != QuaternionWrapper.ONE) {
             GlStateManager.rotate(quaternion);
         }

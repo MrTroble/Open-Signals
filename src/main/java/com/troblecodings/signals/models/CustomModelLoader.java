@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.animation.EmissiveRenderer;
 import com.troblecodings.signals.animation.SignalAnimation;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
@@ -101,6 +102,7 @@ public final class CustomModelLoader implements ICustomModelLoader {
     @Override
     public void onResourceManagerReload(final IResourceManager manager) {
         registeredModels.clear();
+        EmissiveRenderer.clearCache();
         final Map<String, ModelExtention> extentions = new HashMap<>();
         final Map<String, Object> modelmap = ModelStats.getfromJson("modeldefinitions");
 
@@ -146,8 +148,8 @@ public final class CustomModelLoader implements ICustomModelLoader {
 
                         if (!texturestate.isautoBlockstate()) {
 
-                            final Map<String, Map<String, String>> texturemap = texturestate
-                                    .getExtentions();
+                            final Map<String, Map<String, String>> texturemap =
+                                    texturestate.getExtentions();
 
                             if (texturemap != null && !texturemap.isEmpty()) {
 

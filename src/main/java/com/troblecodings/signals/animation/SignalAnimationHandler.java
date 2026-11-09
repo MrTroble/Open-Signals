@@ -89,6 +89,7 @@ public class SignalAnimationHandler {
                     first.getValue(), false);
             blockRenderer.getBlockModelRenderer().renderModelBrightness(first.getKey(), state,
                     0.65f, false);
+            EmissiveRenderer.render(first.getKey(), info.x, info.y, info.z);
 
             GlStateManager.popMatrix();
 
