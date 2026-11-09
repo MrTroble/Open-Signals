@@ -58,6 +58,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     public static final String MONITOR_SIZE_Y = "monitorSizeY";
     public static final String RENDER_START_POINT = "renderStartPoint";
     public static final String RENDER_END_POINT = "renderEndPoint";
+    public static final String ENABLE_INTERACTION = "enableInteraction";
 
     private static final List<SignalBoxNetworkMode> ALLOWED_NETWORK_MODES = ImmutableList.of(
             SignalBoxNetworkHandler.GRID, SignalBoxNetworkHandler.ENTRY,
@@ -71,6 +72,7 @@ public class MonitorTileEntity extends SyncableTileEntity
     private Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
     private UISignalBoxRendering rendering;
     private Point startPoint = null;
+    private boolean enableInteraction = true;
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
@@ -79,6 +81,9 @@ public class MonitorTileEntity extends SyncableTileEntity
         monitorSizeY = wrapper.getInteger(MONITOR_SIZE_Y);
         renderStart = getPointFromWrapper(RENDER_START_POINT, wrapper);
         renderEnd = getPointFromWrapper(RENDER_END_POINT, wrapper);
+        if (wrapper.contains(ENABLE_INTERACTION)) {
+            enableInteraction = wrapper.getBoolean(ENABLE_INTERACTION);
+        }
     }
 
     @Override
@@ -86,6 +91,7 @@ public class MonitorTileEntity extends SyncableTileEntity
         wrapper.putBlockPos(LINKED_SIGNAL_BOX, linkedSignalBox);
         wrapper.putInteger(MONITOR_SIZE_X, monitorSizeX);
         wrapper.putInteger(MONITOR_SIZE_Y, monitorSizeY);
+        wrapper.putBoolean(ENABLE_INTERACTION, enableInteraction);
         savePointOnWrapper(RENDER_START_POINT, renderStart, wrapper);
         savePointOnWrapper(RENDER_END_POINT, renderEnd, wrapper);
     }
@@ -112,7 +118,7 @@ public class MonitorTileEntity extends SyncableTileEntity
 
     public boolean onBlockActivated(final float hitX, final float hitY,
             final MonitorBlockProperties props, final EntityPlayer playerIn) {
-        if (!hasLink() || renderStart.equals(new Point(-1, -1)))
+        if (!enableInteraction || !hasLink() || renderStart.equals(new Point(-1, -1)))
             return false;
         final int cellsX = renderEnd.getX() - renderStart.getX() + 1;
         final int cellsY = renderEnd.getY() - renderStart.getY() + 1;
@@ -151,6 +157,14 @@ public class MonitorTileEntity extends SyncableTileEntity
             startPoint = null;
         }
         return false;
+    }
+
+    public boolean isEnableInteraction() {
+        return enableInteraction;
+    }
+
+    public void setEnableInteraction(final boolean enableInteraction) {
+        this.enableInteraction = enableInteraction;
     }
 
     private static int clamp(final int v, final int min, final int max) {
@@ -219,6 +233,7 @@ public class MonitorTileEntity extends SyncableTileEntity
         linkedSignalBox = buffer.getBlockPos();
         monitorSizeX = buffer.getInt();
         monitorSizeY = buffer.getInt();
+        enableInteraction = buffer.getBoolean();
         renderStart = buffer.getINetworkSaveable(Point.class);
         renderEnd = buffer.getINetworkSaveable(Point.class);
         initRendering();

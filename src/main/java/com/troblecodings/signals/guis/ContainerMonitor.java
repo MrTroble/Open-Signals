@@ -19,6 +19,10 @@ public class ContainerMonitor extends ContainerBase {
     protected MonitorTileEntity tile;
     protected int monitorSizeX, monitorSizeY;
     protected Point renderStart = new Point(-1, -1), renderEnd = new Point(-1, -1);
+    protected boolean enableInteraction = false;
+
+    private static final byte SEND_RENDER_POINTS = 0;
+    private static final byte SEND_INTERACTION_ENABLE = 1;
 
     public ContainerMonitor(final GuiInfo info) {
         super(info);
@@ -35,14 +39,20 @@ public class ContainerMonitor extends ContainerBase {
         tile.getRenderStart().writeNetwork(buffer);
         tile.getRenderEnd().writeNetwork(buffer);
         buffer.putBlockPos(info.pos);
+        buffer.putBoolean(tile.isEnableInteraction());
         OpenSignalsMain.network.sendTo(getPlayer(), buffer);
     }
 
     @Override
     public void deserializeServer(final ReadBuffer buf) {
-        final Point start = Point.of(buf);
-        final Point end = Point.of(buf);
-        tile.setRenderPoints(start, end);
+        final byte mode = buf.getByte();
+        if (mode == SEND_INTERACTION_ENABLE) {
+            tile.setEnableInteraction(buf.getBoolean());
+        } else {
+            final Point start = Point.of(buf);
+            final Point end = Point.of(buf);
+            tile.setRenderPoints(start, end);
+        }
         MonitorNetworkHandler.sendTileData(tile, info.world.playerEntities);
     }
 
@@ -58,6 +68,7 @@ public class ContainerMonitor extends ContainerBase {
         this.renderStart = Point.of(buf);
         this.renderEnd = Point.of(buf);
         this.pos = buf.getBlockPos();
+        this.enableInteraction = buf.getBoolean();
 
         final MonitorTileEntity tile = (MonitorTileEntity) info.world.getTileEntity(pos);
         grid = tile.getGrid();
@@ -65,11 +76,17 @@ public class ContainerMonitor extends ContainerBase {
     }
 
     public void sendNewPointsToServer() {
-        if (renderStart == null || renderEnd == null)
-            return;
         final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte(SEND_RENDER_POINTS);
         renderStart.writeNetwork(buffer);
         renderEnd.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(getPlayer(), buffer);
+    }
+
+    public void sendInteractionEnable() {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte(SEND_INTERACTION_ENABLE);
+        buffer.putBoolean(enableInteraction);
         OpenSignalsMain.network.sendTo(getPlayer(), buffer);
     }
 

@@ -150,6 +150,7 @@ public final class MonitorNetworkHandler implements IChunkLoadable {
         buffer.putBlockPos(tile.getLinkedSignalBox());
         buffer.putInt(tile.getMonitorSizeX());
         buffer.putInt(tile.getMonitorSizeY());
+        buffer.putBoolean(tile.isEnableInteraction());
         tile.getRenderStart().writeNetwork(buffer);
         tile.getRenderEnd().writeNetwork(buffer);
         list.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));

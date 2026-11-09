@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.ContainerBase;
+import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -49,9 +50,14 @@ public class GuiMonitor extends GuiBase {
 
         final UIEntity upperEntity = new UIEntity();
         upperEntity.setInheritWidth(true);
-        upperEntity.setHeight(30);
+        upperEntity.setHeight(40);
         upperEntity.add(new UIBox(UIBox.HBOX, 5));
         list.add(upperEntity);
+
+        final UIEntity topLeftEntity = new UIEntity();
+        topLeftEntity.setInherits(true);
+        topLeftEntity.add(new UIBox(UIBox.VBOX, 10));
+        upperEntity.add(topLeftEntity);
 
         final UIEntity boxEntity = box.entity;
 
@@ -60,7 +66,12 @@ public class GuiMonitor extends GuiBase {
 
         boxEntity.add(mouseUpdate);
 
-        upperEntity.add(GuiElements.createLabel(I18Wrapper.format("tile.monitor.name")));
+        topLeftEntity.add(GuiElements.createLabel(I18Wrapper.format("tile.monitor.name")));
+        topLeftEntity
+                .add(GuiElements.createBoolElement(BoolIntegerables.of("enable_interaction"), i -> {
+                    container.enableInteraction = i == 1 ? true : false;
+                    container.sendInteractionEnable();
+                }, container.enableInteraction ? 1 : 0));
         upperEntity.add(
                 GuiElements.createButton(I18Wrapper.format("gui.monitor.new_section"), 70, e -> {
                     box.rendering.clearColoredPoints();
