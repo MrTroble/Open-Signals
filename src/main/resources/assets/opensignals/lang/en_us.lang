@@ -373,6 +373,8 @@ gui.monitor.y_size=Height
 gui.monitor.new_section=New Section
 gui.monitor.current_ratio=Current Ratio
 gui.monitor.monitor_ratio=Monitor Ratio
+property.enable_interaction.name=Enable interaction
+property.enable_interaction.desc=If this option is activated, you can interact with the monitor. Otherwise, the monitor is only for display purposes.
 
 # SignalReaderUI
 gui.signalreader.and=AND

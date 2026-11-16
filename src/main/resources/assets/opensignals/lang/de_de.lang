@@ -373,6 +373,8 @@ gui.monitor.y_size=Höhe
 gui.monitor.new_section=Neue Auswahl
 gui.monitor.current_ratio=Aktuelle Auflösung
 gui.monitor.monitor_ratio=Monitor Auflösung
+property.enable_interaction.name=Interaktion aktivieren
+property.enable_interaction.desc=Wenn diese Option aktiviert ist, kannst du mit dem Monitor interagieren. Andernfalls dient der Monitor nur zu Anzeigezwecken.
 
 # SignalReaderUI
 gui.signalreader.and=UND
