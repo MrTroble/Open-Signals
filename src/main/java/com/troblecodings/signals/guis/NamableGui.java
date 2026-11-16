@@ -79,10 +79,10 @@ public class NamableGui extends GuiBase {
                 container.tile.getWorld().getBlockState(container.tile.getPos()).getBlock();
         if (block instanceof RedstoneInput) {
             addDelayEntityFor(inner, NamableContainerNetwork.BLOCKING_TIME,
-                    I18Wrapper.format("gui.namable.blocking_delay"), container.blockingDelay);
+                    I18Wrapper.format("gui.nameable.blocking_delay"), container.blockingDelay);
             if (block instanceof CombinedRedstoneInput) {
                 addDelayEntityFor(inner, NamableContainerNetwork.RESET_TIME,
-                        I18Wrapper.format("gui.namable.reset_delay"), container.resetDelay);
+                        I18Wrapper.format("gui.nameable.reset_delay"), container.resetDelay);
             }
         }
 
