@@ -590,4 +590,7 @@ public class SignalBoxNode implements INetworkSaveable, ISaveable, Iterable<Mode
         return ImmutableMap.copyOf(possibleModes);
     }
 
+    public void removeLinkedPos(final BlockPos pos) {
+        possibleModes.values().forEach(entry -> entry.removeLinkedPos(pos));
+    }
 }
