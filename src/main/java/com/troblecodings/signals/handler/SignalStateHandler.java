@@ -143,6 +143,13 @@ public final class SignalStateHandler implements INetworkSync {
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
         if (!info.isValid() || info.worldNullOrClientSide())
             return;
+        if (listener == null) {
+            OpenSignalsMain.getLogger().error(
+                    "Tried to add a SignalStateListener which is null for " + info + "! Log:");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println("        " + e);
+            }
+        }
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners =
                     ALL_LISTENERS.computeIfAbsent(info, _u -> new ArrayList<>());
