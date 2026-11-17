@@ -143,6 +143,14 @@ public final class SignalStateHandler implements INetworkSync {
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
         if (!info.isValid() || info.worldNullOrClientSide())
             return;
+        if (listener == null) {
+            OpenSignalsMain.getLogger().error(
+                    "Tried to add a SignalStateListener which is null for " + info + "! Log:");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println("        " + e);
+            }
+            return;
+        }
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners =
                     ALL_LISTENERS.computeIfAbsent(info, _u -> new ArrayList<>());
@@ -176,9 +184,9 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
-            listeners = ALL_LISTENERS.get(info);
+            listeners = ImmutableList.copyOf(ALL_LISTENERS.getOrDefault(info, new ArrayList<>()));
         }
-        if (listeners == null)
+        if (listeners.isEmpty())
             return;
         info.world.getMinecraftServer().addScheduledTask(() -> listeners
                 .forEach(listener -> listener.update(info, changedProperties, changedState)));

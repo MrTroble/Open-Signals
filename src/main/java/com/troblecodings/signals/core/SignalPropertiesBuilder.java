@@ -38,9 +38,9 @@ public class SignalPropertiesBuilder {
     private float offsetY = 0;
     private float signScale = 1;
     private Map<String, Boolean> doubleSidedText;
-    private int textColor = 0;
+    private String textColor = "0";
     private boolean canLink = true;
-    private List<Integer> colors;
+    private List<String> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
     private Map<String, String> remoteRedstoneOutputs;

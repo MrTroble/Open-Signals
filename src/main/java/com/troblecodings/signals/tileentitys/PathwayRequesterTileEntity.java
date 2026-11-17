@@ -11,6 +11,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
+import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
@@ -25,8 +26,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
-    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
-            new Point(-1, -1));
+    private Map.Entry<Point, Point> pathway =
+            Maps.immutableEntry(new Point(-1, -1), new Point(-1, -1));
     private boolean addPWToSaver = true;
 
     private static final String LINKED_SIGNALBOX = "linkedSignalBox";
@@ -64,11 +65,17 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     public void requestPathway() {
         loadChunkAndGetTile(SignalBoxTileEntity.class, world, linkedSignalBox, (tile, _u) -> {
             final SignalBoxGrid grid = tile.getSignalBoxGrid();
-            final PathType type = SignalBoxUtil.getPathTypeFrom(grid.getNode(pathway.getKey()),
-                    grid.getNode(pathway.getValue()));
+            final SignalBoxNode startNode = grid.getNode(pathway.getKey());
+            final SignalBoxNode endNode = grid.getNode(pathway.getValue());
+            if (startNode == null || endNode == null) {
+                OpenSignalsMain.getLogger().error("Points in PW Requester on [" + getPos()
+                        + "] aren't in grid. PW Request not possible, please check!");
+                return;
+            }
+            final PathType type = SignalBoxUtil.getPathTypeFrom(startNode, endNode);
             if (!type.equals(PathType.NONE)) {
-                final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
-                        pathway.getValue(), type);
+                final PathwayRequestResult result =
+                        grid.requestWay(pathway.getKey(), pathway.getValue(), type);
                 if (result.canBeAddedToSaver(type) && addPWToSaver) {
                     grid.addNextPathway(pathway.getKey(), pathway.getValue(), type);
                 }
