@@ -149,6 +149,7 @@ public final class SignalStateHandler implements INetworkSync {
             for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
                 System.out.println("        " + e);
             }
+            return;
         }
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners =
