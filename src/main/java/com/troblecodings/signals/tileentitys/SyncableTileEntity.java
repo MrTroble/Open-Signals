@@ -7,6 +7,7 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.core.TileEntityInfo;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -25,6 +26,13 @@ public class SyncableTileEntity extends BasicBlockEntity {
         return wrapper.tag;
     }
 
+    // TODO: FIX
+    @Override
+    public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
+        handleUpdateTag(pkt.getNbtCompound());
+    }
+
+    @Override
     public void syncClient() {
         syncClient(getLevel(), getBlockPos());
     }

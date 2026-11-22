@@ -53,6 +53,7 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.network.SignalBoxNetworkHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
+import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
@@ -72,15 +73,40 @@ public class GuiSignalBox extends GuiBase {
     public static final int OUTPUT_COLOR = 0xffff00;
     public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
             ConfigHandler.CLIENT.signalboxTrainnumberBackgroundColor.get();
+    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.signalboxTrainnumberBackgroundColor;
 
-    public static final ResourceLocation REDSTONE_OFF =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
+    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on_blocked.png");
+
+    private static final float[] ALL_LINES = getLines();
+    protected static final int TILE_WIDTH = 10;
+    protected static final int TILE_COUNT = 100;
+
+    private static float[] getLines() {
+        final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
+        final float step = 1.0f / TILE_COUNT;
+        for (int i = 0; i <= TILE_COUNT; i++) {
+            final int offset = i * 4;
+            final float pos = i * step;
+            lines[offset] = pos;
+            lines[offset + 1] = 0;
+            lines[offset + 2] = pos;
+            lines[offset + 3] = 1;
+
+            final int offset2 = (i + TILE_COUNT + 1) * 4;
+            lines[offset2] = 0;
+            lines[offset2 + 1] = pos;
+            lines[offset2 + 2] = 1;
+            lines[offset2 + 3] = pos;
+        }
+        return lines;
+    }
 
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
@@ -209,6 +235,18 @@ public class GuiSignalBox extends GuiBase {
         network.sendSubsidiary(new ModeIdentifier(holder.point, holder.modeSet), state, false);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(null);
+
+        // TODO: FIX
+        this.resetTileSelection();
+
+        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                new ModeIdentifier(holder.point, holder.modeSet), pos,
+                SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
+        final List<MainSignalIdentifier> greenSignals = container.greenSignals
+                .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
+        greenSignals.remove(identifier);
+        updateSignals(ImmutableList.of(holder.point));
+    }
 
         container.grid.getNodeChecked(holder.point).ifPresent(node -> {
             container.updateClientSubsidiary(node, holder.modeSet, state, false);
@@ -350,8 +388,7 @@ public class GuiSignalBox extends GuiBase {
         nameEntity.setHeight(20);
         nameEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity labelEntity =
-                GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
+        final UIEntity labelEntity = GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
         labelEntity.setInheritWidth(false);
         labelEntity.setWidth(100);
         nameEntity.add(labelEntity);
@@ -463,7 +500,11 @@ public class GuiSignalBox extends GuiBase {
             icon.add(new UIToolTip(I18Wrapper.format("type." + t.name())));
             layout.add(icon);
 
-            layout.add(GuiElements.createButton(name));
+            UIEntity btn = GuiElements.createButton(name, e -> {
+                ClientRenderUpdate.INSTANCE.addHighlight(p);
+            });
+            btn.add(new UIToolTip(I18Wrapper.format("sb.highlight")));
+            layout.add(btn);
             layout.add(GuiElements.createButton("x", 20, e -> {
                 network.sendRemovePos(p);
                 list.remove(layout);
@@ -535,8 +576,7 @@ public class GuiSignalBox extends GuiBase {
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo =
-                    GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
+            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -589,8 +629,7 @@ public class GuiSignalBox extends GuiBase {
                 this::initializePageSettings));
         header.add(
                 GuiElements.createButton(I18Wrapper.format("btn.edit"), this::initializeFieldEdit));
-        mainButton =
-                GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
+        mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 

@@ -123,4 +123,11 @@ public final class ConfigHandler {
 
     }
 
+    @Name("highlight duration")
+    @Comment("Change the duration of the highlight. Default: 10 (seconds)")
+    public static int highlightDuration = 10;
+
+    @Name("Debug Mode")
+    @Comment("Toggle debug mode.")
+    public static boolean debugMode = false;
 }
