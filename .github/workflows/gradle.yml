@@ -1,5 +1,6 @@
 name: Build & Publish Mod
 
+<<<<<<< HEAD
 on:
   push:
     branches:
@@ -8,6 +9,9 @@ on:
   pull_request:
     branches:
       - "*-master"
+=======
+on: [push, pull_request]
+>>>>>>> b6dadcda (Merge branch '1.12-master' into linkedSignalHighlight)
 
 permissions:
   contents: read

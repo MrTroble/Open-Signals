@@ -140,6 +140,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(getPos(), 1, getUpdateTag());
+    }
+
+    @Override
     public void saveWrapper(final NBTWrapper wrapper) {
         if (linkedSignalPosition == null || linkedSignal == null)
             return;
@@ -288,6 +293,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
             onLoad();
+            this.syncClient();
             return true;
         }
         if (block instanceof RedstoneInput) {
@@ -307,6 +313,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         linkedSignal = null;
         allStates.clear();
         enabledStates.clear();
+        this.syncClient();
         return true;
     }
 

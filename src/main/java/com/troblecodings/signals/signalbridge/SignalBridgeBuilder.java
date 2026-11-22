@@ -177,6 +177,10 @@ public class SignalBridgeBuilder {
             final NBTWrapper tag = new NBTWrapper();
             vec.write(tag);
             tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getPath());
+
+            // TODO: FIX
+            tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getResourcePath());
+
             tag.putString(CUSTOMNAME, entry.getKey());
             signalList.add(tag);
         });
