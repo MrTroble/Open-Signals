@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -58,7 +59,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
-    private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
+    private static final ThreadPoolExecutor THREAD_SERVICE =
+            (ThreadPoolExecutor) Executors.newCachedThreadPool();
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES =
             new HashMap<>();
     private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
@@ -102,6 +104,8 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         updateListeners(info, states, ChangedState.ADDED_TO_FILE);
+        System.out.println("Calling ThreadService in SignalStateHandler! Count: "
+                + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -184,6 +188,13 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
+            final List<SignalStateListener> l = ALL_LISTENERS.getOrDefault(info, new ArrayList<>());
+            for (final SignalStateListener li : l) {
+                if (li == null) {
+                    System.out.println(
+                            "A Listener for " + info + " is null! This shouldn't be the case!");
+                }
+            }
             listeners = ImmutableList.copyOf(ALL_LISTENERS.getOrDefault(info, new ArrayList<>()));
         }
         if (listeners.isEmpty())
@@ -276,6 +287,8 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
+        System.out.println("Calling ThreadService in SignalStateHandler! Count: "
+                + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
             sendToAll(info, changedProperties, ChangedState.UPDATED);
             info.world.getMinecraftServer()
@@ -559,6 +572,8 @@ public final class SignalStateHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (signals == null || signals.isEmpty())
             return;
+        System.out.println("Calling ThreadService in SignalStateHandler! Count: "
+                + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 boolean isLoaded = false;
