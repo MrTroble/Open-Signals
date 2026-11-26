@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,7 @@ public final class SignalStateHandler implements INetworkSync {
         System.out.println("Calling ThreadService in SignalStateHandler! Count: "
                 + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
+            final long start = Calendar.getInstance().getTimeInMillis();
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
             synchronized (SIGNAL_COUNTER) {
@@ -114,6 +116,8 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states, ChangedState.UPDATED);
             createToFile(info, states);
+            final long end = Calendar.getInstance().getTimeInMillis();
+            System.out.println("Took " + (end - start) + "s to execute in createStates!");
         });
     }
 
@@ -290,12 +294,15 @@ public final class SignalStateHandler implements INetworkSync {
         System.out.println("Calling ThreadService in SignalStateHandler! Count: "
                 + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
+            final long start = Calendar.getInstance().getTimeInMillis();
             sendToAll(info, changedProperties, ChangedState.UPDATED);
             info.world.getMinecraftServer()
                     .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
             if (!contains.get()) {
                 createToFile(info, changedProperties);
             }
+            final long end = Calendar.getInstance().getTimeInMillis();
+            System.out.println("Took " + (end - start) + "s to execute in setStates!");
         });
         info.world.getMinecraftServer().addScheduledTask(
                 () -> info.world.notifyNeighborsOfStateChange(info.pos, info.signal, true));
@@ -575,6 +582,7 @@ public final class SignalStateHandler implements INetworkSync {
         System.out.println("Calling ThreadService in SignalStateHandler! Count: "
                 + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
+            final long start = Calendar.getInstance().getTimeInMillis();
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
@@ -607,6 +615,8 @@ public final class SignalStateHandler implements INetworkSync {
                             ChangedState.ADDED_TO_CACHE));
                 }
             });
+            final long end = Calendar.getInstance().getTimeInMillis();
+            System.out.println("Took " + (end - start) + "s to execute in loadSignals!");
         });
     }
 
