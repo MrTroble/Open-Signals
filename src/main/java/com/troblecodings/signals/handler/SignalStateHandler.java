@@ -6,12 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -58,7 +60,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
-    private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
+    private static final ThreadPoolExecutor THREAD_SERVICE =
+            (ThreadPoolExecutor) Executors.newCachedThreadPool();
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES =
             new HashMap<>();
     private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
@@ -102,7 +105,10 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         updateListeners(info, states, ChangedState.ADDED_TO_FILE);
+        System.out.println("Calling ThreadService in SignalStateHandler! Count: "
+                + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
+            final long start = Calendar.getInstance().getTimeInMillis();
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
             synchronized (SIGNAL_COUNTER) {
@@ -110,6 +116,8 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states, ChangedState.UPDATED);
             createToFile(info, states);
+            final long end = Calendar.getInstance().getTimeInMillis();
+            System.out.println("Took " + (end - start) + "s to execute in createStates!");
         });
     }
 
@@ -143,6 +151,14 @@ public final class SignalStateHandler implements INetworkSync {
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
         if (!info.isValid() || info.worldNullOrClientSide())
             return;
+        if (listener == null) {
+            OpenSignalsMain.getLogger().error(
+                    "Tried to add a SignalStateListener which is null for " + info + "! Log:");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println("        " + e);
+            }
+            return;
+        }
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners =
                     ALL_LISTENERS.computeIfAbsent(info, _u -> new ArrayList<>());
@@ -176,9 +192,16 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
-            listeners = ALL_LISTENERS.get(info);
+            final List<SignalStateListener> l = ALL_LISTENERS.getOrDefault(info, new ArrayList<>());
+            for (final SignalStateListener li : l) {
+                if (li == null) {
+                    System.out.println(
+                            "A Listener for " + info + " is null! This shouldn't be the case!");
+                }
+            }
+            listeners = ImmutableList.copyOf(ALL_LISTENERS.getOrDefault(info, new ArrayList<>()));
         }
-        if (listeners == null)
+        if (listeners.isEmpty())
             return;
         info.world.getMinecraftServer().addScheduledTask(() -> listeners
                 .forEach(listener -> listener.update(info, changedProperties, changedState)));
@@ -268,13 +291,18 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
+        System.out.println("Calling ThreadService in SignalStateHandler! Count: "
+                + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
+            final long start = Calendar.getInstance().getTimeInMillis();
             sendToAll(info, changedProperties, ChangedState.UPDATED);
             info.world.getMinecraftServer()
                     .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
             if (!contains.get()) {
                 createToFile(info, changedProperties);
             }
+            final long end = Calendar.getInstance().getTimeInMillis();
+            System.out.println("Took " + (end - start) + "s to execute in setStates!");
         });
         info.world.getMinecraftServer().addScheduledTask(
                 () -> info.world.notifyNeighborsOfStateChange(info.pos, info.signal, true));
@@ -551,7 +579,10 @@ public final class SignalStateHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (signals == null || signals.isEmpty())
             return;
+        System.out.println("Calling ThreadService in SignalStateHandler! Count: "
+                + THREAD_SERVICE.getPoolSize());
         THREAD_SERVICE.execute(() -> {
+            final long start = Calendar.getInstance().getTimeInMillis();
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
@@ -584,6 +615,8 @@ public final class SignalStateHandler implements INetworkSync {
                             ChangedState.ADDED_TO_CACHE));
                 }
             });
+            final long end = Calendar.getInstance().getTimeInMillis();
+            System.out.println("Took " + (end - start) + "s to execute in loadSignals!");
         });
     }
 

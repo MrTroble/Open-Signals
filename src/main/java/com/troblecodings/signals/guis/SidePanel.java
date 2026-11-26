@@ -29,7 +29,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -37,30 +36,21 @@ import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.SignalBoxIcons;
+import com.troblecodings.signals.enums.SignalBoxIcons.SignalBoxSymbols;
 import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class SidePanel {
-
-    public static final ResourceLocation COUNTER_TEXTURE =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/counter.png");
-    public static final ResourceLocation REDSTONE =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone.png");
-    public static final ResourceLocation SAVE =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/save.png");
-    public static final ResourceLocation EMERGENCY =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/emergency.png");
 
     private boolean showHelpPage = true;
     private final UIEntity helpPage = new UIEntity();
@@ -124,7 +114,6 @@ public class SidePanel {
             spacerEntity.setWidth(85);
             helpPage.clearChildren();
             helpPage.add(infoEntity);
-            lowerEntity.update();
         } else {
             helpPageButton.setText("<-");
             helpPage.clearChildren();
@@ -132,8 +121,8 @@ public class SidePanel {
             helpPage.add(getIcons());
             helpPage.add(label);
             spacerEntity.setWidth(20);
-            lowerEntity.update();
         }
+        lowerEntity.update();
         infoEntity.forEach(entity -> entity.setVisible(showHelpPage));
         label.setVisible(true);
         button.setVisible(true);
@@ -143,6 +132,8 @@ public class SidePanel {
 
     private UIEntity getIcons() {
         final SignalBoxPage page = gui.getPage();
+        SignalBoxIcons icons = SignalBoxIcons.SYMBOLS;
+        int iconId;
         if (page.equals(SignalBoxPage.EDITOR))
             return GuiElements.createSpacerV(25);
         final UIEntity list = new UIEntity();
@@ -153,25 +144,31 @@ public class SidePanel {
         list.add(new UIBox(UIBox.VBOX, 2).setPageable(false));
 
         final UIEntity emergencyEntity = new UIEntity();
+        iconId = SignalBoxSymbols.EMERGENCY.ordinal();
         emergencyEntity.setHeight(20);
         emergencyEntity.setWidth(20);
-        emergencyEntity.add(new UITexture(EMERGENCY));
-        emergencyEntity.add(new UIClickable(e -> gui.network.sendResetAllSignals()));
+        emergencyEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
+        emergencyEntity.add(new UIClickable(e -> gui.container.network.sendResetAllSignals()));
         emergencyEntity.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
         list.add(emergencyEntity);
 
         final UIEntity rsOutputEntity = new UIEntity();
+        iconId = SignalBoxSymbols.REDSTONE.ordinal();
         rsOutputEntity.setHeight(20);
         rsOutputEntity.setWidth(20);
-        rsOutputEntity.add(new UITexture(REDSTONE));
+        rsOutputEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
         rsOutputEntity.add(new UIClickable(e -> addManuellRStoUI()));
         rsOutputEntity.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
         list.add(rsOutputEntity);
 
         final UIEntity savedPathsEntity = new UIEntity();
+        iconId = SignalBoxSymbols.SAVE.ordinal();
         savedPathsEntity.setHeight(20);
         savedPathsEntity.setWidth(20);
-        savedPathsEntity.add(new UITexture(SAVE));
+        savedPathsEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
         savedPathsEntity.add(new UIClickable(e -> addSavedPathsToUI()));
         savedPathsEntity.add(new UIToolTip(I18Wrapper.format("info.usage.savedpathways.desc")));
         list.add(savedPathsEntity);
@@ -189,17 +186,25 @@ public class SidePanel {
     }
 
     private static void drawMenuFromEnum(final DrawInfo info, final EnumGuiMode modes,
-            final int rotation, final float scale) {
+            final int rotation, final float scale, final UISignalBoxProfile profile) {
         info.push();
         info.scale(scale, scale, 1.0f);
         info.translate(UISignalBoxRendering.HALF_TILE, UISignalBoxRendering.HALF_TILE, 0);
         info.rotate(0, 0, (float) (rotation * Math.toRadians(UIRotate.PERPENDICULAR_ANGLE)));
         info.translate(-UISignalBoxRendering.HALF_TILE, -UISignalBoxRendering.HALF_TILE, 0);
-        modes.consumer.apply(SignalState.RED).accept(info, modes.getDefaultColor());
+        modes.consumer.apply(SignalState.RED, profile.getTextureSettings()).accept(info,
+                getColorForMode(modes, profile));
         info.pop();
     }
 
-    public static UIComponent fromEnum(final int selection, final int rotation, final float scale) {
+    private static int getColorForMode(final EnumGuiMode mode, final UISignalBoxProfile profile) {
+        if (mode == EnumGuiMode.TRAIN_NUMBER)
+            return profile.getOperationModeSettings().getTrainnumberBackgroundColor();
+        return EnumPathUsage.FREE.getColor(profile.getOperationModeSettings());
+    }
+
+    public static UIComponent fromEnum(final int selection, final int rotation, final float scale,
+            final UISignalBoxProfile profile) {
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         return new UIComponent() {
 
@@ -207,7 +212,7 @@ public class SidePanel {
             public void draw(final DrawInfo info) {
                 if (this.parent == null)
                     return;
-                drawMenuFromEnum(info, modes, rotation, scale);
+                drawMenuFromEnum(info, modes, rotation, scale, profile);
             }
         };
     }
@@ -222,11 +227,12 @@ public class SidePanel {
         preview.setWidth(60);
         preview.setHeight(60);
         preview.setX(7);
-        preview.add(new UIColor(0xFFAFAFAF));
+        preview.add(
+                new UIColor(gui.profile.getEditorModeSettings().getModePreviewBackgroundColor()));
         preview.add(new UIBorder(preview.getBasicTextColor()));
         preview.add(new UIScissor());
 
-        final UIComponent sbt = fromEnum(selection, rotation, 4.6f);
+        final UIComponent sbt = fromEnum(selection, rotation, 4.6f, gui.profile);
 
         final UIEntity sbtEntity = new UIEntity();
         sbtEntity.setWidth(50);
@@ -261,7 +267,8 @@ public class SidePanel {
 
     public void helpUsageMode(final SignalBoxNode node) {
         infoEntity.clearChildren();
-
+        SignalBoxIcons icons = SignalBoxIcons.SYMBOLS;
+        int iconId;
         final UIEntity helpScroll = new UIEntity();
         helpScroll.setInherits(true);
         helpScroll.add(new UIBox(UIBox.HBOX, 0));
@@ -290,13 +297,15 @@ public class SidePanel {
 
         final UIEntity shButton =
                 GuiElements.createButton("     " + I18Wrapper.format("info.usage.emergency"),
-                        e -> gui.network.sendResetAllSignals());
+                        e -> gui.container.network.sendResetAllSignals());
         shButton.add(new UIToolTip(I18Wrapper.format("info.usage.emergency.desc")));
 
         final UIEntity emergencyEntity = new UIEntity();
+        iconId = SignalBoxSymbols.EMERGENCY.ordinal();
         emergencyEntity.setHeight(20);
         emergencyEntity.setWidth(20);
-        emergencyEntity.add(new UITexture(EMERGENCY));
+        emergencyEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
         shButton.add(emergencyEntity);
 
         shButton.setScale(0.95f);
@@ -306,9 +315,11 @@ public class SidePanel {
                 "     " + I18Wrapper.format("info.usage.manuel"), e -> addManuellRStoUI());
 
         final UIEntity rsOutputEntity = new UIEntity();
+        iconId = SignalBoxSymbols.REDSTONE.ordinal();
         rsOutputEntity.setHeight(20);
         rsOutputEntity.setWidth(20);
-        rsOutputEntity.add(new UITexture(REDSTONE));
+        rsOutputEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
         manuelButton.add(rsOutputEntity);
         manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
 
@@ -320,9 +331,11 @@ public class SidePanel {
                         e -> addSavedPathsToUI());
 
         final UIEntity savedPathsEntity = new UIEntity();
+        iconId = SignalBoxSymbols.SAVE.ordinal();
         savedPathsEntity.setHeight(20);
         savedPathsEntity.setWidth(20);
-        savedPathsEntity.add(new UITexture(SAVE));
+        savedPathsEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
         savedPathways.add(savedPathsEntity);
         savedPathways.add(new UIToolTip(I18Wrapper.format("info.usage.savedpathways.desc")));
 
@@ -330,12 +343,14 @@ public class SidePanel {
         helpList.add(savedPathways);
 
         final UIEntity counterButton = new UIEntity();
+        iconId = SignalBoxSymbols.COUNTER.ordinal();
         counterButton.setHeight(20);
         counterButton.setInheritWidth(true);
         ;
         counterButton.setScale(0.95f);
 
-        counterButton.add(new UITexture(COUNTER_TEXTURE));
+        counterButton.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId), 0,
+                icons.getMX(iconId), 1));
         final UIEntity labelEntity = GuiElements.createLabel(
                 String.format("%04d", gui.container.grid.getCurrentCounter()), 0xFFFFFFFF);
         labelEntity.setX(46);
@@ -392,7 +407,7 @@ public class SidePanel {
                             final UIEntity buttonYes =
                                     GuiElements.createButton(I18Wrapper.format("btn.yes"), e1 -> {
                                         gui.pop();
-                                        gui.network.sendResetPathway(node.getPoint());
+                                        gui.container.network.sendResetPathway(node.getPoint());
                                     });
                             final UIEntity buttonNo = GuiElements
                                     .createButton(I18Wrapper.format("btn.no"), e2 -> gui.pop());
@@ -456,7 +471,7 @@ public class SidePanel {
                                                     node.updateState(mode, SignalState.RED);
                                                     subsidiaries.remove(signalPos);
                                                 }
-                                                gui.network.sendSubsidiary(
+                                                gui.container.network.sendSubsidiary(
                                                         new ModeIdentifier(node.getPoint(), mode),
                                                         state, enable);
                                                 gui.container.updateClientSubsidiary(node, mode,
@@ -502,7 +517,7 @@ public class SidePanel {
                                         final UIEntity info = new UIEntity();
                                         info.setInherits(true);
                                         info.add(new UIBox(UIBox.VBOX, 5));
-                                        info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                                        info.add(new UIColor(gui.profile.getBackgroundColor()));
                                         info.add(new UIClickable(_u -> gui.pop(), 1));
                                         info.add(statusEntity);
                                         final UIEntity textureEntity = new UIEntity();
@@ -513,20 +528,22 @@ public class SidePanel {
                                                 I18Wrapper.format("info.usage.rs.desc")));
                                         if (canBeManuelChanged) {
                                             if (node.containsManuellOutput(mode)) {
-                                                textureEntity.add(
-                                                        new UITexture(GuiSignalBox.REDSTONE_ON));
+                                                textureEntity.add(new UITexture(
+                                                        icons.getResourceLocation(), icons.getX(9),
+                                                        0, icons.getMX(9), 1));
                                             } else {
-                                                textureEntity.add(
-                                                        new UITexture(GuiSignalBox.REDSTONE_OFF));
+                                                textureEntity.add(new UITexture(
+                                                        icons.getResourceLocation(), icons.getX(7),
+                                                        0, icons.getMX(7), 1));
                                             }
+                                        } else if (!usage.equals(EnumPathUsage.FREE)) {
+                                            textureEntity
+                                                    .add(new UITexture(icons.getResourceLocation(),
+                                                            icons.getX(10), 0, icons.getMX(10), 1));
                                         } else {
-                                            if (!usage.equals(EnumPathUsage.FREE)) {
-                                                textureEntity.add(new UITexture(
-                                                        GuiSignalBox.REDSTONE_ON_BLOCKED));
-                                            } else {
-                                                textureEntity.add(new UITexture(
-                                                        GuiSignalBox.REDSTONE_OFF_BLOCKED));
-                                            }
+                                            textureEntity
+                                                    .add(new UITexture(icons.getResourceLocation(),
+                                                            icons.getX(8), 0, icons.getMX(8), 1));
                                         }
                                         info.add(textureEntity);
                                         final UILabel outputStatus =
@@ -557,18 +574,26 @@ public class SidePanel {
                                                             outputStatus.setText(I18Wrapper
                                                                     .format("info.usage.rs.false"));
                                                             textureEntity.add(new UITexture(
-                                                                    GuiSignalBox.REDSTONE_OFF));
+                                                                    icons.getResourceLocation(),
+                                                                    icons.getX(7), 0,
+                                                                    icons.getMX(7), 1));
                                                         } else {
                                                             node.addManuellOutput(mode);
                                                             outputStatus.setText(I18Wrapper
                                                                     .format("info.usage.rs.true"));
                                                             textureEntity.add(new UITexture(
-                                                                    GuiSignalBox.REDSTONE_ON));
+                                                                    icons.getResourceLocation(),
+                                                                    icons.getX(9), 0,
+                                                                    icons.getMX(9), 1));
                                                         }
                                                         gui.rendering.setColor(node.getPoint(),
                                                                 mode,
-                                                                !turnOff ? GuiSignalBox.OUTPUT_COLOR
-                                                                        : SignalBoxUtil.FREE_COLOR);
+                                                                !turnOff ? gui.profile
+                                                                        .getOperationModeSettings()
+                                                                        .getOutputColor()
+                                                                        : gui.profile
+                                                                                .getOperationModeSettings()
+                                                                                .getFreeColor());
                                                     }));
                                         }
                                         gui.pop();
@@ -611,7 +636,7 @@ public class SidePanel {
                             lowerEntity.add(GuiElements.createSpacerH(7));
                             final UIEntity save =
                                     GuiElements.createButton(I18Wrapper.format("btn.save"), e1 -> {
-                                        gui.network.updateTrainNumber(node.getPoint(),
+                                        gui.container.network.updateTrainNumber(node.getPoint(),
                                                 new TrainNumber(input.getText()));
                                         input.setText("");
                                         gui.pop();
@@ -619,7 +644,8 @@ public class SidePanel {
                             save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
                             lowerEntity.add(save);
                             final UIEntity remove = GuiElements.createButton("x", e1 -> {
-                                gui.network.updateTrainNumber(node.getPoint(), TrainNumber.DEFAULT);
+                                gui.container.network.updateTrainNumber(node.getPoint(),
+                                        TrainNumber.DEFAULT);
                                 gui.pop();
                             });
                             remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
@@ -753,26 +779,28 @@ public class SidePanel {
                     info.setInherits(true);
                     info.add(new UIBox(UIBox.VBOX, 5));
                     info.add(new UIClickable(_u -> gui.pop(), 1));
-                    info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    info.add(new UIColor(gui.profile.getBackgroundColor()));
                     info.add(statusEntity);
                     final UIEntity textureEntity = new UIEntity();
                     textureEntity.setHeight(40);
                     textureEntity.setWidth(40);
                     textureEntity.setX(120);
                     textureEntity.add(new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
+                    final SignalBoxIcons icons = SignalBoxIcons.SYMBOLS;
+                    int iconId;
                     if (canBeManuelChanged.get()) {
                         if (currentNode.containsManuellOutput(mode)) {
-                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
+                            iconId = SignalBoxSymbols.REDSTONE_ON.ordinal();
                         } else {
-                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
+                            iconId = SignalBoxSymbols.REDSTONE_OFF.ordinal();
                         }
+                    } else if (!pathUsage.equals(EnumPathUsage.FREE)) {
+                        iconId = SignalBoxSymbols.REDSTONE_ON_BLOCKED.ordinal();
                     } else {
-                        if (!pathUsage.equals(EnumPathUsage.FREE)) {
-                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON_BLOCKED));
-                        } else {
-                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF_BLOCKED));
-                        }
+                        iconId = SignalBoxSymbols.REDSTONE_OFF_BLOCKED.ordinal();
                     }
+                    textureEntity.add(new UITexture(icons.getResourceLocation(), icons.getX(iconId),
+                            0, icons.getMX(iconId), 1));
                     info.add(textureEntity);
                     final UILabel outputStatus =
                             new UILabel(((!pathUsage.equals(EnumPathUsage.FREE))
@@ -794,17 +822,18 @@ public class SidePanel {
                         final boolean turnOff = currentNode.containsManuellOutput(mode);
                         textureEntity.clear();
                         textureEntity.add(new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
+                        int iconsId;
                         if (turnOff) {
                             currentNode.removeManuellOutput(mode);
                             outputStatus.setText(I18Wrapper.format("info.usage.rs.false"));
-                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
+                            iconsId = SignalBoxSymbols.REDSTONE_OFF.ordinal();
                         } else {
                             currentNode.addManuellOutput(mode);
                             outputStatus.setText(I18Wrapper.format("info.usage.rs.true"));
-                            textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
+                            iconsId = SignalBoxSymbols.REDSTONE_ON.ordinal();
                         }
-                        gui.rendering.setColor(currentNode.getPoint(), mode,
-                                !turnOff ? GuiSignalBox.OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR);
+                        textureEntity.add(new UITexture(icons.getResourceLocation(),
+                                icons.getX(iconsId), 0, icons.getMX(iconsId), 1));
                     }));
                     gui.push(GuiElements.createScreen(entity -> entity.add(info)));
                 });
@@ -845,13 +874,13 @@ public class SidePanel {
                             gui.pop();
                             setShowHelpPage(false);
                             addColorToTile(entry.getKey(), entry.getValue(),
-                                    GuiSignalBox.SELECTION_COLOR);
+                                    gui.profile.getOperationModeSettings().getUserSelectionColor());
                             // TODO Maby other color?
                         }));
                 layout.add(GuiElements.createButton("x", 20, _u -> {
                     gui.container.nextPathways.remove(entry);
                     list.remove(layout);
-                    gui.network.sendRemoveSavedPathway(entry.getKey(), entry.getValue());
+                    gui.container.network.sendRemoveSavedPathway(entry.getKey(), entry.getValue());
                     gui.pop();
                 }));
                 list.add(layout);

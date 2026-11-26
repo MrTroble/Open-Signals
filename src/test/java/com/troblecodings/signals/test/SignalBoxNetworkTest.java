@@ -47,6 +47,7 @@ public class SignalBoxNetworkTest {
     public void initializeNewGridAndNetwork() {
         grid = new SignalBoxGrid(null);
         handler = new DebugNetworkHandler(grid);
+        handler.setUpNetworkReader(handler);
     }
 
     @Test

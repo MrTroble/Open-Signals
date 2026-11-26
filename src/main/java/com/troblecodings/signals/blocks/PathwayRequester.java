@@ -3,6 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.PathwayRequesterTileEntity;
 
@@ -22,6 +23,7 @@ import net.minecraft.world.World;
 
 public class PathwayRequester extends BasicBlock {
 
+    public static final TileEntitySupplierWrapper SUPPLIER = PathwayRequesterTileEntity::new;
     public static final PropertyBool POWERED = PropertyBool.create("powered");
 
     public PathwayRequester() {
@@ -37,8 +39,9 @@ public class PathwayRequester extends BasicBlock {
             if (state.getValue(POWERED) != true) {
                 worldIn.setBlockState(pos, state.withProperty(POWERED, true));
                 final TileEntity entity = worldIn.getTileEntity(pos);
-                if (entity instanceof PathwayRequesterTileEntity)
+                if (entity instanceof PathwayRequesterTileEntity) {
                     ((PathwayRequesterTileEntity) entity).requestPathway();
+                }
             }
         } else {
             worldIn.setBlockState(pos, state.withProperty(POWERED, false));
@@ -81,7 +84,7 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
-        return new PathwayRequesterTileEntity();
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+        return Optional.of(SUPPLIER);
     }
 }

@@ -1,21 +1,10 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = 'https://plugins.gradle.org/m2/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.+'
-        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
-        classpath "com.modrinth.minotaur:Minotaur:2.+"
-    }
+plugins {
+    id 'net.minecraftforge.gradle' version '6.0.+'
+    id 'com.gradleup.shadow' version '9.2.0+'
+    id 'eclipse'
+    id 'net.darkhax.curseforgegradle' version '1.3.+'
+    id 'com.modrinth.minotaur' version '2.+'
 }
-
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'com.matthewprenger.cursegradle'
-apply plugin: 'com.modrinth.minotaur'
 
 group = project.mod_group
 version = project.mod_version
@@ -69,6 +58,17 @@ test {
 }
 
 jar {
+    archiveClassifier.set("old")
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    configurations = []
+    relocate 'com.troblecodings.linkableapi', "${project.group}.signals.shadow.linkableapi"
+    relocate 'com.troblecodings.guilib', "${project.group}.signals.shadow.guilib"
+    relocate 'com.troblecodings.core', "${project.group}.signals.shadow.core"
+    relocate 'com.troblecodings.contentpacklib', "${project.group}.signals.shadow.contentpacklib"
+
     manifest {
         attributes([
             "Specification-Title": project.mod_name,
@@ -80,27 +80,32 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+
+    from("changelog.md")
+    from("LICENSE")
 }
 
-jar.finalizedBy('reobfJar')
+reobf {
+    shadowJar {}
+}
 
-def key = System.getenv("CURSETOKEN")
-if (key == null)
-    key = 'dev'
+def releaseJar = file("$buildDir/libs/${project.mod_name}-${project.minecraft_version}-${project.mod_version}.jar")
 
-curseforge {
-    apiKey = key 
+tasks.register("publishCurseforge", net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    dependsOn("reobfShadowJar")
 
-    project {
-        id = project.curseforge_project_id
+    def key = System.getenv("CURSETOKEN")
+    if (key == null)
+        key = 'dev'
+    apiToken = key
 
-        changelog = file("changelog.md")
-        changelogType = "markdown"
-
-        releaseType = "release"
-
-        addGameVersion project.minecraft_version
-    }
+    def mainFile = upload(project.curseforge_project_id, releaseJar)
+    mainFile.changelog = file("changelog.md").text
+    mainFile.changelogType = 'markdown'
+    mainFile.releaseType = 'release'
+    mainFile.addModLoader("${project.loader}")
+    mainFile.addEnvironment("Client", "Server")
+    mainFile.addGameVersion("${project.minecraft_version}")
 }
 
 modrinth {
@@ -111,14 +116,15 @@ modrinth {
     versionNumber = project.version
     versionName = "${project.mod_name} ${project.version}"
 
-    uploadFile = jar
+    uploadFile = releaseJar
 
     gameVersions = [project.minecraft_version]
-    loaders = [project.loader]
+    loaders = [project.loader.toLowerCase()]
 
     changelog = file("changelog.md").text
 }
 
-tasks.register("publishMods") {
-    dependsOn("curseforge", "modrinth")
+tasks.register("publishModrinth") {
+    dependsOn("reobfShadowJar")
+    dependsOn("modrinth")
 }

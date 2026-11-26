@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -14,6 +15,8 @@ import com.troblecodings.core.interfaces.INetworkSaveable;
 import com.troblecodings.core.interfaces.ISaveable;
 import com.troblecodings.signals.core.NetworkBufferWrappers;
 import com.troblecodings.signals.network.PathOptionEntryNetwork;
+
+import net.minecraft.util.math.BlockPos;
 
 public class PathOptionEntry implements INetworkSaveable, ISaveable {
 
@@ -132,19 +135,11 @@ public class PathOptionEntry implements INetworkSaveable, ISaveable {
                 WriteBuffer.getINetworkSaveableConsumer());
     }
 
-    public void writeUpdateNetwork(final WriteBuffer builder) {
-        int size = 0;
-        for (final PathEntryType<?> entry : pathEntrys.keySet()) {
-            if (entry.equals(PathEntryType.PATHUSAGE) || entry.equals(PathEntryType.TRAINNUMBER)) {
-                size++;
-            }
-        }
-        builder.putByte((byte) size);
-        pathEntrys.forEach((mode, entry) -> {
-            if (mode.equals(PathEntryType.PATHUSAGE) || mode.equals(PathEntryType.TRAINNUMBER)) {
-                builder.putByte((byte) mode.getID());
-                entry.writeNetwork(builder);
-            }
-        });
+    public void removeLinkedPos(final BlockPos pos) {
+        ImmutableMap.copyOf(pathEntrys).entrySet().stream()
+                .filter(entry -> entry.getKey().getEntryClass().equals(BlockposEntry.class)
+                        && entry.getValue().getValue().equals(pos))
+                .forEach(entry -> removeEntry(entry.getKey()));
     }
+
 }

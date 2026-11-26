@@ -39,7 +39,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     private BlockPos linkedSignalPosition = null;
     private Signal linkedSignal = null;
-    private int lastProfile = 0;
     private EnumMode lastState;
     private BlockPos linkedRSInput = null;
     private Byte profileRSInput = -1;
@@ -60,7 +59,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String PROFILE = "profile";
     private static final String PROPERITES = "properties";
     private static final String ALLSTATES = "allstates";
-    private static final String LAST_PROFILE = "lastprofile";
     private static final String ENUM_MODE = "enummode";
     private static final String LINKED_RS_INPUT = "linkedrsinput";
     private static final String RS_INPUT_PROFILE = "rsinputprofile";
@@ -77,14 +75,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (lastState == null)
             return EnumMode.MANUELL;
         return lastState;
-    }
-
-    public int getProfile() {
-        return lastProfile;
-    }
-
-    public void setProfile(final int profile) {
-        lastProfile = profile;
     }
 
     public void removePropertyFromProfile(final Byte profile, final SEProperty property) {
@@ -104,6 +94,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void updateRedstoneProfile(final Byte profile, final SEProperty property,
             final String value) {
         allStates.computeIfAbsent(profile, _u -> new HashMap<>()).put(property, value);
+    }
+
+    public void removeProfile(final Byte profile) {
+        allStates.remove(profile);
     }
 
     public void updateEnabledStates(final EnumFacing direction, final EnumState state,
@@ -146,7 +140,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             return;
         wrapper.putBlockPos(BLOCK_POS_ID, linkedSignalPosition);
         wrapper.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
-        wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null) {
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
         }
@@ -185,7 +178,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         linkedSignal = Signal.SIGNALS.get(wrapper.getString(SIGNAL_NAME));
         if (linkedSignalPosition == null || linkedSignal == null)
             return;
-        lastProfile = wrapper.getInteger(LAST_PROFILE);
         lastState = EnumMode.values()[wrapper.getInteger(ENUM_MODE)];
         for (final EnumFacing direction : EnumFacing.values()) {
             if (!wrapper.contains(direction.getName())) {
@@ -232,15 +224,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void onLoad() {
         if (!world.isRemote) {
             if (linkedSignalPosition != null && linkedSignal != null) {
-                final Block thisBlock = world.getBlockState(this.getLinkedPosition()).getBlock();
-                if (!thisBlock.equals(linkedSignal)) {
-                    OpenSignalsMain.getLogger()
-                            .error("Unlinked wrong signal data for [" + getPos() + "]! Linked Pos="
-                                    + getLinkedPos() + ", Saved block=" + linkedSignal
-                                    + ", Real block=" + thisBlock);
-                    unlink();
-                    return;
-                }
                 final SignalStateInfo info =
                         new SignalStateInfo(world, linkedSignalPosition, linkedSignal);
                 final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, pos));

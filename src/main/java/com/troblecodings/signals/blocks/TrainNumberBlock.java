@@ -3,6 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.TrainNumberTileEntity;
 
@@ -22,6 +23,7 @@ import net.minecraft.world.World;
 
 public class TrainNumberBlock extends BasicBlock {
 
+    public static final TileEntitySupplierWrapper SUPPLIER = TrainNumberTileEntity::new;
     public static final PropertyBool POWERED = PropertyBool.create("powered");
 
     public TrainNumberBlock() {
@@ -82,8 +84,8 @@ public class TrainNumberBlock extends BasicBlock {
     }
 
     @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
-        return new TrainNumberTileEntity();
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+        return Optional.of(SUPPLIER);
     }
 
 }
